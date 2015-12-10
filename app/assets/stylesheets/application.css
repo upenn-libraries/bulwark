@@ -12,4 +12,7 @@
  *
  *= require_tree .
  *= require_self
+
+ @import 'hydra-editor/multi_value_fields';
+
  */

@@ -5,9 +5,9 @@ class CatalogController < ApplicationController
 
   include Hydra::Catalog
   # These before_filters apply the hydra access controls
-  before_filter :enforce_show_permissions, :only=>:show
+  #before_filter :enforce_show_permissions, :only=>:show
   # This applies appropriate access controls to all solr queries
-  CatalogController.search_params_logic += [:add_access_controls_to_solr_params]
+  #CatalogController.search_params_logic += [:add_access_controls_to_solr_params]
 
 
   configure_blacklight do |config|
@@ -41,6 +41,7 @@ class CatalogController < ApplicationController
     #
     # :show may be set to false if you don't want the facet to be drawn in the
     # facet bar
+    config.add_facet_field solr_name('title', :facetable), :label => 'Title'
     config.add_facet_field solr_name('object_type', :facetable), :label => 'Format'
     config.add_facet_field solr_name('pub_date', :facetable), :label => 'Publication Year'
     config.add_facet_field solr_name('subject_topic', :facetable), :label => 'Topic', :limit => 20
@@ -72,6 +73,8 @@ class CatalogController < ApplicationController
     # solr fields to be displayed in the show (single result) view
     #   The ordering of the field names is the order of the display
     config.add_show_field solr_name('title', :stored_searchable, type: :string), :label => 'Title:'
+    config.add_show_field solr_name('origin', :stored_searchable, type: :string), :label => 'Origin:'
+    config.add_show_field solr_name('description', :stored_searchable, type: :string), :label => 'Description:'
     config.add_show_field solr_name('title_vern', :stored_searchable, type: :string), :label => 'Title:'
     config.add_show_field solr_name('subtitle', :stored_searchable, type: :string), :label => 'Subtitle:'
     config.add_show_field solr_name('subtitle_vern', :stored_searchable, type: :string), :label => 'Subtitle:'
