@@ -12,4 +12,9 @@ class Manuscript < ActiveFedora::Base
     index.as :stored_searchable
   end
 
+  def works_add(work)
+    binding.pry()
+    self.members.select(&:work?) << work
+  end
+
 end

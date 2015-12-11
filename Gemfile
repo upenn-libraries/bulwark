@@ -20,7 +20,7 @@ gem 'hydra-head', '9.1.4'
 gem 'blacklight'
 gem 'hydra-editor'
 gem 'hydra-role-management'
-gem 'hydra-works'
+gem 'hydra-works', '~> 0.1'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'

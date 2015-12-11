@@ -413,7 +413,7 @@ DEPENDENCIES
   hydra-editor
   hydra-head (= 9.1.4)
   hydra-role-management
-  hydra-works
+  hydra-works (~> 0.1)
   jbuilder (~> 2.0)
   jettywrapper
   jquery-rails
