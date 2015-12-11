@@ -1,4 +1,5 @@
 class Manuscript < ActiveFedora::Base
+  include Hydra::Works::WorkBehavior
   property :title, predicate: ::RDF::Vocab::DC.title, multiple: false do |index|
     index.as :stored_searchable, :facetable
   end

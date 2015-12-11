@@ -1,5 +1,5 @@
 class Page < ActiveFedora::Base
-
+  include Hydra::Works::FileSetBehavior
   contains "pageImage"
 
   property :number, predicate: ::RDF::URI.new('http://www.library.upenn.edu/hydra/pageNumber'), multiple: false do |index|
