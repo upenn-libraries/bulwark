@@ -129,19 +129,11 @@ GEM
       hydra-access-controls (= 9.1.4)
       jettywrapper (>= 2.0.0)
       rails (~> 4.0)
-    hydra-derivatives (3.0.0)
-      active-fedora (~> 9.0)
-      activesupport (~> 4.0)
-      deprecation
-      mime-types (< 3)
-      mini_magick (>= 3.2, < 5)
     hydra-editor (1.1.0)
       active-fedora (>= 9.0.0)
       cancancan (~> 1.8)
       rails (~> 4.1)
       simple_form (~> 3.1.0)
-    hydra-file_characterization (0.3.3)
-      activesupport (>= 3.0.0)
     hydra-head (9.1.4)
       hydra-access-controls (= 9.1.4)
       hydra-core (= 9.1.4)
@@ -154,10 +146,6 @@ GEM
       blacklight
       bootstrap_form
       cancancan
-    hydra-works (0.5.0)
-      hydra-derivatives (~> 3.0)
-      hydra-file_characterization (~> 0.3, >= 0.3.3)
-      hydra-pcdm (~> 0.3)
     i18n (0.7.0)
     jbuilder (2.3.2)
       activesupport (>= 3.0.0, < 5)
@@ -214,7 +202,6 @@ GEM
       mime-types (>= 1.16, < 3)
     method_source (0.8.2)
     mime-types (2.99)
-    mini_magick (4.3.6)
     mini_portile2 (2.0.0)
     minitest (5.8.3)
     multi_json (1.11.2)
@@ -412,8 +399,8 @@ DEPENDENCIES
   devise-guests (~> 0.3)
   hydra-editor
   hydra-head (= 9.1.4)
+  hydra-pcdm
   hydra-role-management
-  hydra-works (~> 0.1)
   jbuilder (~> 2.0)
   jettywrapper
   jquery-rails

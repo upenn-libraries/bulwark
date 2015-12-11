@@ -1,5 +1,4 @@
 class Manuscript < ActiveFedora::Base
-  include Hydra::Works::WorkBehavior
   property :title, predicate: ::RDF::Vocab::DC.title, multiple: false do |index|
     index.as :stored_searchable, :facetable
   end
@@ -12,9 +11,7 @@ class Manuscript < ActiveFedora::Base
     index.as :stored_searchable
   end
 
-  def works_add(work)
-    binding.pry()
-    self.members.select(&:work?) << work
-  end
+  belongs_to :collection, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
+
 
 end
