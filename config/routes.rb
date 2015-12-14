@@ -5,4 +5,5 @@ Rails.application.routes.draw do
   mount Qa::Engine => '/qa'
   mount HydraEditor::Engine => '/'
   mount Hydra::RoleManagement::Engine => '/'
+  Hydra::BatchEdit.add_routes(self)
 end

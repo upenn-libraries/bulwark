@@ -131,6 +131,13 @@ GEM
       cancancan (~> 1.8)
       deprecation (~> 0.1)
       sass-rails
+    hydra-batch-edit (1.1.1)
+      blacklight
+      hydra-collections
+    hydra-collections (5.0.3)
+      blacklight (~> 5.10)
+      deprecation (~> 0.1)
+      hydra-head (~> 9.1)
     hydra-core (9.1.4)
       hydra-access-controls (= 9.1.4)
       jettywrapper (>= 2.0.0)
@@ -417,6 +424,7 @@ DEPENDENCIES
   coffee-rails (~> 4.0.0)
   devise
   devise-guests (~> 0.3)
+  hydra-batch-edit
   hydra-editor
   hydra-head (= 9.1.4)
   hydra-pcdm

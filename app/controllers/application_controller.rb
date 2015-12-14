@@ -1,7 +1,9 @@
 class ApplicationController < ActionController::Base
-  # Adds a few additional behaviors into the application controller 
+  # Adds a few additional behaviors into the application controller
   include Blacklight::Controller
   include Hydra::Controller::ControllerBehavior
+  include Blacklight::Base
+
   layout 'blacklight'
 
   # Prevent CSRF attacks by raising an exception.
