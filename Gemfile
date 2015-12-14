@@ -21,6 +21,7 @@ gem 'blacklight'
 gem 'hydra-editor'
 gem 'hydra-role-management'
 gem 'hydra-pcdm'
+gem 'qa'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
