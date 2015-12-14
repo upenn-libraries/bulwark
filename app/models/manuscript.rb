@@ -1,32 +1,33 @@
 class Manuscript < ActiveFedora::Base
   after_initialize :init
   include Hydra::PCDM::ObjectBehavior
+  contains "pageImage"
 
-  property :title, predicate: ::RDF::Vocab::DC.title, multiple: false do |index|
+  property :title, predicate: ::RDF::URI.new("http://library.upenn.edu/pqc/title"), multiple: true do |index|
     index.as :stored_searchable
   end
-  property :creator, predicate: ::RDF::Vocab::DC.creator, multiple: false do |index|
+  property :creator, predicate: ::RDF::Vocab::DC.creator, multiple: true do |index|
     index.as :stored_searchable, :facetable
   end
-  property :date, predicate: ::RDF::Vocab::DC.date, multiple: false do |index|
+  property :date, predicate: ::RDF::Vocab::DC.date, multiple: true do |index|
     index.as :stored_searchable, :facetable
   end
-  property :description, predicate: ::RDF::Vocab::DC.description, multiple: false do |index|
+  property :description, predicate: ::RDF::Vocab::DC.description, multiple: true do |index|
     index.as :stored_searchable
   end
   property :item_type, predicate: ::RDF::Vocab::DC.type, multiple: false do |index|
     index.as :stored_searchable, :facetable
   end
-  property :subject, predicate: ::RDF::Vocab::DC.subject, multiple: false do |index|
+  property :subject, predicate: ::RDF::Vocab::DC.subject, multiple: true do |index|
     index.as :stored_searchable
   end
-  property :collection, predicate: ::RDF::Vocab::DC.publisher, multiple: false do |index|
+  property :collection, predicate: ::RDF::Vocab::DC.publisher, multiple: true do |index|
     index.as :stored_searchable, :facetable
   end
-  property :identifier, predicate: ::RDF::Vocab::DC.identifier, multiple: false do |index|
+  property :identifier, predicate: ::RDF::Vocab::DC.identifier, multiple: true do |index|
     index.as :stored_searchable
   end
-  property :location, predicate: ::RDF::Vocab::DC.relation, multiple: false do |index|
+  property :location, predicate: ::RDF::Vocab::DC.publisher, multiple: true do |index|
     index.as :stored_searchable
   end
   property :rights, predicate: ::RDF::Vocab::DC.rights, multiple: false do |index|
