@@ -9,7 +9,7 @@ class CatalogController < ApplicationController
   #before_filter :enforce_show_permissions, :only=>:show
   # This applies appropriate access controls to all solr queries
 
-  #CatalogController.search_params_logic += [:exclude_unwanted_models, :exclude_unwanted_terms]
+  CatalogController.search_params_logic += [:exclude_unwanted_models]#, :exclude_unwanted_terms]
 
   configure_blacklight do |config|
     config.search_builder_class = Hydra::SearchBuilder
@@ -146,7 +146,7 @@ class CatalogController < ApplicationController
       end
     solr_parameters[:fq] << "-has_model_ssim:\"#{model_uri}\""
     end
-    solr_parameters[:fq] << "-has_model_s:\"info:fedora/afmodel:FileAsset\""
+    #solr_parameters[:fq] << "-has_model_s:\"info:fedora/afmodel:FileAsset\""
   end
 
   def exclude_unwanted_terms(solr_parameters, user_parameters)
