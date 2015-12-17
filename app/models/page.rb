@@ -9,4 +9,5 @@ class Page < ActiveFedora::Base
     index.as :stored_searchable
   end
   belongs_to :manuscript, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
+
 end

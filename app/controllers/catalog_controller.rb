@@ -154,7 +154,7 @@ class CatalogController < ApplicationController
   end
 
   def unwanted_models
-    return [Collection, Page, ActiveFedora::DirectContainer, ActiveFedora::IndirectContainer, ActiveFedora::Aggregation::Proxy]
+    return [Collection, ActiveFedora::DirectContainer, ActiveFedora::IndirectContainer, ActiveFedora::Aggregation::Proxy]
   end
 
 end

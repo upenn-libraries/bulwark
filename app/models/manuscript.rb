@@ -1,6 +1,7 @@
 class Manuscript < ActiveFedora::Base
   after_initialize :init
-  include Hydra::PCDM::ObjectBehavior
+
+  #include Hydra::PCDM::ObjectBehavior
 
   property :abstract, predicate: ::RDF::Vocab::DC.abstract, multiple: false do |index|
     index.as :stored_searchable
@@ -75,7 +76,7 @@ class Manuscript < ActiveFedora::Base
   end
 
   belongs_to :collection, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
-  has_many :pages, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.hasPart
+  has_many :pages
 
   def init
     self.item_type ||= "Image"
