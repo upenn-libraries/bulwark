@@ -44,6 +44,7 @@ class CatalogController < ApplicationController
     # facet bar
     config.add_facet_field solr_name('creator', :facetable), :label => 'Creator'
     config.add_facet_field solr_name('date', :facetable), :label => 'Date'
+    config.add_facet_field solr_name('description', :facetable), :label => 'Description'
 
 
     # Have BL send all facet field names to Solr, which has been the default

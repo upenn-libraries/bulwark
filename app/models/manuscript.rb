@@ -16,7 +16,7 @@ class Manuscript < ActiveFedora::Base
   end
 
   property :creator, predicate: ::RDF::Vocab::DC.creator, multiple: true do |index|
-    index.as :stored_searchable
+    index.as :stored_searchable, :facetable
   end
 
   property :date, predicate: ::RDF::Vocab::DC.date, multiple: true do |index|
@@ -24,7 +24,7 @@ class Manuscript < ActiveFedora::Base
   end
 
   property :description, predicate: ::RDF::Vocab::DC.description, multiple: true do |index|
-    index.as :stored_searchable
+    index.as :stored_searchable, :facetable
   end
 
   property :format, predicate: ::RDF::Vocab::DC.format, multiple: true do |index|
