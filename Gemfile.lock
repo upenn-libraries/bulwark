@@ -74,6 +74,10 @@ GEM
       nokogiri (~> 1.6)
       rails (>= 3.2.6, < 5)
       rsolr (~> 1.0.11)
+    blacklight_range_limit (5.2.0)
+      blacklight (~> 5.15)
+      jquery-rails
+      rails (>= 3.0, < 5.0)
     bootstrap-sass (3.3.4.1)
       autoprefixer-rails (>= 5.0.0.1)
       sass (>= 3.2.19)
@@ -420,6 +424,7 @@ PLATFORMS
 
 DEPENDENCIES
   blacklight
+  blacklight_range_limit
   bootstrap-sass (= 3.3.4.1)
   coffee-rails (~> 4.0.0)
   devise

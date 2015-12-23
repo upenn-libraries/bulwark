@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <record>
+    <abstract>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque ac elementum diam. Integer sit amet vestibulum dolor. Curabitur nulla arcu, maximus nec tempus et, blandit nec odio. In consequat id metus eu consequat. Quisque nisl ligula, elementum at pretium sed, lobortis ultrices nibh. Duis sed odio ut magna fermentum elementum pellentesque et sem. Proin tincidunt erat sapien, at porta arcu sollicitudin nec. Aliquam erat volutpat.</abstract>
+    <coverage></coverage>
+    <date>1900</date>
+    <description>Fusce nec vulputate nibh. Etiam pharetra scelerisque tellus eu consectetur. Quisque arcu.</description>
+    <identifier>changeme1</identifier>
+    <item_type>Manuscript</item_type>
+    <language>English</language>
+    <title>Consectetur adipiscing elit id venenatis ex, ut finibus lorem.</title>
+  </record>
+</root>

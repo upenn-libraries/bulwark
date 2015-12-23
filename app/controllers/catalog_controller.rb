@@ -43,8 +43,9 @@ class CatalogController < ApplicationController
     # :show may be set to false if you don't want the facet to be drawn in the
     # facet bar
     config.add_facet_field solr_name('creator', :facetable), :label => 'Creator'
-    config.add_facet_field solr_name('date', :facetable), :label => 'Date'
-    config.add_facet_field solr_name('description', :facetable), :label => 'Description'
+    config.add_facet_field solr_name('date', :facetable), :label => 'Date', :range => true 
+
+    config.add_facet_field solr_name('language', :facetable), :label => 'Language'
 
 
     # Have BL send all facet field names to Solr, which has been the default
@@ -67,7 +68,6 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('creator', :stored_searchable, type: :string), :label => 'Creator', :link_to_search => solr_name('creator', :facetable)
     config.add_show_field solr_name('date', :stored_searchable, type: :string), :label => 'Date', :link_to_search => solr_name('date', :facetable)
     config.add_show_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
-
 
     # "fielded" search configuration. Used by pulldown among other places.
     # For supported keys in hash, see rdoc for Blacklight::SearchFields

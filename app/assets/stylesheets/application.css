@@ -16,4 +16,9 @@
 
  @import 'hydra-editor/multi_value_fields';
 
- */
+ 
+ *
+ * Used by blacklight_range_limit
+ *= require  'blacklight_range_limit'
+ *
+*/

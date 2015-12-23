@@ -23,6 +23,7 @@ gem 'hydra-role-management'
 gem 'hydra-pcdm'
 gem 'hydra-batch-edit'
 gem 'qa'
+gem "blacklight_range_limit"
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
