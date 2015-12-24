@@ -1,0 +1,10 @@
+en:
+  filesystem:
+    yaml_separator: |+
+      ---------------------------------
+    yaml_checking: 'Checking YAML syntax... '
+    yaml_good: 'YAML syntax valid...yay!'
+    yaml_bad: 'The following yaml error was produced:'
+    yaml_bad_instructions: 'Remove newly-inserted values from YAML file and verify that the manifest values are correctly formatted for YAML excluding indentation rules'
+    yaml_label: 'YAML File: '
+    manifest_label: 'Manifest File: '
