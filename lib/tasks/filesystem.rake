@@ -6,7 +6,7 @@ namespace :filesystem do
   @manifest_location = config['development']['manifest_location']
 
   desc "Populate filesystem.yml"
-  task :populate_yml => :environment do
+  task :populate_yaml => :environment do
     search_line = "#{Rails.env}:\n"
     split_on = config['development']['split_on']
     raw = File.open(@manifest_location)
@@ -24,7 +24,7 @@ namespace :filesystem do
     begin
       puts I18n.t('filesystem.yaml_checking')
       f = YAML.load_file(@filesystem_yml)
-      puts I18n.t('filesystem.yaml_good')
+      puts I18n.t('filesystem.yaml_good') << I18n.t('filesystem.yaml_separator') << I18n.t('filesystem.yaml_good_instructions') << I18n.t('filesystem.yaml_separator')
 
     rescue Exception
       puts "#{I18n.t('filesystem.yaml_bad')}
@@ -32,7 +32,7 @@ namespace :filesystem do
       #{I18n.t('filesystem.manifest_label')} #{@manifest_location}
       #{I18n.t('filesystem.yaml_separator')}
       #{$!}
-      
+
       #{I18n.t('filesystem.yaml_separator')}
       #{I18n.t('filesystem.yaml_bad_instructions')}"
 
@@ -40,8 +40,14 @@ namespace :filesystem do
 
   end
 
-  desc "Fetc flat XML"
+  desc "Fetch flat XML"
 	task :fetch_files => :environment do
+    Dir.glob "#{config['development']['assets_path']}/*" do |directory|
+      Dir.glob "#{directory}#{config['development']['object_manifest_location']}" do |d|
+        puts d
+        binding.pry
+      end
+    end
 	end
 
   desc "Trigger batch import to Fedora"
