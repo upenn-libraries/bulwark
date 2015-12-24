@@ -1,0 +1,11 @@
+# Config file for working with the filesystem
+
+development:
+  manifest_location: /path/to/manifest.txt
+  split_on: |
+test:
+  manifest_location: /path/to/manifest.txt
+  split_on: |
+production:
+  manifest_location: /path/to/manifest.txt
+  split_on: |
