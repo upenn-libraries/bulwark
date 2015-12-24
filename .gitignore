@@ -17,4 +17,9 @@
 /tmp
 /jetty
 /imports
+
+# Ignore filesystem.yml
+filesystem.yml
+
+# Ignore bash script
 repo.sh
