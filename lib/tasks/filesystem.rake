@@ -42,17 +42,33 @@ namespace :filesystem do
 
   desc "Fetch flat XML"
 	task :fetch_files => :environment do
+
+    manifest_keys_array ||= []
+    manifest_values_array ||= []
+
     Dir.glob "#{config['development']['assets_path']}/*" do |directory|
       Dir.glob "#{directory}/#{config['development']['object_manifest_location']}" do |d|
         f = File.readlines(d)
-        g = f.first.split(":")
-        g.last.strip!
-        Dir.glob "#{directory}/#{g.last}" do |p|
-          `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{p}`
+
+        f.each do |line|
+          lp = line.split(":")
+          lp.first.strip!
+          lp.last.strip!
+          manifest_keys_array.push(lp.first)
+          manifest_values_array.push(lp.last)
         end
+
+        manifest = manifest_keys_array.zip(manifest_values_array).to_h
+        `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{directory}/#{manifest["METADATA_PATH"]}`
       end
     end
 	end
+
+  desc "Attach files to Fedora metadata"
+  task :attach_files => :environment do
+    fs_prefix = "/fs/pub/data"
+    fed_prefix = "http://localhost:8983/fedora/rest/files"
+  end
 
   namespace :generate do
     desc "Generate sha1.log"
