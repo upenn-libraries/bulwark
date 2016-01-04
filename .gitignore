@@ -23,3 +23,4 @@ filesystem.yml
 
 # Ignore bash script
 repo.sh
+just_jetty.sh
