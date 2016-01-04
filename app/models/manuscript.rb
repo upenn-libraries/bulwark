@@ -75,6 +75,10 @@ class Manuscript < ActiveFedora::Base
     index.as :stored_searchable
   end
 
+  property :file_location, predicate: ::RDF::URI.new("http://library.upenn.edu/ns/file_location") do |index|
+    index.as :stored_searchable
+  end
+
   belongs_to :collection, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
   has_many :pages
 

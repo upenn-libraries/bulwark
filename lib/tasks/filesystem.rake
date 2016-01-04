@@ -45,6 +45,7 @@ namespace :filesystem do
 
     manifest_keys_array ||= []
     manifest_values_array ||= []
+    files_array ||= []
 
     Dir.glob "#{config['development']['assets_path']}/*" do |directory|
       Dir.glob "#{directory}/#{config['development']['object_manifest_location']}" do |d|
@@ -59,7 +60,25 @@ namespace :filesystem do
         end
 
         manifest = manifest_keys_array.zip(manifest_values_array).to_h
-        `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{directory}/#{manifest["METADATA_PATH"]}`
+
+        fs_prefix = "/fs/pub/data"
+        fed_prefix = "http://localhost:8983/fedora/rest/files"
+
+        Dir.glob("#{directory}/#{manifest["FILE_PATH"]}").each do |file|
+          files_array.push(file)
+        end
+
+        f = File.readlines("#{directory}/#{manifest["METADATA_PATH"]}")
+        index = f.index("  </record>\n")
+        files_array.each do |file_name|
+          file_name.gsub!(fs_prefix, fed_prefix)
+          f.insert(index, "    <file_location>#{file_name}</file_location>")
+        end
+
+        File.open("tmp/structure.xml", "w+") do |updated_metadata|
+          updated_metadata.puts(f)
+        end
+        `xsltproc #{Rails.root}/lib/tasks/sv.xslt tmp/structure.xml`
       end
     end
 	end
