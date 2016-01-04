@@ -43,16 +43,16 @@ namespace :filesystem do
   desc "Fetch flat XML"
 	task :fetch_files => :environment do
     Dir.glob "#{config['development']['assets_path']}/*" do |directory|
-      Dir.glob "#{directory}#{config['development']['object_manifest_location']}" do |d|
-        puts d
-        binding.pry
+      Dir.glob "#{directory}/#{config['development']['object_manifest_location']}" do |d|
+        f = File.readlines(d)
+        g = f.first.split(":")
+        g.last.strip!
+        Dir.glob "#{directory}/#{g.last}" do |p|
+          `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{p}`
+        end
       end
     end
 	end
-
-  desc "Trigger batch import to Fedora"
-  task :convert_to_sv => :environment do
-  end
 
   namespace :generate do
     desc "Generate sha1.log"

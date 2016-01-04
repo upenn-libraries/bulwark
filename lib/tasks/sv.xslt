@@ -55,7 +55,7 @@
             <sv:value><xsl:value-of select="coverage" /></sv:value>
           </sv:property>
           <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="true">
-            <xsl:apply-templates select="identifier"/>
+            <sv:value><xsl:apply-templates select="identifier"/></sv:value>
           </sv:property>
           <sv:property sv:name="ns002:language" sv:type="String" sv:multiple="true">
             <sv:value><xsl:value-of select="language" /></sv:value>
