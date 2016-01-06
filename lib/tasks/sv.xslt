@@ -6,8 +6,11 @@
   xmlns:sv="http://www.jcp.org/jcr/sv/1.0"
   xmlns:image="http://www.modeshape.org/images/1.0"
   xmlns:space="preserve"
-
   extension-element-prefixes="exsl ex">
+  <xsl:variable name="identifier">
+    <xsl:value-of select="/root/record/identifier" />
+  </xsl:variable>
+
   <xsl:output method="xml" indent="yes"/>
   <xsl:preserve-space elements="sv:node sv:property sv:value"/>
     <xsl:template match="/root/record">
@@ -18,7 +21,7 @@
             xmlns:sv="http://www.jcp.org/jcr/sv/1.0"
             xmlns:test="info:fedora/test/" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
             xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-            xmlns:ns003="http://library.upenn.edu/ns/"
+            xmlns:ns003="http://library.upenn.edu/pqc/ns/"
             xmlns:ns002="http://purl.org/dc/terms/"
             xmlns:ns001="info:fedora/fedora-system:def/model#"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -64,8 +67,8 @@
           <sv:property sv:name="ns002:description" sv:type="String" sv:multiple="true">
             <xsl:apply-templates select="description" />
           </sv:property>
-          <sv:property sv:name="ns003:file_location" sv:type="String" sv:multiple="true">
-            <xsl:apply-templates select="file_location" />
+          <sv:property sv:name="ns004:file_list" sv:type="String" sv:multiple="true">
+            <xsl:apply-templates select="file_list/file" />
           </sv:property>
           <sv:property sv:name="ns002:item_type" sv:type="String" sv:multiple="true">
             <sv:value><xsl:value-of select="item_type" /></sv:value>
@@ -76,7 +79,7 @@
           <sv:property sv:name="ns002:date" sv:type="String" sv:multiple="true">
             <sv:value><xsl:value-of select="date" /></sv:value>
           </sv:property>
-
+          <xsl:apply-templates select="page_structure/page" />
           </sv:node>
         </exsl:document>
       </xsl:copy>
@@ -85,8 +88,45 @@
     <xsl:template match="description">
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
-    <xsl:template match="file_location">
+    <xsl:template match="file_list/file">
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
+
+    <xsl:template match="page_structure/page">
+      <sv:node>
+      <xsl:attribute name="sv:name"><xsl:value-of select="page_id" /></xsl:attribute>
+      <sv:property sv:name="jcr:primaryType" sv:type="Name">
+        <sv:value>nt:folder</sv:value>
+      </sv:property>
+      <sv:property sv:name="jcr:mixinTypes" sv:type="Name" sv:multiple="true">
+        <sv:value>fedora:Container</sv:value>
+        <sv:value>fedora:Resource</sv:value>
+      </sv:property>
+      <sv:property sv:name="jcr:lastModifiedBy" sv:type="String">
+        <sv:value>bypassAdmin</sv:value>
+      </sv:property>
+      <sv:property sv:name="ns001:hasModel" sv:type="String" sv:multiple="true">
+        <sv:value>Page</sv:value>
+      </sv:property>
+      <sv:property sv:name="jcr:createdBy" sv:type="String">
+        <sv:value>bypassAdmin</sv:value>
+      </sv:property>
+      <sv:property sv:name="ns004:parent_manuscript" sv:type="String" sv:multiple="true">
+        <sv:value><xsl:value-of select="$identifier" /></sv:value>
+      </sv:property>
+      <sv:property sv:name="ns004:page_id" sv:type="String" sv:multiple="true">
+        <sv:value><xsl:value-of select="page_id" /></sv:value>
+      </sv:property>
+      <sv:property sv:name="ns004:file_name" sv:type="String" sv:multiple="true">
+        <sv:value><xsl:value-of select="file_name" /></sv:value>
+      </sv:property>
+      <sv:property sv:name="ns004:page_number" sv:type="Long" sv:multiple="true">
+        <sv:value><xsl:value-of select="page_number" /></sv:value>
+      </sv:property>
+      <sv:property sv:name="ns004:ocr_text" sv:type="String" sv:multiple="true">
+        <sv:value><xsl:value-of select="ocr_text" /></sv:value>
+      </sv:property>
+    </sv:node>
+  </xsl:template>
 
 </xsl:stylesheet>

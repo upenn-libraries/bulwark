@@ -38,7 +38,7 @@ class Manuscript < ActiveFedora::Base
     index.as :stored_searchable
   end
 
-  property :includesComponent, predicate: ::RDF::URI.new("http://www.library.upenn.edu/pqc/ns/includesComponent"), multiple: true do |index|
+  property :includesComponent, predicate: ::RDF::URI.new("http://library.upenn.edu/pqc/ns/includesComponent"), multiple: true do |index|
     index.as :stored_searchable
   end
 
@@ -74,8 +74,8 @@ class Manuscript < ActiveFedora::Base
     index.as :stored_searchable
   end
 
-  property :file_location, predicate: ::RDF::URI.new("http://library.upenn.edu/ns/file_location") do |index|
-    index.as :stored_searchable
+  property :file_list, predicate: ::RDF::URI.new("http://library.upenn.edu/pqc/ns/file_list") do |index|
+    index.as :displayable
   end
 
   belongs_to :collection, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf

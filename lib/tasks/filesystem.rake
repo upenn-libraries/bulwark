@@ -74,17 +74,17 @@ namespace :filesystem do
 
         f = File.readlines(manifest["METADATA_PATH"])
         index = f.index("  </record>\n")
+        f.insert(index, "    <file_list>\n","    </file_list>\n") unless files_array.empty?
+        flist_index = f.index("    <file_list>\n")
         files_array.each do |file_name|
           file_name.gsub!(fs_prefix, fed_prefix)
-          f.insert(index, "    <file_location>#{file_name}</file_location>")
+          f.insert((flist_index+1), "      <file>#{file_name}</file>")
         end
 
         File.open("tmp/structure.xml", "w+") do |updated_metadata|
           updated_metadata.puts(f)
         end
-
         `xsltproc #{Rails.root}/lib/tasks/sv.xslt tmp/structure.xml`
-        `xsltproc #{Rails.root}/lib/tasks/page.xslt tmp/structure.xml`
       end
     end
 	end
