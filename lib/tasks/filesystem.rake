@@ -43,11 +43,12 @@ namespace :filesystem do
   desc "Fetch flat XML"
 	task :fetch_files => :environment do
 
-    manifest_keys_array ||= []
-    manifest_values_array ||= []
-    files_array ||= []
+    manifest_keys_array = Array.new
+    manifest_values_array = Array.new
 
     Dir.glob "#{config['development']['assets_path']}/*" do |directory|
+      files_array = Array.new
+      manifest = Hash.new
       Dir.glob "#{directory}/#{config['development']['object_manifest_location']}" do |d|
         f = File.readlines(d)
 
@@ -61,14 +62,17 @@ namespace :filesystem do
 
         manifest = manifest_keys_array.zip(manifest_values_array).to_h
 
+        manifest["METADATA_PATH"].prepend("#{directory}/")
+        manifest["FILE_PATH"].prepend("#{directory}/")
+
         fs_prefix = "/fs/pub/data"
         fed_prefix = "http://localhost:8983/fedora/rest/files"
 
-        Dir.glob("#{directory}/#{manifest["FILE_PATH"]}").each do |file|
+        Dir.glob(manifest["FILE_PATH"]).each do |file|
           files_array.push(file)
         end
 
-        f = File.readlines("#{directory}/#{manifest["METADATA_PATH"]}")
+        f = File.readlines(manifest["METADATA_PATH"])
         index = f.index("  </record>\n")
         files_array.each do |file_name|
           file_name.gsub!(fs_prefix, fed_prefix)
@@ -78,7 +82,9 @@ namespace :filesystem do
         File.open("tmp/structure.xml", "w+") do |updated_metadata|
           updated_metadata.puts(f)
         end
+
         `xsltproc #{Rails.root}/lib/tasks/sv.xslt tmp/structure.xml`
+        `xsltproc #{Rails.root}/lib/tasks/page.xslt tmp/structure.xml`
       end
     end
 	end
