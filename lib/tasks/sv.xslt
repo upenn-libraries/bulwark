@@ -63,7 +63,7 @@
             <sv:value><xsl:apply-templates select="identifier"/></sv:value>
           </sv:property>
           <sv:property sv:name="ns002:language" sv:type="String" sv:multiple="true">
-            <sv:value><xsl:value-of select="language" /></sv:value>
+            <xsl:apply-templates select="language" />
           </sv:property>
           <sv:property sv:name="ns002:description" sv:type="String" sv:multiple="true">
             <xsl:apply-templates select="description" />
@@ -86,9 +86,14 @@
       </xsl:copy>
     </xsl:template>
 
+    <xsl:template match="language">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
     <xsl:template match="description">
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
+
     <xsl:template match="file_list/file">
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
