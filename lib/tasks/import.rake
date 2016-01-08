@@ -19,6 +19,8 @@ namespace :fedora do
         manuscript.file_list.each {|f| file_link = f if f.ends_with?(p.file_name)}
         curl_command = "curl -u fedoraAdmin:fedoraAdmin  -X PUT -H \"Content-Type: message/external-body; access-type=URL; URL=\\\"#{file_link}\\\"\" \"#{fedora_link}\""
         `#{curl_command}`
+        p.manuscript = manuscript
+        p.save
       end
     end
   end
