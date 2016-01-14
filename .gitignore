@@ -21,6 +21,9 @@
 # Ignore filesystem.yml
 filesystem.yml
 
+# Ignore fedora.yml
+config/fedora.yml
+
 # Ignore bash script
 repo.sh
 just_jetty.sh
