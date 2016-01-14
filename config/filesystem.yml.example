@@ -3,12 +3,18 @@
 development:
   manifest_location: /path/to/manifest.txt
   federated_fs_path: http://full/path/to/federated/fs
+  metadata_path_label: metadata_label_in_manifest
+  file_path_label: file_path_label_in_manifest
   split_on: |
 test:
   manifest_location: /path/to/manifest.txt
   federated_fs_path: http://full/path/to/federated/fs
+  metadata_path_label: metadata_label_in_manifest
+  file_path_label: file_path_label_in_manifest
   split_on: |
 production:
   manifest_location: /path/to/manifest.txt
   federated_fs_path: http://full/path/to/federated/fs
+  metadata_path_label: metadata_label_in_manifest
+  file_path_label: file_path_label_in_manifest
   split_on: |
