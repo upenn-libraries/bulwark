@@ -16,8 +16,8 @@ gem 'coffee-rails', '~> 4.0.0'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 gem 'therubyracer',  platforms: :ruby
 
-gem 'hydra-head', '9.1.4'
-gem 'blacklight'
+gem 'hydra', github: 'projecthydra/hydra', branch: 'pcdm'
+
 gem 'hydra-editor'
 gem 'hydra-role-management'
 gem 'hydra-pcdm'
