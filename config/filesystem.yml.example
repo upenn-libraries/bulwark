@@ -2,10 +2,13 @@
 
 development:
   manifest_location: /path/to/manifest.txt
+  federated_fs_path: http://full/path/to/federated/fs
   split_on: |
 test:
   manifest_location: /path/to/manifest.txt
+  federated_fs_path: http://full/path/to/federated/fs
   split_on: |
 production:
   manifest_location: /path/to/manifest.txt
+  federated_fs_path: http://full/path/to/federated/fs
   split_on: |

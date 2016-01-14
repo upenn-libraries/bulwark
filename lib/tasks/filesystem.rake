@@ -65,9 +65,6 @@ namespace :filesystem do
         manifest["METADATA_PATH"].prepend("#{directory}/")
         manifest["FILE_PATH"].prepend("#{directory}/")
 
-        fs_prefix = "/fs/pub/data"
-        fed_prefix = "http://localhost:8983/fedora/rest/files"
-
         Dir.glob(manifest["FILE_PATH"]).each do |file|
           files_array.push(file)
         end
@@ -77,7 +74,7 @@ namespace :filesystem do
         f.insert(index, "    <file_list>\n","    </file_list>\n") unless files_array.empty?
         flist_index = f.index("    <file_list>\n")
         files_array.each do |file_name|
-          file_name.gsub!(fs_prefix, fed_prefix)
+          file_name.gsub!(config['development']['assets_path'], config['development']['federated_fs_path'])
           f.insert((flist_index+1), "      <file>#{file_name}</file>")
         end
 
@@ -88,12 +85,6 @@ namespace :filesystem do
       end
     end
 	end
-
-  desc "Attach files to Fedora metadata"
-  task :attach_files => :environment do
-    fs_prefix = "/fs/pub/data"
-    fed_prefix = "http://localhost:8983/fedora/rest/files"
-  end
 
   namespace :generate do
     desc "Generate sha1.log"
