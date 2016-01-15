@@ -19,5 +19,13 @@ module Utils
       manifest.save
     end
 
+    def get_contents(obj)
+
+    end
+
+    def set_contents(type, contents)
+
+    end
+
   end
 end

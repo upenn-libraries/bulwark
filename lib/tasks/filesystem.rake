@@ -68,14 +68,6 @@ namespace :filesystem do
         `xsltproc #{Rails.root}/lib/tasks/sv.xslt tmp/structure.xml`
       end
     end
-
   end
 
-  namespace :generate do
-
-    desc "Generate sha1.log"
-    task :sha1_log => :environment do
-      binding.pry()
-    end
-  end
 end
