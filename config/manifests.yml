@@ -1,0 +1,9 @@
+development:
+  log_name:
+    checksum: "checksums.tsv"
+test:
+  log_name:
+    checksum: "checksums.tsv"
+production:
+  log_name:
+    checksum: "checksums.tsv"
