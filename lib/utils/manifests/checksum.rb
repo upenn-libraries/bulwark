@@ -21,6 +21,7 @@ module Utils
       end
 
       def calculate(file_list)
+        @checksums_hash = Hash.new
         file_list.each do |file_to_check|
           checksum = @digest.file file_to_check
           @checksums_hash[file_to_check] = checksum.hexdigest

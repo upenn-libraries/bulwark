@@ -7,10 +7,8 @@ namespace :preprocess do
   @manifest_location = fs_config['development']['manifest_location']
 
   namespace :generate do
-
     desc "Generate checksum log"
     task :checksum_log => :environment do
-
       manifest_keys_array = Array.new
       manifest_values_array = Array.new
       files_array = Array.new
@@ -27,23 +25,17 @@ namespace :preprocess do
             manifest_values_array.push(lp.last)
           end
           manifest = manifest_keys_array.zip(manifest_values_array).to_h
-
           file_list = Dir.glob("#{directory}/#{manifest["#{fs_config['development']['file_path_label']}"]}")
-
           b.calculate(file_list)
-
           hash_separated = ""
           b.checksums_hash.each do |v|
             arr = v.flatten.join("\t")
             hash_separated += arr
+            hash_separated += "\n"
           end
-
           path = "#{directory}/#{fs_config["development"]["object_admin_path"]}/#{mani_config['development']['log_name']['checksum']}"
-
           m = Utils::Manifests::Manifest.new(Utils::Manifests::Checksum, path, hash_separated)
-
           m.save
-
         end
       end
 
