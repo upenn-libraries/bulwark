@@ -26,14 +26,10 @@ module Utils
           checksum = @digest.file file_to_check
           @checksums_hash[file_to_check] = checksum.hexdigest
         end
-        @content = format_content
+        @content = format_content(file_list)
       end
 
-      def swap_paths(file_list)
-        file_list.each do |item|
-          item.gsub!(@fs_config['development']['federated_fs_path'], @fs_config['development']['assets_path'])
-        end
-      end
+
 
       private
         def set_digest(hash_type)
@@ -58,14 +54,27 @@ module Utils
 
         end
 
-        def format_content
-          formatted_checksums_hash = ""
-          @checksums_hash.each do |row|
-             formatted = row.flatten.join("\t")
-             formatted_checksums_hash += formatted
+        def format_content(file_list)
+          hash_separated = ""
+          @checksums_hash.each do |v|
+            arr = v.flatten.join("\t")
+            hash_separated += arr
+            hash_separated += "\n"
           end
-          return formatted_checksums_hash
+          file_list.each do |item|
+            item.gsub!(@fs_config['development']['federated_fs_path'], @fs_config['development']['assets_path'])
+          end
+          return hash_separated
         end
+
+        # def format_content
+        #   formatted_checksums_hash = ""
+        #   @checksums_hash.each do |row|
+        #      formatted = row.flatten.join("\t")
+        #      formatted_checksums_hash += formatted
+        #   end
+        #   return formatted_checksums_hash
+        # end
 
     end
   end

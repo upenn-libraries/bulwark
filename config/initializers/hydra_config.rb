@@ -19,4 +19,5 @@ Hydra.configure do |config|
   #
   # specify the user model
   # config.user_model = '#{model_name.classify}'
+
 end

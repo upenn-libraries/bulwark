@@ -25,6 +25,8 @@ gem 'hydra-batch-edit'
 gem 'qa'
 gem "blacklight_range_limit"
 
+gem "colorize"
+
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks

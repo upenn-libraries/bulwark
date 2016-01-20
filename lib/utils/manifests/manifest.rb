@@ -16,9 +16,6 @@ module Utils
     end
 
     private
-      # def assemble_content(raw_content)
-      #
-      # end
 
       def create_manifest
         unless File.exist?(File.dirname(@temp_path))
