@@ -9,6 +9,7 @@ Utils.configure do |config|
     raise("#{fs_env_file} was found, but could not be parsed.\n")
   end
 
+
   if File.exists?(fs_env_file)
     options = fs_yml.fetch(Rails.env).with_indifferent_access
     config.object_admin_path = options.fetch(:object_admin_path)
@@ -23,4 +24,5 @@ Utils.configure do |config|
     config.repository_prefix = options.fetch(:repository_prefix)
     config.split_on = options.fetch(:split_on)
   end
+
 end
