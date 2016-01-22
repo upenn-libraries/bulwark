@@ -14,12 +14,12 @@ namespace :postprocess do
         page_relations = Page.where(parent_manuscript: manuscript.id).to_a
         page_relations.each do |page_relation|
           page = Page.find(page_relation.id)
-          binding.pry()
+          #binding.pry()
           page.manuscript = manuscript
-          binding.pry()
-          page.save
+          #binding.pry()
+          #page.save
         end
-        binding.pry()
+        #binding.pry()
       end
     end
   end

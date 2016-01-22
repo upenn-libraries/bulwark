@@ -79,7 +79,8 @@ class Manuscript < ActiveFedora::Base
   end
 
   belongs_to :collection, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
-  has_many :pages
+  has_many :pages, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.hasMember
+
 
   def init
     self.item_type ||= "Image"

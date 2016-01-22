@@ -1,6 +1,7 @@
 class Page < ActiveFedora::Base
   include Hydra::PCDM::ObjectBehavior
   contains "pageImage"
+
   property :page_id, predicate: ::RDF::Vocab::DC.identifier, multiple: false do |index|
     index.as :stored_searchable
     index.type :stored_searchable
