@@ -1,6 +1,4 @@
 class Manuscript < ActiveFedora::Base
-  after_initialize :init
-  include Hydra::PCDM::ObjectBehavior
 
   property :abstract, predicate: ::RDF::Vocab::DC.abstract, multiple: false do |index|
     index.as :stored_searchable
@@ -77,10 +75,6 @@ class Manuscript < ActiveFedora::Base
   property :file_list, predicate: ::RDF::URI.new("http://library.upenn.edu/pqc/ns/file_list") do |index|
     index.as :displayable
   end
-
-  belongs_to :collection, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
-  has_many :pages, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.hasMember
-
 
   def init
     self.item_type ||= "Image"

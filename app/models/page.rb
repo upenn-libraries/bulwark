@@ -1,5 +1,4 @@
 class Page < ActiveFedora::Base
-  include Hydra::PCDM::ObjectBehavior
   contains "pageImage"
 
   property :page_id, predicate: ::RDF::Vocab::DC.identifier, multiple: false do |index|
@@ -28,7 +27,4 @@ class Page < ActiveFedora::Base
   property :parent_manuscript, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/parentManuscript'), multiple: false do |index|
     index.as :stored_searchable
   end
-
-  belongs_to :manuscript, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
-
 end
