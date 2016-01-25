@@ -17,7 +17,7 @@
 /tmp
 /jetty
 /imports
-*/.DS_Store
+.DS_Store
 
 # Ignore filesystem.yml
 filesystem.yml
