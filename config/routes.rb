@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :repos
+  mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   root to: "catalog#index"
   blacklight_for :catalog
   devise_for :users
