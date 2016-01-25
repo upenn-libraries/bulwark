@@ -1,6 +1,5 @@
 require Rails.root.join('lib', 'rails_admin', 'git_review.rb')
 require Rails.root.join('lib', 'rails_admin', 'create_remote.rb')
-RailsAdmin::Config::Actions.register(RailsAdmin::Config::Actions::GitReview)
 
 RailsAdmin.config do |config|
   config.main_app_name = ["Intermediary", "Admin Interface"]
