@@ -1,4 +1,5 @@
 require Rails.root.join('lib', 'rails_admin', 'git_review.rb')
+require Rails.root.join('lib', 'rails_admin', 'create_remote.rb')
 RailsAdmin::Config::Actions.register(RailsAdmin::Config::Actions::GitReview)
 
 RailsAdmin.config do |config|
@@ -19,6 +20,18 @@ RailsAdmin.config do |config|
     git_review do
       only ["Repo"]
     end
+    create_remote do
+      only ["Repo"]
+    end
+    # clone_from_production do
+    #   only ["Repo"]
+    # end
+    # sign_off_production do
+    #   only ["Repo"]
+    # end
+    # report_flagged do
+    #   only ["Repo"]
+    # end
   end
 
 end

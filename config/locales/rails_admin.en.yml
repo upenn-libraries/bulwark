@@ -1,0 +1,23 @@
+en:
+  admin:
+    actions:
+      git_review:
+        title: "Git Review of Repo"
+        menu: "Git Review"
+        breadcrumb: "Git Review"
+      create_remote:
+        title: "Create Remote Repository"
+        menu: "Create Remote Repository"
+        breadcrumb: "Create Remote"
+      clone_from_production:
+        title: "Clone Repository Contents from Production"
+        menu: "Clone from Production"
+        breadcrumb: "Clone from Production"
+      sign_off_production:
+        title: "Sign Off for Migrate to Production"
+        menu: "Migrate to Production (Admins only)"
+        breadcrumb: "Migrate to Production"
+      report_flagged:
+        title: "Flagged for Production"
+        menu: "Items Flagged -- New/Updated/To Delete"
+        breadcrumb: "Items Flagged"
