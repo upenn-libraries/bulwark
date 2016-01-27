@@ -20,6 +20,10 @@ module RailsAdmin
           true
         end
 
+        register_instance_option :link_icon do
+         'icon-folder-close'
+        end
+
         register_instance_option :http_methods do
           [:get, :post]
         end

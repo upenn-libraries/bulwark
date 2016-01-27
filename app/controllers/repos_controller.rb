@@ -69,6 +69,6 @@ class ReposController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def repo_params
-      params.require(:repo).permit(:title, :purl, :prefix, :description)
+      params.require(:repo).permit(:title, :directory, :identifier, :description, :metadata_subdirectory, :assets_subdirectory, :metadata_filename, :file_extensions)
     end
 end

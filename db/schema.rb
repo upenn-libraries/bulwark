@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160125162953) do
+ActiveRecord::Schema.define(version: 20160126215036) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
@@ -27,11 +27,15 @@ ActiveRecord::Schema.define(version: 20160125162953) do
 
   create_table "repos", force: :cascade do |t|
     t.string   "title"
-    t.string   "purl"
-    t.string   "prefix"
+    t.string   "directory"
+    t.string   "identifier"
     t.string   "description"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+    t.string   "metadata_subdirectory"
+    t.string   "assets_subdirectory"
+    t.string   "metadata_filename"
+    t.string   "file_extensions"
   end
 
   create_table "roles", force: :cascade do |t|
