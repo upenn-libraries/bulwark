@@ -4,21 +4,25 @@ class Repo < ActiveRecord::Base
 
   def create_remote
     unless Dir.exists?("/fs/pub/data/#{self.directory}")
-      full_path = "/fs/pub/data/#{self.directory}"
-      admin_subdirectory = "admin"
-      Dir.mkdir(full_path)
-      Dir.mkdir("#{full_path}/#{self.metadata_subdirectory}")
-      Dir.mkdir("#{full_path}/#{self.assets_subdirectory}")
-      Dir.mkdir("#{full_path}/#{admin_subdirectory}")
-      populate_admin_manifest("#{full_path}/#{admin_subdirectory}")
-      Git.init(full_path)
-      Dir.chdir("#{full_path}")
+      @full_directory_path = "/fs/pub/data/#{self.directory}"
+      build_and_populate_directories
+      Git.init(@full_directory_path)
+      Dir.chdir(@full_directory_path)
       `git annex init`
-      return {:success => "Remote successfully created"}
+      return { :success => "Remote successfully created" }
     else
-      return {:error => "Remote already exists"}
+      return { :error => "Remote already exists" }
     end
 
+  end
+
+  def build_and_populate_directories
+    admin_subdirectory = "admin"
+    Dir.mkdir(@full_directory_path)
+    Dir.mkdir("#{@full_directory_path}/#{self.metadata_subdirectory}")
+    Dir.mkdir("#{@full_directory_path}/#{self.assets_subdirectory}")
+    Dir.mkdir("#{@full_directory_path}/#{admin_subdirectory}")
+    populate_admin_manifest("#{@full_directory_path}/#{admin_subdirectory}")
   end
 
   def populate_admin_manifest(full_admin_path)

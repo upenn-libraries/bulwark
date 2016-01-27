@@ -10,7 +10,13 @@ class ReposController < ApplicationController
   # GET /repos/1
   # GET /repos/1.json
   def show
-    @repo.create_remote
+    @message = @repo.create_remote
+    if @message[:error].present?
+      redirect_to "/admin_repo/repo/#{@repo.id}/git_review", :flash => { :error => @message[:error] }
+    elsif @message[:success].present?
+      redirect_to "/admin_repo/repo/#{@repo.id}/git_review", :flash => { :success => @message[:success] }
+
+    end
   end
 
   # GET /repos/new
