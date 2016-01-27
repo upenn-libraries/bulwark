@@ -1,24 +1,16 @@
 <p id="notice"><%= notice %></p>
 
 <p>
-  <strong>Title:</strong>
+  <strong>Name:</strong>
   <%= @repo.title %>
 </p>
 
 <p>
-  <strong>Purl:</strong>
-  <%= @repo.purl %>
-</p>
-
-<p>
-  <strong>Prefix:</strong>
-  <%= @repo.prefix %>
+  <strong>Directory:</strong>
+  <%= @repo.directory %>
 </p>
 
 <p>
   <strong>Description:</strong>
   <%= @repo.description %>
 </p>
-
-<%= link_to 'Edit', edit_repo_path(@repo) %> |
-<%= link_to 'Back', repos_path %>

@@ -10,6 +10,7 @@ class ReposController < ApplicationController
   # GET /repos/1
   # GET /repos/1.json
   def show
+    @repo.create_remote
   end
 
   # GET /repos/new

@@ -8,16 +8,23 @@ module RailsAdmin
 
          RailsAdmin::Config::Actions.register(self)
 
-         register_instance_option :route_fragment do
-           'create_remote'
-         end
-
         register_instance_option :member? do
           true
         end
 
+        register_instance_option :route_fragment do
+          'create_remote'
+        end
+
         register_instance_option :http_methods do
-          [:get,:post]
+          [:post]
+        end
+
+        register_instance_option :controller do
+          Proc.new do
+            @object.create_remote
+            redirect_to main_app.show_path(@object)
+          end
         end
 
       end

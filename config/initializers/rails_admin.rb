@@ -18,6 +18,9 @@ RailsAdmin.config do |config|
     git_review do
       only ["Repo"]
     end
+    create_remote do
+      only ["Repo"]
+    end
     # clone_from_production do
     #   only ["Repo"]
     # end
