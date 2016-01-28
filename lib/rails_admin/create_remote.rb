@@ -12,10 +12,6 @@ module RailsAdmin
           true
         end
 
-        register_instance_option :route_fragment do
-          'create_remote'
-        end
-
         register_instance_option :http_methods do
           [:post]
         end
