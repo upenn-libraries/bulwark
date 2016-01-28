@@ -25,7 +25,9 @@ gem 'hydra-batch-edit'
 gem 'qa'
 gem "blacklight_range_limit"
 
+gem "rails_admin"
 gem "colorize"
+gem "git"
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
