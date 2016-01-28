@@ -13,7 +13,7 @@ module RailsAdmin
          end
 
          register_instance_option :route_fragment do
-           'git_review'
+           'sign_off_production'
          end
 
         register_instance_option :member? do
