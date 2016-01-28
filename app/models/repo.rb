@@ -2,9 +2,11 @@ require 'git'
 
 class Repo < ActiveRecord::Base
 
+  include Filesystem
+
   def create_remote
-    unless Dir.exists?("/fs/pub/data/#{self.directory}")
-      @full_directory_path = "/fs/pub/data/#{self.directory}"
+    unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
+      @full_directory_path = "#{assets_path_prefix}/#{self.directory}"
       build_and_populate_directories
       Git.init(@full_directory_path)
       Dir.chdir(@full_directory_path)
