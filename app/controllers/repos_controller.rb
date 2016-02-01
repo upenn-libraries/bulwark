@@ -67,9 +67,14 @@ class ReposController < ApplicationController
     end
   end
 
-  def checksum_log(rid)
-    Utils.generate_checksum_log
-    redirect_to "/admin_repo/repo/#{rid}/git_review"
+  def checksum_log
+    rid = 1
+    @message = Utils.generate_checksum_log
+    if @message[:error].present?
+      redirect_to "/admin_repo/repo/#{rid}/preprocess", :flash => { :error => @message[:error] }
+    elsif @message[:success].present?
+      redirect_to "/admin_repo/repo/#{rid}/preprocess", :flash => { :success => @message[:success] }
+    end
   end
 
   private
