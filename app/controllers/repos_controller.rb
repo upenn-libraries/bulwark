@@ -1,5 +1,5 @@
 class ReposController < ApplicationController
-  before_action :set_repo, only: [:show, :edit, :update, :destroy]
+  before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log]
 
   # GET /repos
   # GET /repos.json
@@ -68,12 +68,11 @@ class ReposController < ApplicationController
   end
 
   def checksum_log
-    rid = 1
     @message = Utils.generate_checksum_log
     if @message[:error].present?
-      redirect_to "/admin_repo/repo/#{rid}/preprocess", :flash => { :error => @message[:error] }
+      redirect_to "/admin_repo/repo/#{@repo.id}/preprocess", :flash => { :error => @message[:error] }
     elsif @message[:success].present?
-      redirect_to "/admin_repo/repo/#{rid}/preprocess", :flash => { :success => @message[:success] }
+      redirect_to "/admin_repo/repo/#{@repo.id}/preprocess", :flash => { :success => @message[:success] }
     end
   end
 
