@@ -50,10 +50,6 @@ module Utils
           return digest
         end
 
-        def get_file_list
-
-        end
-
         def format_content(file_list)
           hash_separated = ""
           @checksums_hash.each do |v|
@@ -66,15 +62,6 @@ module Utils
           end
           return hash_separated
         end
-
-        # def format_content
-        #   formatted_checksums_hash = ""
-        #   @checksums_hash.each do |row|
-        #      formatted = row.flatten.join("\t")
-        #      formatted_checksums_hash += formatted
-        #   end
-        #   return formatted_checksums_hash
-        # end
 
     end
   end

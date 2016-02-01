@@ -1,5 +1,5 @@
 class ReposController < ApplicationController
-  before_action :set_repo, only: [:show, :edit, :update, :destroy]
+  before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log]
 
   # GET /repos
   # GET /repos.json
@@ -15,7 +15,6 @@ class ReposController < ApplicationController
       redirect_to "/admin_repo/repo/#{@repo.id}/git_review", :flash => { :error => @message[:error] }
     elsif @message[:success].present?
       redirect_to "/admin_repo/repo/#{@repo.id}/git_review", :flash => { :success => @message[:success] }
-
     end
   end
 
@@ -65,6 +64,15 @@ class ReposController < ApplicationController
     respond_to do |format|
       format.html { redirect_to repos_url, notice: 'Repo was successfully destroyed.' }
       format.json { head :no_content }
+    end
+  end
+
+  def checksum_log
+    @message = Utils.generate_checksum_log
+    if @message[:error].present?
+      redirect_to "/admin_repo/repo/#{@repo.id}/preprocess", :flash => { :error => @message[:error] }
+    elsif @message[:success].present?
+      redirect_to "/admin_repo/repo/#{@repo.id}/preprocess", :flash => { :success => @message[:success] }
     end
   end
 

@@ -3,6 +3,7 @@ require Rails.root.join('lib', 'rails_admin', 'create_remote.rb')
 require Rails.root.join('lib', 'rails_admin', 'clone_from_production.rb')
 require Rails.root.join('lib', 'rails_admin', 'sign_off_production.rb')
 require Rails.root.join('lib', 'rails_admin', 'report_flagged.rb')
+require Rails.root.join('lib', 'rails_admin', 'preprocess_review.rb')
 
 RailsAdmin.config do |config|
   config.main_app_name = ["Intermediary", "Admin Interface"]
@@ -24,13 +25,7 @@ RailsAdmin.config do |config|
     create_remote do
       only ["Repo"]
     end
-    clone_from_production do
-      only ["Repo"]
-    end
-    report_flagged do
-      only ["Repo"]
-    end
-    sign_off_production do
+    preprocess_review do
       only ["Repo"]
     end
   end

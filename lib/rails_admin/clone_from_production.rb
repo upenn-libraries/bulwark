@@ -8,10 +8,6 @@ module RailsAdmin
 
          RailsAdmin::Config::Actions.register(self)
 
-         register_instance_option :review_status do
-           :to_review
-         end
-
          register_instance_option :route_fragment do
            'clone_from_production'
          end

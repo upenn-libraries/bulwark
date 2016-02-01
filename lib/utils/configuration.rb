@@ -11,8 +11,5 @@ module Utils
     attr_accessor :imports_local_staging
     attr_accessor :repository_prefix
     attr_accessor :split_on
-    
   end
-
-
 end

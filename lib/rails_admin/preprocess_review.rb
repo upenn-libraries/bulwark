@@ -4,12 +4,12 @@ require 'rails_admin/config/actions/base'
 module RailsAdmin
   module Config
     module Actions
-      class SignOffProduction < RailsAdmin::Config::Actions::Base
+      class PreprocessReview < RailsAdmin::Config::Actions::Base
 
          RailsAdmin::Config::Actions.register(self)
 
          register_instance_option :route_fragment do
-           'sign_off_production'
+           'preprocess'
          end
 
         register_instance_option :member? do
@@ -17,7 +17,7 @@ module RailsAdmin
         end
 
         register_instance_option :link_icon do
-         'fa fa-check'
+         'fa fa-tasks'
         end
 
         register_instance_option :http_methods do
