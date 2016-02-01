@@ -2,9 +2,7 @@ namespace :process do
 
   desc "Trigger batch import to Fedora"
   task :import => :environment do
-    Dir.glob "#{Utils.config.imports_local_staging}/#{Utils.config.repository_prefix}*.xml" do |file|
-      Utils::Process.import(file)
-    end
+    Utils.import_to_fedora
   end
 
   desc "Attach files to pages"
