@@ -15,7 +15,6 @@ class ReposController < ApplicationController
       redirect_to "/admin_repo/repo/#{@repo.id}/git_review", :flash => { :error => @message[:error] }
     elsif @message[:success].present?
       redirect_to "/admin_repo/repo/#{@repo.id}/git_review", :flash => { :success => @message[:success] }
-
     end
   end
 
@@ -66,6 +65,11 @@ class ReposController < ApplicationController
       format.html { redirect_to repos_url, notice: 'Repo was successfully destroyed.' }
       format.json { head :no_content }
     end
+  end
+
+  def checksum_log(rid)
+    Utils.generate_checksum_log
+    redirect_to "/admin_repo/repo/#{rid}/git_review"
   end
 
   private
