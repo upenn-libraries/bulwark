@@ -7,4 +7,9 @@ namespace :preprocess do
     end
   end
 
+  desc "Fetch and convert flat XML"
+  task :fetch_and_convert_files => :environment do
+    Utils.fetch_and_convert_files
+  end
+
 end

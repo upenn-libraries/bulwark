@@ -33,27 +33,4 @@ namespace :filesystem do
       #{I18n.t('filesystem.yaml_bad_instructions')}"
     end
   end
-
-  desc "Fetch and convert flat XML"
-  task :fetch_files => :environment do
-    Dir.glob "#{Utils.config.assets_path}/*" do |directory|
-      manifest_present = Utils::Preprocess.check_for_manifest("#{directory}/#{Utils.config.object_manifest_location}")
-      if(manifest_present)
-        manifest, file_list = Utils::Preprocess.build_for_preprocessing(directory)
-        manifest.each { |k, v| manifest[k] = v.prepend("#{directory}/") }
-        f = File.readlines(manifest["#{Utils.config.metadata_path_label}"])
-        index = f.index("  </record>\n")
-        f.insert(index, "    <file_list>\n","    </file_list>\n") unless file_list.empty?
-        flist_index = f.index("    <file_list>\n")
-        file_list.each do |file_name|
-          file_name.gsub!(Utils.config.assets_path, Utils.config.federated_fs_path)
-          f.insert((flist_index+1), "      <file>#{file_name}</file>")
-        end
-        File.open("tmp/structure.xml", "w+") do |updated_metadata|
-          updated_metadata.puts(f)
-        end
-        `xsltproc #{Rails.root}/lib/tasks/sv.xslt tmp/structure.xml`
-      end
-    end
-  end
 end
