@@ -2,6 +2,8 @@ Rails.application.routes.draw do
   resources :repos do
     member do
       post :checksum_log
+      post :prepare_for_ingest
+      post :ingest
     end
   end
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'

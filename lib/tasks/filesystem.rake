@@ -34,7 +34,7 @@ namespace :filesystem do
     end
   end
 
-  desc "Fetch flat XML"
+  desc "Fetch and convert flat XML"
   task :fetch_files => :environment do
     Dir.glob "#{Utils.config.assets_path}/*" do |directory|
       manifest_present = Utils::Preprocess.check_for_manifest("#{directory}/#{Utils.config.object_manifest_location}")
@@ -54,8 +54,6 @@ namespace :filesystem do
         end
         `xsltproc #{Rails.root}/lib/tasks/sv.xslt tmp/structure.xml`
       end
-
-
     end
   end
 end
