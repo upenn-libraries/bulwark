@@ -1,6 +1,13 @@
 require 'git'
 
 class Repo < ActiveRecord::Base
+  
+  validates :title, presence: true
+  validates :directory, presence: true
+  validates :metadata_subdirectory, presence: true
+  validates :assets_subdirectory, presence: true
+  validates :metadata_filename, presence: true
+  validates :file_extensions, presence: true
 
   include Filesystem
 
