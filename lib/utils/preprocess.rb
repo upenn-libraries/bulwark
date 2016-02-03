@@ -34,6 +34,9 @@ module Utils
       manifest = get_filesystem_manifest_hash(manifest_path)
       file_list = get_file_list(parent_directory)
       return manifest, file_list
+      unless File.exists?(manifest_path)
+        Rails.logger.debug "WARNING: No filesystem manifest found at #{manifest_path}, skipping..."
+      end
     end
   end
 

@@ -37,8 +37,8 @@ class Repo < ActiveRecord::Base
   def populate_admin_manifest(full_admin_path)
     manifest_path = "#{full_admin_path}/manifest.txt"
     file_types = define_file_types
-    metadata_line = "METADATA_PATH: #{self.metadata_subdirectory}/#{metadata_filename}"
-    assets_line = "ASSETS_PATH: #{self.assets_subdirectory}/#{file_types}"
+    metadata_line = "#{Utils.config.metadata_path_label}: #{self.metadata_subdirectory}/#{metadata_filename}"
+    assets_line = "#{Utils.config.file_path_label}: #{self.assets_subdirectory}/#{file_types}"
     File.open(manifest_path, "w+") do |file|
       file.puts("#{metadata_line}\n#{assets_line}")
     end
