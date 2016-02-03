@@ -1,14 +1,10 @@
 class ReposController < ApplicationController
-  before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log]
+  before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log, :prepare_for_ingest, :ingest]
 
-  # GET /repos
-  # GET /repos.json
   def index
     @repos = Repo.all
   end
 
-  # GET /repos/1
-  # GET /repos/1.json
   def show
     @message = @repo.create_remote
     if @message[:error].present?
@@ -18,17 +14,13 @@ class ReposController < ApplicationController
     end
   end
 
-  # GET /repos/new
   def new
     @repo = Repo.new
   end
 
-  # GET /repos/1/edit
   def edit
   end
 
-  # POST /repos
-  # POST /repos.json
   def create
     @repo = Repo.new(repo_params)
 
@@ -43,8 +35,6 @@ class ReposController < ApplicationController
     end
   end
 
-  # PATCH/PUT /repos/1
-  # PATCH/PUT /repos/1.json
   def update
     respond_to do |format|
       if @repo.update(repo_params)
@@ -57,8 +47,6 @@ class ReposController < ApplicationController
     end
   end
 
-  # DELETE /repos/1
-  # DELETE /repos/1.json
   def destroy
     @repo.destroy
     respond_to do |format|
@@ -76,13 +64,30 @@ class ReposController < ApplicationController
     end
   end
 
+  def prepare_for_ingest
+    @message = Utils.fetch_and_convert_files
+    if @message[:error].present?
+      redirect_to "/admin_repo/repo/#{@repo.id}/preprocess", :flash => { :error => @message[:error] }
+    elsif @message[:success].present?
+      redirect_to "/admin_repo/repo/#{@repo.id}/preprocess", :flash => { :success => @message[:success] }
+    end
+  end
+
+  def ingest
+    @message = Utils.import
+    Utils.index
+    if @message[:error].present?
+      redirect_to "/admin_repo/repo/#{@repo.id}/preprocess", :flash => { :error => @message[:error] }
+    elsif @message[:success].present?
+      redirect_to "/admin_repo/repo/#{@repo.id}/preprocess", :flash => { :success => @message[:success] }
+    end
+  end
+
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_repo
       @repo = Repo.find(params[:id])
     end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
     def repo_params
       params.require(:repo).permit(:title, :directory, :identifier, :description, :metadata_subdirectory, :assets_subdirectory, :metadata_filename, :file_extensions)
     end
