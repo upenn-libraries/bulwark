@@ -14,10 +14,15 @@ module Utils
       Dir.glob "#{Utils.config.assets_path}/*" do |directory|
         begin
           manifest, file_list = Utils::Preprocess.build_for_preprocessing(directory)
-          checksum_path = "#{directory}/#{Utils.config.object_admin_path}/checksum.tsv"
-          b.calculate(file_list)
-          checksum_manifest = Utils::Manifests::Manifest.new(Utils::Manifests::Checksum, checksum_path, b.content)
-          checksum_manifest.save
+
+          unless file_list.empty?
+            checksum_path = "#{directory}/#{Utils.config.object_admin_path}/checksum.tsv"
+            b.calculate(file_list)
+            checksum_manifest = Utils::Manifests::Manifest.new(Utils::Manifests::Checksum, checksum_path, b.content)
+            checksum_manifest.save
+          else
+            return {:error => "No files detected for #{directory}/#{manifest[Utils.config.file_path_label]}"}
+          end
         rescue SystemCallError
           next
         end
