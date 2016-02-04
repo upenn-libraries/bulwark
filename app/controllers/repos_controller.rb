@@ -56,7 +56,7 @@ class ReposController < ApplicationController
   end
 
   def checksum_log
-    @message = Utils.generate_checksum_log
+    @message = Utils.generate_checksum_log("#{Utils.config.assets_path}/#{@repo.directory}")
     if @message[:error].present?
       redirect_to "/admin_repo/repo/#{@repo.id}/preprocess", :flash => { :error => @message[:error] }
     elsif @message[:success].present?
