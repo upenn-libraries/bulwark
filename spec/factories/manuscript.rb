@@ -5,5 +5,4 @@ FactoryGirl.define do
     title {Faker::Lorem.words(10, true)}
     identifier [Faker::Internet.slug]
   end
-
 end
