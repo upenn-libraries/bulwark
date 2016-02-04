@@ -1,5 +1,8 @@
 class Manuscript < ActiveFedora::Base
 
+  validates :title, presence: true
+  validates :identifier, presence: true
+
   property :abstract, predicate: ::RDF::Vocab::DC.abstract, multiple: false do |index|
     index.as :stored_searchable
   end
@@ -64,7 +67,7 @@ class Manuscript < ActiveFedora::Base
     index.as :stored_searchable, :facetable
   end
 
-  property :title, predicate: ::RDF::Vocab::DC.title, multiple: false do |index|
+  property :title, predicate: ::RDF::Vocab::DC.title, multiple: true do |index|
     index.as :stored_searchable
   end
 
