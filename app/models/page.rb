@@ -1,7 +1,10 @@
 class Page < ActiveFedora::Base
   contains "pageImage"
 
-  property :page_id, predicate: ::RDF::Vocab::DC.identifier, multiple: false do |index|
+  validates :page_id, presence: true
+  validates :parent_manuscript, presence: true
+
+  property :page_id, predicate: ::RDF::Vocab::DC.identifier, multiple: true do |index|
     index.as :stored_searchable
     index.type :stored_searchable
   end
@@ -11,7 +14,7 @@ class Page < ActiveFedora::Base
     index.type :stored_searchable
   end
 
-  property :page_number, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/pageNumber'), multiple: false do |index|
+  property :page_number, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/pageNumber'), multiple: true do |index|
     index.as :stored_searchable
     index.type :integer
   end
@@ -24,7 +27,7 @@ class Page < ActiveFedora::Base
     index.as :stored_searchable
   end
 
-  property :parent_manuscript, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/parentManuscript'), multiple: false do |index|
+  property :parent_manuscript, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/parentManuscript'), multiple: true do |index|
     index.as :stored_searchable
   end
 end

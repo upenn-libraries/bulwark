@@ -1,5 +1,8 @@
 class Manuscript < ActiveFedora::Base
 
+  validates :title, presence: true
+  validates :identifier, presence: true
+
   property :abstract, predicate: ::RDF::Vocab::DC.abstract, multiple: false do |index|
     index.as :stored_searchable
   end
