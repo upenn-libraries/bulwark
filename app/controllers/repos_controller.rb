@@ -1,57 +1,12 @@
 class ReposController < ApplicationController
   before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log, :prepare_for_ingest, :ingest]
 
-  def index
-    @repos = Repo.all
-  end
-
   def show
     @message = @repo.create_remote
     if @message[:error].present?
       redirect_to "/admin_repo/repo/#{@repo.id}/git_review", :flash => { :error => @message[:error] }
     elsif @message[:success].present?
       redirect_to "/admin_repo/repo/#{@repo.id}/git_review", :flash => { :success => @message[:success] }
-    end
-  end
-
-  def new
-    @repo = Repo.new
-  end
-
-  def edit
-  end
-
-  def create
-    @repo = Repo.new(repo_params)
-
-    respond_to do |format|
-      if @repo.save
-        format.html { redirect_to @repo, notice: 'Repo was successfully created.' }
-        format.json { render :show, status: :created, location: @repo }
-      else
-        format.html { render :new }
-        format.json { render json: @repo.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  def update
-    respond_to do |format|
-      if @repo.update(repo_params)
-        format.html { redirect_to @repo, notice: 'Repo was successfully updated.' }
-        format.json { render :show, status: :ok, location: @repo }
-      else
-        format.html { render :edit }
-        format.json { render json: @repo.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  def destroy
-    @repo.destroy
-    respond_to do |format|
-      format.html { redirect_to repos_url, notice: 'Repo was successfully destroyed.' }
-      format.json { head :no_content }
     end
   end
 
