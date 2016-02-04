@@ -9,25 +9,20 @@ module Utils
       yield config
     end
 
-    def generate_checksum_log
+    def generate_checksum_log(directory)
       b = Utils::Manifests::Checksum.new("sha256")
-      Dir.glob "#{Utils.config.assets_path}/*" do |directory|
-        begin
-          manifest, file_list = Utils::Preprocess.build_for_preprocessing(directory)
-
-          unless file_list.empty?
-            checksum_path = "#{directory}/#{Utils.config.object_admin_path}/checksum.tsv"
-            b.calculate(file_list)
-            checksum_manifest = Utils::Manifests::Manifest.new(Utils::Manifests::Checksum, checksum_path, b.content)
-            checksum_manifest.save
-          else
-            return {:error => "No files detected for #{directory}/#{manifest[Utils.config.file_path_label]}"}
-          end
-        rescue SystemCallError
-          next
+      begin
+        manifest, file_list = Utils::Preprocess.build_for_preprocessing(directory)
+        unless file_list.empty?
+          checksum_path = "#{directory}/#{Utils.config.object_admin_path}/checksum.tsv"
+          b.calculate(file_list)
+          checksum_manifest = Utils::Manifests::Manifest.new(Utils::Manifests::Checksum, checksum_path, b.content)
+          checksum_manifest.save
+        else
+          return {:error => "No files detected for #{directory}/#{manifest[Utils.config.file_path_label]}"}
         end
+        return { :success => "Checksum log generated" }
       end
-      return { :success => "Checksum log generated" }
     end
 
     def fetch_and_convert_files

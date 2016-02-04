@@ -46,6 +46,14 @@ gem "devise"
 gem "devise-guests", "~> 0.3"
 group :development, :test do
   gem "pry-rails", "~> 0.3.4"
-  gem "rspec-rails"
   gem "jettywrapper"
+end
+
+group :test do
+  gem 'rspec-rails'
+  gem 'factory_girl_rails'
+  gem 'faker'
+  gem 'capybara'
+  gem 'guard-rspec'
+  gem 'launchy'
 end

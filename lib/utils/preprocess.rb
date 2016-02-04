@@ -7,7 +7,6 @@ module Utils
       manifest = Hash.new
       manifest_keys_array = Array.new
       manifest_values_array = Array.new
-
       f = File.readlines(path)
       f.each do |line|
         lp = line.split(":")

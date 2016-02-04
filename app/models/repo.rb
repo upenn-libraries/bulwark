@@ -2,6 +2,17 @@ require 'git'
 
 class Repo < ActiveRecord::Base
 
+  validates :title, presence: true
+  validates :directory, presence: true
+  validates :metadata_subdirectory, presence: true
+  validates :assets_subdirectory, presence: true
+  validates :metadata_filename, presence: true
+  validates :file_extensions, presence: true
+
+  validates :title, multiple: false
+  validates :directory, multiple: false
+
+
   include Filesystem
 
   def create_remote
@@ -17,7 +28,7 @@ class Repo < ActiveRecord::Base
     end
 
   end
-
+private
   def build_and_populate_directories
     admin_subdirectory = "admin"
     Dir.mkdir(@full_directory_path)
