@@ -10,5 +10,15 @@ RSpec.describe Page, type: :model do
   it "is invalid without a parent manuscript" do
     expect(FactoryGirl.build(:page, :parent_manuscript => nil)).not_to be_valid
   end
-  it "is the child of an existing manuscript"
+
+  describe "relationship to manuscript" do
+    before :each do
+      @manuscript = FactoryGirl.create(:manuscript)
+    end
+    
+    it "is the child of an existing manuscript" do
+      expect(FactoryGirl.create(:page, :parent_manuscript => @manuscript.identifier)).to be_valid
+    end
+  end
+
 end
