@@ -62,6 +62,9 @@ RailsAdmin.config do |config|
       required(true)
       help "Required - comma-separated list of accepted file extensions for assets to be served to production from the assets subdirectory.  Example: jpeg,tif"
     end
+    field :metadata_sources do
+      required(false)
+    end
 
   end
 

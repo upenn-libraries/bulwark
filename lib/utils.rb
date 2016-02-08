@@ -69,15 +69,19 @@ module Utils
     end
 
     def detect_metadata(repo)
-      metadata_sources = Array.new
-      Dir.glob("#{Utils.config.assets_path}/#{repo.directory}/#{repo.metadata_subdirectory}/*") do |file|
-        ext = file.split(".").last
-        m_source = Utils::Artifacts::MetadataSource.new(file, ext)
-        metadata_sources << m_source.to_a
+      begin
+        metadata_sources = Array.new
+        Dir.glob("#{Utils.config.assets_path}/#{repo.directory}/#{repo.metadata_subdirectory}/*") do |file|
+          ext = file.split(".").last
+          m_source = ["tbd", file, ext]
+          metadata_sources << m_source.to_a
+        end
+        repo.metadata_sources = metadata_sources
+        repo.save
+        return {:success => "Sources detected -- see table below for details."}
+      rescue
+        return {:error => "No sources detected."}
       end
-      repo.metadata_sources = metadata_sources
-      repo.save
-      return {:success => "Sources detected: #{metadata_sources}"}
     end
 
   end

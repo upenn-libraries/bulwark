@@ -23,14 +23,26 @@ module RailsAdminHelper
   end
 
   def render_sources_table(repo)
-    table = _build_table_from_array(repo.metadata_sources)
-    page_content = table
+    headers = ["Type", "Path", "Unit Format"]
+    table = _build_table_from_array(headers, repo.metadata_sources)
+    page_content = content_tag("div", table, :class => "metadata-sources-table")
     return page_content
   end
 
-  def _build_table_from_array(array_to_use)
-    binding.pry()
-    array_table = ""
-    return array_table
+  def _build_table_from_array(table_headers, array_to_use)
+    headers_formatted = ""
+    table_headers.each {|header| headers_formatted << "<th>#{header}</th>" }
+    rows = ""
+
+    array_to_use.each do |row|
+      rows << "<tr>"
+      row.each do |val|
+        rows << "<td>" << val << "</td>"
+      end
+      rows << "</tr>"
+    end
+
+    array_table = "<table>#{headers_formatted}#{rows}</table>"
+    return array_table.html_safe
   end
 end
