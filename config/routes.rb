@@ -4,6 +4,7 @@ Rails.application.routes.draw do
       post :checksum_log
       post :prepare_for_ingest
       post :ingest
+      post :detect_metadata
     end
   end
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'

@@ -1,5 +1,6 @@
 module RailsAdminHelper
   include Filesystem
+  include Utils
 
   def render_git_remote_options
     full_path = "#{assets_path_prefix}/#{@object.directory}"
@@ -19,5 +20,17 @@ module RailsAdminHelper
       end
     end
     return page_content
+  end
+
+  def render_sources_table(repo)
+    table = _build_table_from_array(repo.metadata_sources)
+    page_content = table
+    return page_content
+  end
+
+  def _build_table_from_array(array_to_use)
+    binding.pry()
+    array_table = ""
+    return array_table
   end
 end

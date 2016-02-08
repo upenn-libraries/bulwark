@@ -12,6 +12,7 @@ class Repo < ActiveRecord::Base
   validates :title, multiple: false
   validates :directory, multiple: false
 
+  serialize :metadata_sources
 
   include Filesystem
 
