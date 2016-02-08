@@ -1,3 +1,5 @@
+require 'roo'
+
 module Utils
   class << self
 
@@ -73,8 +75,8 @@ module Utils
         metadata_sources = Array.new
         Dir.glob("#{Utils.config.assets_path}/#{repo.directory}/#{repo.metadata_subdirectory}/*") do |file|
           ext = file.split(".").last
-          m_source = ["tbd", file, ext]
-          metadata_sources << m_source.to_a
+          m_source = {:type => "tbd", :path => file, :unit_type => ext}
+          metadata_sources << m_source
         end
         repo.metadata_sources = metadata_sources
         repo.save
@@ -84,5 +86,25 @@ module Utils
       end
     end
 
+    def convert_metadata(repo)
+      begin
+        repo.metadata_sources.each do |source|
+          case source[:unit_type]
+          when "xlsx"
+            xlsx = Roo::Spreadsheet.open(source[:path])
+            File.open("thing.csv", "w+") do |f|
+              f.write(xlsx.to_csv)
+            end
+          when "csv"
+          when "xml"
+          else
+            raise "Illegal metadata source unit type"
+          end
+        end
+        return {:success => "It worked!"}
+      rescue
+        return {:error => "Something wrong"}
+      end
+    end
   end
 end

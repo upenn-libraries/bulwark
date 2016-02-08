@@ -1,4 +1,6 @@
 <ul>
   <%= content_tag("li", (link_to "Detect metadata source", "/repos/#{@object.id}/detect_metadata", :id => @object.id, method: :post)) %>
   <%= render_sources_table(@object) unless @object.metadata_sources.nil? %>
+  <%= content_tag("li", (link_to "Convert metadata source files to XML", "/repos/#{@object.id}/convert_metadata", :id => @object.id, method: :post)) %>
+
 </ul>

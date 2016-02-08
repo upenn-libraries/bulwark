@@ -1,5 +1,5 @@
 class ReposController < ApplicationController
-  before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log, :prepare_for_ingest, :ingest, :detect_metadata]
+  before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log, :prepare_for_ingest, :ingest, :detect_metadata, :convert_metadata]
 
   def show
     @message = @repo.create_remote
@@ -40,6 +40,15 @@ class ReposController < ApplicationController
 
   def detect_metadata
     @message = Utils.detect_metadata(@repo)
+    if @message[:error].present?
+      redirect_to "/admin_repo/repo/#{@repo.id}/map_metadata", :flash => { :error => @message[:error] }
+    elsif @message[:success].present?
+      redirect_to "/admin_repo/repo/#{@repo.id}/map_metadata", :flash => { :success => @message[:success] }
+    end
+  end
+
+  def convert_metadata
+    @message = Utils.convert_metadata(@repo)
     if @message[:error].present?
       redirect_to "/admin_repo/repo/#{@repo.id}/map_metadata", :flash => { :error => @message[:error] }
     elsif @message[:success].present?

@@ -441,6 +441,9 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
+    roo (2.3.1)
+      nokogiri (~> 1)
+      rubyzip (~> 1.1, < 2.0.0)
     rsolr (1.0.13)
       builder (>= 2.1.2)
     rspec (3.4.0)
@@ -560,6 +563,7 @@ DEPENDENCIES
   qa
   rails (= 4.2.5)
   rails_admin
+  roo
   rsolr (~> 1.0.6)
   rspec-rails
   sass-rails (< 5.0)
