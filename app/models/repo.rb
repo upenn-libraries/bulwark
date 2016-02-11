@@ -27,8 +27,21 @@ class Repo < ActiveRecord::Base
     else
       return { :error => "Remote already exists" }
     end
-
   end
+
+  def set_metadata_sources
+    begin
+      metadata_sources = Array.new
+      Dir.glob("#{Utils.config.assets_path}/#{self.directory}/#{self.metadata_subdirectory}/*") do |file|
+        metadata_sources << file
+      end
+      self.metadata_sources = metadata_sources
+      self.save
+    rescue
+      raise "No metadata sources detected"
+    end
+  end
+
 private
   def build_and_populate_directories
     admin_subdirectory = "admin"

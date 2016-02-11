@@ -71,22 +71,6 @@ module Utils
       ActiveFedora::Base.reindex_everything
     end
 
-    def detect_metadata(repo)
-      begin
-        metadata_sources = Array.new
-        Dir.glob("#{Utils.config.assets_path}/#{repo.directory}/#{repo.metadata_subdirectory}/*") do |file|
-          ext = file.split(".").last
-          m_source = {:type => "tbd", :path => file, :unit_type => ext}
-          metadata_sources << m_source
-        end
-        repo.metadata_sources = metadata_sources
-        repo.save
-        return {:success => "Sources detected -- see table below for details."}
-      rescue
-        return {:error => "No sources detected."}
-      end
-    end
-
     def convert_metadata(repo)
       begin
         repo.metadata_sources.each do |source|
