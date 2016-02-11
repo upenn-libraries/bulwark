@@ -45,4 +45,9 @@ module RailsAdminHelper
     return array_table.html_safe
   end
 
+  def _build_form_list(repo)
+    @mappings = Utils.convert_metadata(repo)
+    return @mappings
+  end
+
 end
