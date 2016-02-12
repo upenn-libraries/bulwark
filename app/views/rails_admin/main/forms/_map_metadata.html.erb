@@ -3,11 +3,13 @@
   <%= field_set_tag 'Map source metadata to XML' do %>
     Fill out the fields below to map your metadata to source.
   <% end %>
-  <% mappings.each do |p| %>
-    <%= content_tag :div, :class => "field" do -%>
-    <%= content_tag(:span, "\"#{p.first}\" should map to:") %>
-    <%= f.text_field :field_mappings, :value => "#{p.first}" %>
-    <%= content_tag(:div, "Example values from source: #{p.last.to_s}", :class => "field_tip") %>
+  <% mappings_sets.each do |mappings| %>
+    <% mappings.each do |p| %>
+      <%= content_tag :div, :class => "field" do -%>
+      <%= content_tag(:span, "\"#{p.first}\" should map to:") %>
+      <%= f.text_field :field_mappings, :value => "#{p.first}" %>
+      <%= content_tag(:div, "Example values from source: #{p.last.to_s}", :class => "field_tip") %>
+      <% end -%>
     <% end -%>
   <% end -%>
   <%= f.submit %>

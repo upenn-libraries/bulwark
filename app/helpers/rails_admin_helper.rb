@@ -49,18 +49,22 @@ module RailsAdminHelper
     return @mappings
   end
 
-  def render_sample_xml(mappings)
-    sample_xml_content = "<record>"
-    mappings.each do |mapping|
-      mapping.last.each do |val|
-        sample_xml_content << "<#{mapping.first}>#{val}</#{mapping.first}>\n"
+  def render_sample_xml(mappings_sets)
+    sample_xml_docs = ""
+    mappings_sets.each do |mappings|
+      sample_xml_content = "<root>"
+      mappings.each do |mapping|
+        mapping.last.each do |val|
+          sample_xml_content << "<#{mapping.first}>#{val}</#{mapping.first}>\n"
+        end
       end
+      sample_xml_content << "</root>"
+      sample_xml_doc = REXML::Document.new sample_xml_content
+      sample_xml = ""
+      sample_xml_doc.write(sample_xml, 1)
+      sample_xml_docs << content_tag(:pre, "#{sample_xml}")
     end
-    sample_xml_content << "</record>"
-    sample_xml_doc = REXML::Document.new sample_xml_content
-    sample_xml = ""
-    sample_xml_doc.write(sample_xml, 1)
-    return content_tag(:pre, sample_xml)
+    return sample_xml_docs.html_safe
   end
 
 end
