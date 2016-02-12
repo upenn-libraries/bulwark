@@ -1,3 +1,5 @@
+require "rexml/document"
+
 module RailsAdminHelper
   include Filesystem
   include Utils
@@ -24,7 +26,7 @@ module RailsAdminHelper
 
   def render_sources_table(repo)
     headers = Array.new
-    repo.metadata_sources.first.each{ |header| headers << header.first.to_s }
+    repo.metadata_sources.each{ |header| headers << header.first.to_s }
     table = _build_table_from_hash(headers, repo.metadata_sources)
     page_content = content_tag("div", table, :class => "metadata-sources-table")
     return page_content
@@ -35,19 +37,30 @@ module RailsAdminHelper
     table_headers.each {|header| headers_formatted << "<th>#{header}</th>" }
     rows = ""
     hash_to_use.each do |row|
-      rows << "<tr>"
-      row.each do |val|
-        rows << "<td>" << val.last << "</td>"
-      end
-      rows << "</tr>"
+      rows << "<tr>" << "<td>" << row << "</td>" << "</tr>"
     end
     array_table = "<table>#{headers_formatted}#{rows}</table>"
     return array_table.html_safe
   end
 
   def _build_form_list(repo)
-    @mappings = Utils.convert_metadata(repo)
+    metadata_builder = MetadataBuilder.create(:parent_repo => repo.id.to_i)
+    @mappings = metadata_builder.prep_for_mapping
     return @mappings
+  end
+
+  def render_sample_xml(mappings)
+    sample_xml_content = "<record>"
+    mappings.each do |mapping|
+      mapping.last.each do |val|
+        sample_xml_content << "<#{mapping.first}>#{val}</#{mapping.first}>\n"
+      end
+    end
+    sample_xml_content << "</record>"
+    sample_xml_doc = REXML::Document.new sample_xml_content
+    sample_xml = ""
+    sample_xml_doc.write(sample_xml, 1)
+    return content_tag(:pre, sample_xml)
   end
 
 end

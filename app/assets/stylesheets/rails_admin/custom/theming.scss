@@ -1,6 +1,5 @@
 @import "font-awesome";
 
-
 .git-actions pre {
   background-color: #e4e4e4;
 }
@@ -8,4 +7,13 @@
 .metadata-sources-table table, .metadata-sources-table th, .metadata-sources-table tr, .metadata-sources-table td {
   border: 1px solid #000000;
   padding: 5px;
+}
+
+form.field_mappings .field {
+  margin-top: 20px;
+}
+
+.field_mappings .field_tip {
+  color: #524e51;
+  font-size: 12px;
 }

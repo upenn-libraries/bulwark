@@ -1,2 +1,15 @@
-<%= @mappings = _build_form_list(@object) %>
-<%= form_for @mappings do |f|; f.input :text_field, as: :array; end; %>
+<h2>Metadata Mapping</h2>
+  <%= form_for(:metadata_builder, :html => { :class => "field_mappings"}) do |f| %>
+  <%= field_set_tag 'Map source metadata to XML' do %>
+    Fill out the fields below to map your metadata to source.
+  <% end %>
+  <% mappings.each do |p| %>
+    <%= content_tag :div, :class => "field" do -%>
+    <%= content_tag(:span, "\"#{p.first}\" should map to:") %>
+    <%= f.text_field :field_mappings, :value => "#{p.first}" %>
+    <%= content_tag(:div, "Example values from source: #{p.last.to_s}", :class => "field_tip") %>
+    <% end -%>
+  <% end -%>
+  <%= f.submit %>
+<% end %>
+<%= render_sample_xml(@mappings) %>

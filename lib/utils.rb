@@ -70,44 +70,6 @@ module Utils
     def index
       ActiveFedora::Base.reindex_everything
     end
-
-    def convert_metadata(repo)
-      begin
-        repo.metadata_sources.each do |source|
-          case source[:unit_type]
-          when "xlsx"
-            xlsx = Roo::Spreadsheet.open(source[:path])
-            tmp_csv = "tmp/#{Pathname.new(source[:path]).basename.to_s}.csv"
-            File.open(tmp_csv, "w+") do |f|
-              f.write(xlsx.to_csv)
-            end
-            @mappings = generate_mapping_options_csv(tmp_csv)
-          when "csv"
-            @mappings = generate_mapping_options_csv(tmp_csv)
-          when "xml"
-          else
-            raise "Illegal metadata source unit type"
-          end
-        end
-        return @mappings, {:success => "See metadata mapping options below"}
-      rescue
-        return {:error => "Metadata conversion failed.  See log for errors."}
-      end
-    end
-
-    def generate_mapping_options_csv(base_file)
-      mappings = {}
-
-      headers = CSV.open(base_file, 'r') { |csv| csv.first }
-      headers.each{|a| mappings[a] = 0}
-      headers.each do |header|
-        sample_vals = Array.new
-        CSV.foreach(base_file, :headers => true) do |row|
-          sample_vals << row["#{header}"] unless row["#{header}"].nil?
-        end
-        mappings["#{header}"] = sample_vals
-      end
-      return mappings
-    end
+    
   end
 end
