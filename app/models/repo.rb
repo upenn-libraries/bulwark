@@ -37,8 +37,9 @@ class Repo < ActiveRecord::Base
       end
       self.metadata_sources = metadata_sources
       self.save
+      return { :success => "Metadata sources detected -- see output below." }
     rescue
-      raise "No metadata sources detected"
+      return { :error => "No metadata sources detected." }
     end
   end
 

@@ -25,28 +25,30 @@ module RailsAdminHelper
   end
 
   def render_sources_table(repo)
-    headers = Array.new
-    repo.metadata_sources.each{ |header| headers << header.first.to_s }
-    table = _build_table_from_hash(headers, repo.metadata_sources)
+    table = _build_table_from_hash(repo.metadata_sources)
     page_content = content_tag("div", table, :class => "metadata-sources-table")
     return page_content
   end
 
-  def _build_table_from_hash(table_headers, hash_to_use)
-    headers_formatted = ""
-    table_headers.each {|header| headers_formatted << "<th>#{header}</th>" }
+  def _build_table_from_hash(hash_to_use)
+    header = "<th>File Path</th>"
     rows = ""
     hash_to_use.each do |row|
       rows << "<tr>" << "<td>" << row << "</td>" << "</tr>"
     end
-    array_table = "<table>#{headers_formatted}#{rows}</table>"
+    array_table = "<table>#{header}#{rows}</table>"
     return array_table.html_safe
   end
 
   def _build_form_list(repo)
-    metadata_builder = MetadataBuilder.create(:parent_repo => repo.id.to_i)
+    metadata_builder = _metadata_builder(repo)
     @mappings = metadata_builder.prep_for_mapping
     return @mappings
+  end
+
+  def _metadata_builder(repo)
+    mb = MetadataBuilder.where(:parent_repo => repo.id).blank? ? MetadataBuilder.create(:parent_repo => repo.id) : MetadataBuilder.find_by(:parent_repo => repo.id)
+    return mb
   end
 
   def render_sample_xml(mappings_sets)

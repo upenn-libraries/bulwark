@@ -39,7 +39,7 @@ class ReposController < ApplicationController
   end
 
   def detect_metadata
-    @message = Utils.detect_metadata(@repo)
+    @message = @repo.set_metadata_sources
     if @message[:error].present?
       redirect_to "/admin_repo/repo/#{@repo.id}/map_metadata", :flash => { :error => @message[:error] }
     elsif @message[:success].present?
@@ -47,14 +47,6 @@ class ReposController < ApplicationController
     end
   end
 
-  def convert_metadata
-    @message = Utils.convert_metadata(@repo)
-    if @message[:error].present?
-      redirect_to "/admin_repo/repo/#{@repo.id}/map_metadata", :flash => { :error => @message[:error] }
-    elsif @message[:success].present?
-      redirect_to "/admin_repo/repo/#{@repo.id}/map_metadata", :flash => { :success => @message[:success] }
-    end
-  end
 
   private
     def set_repo

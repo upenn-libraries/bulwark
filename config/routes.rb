@@ -6,6 +6,12 @@ Rails.application.routes.draw do
       post :ingest
       post :detect_metadata
       post :convert_metadata
+      post :save_mappings
+    end
+  end
+  resources :metadata_builders do
+    member do
+      post :save_mappings
     end
   end
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
