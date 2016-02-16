@@ -7,7 +7,13 @@ class MetadataBuilder < ActiveRecord::Base
 
   serialize :source
 
+  serialize :field_mappings
+
   before_validation :set_source
+
+  def field_mappings=(field_mappings)
+    self[:field_mappings] = eval(field_mappings)
+  end
 
   def set_source
     repo = Repo.find(self.parent_repo)

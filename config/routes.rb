@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   end
   resources :metadata_builders do
     member do
-      post :save_mappings
+      post :update
     end
   end
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
