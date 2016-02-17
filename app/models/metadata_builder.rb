@@ -1,18 +1,25 @@
 class MetadataBuilder < ActiveRecord::Base
 
+  belongs_to :repo
+
   include Utils
+
+  before_validation :set_source
 
   validates :parent_repo, presence: true
   validates :source, presence: true
 
   serialize :source
-
   serialize :field_mappings
-
-  before_validation :set_source
 
   def field_mappings=(field_mappings)
     self[:field_mappings] = eval(field_mappings)
+  end
+
+  def parent_repo=(parent_repo)
+    self[:parent_repo] = parent_repo
+    @repo = Repo.find(parent_repo)
+    self.repo = @repo
   end
 
   def set_source

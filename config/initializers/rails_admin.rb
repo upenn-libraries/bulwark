@@ -40,9 +40,6 @@ RailsAdmin.config do |config|
       required(true)
       help "Required - directory on the remote filesystem that will serve as the location for the git repository"
     end
-    field :identifier do
-      required(false)
-    end
     field :description do
       required(false)
     end
@@ -62,10 +59,6 @@ RailsAdmin.config do |config|
       required(true)
       help "Required - comma-separated list of accepted file extensions for assets to be served to production from the assets subdirectory.  Example: jpeg,tif"
     end
-    field :metadata_sources do
-      required(false)
-    end
-
   end
 
 end

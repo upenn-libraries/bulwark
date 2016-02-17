@@ -2,6 +2,8 @@ require 'git'
 
 class Repo < ActiveRecord::Base
 
+  has_one :metadata_builder, dependent: :destroy, :validate => false
+
   validates :title, presence: true
   validates :directory, presence: true
   validates :metadata_subdirectory, presence: true
@@ -13,6 +15,7 @@ class Repo < ActiveRecord::Base
   validates :directory, multiple: false
 
   serialize :metadata_sources
+  serialize :metadata_builder_id
 
   include Filesystem
 

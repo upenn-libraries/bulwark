@@ -51,13 +51,16 @@ module RailsAdminHelper
     return mb
   end
 
-  def render_sample_xml(mappings_sets)
+  def render_sample_xml(metadata_builder, mappings_sets)
     sample_xml_docs = ""
     mappings_sets.each do |mappings|
       sample_xml_content = "<root>"
       mappings.drop(1).each do |mapping|
+        fname = mappings.first.last
+        mid = mapping.first
         mapping.last.each do |val|
-          sample_xml_content << "<#{mapping.first}>#{val}</#{mapping.first}>"
+          field_key = metadata_builder.field_mappings["#{fname}"]["#{mid}"]["mapped_value"]
+          sample_xml_content << "<#{field_key}>#{val}</#{field_key}>"
         end
       end
       sample_xml_content << "</root>"

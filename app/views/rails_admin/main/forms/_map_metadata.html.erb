@@ -6,14 +6,16 @@
   <%= f.hidden_field :parent_repo, :value => "#{@object.id}" %>
   <% @mappings.each do |mappings| %>
     <h3>Mappings for <%= mappings.first.last %></h3>
+    <%= f.hidden_field :source_file, :value => "#{mappings.first.last}" %>
     <% mappings.drop(1).each do |p| %>
       <%= content_tag :div, :class => "field" do -%>
       <%= content_tag(:span, "\"#{p.first}\" should map to:") %>
-      <%= f.text_field "field_mappings[#{p.first}][mapped_value]", :value => "#{p.first}" %>
+      <% val = @object.metadata_builder.field_mappings["#{mappings.first.last}"]["#{p.first}"]["mapped_value"]  %>
+      <%= f.text_field "field_mappings[#{mappings.first.last}][#{p.first}][mapped_value]", :value => "#{val}" %>
       <%= content_tag(:div, "Example values from source: #{p.last.to_s}", :class => "field_tip") %>
       <% end -%>
     <% end -%>
   <% end -%>
   <%= f.submit %>
 <% end %>
-<%= render_sample_xml(@mappings) %>
+<%= render_sample_xml(@object.metadata_builder, @mappings) unless @object.metadata_builder.nil? %>
