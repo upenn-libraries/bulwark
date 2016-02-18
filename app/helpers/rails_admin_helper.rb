@@ -59,7 +59,7 @@ module RailsAdminHelper
         fname = mappings.first.last
         mid = mapping.first
         mapping.last.each do |val|
-          field_key = metadata_builder.field_mappings["#{fname}"]["#{mid}"]["mapped_value"]
+          field_key = metadata_builder.field_mappings.nil? ? mapping.first : metadata_builder.field_mappings["#{fname}"]["#{mid}"]["mapped_value"]
           sample_xml_content << "<#{field_key}>#{val}</#{field_key}>"
         end
       end
