@@ -17,13 +17,6 @@ class MetadataBuilder < ActiveRecord::Base
     self[:field_mappings] = eval(field_mappings)
   end
 
-  def xml=(xml)
-    self.field_mappings.each do |mappings|
-      #xml = self.to_xml(mappings)
-    end
-    self[:xml] = xml
-  end
-
   def parent_repo=(parent_repo)
     self[:parent_repo] = parent_repo
     @repo = Repo.find(parent_repo)
@@ -41,16 +34,25 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def to_xml(mapping)
-  xml_content = "<root>"
-  fname = mapping.first.last
-  mapping.drop(1).each do |row|
-    key = row.first
-    field_key = self.field_mappings.nil? ? row.first : self.field_mappings["#{fname}"]["#{key}"]["mapped_value"]
-    row.last.each do |value|
-      xml_content << "<#{field_key}>#{value}</#{field_key}>"
+    xml_content = "<root>"
+    fname = mapping.first.last
+    mapping.drop(1).each do |row|
+      key = row.first
+      field_key = self.field_mappings.nil? ? row.first : self.field_mappings["#{fname}"]["#{key}"]["mapped_value"]
+      row.last.each do |value|
+        xml_content << "<#{field_key}>#{value}</#{field_key}>"
+      end
     end
+    xml_content << "</root>"
   end
-  xml_content << "</root>"
+
+  def build_xml_files(xml_hash)
+    xml_hash.each do |xml|
+      fname = "tmp/#{xml.first}.xml"
+      File.open(fname, "w+") do |file|
+        file << xml.last
+      end
+    end
   end
 
   private

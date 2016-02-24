@@ -4,6 +4,8 @@ class MetadataBuildersController < ApplicationController
   before_filter :merge_mappings, :only => [:create, :update]
   before_filter :merge_xml, :only => [:create, :update]
 
+  before_filter :build_xml, :only => [:create, :update]
+
   def edit
     @metadata_builder = MetadataBuilder.find(params[:id])
   end
@@ -34,6 +36,11 @@ class MetadataBuildersController < ApplicationController
 
   def merge_xml
     params[:metadata_builder][:xml] = params[:metadata_builder][:xml].to_s
+  end
+
+  def build_xml
+    @metadata_builder = MetadataBuilder.find(params[:id])
+    @metadata_builder.build_xml_files(eval(params[:metadata_builder][:xml]))
   end
 
 end
