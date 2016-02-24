@@ -11,9 +11,17 @@ class MetadataBuilder < ActiveRecord::Base
 
   serialize :source
   serialize :field_mappings
+  serialize :xml
 
   def field_mappings=(field_mappings)
     self[:field_mappings] = eval(field_mappings)
+  end
+
+  def xml=(xml)
+    self.field_mappings.each do |mappings|
+      xml = self.to_xml(mappings)
+    end
+    self[:xml] = xml
   end
 
   def parent_repo=(parent_repo)
@@ -30,6 +38,19 @@ class MetadataBuilder < ActiveRecord::Base
 
   def prep_for_mapping
     convert_metadata
+  end
+
+  def to_xml(mappings)
+    xml_content = "<root>"
+    mappings.drop(1).each do |mapping|
+      fname = mappings.first.last
+      mid = mapping.first
+      mapping.last.each do |val|
+        field_key = self.field_mappings.nil? ? mapping.first : self.field_mappings["#{fname}"]["#{mid}"]["mapped_value"]
+        xml_content << "<#{field_key}>#{val}</#{field_key}>"
+      end
+    end
+    xml_content << "</root>"
   end
 
   private

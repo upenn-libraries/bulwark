@@ -15,9 +15,6 @@
 //= require turbolinks//
 // Required by Blacklight
 //= require blacklight/blacklight
-//= require hydra-editor/hydra-editor
-//= require batch_edit
-//= require hydra/batch_select
 
 //= require_tree .
 

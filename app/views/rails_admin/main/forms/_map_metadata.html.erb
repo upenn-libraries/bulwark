@@ -18,6 +18,6 @@
       <% end -%>
     <% end -%>
   <% end -%>
+  <%= content_tag(:div, render_sample_xml(@object.metadata_builder, @mappings), :class => "xml-rendered") unless @object.metadata_builder.nil? %>
   <%= f.submit %>
 <% end %>
-<%= render_sample_xml(@object.metadata_builder, @mappings) unless @object.metadata_builder.nil? %>

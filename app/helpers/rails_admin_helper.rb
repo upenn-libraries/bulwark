@@ -54,20 +54,13 @@ module RailsAdminHelper
   def render_sample_xml(metadata_builder, mappings_sets)
     sample_xml_docs = ""
     mappings_sets.each do |mappings|
-      sample_xml_content = "<root>"
-      mappings.drop(1).each do |mapping|
-        fname = mappings.first.last
-        mid = mapping.first
-        mapping.last.each do |val|
-          field_key = metadata_builder.field_mappings.nil? ? mapping.first : metadata_builder.field_mappings["#{fname}"]["#{mid}"]["mapped_value"]
-          sample_xml_content << "<#{field_key}>#{val}</#{field_key}>"
-        end
-      end
-      sample_xml_content << "</root>"
+      sample_xml_content = metadata_builder.to_xml(mappings)
       sample_xml_doc = REXML::Document.new sample_xml_content
       sample_xml = ""
       sample_xml_doc.write(sample_xml, 1)
-      sample_xml_docs << content_tag(:h3, "Sample output: #{mappings.first.last}") << content_tag(:pre, "#{sample_xml}")
+      heading = content_tag(:h3, "Sample output: #{mappings.first.last}")
+      xml_code = content_tag(:pre, "#{sample_xml}")
+      sample_xml_docs << heading << content_tag(:div,  xml_code, :class => "doc")
     end
     return sample_xml_docs.html_safe
   end

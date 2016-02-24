@@ -19,5 +19,4 @@ Rails.application.routes.draw do
   blacklight_for :catalog
   devise_for :users
   mount Qa::Engine => '/qa'
-  mount HydraEditor::Engine => '/'
 end

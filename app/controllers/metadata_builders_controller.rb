@@ -1,7 +1,8 @@
 class MetadataBuildersController < ApplicationController
+
   before_action :set_metadata_builder, only: [:edit, :update]
   before_filter :merge_mappings, :only => [:create, :update]
-
+  before_filter :merge_xml, :only => [:create, :update]
 
   def edit
     @metadata_builder = MetadataBuilder.find(params[:id])
@@ -29,6 +30,10 @@ class MetadataBuildersController < ApplicationController
 
   def merge_mappings
     params[:metadata_builder][:field_mappings] = params[:metadata_builder][:field_mappings].to_s
+  end
+
+  def merge_xml
+    params[:metadata_builder][:xml] = params[:metadata_builder][:xml].to_s
   end
 
 end

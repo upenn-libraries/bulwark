@@ -21,3 +21,17 @@ form.field_mappings .field {
 .mapping-dashboard input.detect-metadata{
   margin-bottom: 1em;
 }
+
+.xml-rendered{
+  background-color: #ff0000;
+}
+
+.xml-rendered .doc{
+  float: left;
+  width: 40%;
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid #000000;
+  height: 400px;
+  overflow: scroll;
+}
