@@ -17,7 +17,11 @@
         <%= content_tag(:div, "Example values from source: #{p.last.to_s}", :class => "field-tip") %>
       <% end -%>
     <% end -%>
+    <% sample_xml_content = @object.metadata_builder.to_xml(mappings) %>
+    <%= f.hidden_field "field_mappings[mappings.first.last][xml]", :value => "#{sample_xml_content}" %>
+    <%= content_tag(:h3, "Sample output: #{mappings.first.last}") %>    
+    <%= content_tag(:div, render_sample_xml(sample_xml_content), :class => "xml-rendered") unless @object.metadata_builder.nil? %>
   <% end -%>
-  <%= content_tag(:div, render_sample_xml(@object.metadata_builder, @mappings), :class => "xml-rendered") unless @object.metadata_builder.nil? %>
+
   <%= content_tag(:div, f.submit, :class => "form-bottom") %>
 <% end %>

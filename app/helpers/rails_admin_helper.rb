@@ -51,17 +51,13 @@ module RailsAdminHelper
     return mb
   end
 
-  def render_sample_xml(metadata_builder, mappings_sets)
+  def render_sample_xml(sample_xml_content)
     sample_xml_docs = ""
-    mappings_sets.each do |mappings|
-      sample_xml_content = metadata_builder.to_xml(mappings)
-      sample_xml_doc = REXML::Document.new sample_xml_content
-      sample_xml = ""
-      sample_xml_doc.write(sample_xml, 1)
-      heading = content_tag(:h3, "Sample output: #{mappings.first.last}")
-      xml_code = content_tag(:pre, "#{sample_xml}")
-      sample_xml_docs << content_tag(:div, heading << xml_code, :class => "doc")
-    end
+    sample_xml_doc = REXML::Document.new sample_xml_content
+    sample_xml = ""
+    sample_xml_doc.write(sample_xml, 1)
+    xml_code = content_tag(:pre, "#{sample_xml}")
+    sample_xml_docs << content_tag(:div, xml_code, :class => "doc")
     return sample_xml_docs.html_safe
   end
 

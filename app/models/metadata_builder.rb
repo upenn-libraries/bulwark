@@ -19,7 +19,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   def xml=(xml)
     self.field_mappings.each do |mappings|
-      xml = self.to_xml(mappings)
+      #xml = self.to_xml(mappings)
     end
     self[:xml] = xml
   end
@@ -40,17 +40,17 @@ class MetadataBuilder < ActiveRecord::Base
     convert_metadata
   end
 
-  def to_xml(mappings)
-    xml_content = "<root>"
-    mappings.drop(1).each do |mapping|
-      fname = mappings.first.last
-      mid = mapping.first
-      mapping.last.each do |val|
-        field_key = self.field_mappings.nil? ? mapping.first : self.field_mappings["#{fname}"]["#{mid}"]["mapped_value"]
-        xml_content << "<#{field_key}>#{val}</#{field_key}>"
-      end
+  def to_xml(mapping)
+  xml_content = "<root>"
+  fname = mapping.first.last
+  mapping.drop(1).each do |row|
+    key = row.first
+    field_key = self.field_mappings.nil? ? row.first : self.field_mappings["#{fname}"]["#{key}"]["mapped_value"]
+    row.last.each do |value|
+      xml_content << "<#{field_key}>#{value}</#{field_key}>"
     end
-    xml_content << "</root>"
+  end
+  xml_content << "</root>"
   end
 
   private
