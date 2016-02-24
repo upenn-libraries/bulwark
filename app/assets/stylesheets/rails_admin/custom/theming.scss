@@ -9,11 +9,11 @@
   padding: 0.5em;
 }
 
-form.field_mappings .field {
+form.field-mappings .field {
   margin-top: 2em;
 }
 
-.field_mappings .field_tip {
+.field-mappings .field-tip {
   color: #524e51;
   font-size: 0.7em;
 }
@@ -22,16 +22,19 @@ form.field_mappings .field {
   margin-bottom: 1em;
 }
 
-.xml-rendered{
-  background-color: #ff0000;
-}
-
 .xml-rendered .doc{
   float: left;
   width: 40%;
   padding: 10px;
   margin: 10px;
+}
+
+.xml-rendered .doc pre {
   border: 1px solid #000000;
   height: 400px;
   overflow: scroll;
+}
+
+.mapping-dashboard .field-mappings .form-bottom{
+  clear: both;
 }

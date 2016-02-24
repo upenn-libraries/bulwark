@@ -60,7 +60,7 @@ module RailsAdminHelper
       sample_xml_doc.write(sample_xml, 1)
       heading = content_tag(:h3, "Sample output: #{mappings.first.last}")
       xml_code = content_tag(:pre, "#{sample_xml}")
-      sample_xml_docs << heading << content_tag(:div,  xml_code, :class => "doc")
+      sample_xml_docs << content_tag(:div, heading << xml_code, :class => "doc")
     end
     return sample_xml_docs.html_safe
   end
