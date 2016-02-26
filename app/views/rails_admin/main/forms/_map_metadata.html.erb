@@ -18,9 +18,9 @@
       <% end -%>
     <% end -%>
     <% sample_xml_content = @object.metadata_builder.to_xml(mappings) %>
-    <%= f.hidden_field "xml[#{mappings.first.last}]", :value => "#{sample_xml_content}" %>
-    <%= content_tag(:h3, "Sample output: #{mappings.first.last}") %>
-    <%= content_tag(:div, render_sample_xml(sample_xml_content), :class => "xml-rendered") unless @object.metadata_builder.nil? %>
+    <%= f.hidden_field "xml[#{mappings.first.last}]", :value => "#{mappings}" %>
+    <%= content_tag(:h3, "Sample output: #{mappings.first.last}") unless @object.metadata_builder.field_mappings.nil? %>
+    <%= content_tag(:div, render_sample_xml(sample_xml_content), :class => "xml-rendered") unless @object.metadata_builder.field_mappings.nil? %>
   <% end -%>
   <%= content_tag(:div, f.submit, :class => "form-bottom") %>
 <% end %>
