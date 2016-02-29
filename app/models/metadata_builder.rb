@@ -34,6 +34,7 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def to_xml(mapping)
+    binding.pry()
     xml_content = "<root>"
     fname = mapping.first.last
     mapping.drop(1).each do |row|
@@ -47,11 +48,10 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def build_xml_files(xml_hash)
-    binding.pry()
     xml_hash.each do |xml|
       fname = "tmp/#{xml.first}.xml"
       File.open(fname, "w+") do |file|
-        file << xml.last
+        file << to_xml(eval(xml.last))
       end
     end
   end
@@ -89,7 +89,7 @@ class MetadataBuilder < ActiveRecord::Base
 
     def generate_mapping_options_csv(base_file)
       mappings = {}
-      #mappings[:base_file] = "#{base_file.sub('tmp/','')}"
+      mappings["base_file"] = "#{base_file.sub('tmp/','')}"
       headers = CSV.open(base_file, 'r') { |csv| csv.first }
       headers.each{|a| mappings[a] = 0}
       headers.each do |header|
