@@ -1,2 +1,3 @@
 <h2>Git Options</h2>
 <%= render_git_remote_options %>
+<%= content_tag("li", (link_to "Commit to git", "/metadata_builders/#{@object.id}/git_annex_commit", :id => @object.id, method: :post)) %>

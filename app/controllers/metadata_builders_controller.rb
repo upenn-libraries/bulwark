@@ -1,17 +1,15 @@
 class MetadataBuildersController < ApplicationController
 
-  before_action :set_metadata_builder, only: [:edit, :update]
+  before_action :set_metadata_builder, only: [:edit, :update, :git_annex_commit]
   before_filter :merge_mappings, :only => [:create, :update]
   before_filter :merge_xml, :only => [:create, :update]
 
   before_filter :build_xml, :only => [:create, :update]
 
   def edit
-    @metadata_builder = MetadataBuilder.find(params[:id])
   end
 
   def update
-    @metadata_builder = MetadataBuilder.find(params[:id])
     if @metadata_builder.update(metadata_builder_params)
       flash[:success] = "Metadata Builder successfully updated"
       redirect_to "/admin_repo/repo/#{@metadata_builder.id}/map_metadata"
@@ -19,6 +17,17 @@ class MetadataBuildersController < ApplicationController
       render :partial => "rails_admin/main/forms/map_metadata"
     end
   end
+
+  def git_annex_commit
+    @message = @metadata_builder.commit_to_annex
+    if @message[:error].present?
+      redirect_to "admin_repo/", :flash => { :error => @message[:error] }
+    elsif @message[:success].present?
+      redirect_to "admin_repo/", :flas => { :success => @message[:success] }
+    end
+
+  end
+
 
   private
 

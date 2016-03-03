@@ -1,8 +1,8 @@
-require 'git'
-
 class Repo < ActiveRecord::Base
 
   has_one :metadata_builder, dependent: :destroy, :validate => false
+
+  before_validation :concatenate_git
 
   validates :title, presence: true
   validates :directory, presence: true
@@ -21,11 +21,11 @@ class Repo < ActiveRecord::Base
 
   def create_remote
     unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
-      @full_directory_path = "#{assets_path_prefix}/#{self.directory}"
-      build_and_populate_directories
-      Git.init(@full_directory_path)
-      Dir.chdir(@full_directory_path)
-      `git annex init`
+      ga = Utils::VersionControl::GitAnnex.new(self)
+      ga.initialize_bare_remote
+      @@working_copy = ga.clone
+      build_and_populate_directories(ga.working_repo_path)
+      ga.commit_and_remove_working_directory
       return { :success => "Remote successfully created" }
     else
       return { :error => "Remote already exists" }
@@ -33,31 +33,31 @@ class Repo < ActiveRecord::Base
   end
 
   def set_metadata_sources
-    begin
-      metadata_sources = Array.new
-      Dir.glob("#{Utils.config.assets_path}/#{self.directory}/#{self.metadata_subdirectory}/*") do |file|
-        metadata_sources << file
-      end
-      self.metadata_sources = metadata_sources
-      self.save
-      return { :success => "Metadata sources detected -- see output below." }
-    rescue
-      return { :error => "No metadata sources detected." }
+    metadata_sources = Array.new
+    Dir.glob("#{Utils.config.assets_path}/#{self.directory}/#{self.metadata_subdirectory}/*") do |file|
+      metadata_sources << file
     end
+    self.metadata_sources = metadata_sources
+    self.save
+    status = Dir.glob("#{Utils.config.assets_path}/#{self.directory}/#{self.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
+    return status
   end
 
 private
-  def build_and_populate_directories
+  def build_and_populate_directories(working_copy_path)
+
+    #TODO: Config out
     admin_subdirectory = "admin"
-    Dir.mkdir(@full_directory_path)
-    Dir.mkdir("#{@full_directory_path}/#{self.metadata_subdirectory}")
-    Dir.mkdir("#{@full_directory_path}/#{self.assets_subdirectory}")
-    Dir.mkdir("#{@full_directory_path}/#{admin_subdirectory}")
-    populate_admin_manifest("#{@full_directory_path}/#{admin_subdirectory}")
+
+    Dir.chdir("#{working_copy_path}")
+    Dir.mkdir("#{self.metadata_subdirectory}") && FileUtils.touch
+    Dir.mkdir("#{self.assets_subdirectory}")
+    Dir.mkdir("#{admin_subdirectory}")
+    populate_admin_manifest("#{admin_subdirectory}")
   end
 
-  def populate_admin_manifest(full_admin_path)
-    manifest_path = "#{full_admin_path}/manifest.txt"
+  def populate_admin_manifest(admin_path)
+    manifest_path = "#{admin_path}/manifest.txt"
     file_types = define_file_types
     metadata_line = "#{Utils.config.metadata_path_label}: #{self.metadata_subdirectory}/#{metadata_filename}"
     assets_line = "#{Utils.config.file_path_label}: #{self.assets_subdirectory}/#{file_types}"
@@ -72,6 +72,11 @@ private
     aft = ft.join(',')
     aft = "*{#{aft}}"
     return aft
+  end
+
+  # TODO: Determine if this is really the best place because we're dealing with Git bare repo best practices
+  def concatenate_git
+    self.directory.concat('.git') unless self.directory =~ /.git$/
   end
 
 end

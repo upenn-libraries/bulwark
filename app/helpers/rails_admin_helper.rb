@@ -9,13 +9,11 @@ module RailsAdminHelper
     page_content = content_tag("div", :class => "git-actions") do
       if Dir.exists?(full_path)
         initialized_p = content_tag("p","Your git remote has been initialized at #{full_path}.  To begin using this remote, run the following commands from the terminal:")
-        initialized_pre = content_tag("pre", "git annex init\ngit remote add fs ~/#{@object.directory}")
+        #TODO: Create config option to store server URL for users creating remotes
+        initialized_pre = content_tag("pre", "git annex init\ngit remote add fs #{Utils.config.assets_path}/#{@object.directory}")
         push_p = content_tag("p","To push to this remote, run the following command from the terminal:")
         push_pre = content_tag("pre","git push fs master")
-        concat(initialized_p)
-        concat(initialized_pre)
-        concat(push_p)
-        concat(push_pre)
+        concat(initialized_p << initialized_pre << push_p << push_pre)
       else
         # TODO: make construction of the other model's URL stronger for deployment from subdirectories
         page_content = link_to "Create Remote", "/repos/#{@object.id}"

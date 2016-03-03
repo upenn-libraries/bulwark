@@ -34,7 +34,6 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def to_xml(mapping)
-    binding.pry()
     xml_content = "<root>"
     fname = mapping.first.last
     mapping.drop(1).each do |row|

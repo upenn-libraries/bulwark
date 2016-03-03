@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   resources :metadata_builders do
     member do
       post :update
+      post :git_annex_commit
     end
   end
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
