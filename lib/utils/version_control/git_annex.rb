@@ -29,6 +29,7 @@ module Utils
         working_repo = Git.open(@working_repo_path)
         working_repo.add(:all => true)
         working_repo.commit(commit_message)
+        working_repo.push
       end
 
       def remove_working_directory

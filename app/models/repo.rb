@@ -25,7 +25,7 @@ class Repo < ActiveRecord::Base
       ga.initialize_bare_remote
       @@working_copy = ga.clone
       build_and_populate_directories(ga.working_repo_path)
-      ga.commit_and_remove_working_directory
+      ga.commit_and_remove_working_directory("Building out directories")
       return { :success => "Remote successfully created" }
     else
       return { :error => "Remote already exists" }
@@ -50,7 +50,7 @@ private
     admin_subdirectory = "admin"
 
     Dir.chdir("#{working_copy_path}")
-    Dir.mkdir("#{self.metadata_subdirectory}") && FileUtils.touch
+    Dir.mkdir("#{self.metadata_subdirectory}") && FileUtils.touch("#{self.metadata_filename}")
     Dir.mkdir("#{self.assets_subdirectory}")
     Dir.mkdir("#{admin_subdirectory}")
     populate_admin_manifest("#{admin_subdirectory}")
