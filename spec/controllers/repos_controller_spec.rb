@@ -43,4 +43,14 @@ describe ReposController do
     end
   end
 
+  describe "map metadata" do
+    it "should be able to detect metadata source type" do
+      post :detect_metadata, :id => @repo.id
+      expect(flash[:success]).to be_present
+    end
+    it "can convert an xlsx file to csv"
+    it "can generate custom mappings for a csv to xml file"
+    it "can create a flat XML file based on metadata source and user-generated mappings"
+  end
+
 end
