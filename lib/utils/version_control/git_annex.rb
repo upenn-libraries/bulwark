@@ -14,8 +14,6 @@ module Utils
 
       def initialize_bare_remote
         `git init --bare #{@remote_repo_path}`
-        Dir.chdir(@remote_repo_path)
-        `git annex init origin`
       end
 
       def clone
@@ -23,6 +21,16 @@ module Utils
       end
 
       def checkout
+      end
+
+      def sync(options = {})
+        binding.pry()
+        working_repo = Git.open(@working_repo_path)
+        `git annex sync #{options}`
+      end
+
+      def push
+        `git push origin master git-annex`
       end
 
       def commit_and_push(commit_message)

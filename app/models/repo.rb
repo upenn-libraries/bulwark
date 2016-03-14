@@ -50,8 +50,8 @@ private
     admin_subdirectory = "admin"
 
     Dir.chdir("#{working_copy_path}")
-    Dir.mkdir("#{self.metadata_subdirectory}") && FileUtils.touch("#{self.metadata_filename}")
-    Dir.mkdir("#{self.assets_subdirectory}")
+    Dir.mkdir("#{self.metadata_subdirectory}") && FileUtils.touch("#{self.metadata_subdirectory}/.keep")
+    Dir.mkdir("#{self.assets_subdirectory}") && FileUtils.touch("#{self.assets_subdirectory}/.keep")
     Dir.mkdir("#{admin_subdirectory}")
     populate_admin_manifest("#{admin_subdirectory}")
   end
