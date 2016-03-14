@@ -29,8 +29,6 @@ module Utils
         @content = format_content(file_list)
       end
 
-
-
       private
         def set_digest(hash_type)
           case hash_type.downcase

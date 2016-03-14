@@ -1,0 +1,26 @@
+<h2>Metadata Mapping</h2>
+<%= form_for(:metadata_builder, :html => { :class => "field-mappings", :method => :post}, :url => "/metadata_builders/1") do |f| %>
+  <%= field_set_tag 'Map source metadata to XML' do %>
+    Fill out the fields below to map your metadata to source.
+  <% end %>
+  <%= f.hidden_field :parent_repo, :value => "#{@object.id}" %>
+  <% @mappings.each do |mappings| %>
+    <h3>Mappings for <%= mappings.first.last %></h3>
+    <%= f.hidden_field :source_file, :value => "#{mappings.first.last}" %>
+    <%= f.label "#{mappings.first.last}[parent_element]", "Parent element:" %>
+    <%= f.text_field "#{mappings.first.last}[parent_element]", :value => "record" %>
+    <% mappings.drop(1).each do |p| %>
+      <% val = @object.metadata_builder.field_mappings.nil? ? p.first : @object.metadata_builder.field_mappings["#{mappings.first.last}"]["#{p.first}"]["mapped_value"]  %>
+      <%= content_tag :div, :class => "field" do -%>
+        <%= f.label "field_mappings[#{mappings.first.last}][#{p.first}][mapped_value]", "\"#{p.first}\" should map to:" %>
+        <%= f.text_field "field_mappings[#{mappings.first.last}][#{p.first}][mapped_value]", :value => "#{val}" %>
+        <%= content_tag(:div, "Example values from source: #{p.last.to_s}", :class => "field-tip") %>
+      <% end -%>
+    <% end -%>
+    <% sample_xml_content = @object.metadata_builder.to_xml(mappings) %>
+    <%= f.hidden_field "xml[#{mappings.first.last}]", :value => "#{mappings}" %>
+    <%= content_tag(:h3, "Sample output: #{mappings.first.last}") unless @object.metadata_builder.field_mappings.nil? %>
+    <%= content_tag(:div, render_sample_xml(sample_xml_content), :class => "xml-rendered") unless @object.metadata_builder.field_mappings.nil? %>
+  <% end -%>
+  <%= content_tag(:div, f.submit, :class => "form-bottom") %>
+<% end %>

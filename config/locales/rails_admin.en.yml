@@ -25,3 +25,7 @@ en:
         title: "Preprocess Review"
         menu: "Perform tasks on objects before ingestion"
         breadcrumb: "Preprocess Review"
+      map_metadata:
+        title: "Map Metadata"
+        menu: "Map metadata from source"
+        breadcrumb: "Map Metadata"

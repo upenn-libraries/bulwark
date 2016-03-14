@@ -1,1 +1,0 @@
-HydraEditor.models = ["Manuscript"]

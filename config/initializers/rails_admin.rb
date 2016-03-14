@@ -4,6 +4,7 @@ require Rails.root.join('lib', 'rails_admin', 'clone_from_production.rb')
 require Rails.root.join('lib', 'rails_admin', 'sign_off_production.rb')
 require Rails.root.join('lib', 'rails_admin', 'report_flagged.rb')
 require Rails.root.join('lib', 'rails_admin', 'preprocess_review.rb')
+require Rails.root.join('lib', 'rails_admin', 'map_metadata.rb')
 
 RailsAdmin.config do |config|
   config.main_app_name = ["Intermediary", "Admin Interface"]
@@ -19,6 +20,7 @@ RailsAdmin.config do |config|
     show
     edit
     delete
+    map_metadata
     git_review do
       only ["Repo"]
     end
@@ -37,9 +39,6 @@ RailsAdmin.config do |config|
     field :directory do
       required(true)
       help "Required - directory on the remote filesystem that will serve as the location for the git repository"
-    end
-    field :identifier do
-      required(false)
     end
     field :description do
       required(false)
@@ -60,7 +59,6 @@ RailsAdmin.config do |config|
       required(true)
       help "Required - comma-separated list of accepted file extensions for assets to be served to production from the assets subdirectory.  Example: jpeg,tif"
     end
-
   end
 
 end
