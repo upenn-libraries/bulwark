@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160126215036) do
+ActiveRecord::Schema.define(version: 20160217212120) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
@@ -25,6 +25,18 @@ ActiveRecord::Schema.define(version: 20160126215036) do
 
   add_index "bookmarks", ["user_id"], name: "index_bookmarks_on_user_id"
 
+  create_table "metadata_builders", force: :cascade do |t|
+    t.string   "parent_repo"
+    t.string   "source"
+    t.text     "field_mappings"
+    t.text     "xml"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+    t.integer  "repo_id"
+  end
+
+  add_index "metadata_builders", ["repo_id"], name: "index_metadata_builders_on_repo_id"
+
   create_table "repos", force: :cascade do |t|
     t.string   "title"
     t.string   "directory"
@@ -36,7 +48,11 @@ ActiveRecord::Schema.define(version: 20160126215036) do
     t.string   "assets_subdirectory"
     t.string   "metadata_filename"
     t.string   "file_extensions"
+    t.text     "metadata_sources"
+    t.integer  "metadata_builder_id"
   end
+
+  add_index "repos", ["metadata_builder_id"], name: "index_repos_on_metadata_builder_id"
 
   create_table "roles", force: :cascade do |t|
     t.string "name"

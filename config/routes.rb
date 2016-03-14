@@ -4,6 +4,15 @@ Rails.application.routes.draw do
       post :checksum_log
       post :prepare_for_ingest
       post :ingest
+      post :detect_metadata
+      post :convert_metadata
+      post :save_mappings
+    end
+  end
+  resources :metadata_builders do
+    member do
+      post :update
+      post :git_annex_commit
     end
   end
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
@@ -11,5 +20,4 @@ Rails.application.routes.draw do
   blacklight_for :catalog
   devise_for :users
   mount Qa::Engine => '/qa'
-  mount HydraEditor::Engine => '/'
 end

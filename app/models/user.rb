@@ -1,11 +1,6 @@
 class User < ActiveRecord::Base
   # Connects this user object to Hydra behaviors.
   include Hydra::User
-  # Connects this user object to Role-management behaviors.
-  include Hydra::RoleManagement::UserRoles
-
-
-
 
   if Blacklight::Utils.needs_attr_accessible?
 
