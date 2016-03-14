@@ -54,6 +54,6 @@ class ReposController < ApplicationController
     end
 
     def repo_params
-      params.require(:repo).permit(:title, :directory, :identifier, :description, :metadata_subdirectory, :assets_subdirectory, :metadata_filename, :file_extensions)
+      params.require(:repo).permit(:title, :directory, :identifier, :description, :metadata_subdirectory, :assets_subdirectory, :metadata_filename, :file_extensions, :git_agent)
     end
 end

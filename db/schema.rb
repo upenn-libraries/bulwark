@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160217212120) do
+ActiveRecord::Schema.define(version: 20160314154528) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
@@ -50,6 +50,7 @@ ActiveRecord::Schema.define(version: 20160217212120) do
     t.string   "file_extensions"
     t.text     "metadata_sources"
     t.integer  "metadata_builder_id"
+    t.string   "git_agent"
   end
 
   add_index "repos", ["metadata_builder_id"], name: "index_repos_on_metadata_builder_id"

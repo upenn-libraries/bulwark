@@ -4,6 +4,8 @@ class Repo < ActiveRecord::Base
 
   before_validation :concatenate_git
 
+  after_initialize :create_git_agent
+
   validates :title, presence: true
   validates :directory, presence: true
   validates :metadata_subdirectory, presence: true
@@ -34,6 +36,9 @@ class Repo < ActiveRecord::Base
 
   def set_metadata_sources
     metadata_sources = Array.new
+
+    ga = Utils::VersionControl::GitAnnex.new(self)
+    ga.clone
 
     Dir.glob("#{ga.working_repo_path}/#{self.metadata_subdirectory}/*") do |file|
       metadata_sources << file
@@ -73,6 +78,10 @@ private
     aft = ft.join(',')
     aft = "*{#{aft}}"
     return aft
+  end
+
+  def create_git_agent
+    self.git_agent = Utils::VersionControl::GitAnnex.new(self)
   end
 
   # TODO: Determine if this is really the best place because we're dealing with Git bare repo best practices
