@@ -98,10 +98,12 @@ ActiveRecord::Schema.define(version: 20160314191728) do
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
 
   create_table "version_control_agents", force: :cascade do |t|
-    t.string   "type"
+    t.string   "vc_type"
+    t.string   "remote_repo_path"
+    t.string   "working_repo_path"
     t.integer  "repo_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
   end
 
   add_index "version_control_agents", ["repo_id"], name: "index_version_control_agents_on_repo_id"

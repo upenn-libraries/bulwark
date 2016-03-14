@@ -37,10 +37,8 @@ class Repo < ActiveRecord::Base
 
   def set_metadata_sources
     metadata_sources = Array.new
-
     ga = Utils::VersionControl::GitAnnex.new(self)
     ga.clone
-
     Dir.glob("#{ga.working_repo_path}/#{self.metadata_subdirectory}/*") do |file|
       metadata_sources << file
     end
@@ -52,7 +50,6 @@ class Repo < ActiveRecord::Base
 
 private
   def build_and_populate_directories(working_copy_path)
-
     #TODO: Config out
     admin_subdirectory = "admin"
 
@@ -81,14 +78,15 @@ private
     return aft
   end
 
+  def set_version_control_agent
+    self.version_control_agent = VersionControlAgent.new
+    self.version_control_agent.vc_type = "GitAnnex"
+  end
+
   # TODO: Determine if this is really the best place because we're dealing with Git bare repo best practices
   def concatenate_git
     self.directory.concat('.git') unless self.directory =~ /.git$/ || self.directory.nil?
   end
 
-  def set_version_control_agent
-    self.version_control_agent = VersionControlAgent.new
-    #self.version_control_agent.save!
-  end
 
 end
