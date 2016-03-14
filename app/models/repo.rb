@@ -34,12 +34,13 @@ class Repo < ActiveRecord::Base
 
   def set_metadata_sources
     metadata_sources = Array.new
-    Dir.glob("#{Utils.config.assets_path}/#{self.directory}/#{self.metadata_subdirectory}/*") do |file|
+
+    Dir.glob("#{ga.working_repo_path}/#{self.metadata_subdirectory}/*") do |file|
       metadata_sources << file
     end
     self.metadata_sources = metadata_sources
     self.save
-    status = Dir.glob("#{Utils.config.assets_path}/#{self.directory}/#{self.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
+    status = Dir.glob("#{ga.working_repo_path}/#{self.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
     return status
   end
 

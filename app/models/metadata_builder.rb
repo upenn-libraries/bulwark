@@ -59,6 +59,11 @@ class MetadataBuilder < ActiveRecord::Base
 
     def convert_metadata
       begin
+        repo = Repo.find(self.repo_id)
+        ga = Utils::VersionControl::GitAnnex.new(repo)
+        ga.clone
+        Dir.chdir("#{ga.working_repo_path}/#{repo.metadata_subdirectory}")
+        `git annex get .`
         @mappings_sets = Array.new
         self.source.each do |source|
           pathname = Pathname.new(source)
@@ -66,7 +71,7 @@ class MetadataBuilder < ActiveRecord::Base
           case ext
           when "xlsx"
             xlsx = Roo::Spreadsheet.open(source)
-            tmp_csv = "tmp/#{pathname.basename.to_s}.csv"
+            tmp_csv = "#{ga.working_repo_path}/#{repo.metadata_subdirectory}/#{pathname.basename.to_s}.csv"
             File.open(tmp_csv, "w+") do |f|
               f.write(xlsx.to_csv)
             end
