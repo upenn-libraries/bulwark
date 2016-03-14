@@ -24,9 +24,12 @@ module Utils
       end
 
       def sync(options = {})
-        binding.pry()
-        working_repo = Git.open(@working_repo_path)
-        `git annex sync #{options}`
+        begin
+          Dir.chdir(@working_repo_path) if File.directory?(@working_repo_path)
+          `git annex sync #{options}`
+        rescue
+          puts "Trying to perform git annex sync outside of an annexed repository"
+        end
       end
 
       def push
