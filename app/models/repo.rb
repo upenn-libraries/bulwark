@@ -1,10 +1,11 @@
 class Repo < ActiveRecord::Base
 
   has_one :metadata_builder, dependent: :destroy, :validate => false
+  has_one :version_control_agent, dependent: :destroy, :validate => false
 
   before_validation :concatenate_git
 
-  after_initialize :create_git_agent
+  before_save :set_version_control_agent
 
   validates :title, presence: true
   validates :directory, presence: true
@@ -25,7 +26,7 @@ class Repo < ActiveRecord::Base
     unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
       ga = Utils::VersionControl::GitAnnex.new(self)
       ga.initialize_bare_remote
-      @@working_copy = ga.clone
+      ga.clone
       build_and_populate_directories(ga.working_repo_path)
       ga.commit_and_remove_working_directory("Building out directories")
       return { :success => "Remote successfully created" }
@@ -80,13 +81,14 @@ private
     return aft
   end
 
-  def create_git_agent
-    self.git_agent = Utils::VersionControl::GitAnnex.new(self)
-  end
-
   # TODO: Determine if this is really the best place because we're dealing with Git bare repo best practices
   def concatenate_git
-    self.directory.concat('.git') unless self.directory =~ /.git$/
+    self.directory.concat('.git') unless self.directory =~ /.git$/ || self.directory.nil?
+  end
+
+  def set_version_control_agent
+    self.version_control_agent = VersionControlAgent.new
+    #self.version_control_agent.save!
   end
 
 end
