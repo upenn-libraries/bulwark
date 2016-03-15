@@ -21,6 +21,7 @@ module RailsAdminHelper
   end
 
   def render_sources_table(repo)
+    binding.pry()
     table = _build_table_from_hash(repo.metadata_sources)
     page_content = content_tag("div", table, :class => "metadata-sources-table")
     return page_content
@@ -37,6 +38,7 @@ module RailsAdminHelper
   end
 
   def _build_form_list(repo)
+    binding.pry()
     metadata_builder = _metadata_builder(repo)
     @mappings = metadata_builder.prep_for_mapping
     return @mappings

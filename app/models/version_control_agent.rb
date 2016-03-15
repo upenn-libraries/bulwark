@@ -9,11 +9,10 @@ class VersionControlAgent < ActiveRecord::Base
   end
 
   def initialize_worker
-    binding.pry()
     @@worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo)
     self.remote_path = @@worker.remote_repo_path
     self.working_path = @@worker.working_repo_path
-    binding.pry()
+    self.save!
   end
 
   def init_bare
@@ -32,11 +31,12 @@ class VersionControlAgent < ActiveRecord::Base
     @@worker.commit_and_push
   end
 
-  def get
-    @@worker.get
+  def get(get_location)
+    @@worker.get(get_location)
   end
 
-  def delete_clone
+  def delete_clone(drop_location)
+    @@worker.drop(drop_location)
     @@worker.remove_working_directory
   end
 

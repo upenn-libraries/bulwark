@@ -64,8 +64,7 @@ class MetadataBuilder < ActiveRecord::Base
         binding.pry()
         repo.version_control_agent.clone
         binding.pry()
-        Dir.chdir("#{repo.version_control_agent.working_path}/#{repo.version_control_agent.metadata_subdirectory}")
-        repo.version_control_agent.get
+        repo.version_control_agent.get("#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
         binding.pry()
         @mappings_sets = Array.new
         self.source.each do |source|
@@ -73,18 +72,14 @@ class MetadataBuilder < ActiveRecord::Base
           ext = pathname.extname.to_s[1..-1]
           case ext
           when "xlsx"
-            binding.pry()
             xlsx = Roo::Spreadsheet.open(source)
             tmp_csv = "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}/#{pathname.basename.to_s}.csv"
             File.open(tmp_csv, "w+") do |f|
-              binding.pry()
               f.write(xlsx.to_csv)
             end
-            binding.pry()
             @mappings = generate_mapping_options_csv(tmp_csv)
             @mappings_sets << @mappings
           when "csv"
-            binding.pry()
             @mappings = generate_mapping_options_csv(tmp_csv)
             @mappings_sets << @mappings
           when "xml"
@@ -93,7 +88,7 @@ class MetadataBuilder < ActiveRecord::Base
           end
         end
         binding.pry()
-        repo.version_control_agent.delete_clone
+        repo.version_control_agent.delete_clone("#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
         return @mappings_sets
       rescue
         raise $!, "Metadata conversion failed due to the following error(s): #{$!}", $!.backtrace

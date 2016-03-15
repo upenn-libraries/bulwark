@@ -22,18 +22,18 @@ class Repo < ActiveRecord::Base
 
   include Filesystem
 
-  def create_remote
-    unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
-      ga = Utils::VersionControl::GitAnnex.new(self)
-      ga.initialize_bare_remote
-      ga.clone
-      build_and_populate_directories(ga.working_path)
-      ga.commit_and_remove_working_directory("Building out directories")
-      return { :success => "Remote successfully created" }
-    else
-      return { :error => "Remote already exists" }
-    end
-  end
+  # def create_remote
+  #   unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
+  #     ga = Utils::VersionControl::GitAnnex.new(self)
+  #     ga.initialize_bare_remote
+  #     ga.clone
+  #     build_and_populate_directories(ga.working_path)
+  #     ga.commit_and_remove_working_directory("Building out directories")
+  #     return { :success => "Remote successfully created" }
+  #   else
+  #     return { :error => "Remote already exists" }
+  #   end
+  # end
 
   def set_metadata_sources
     metadata_sources = Array.new
@@ -44,6 +44,7 @@ class Repo < ActiveRecord::Base
     self.metadata_sources = metadata_sources
     self.save
     status = Dir.glob("#{self.version_control_agent.working_path}/#{self.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
+    self.version_control_agent.delete_clone
     return status
   end
 

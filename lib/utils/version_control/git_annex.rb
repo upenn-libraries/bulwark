@@ -9,7 +9,7 @@ module Utils
       def initialize(repo)
         @repo = repo
         @remote_repo_path = "#{Utils.config.assets_path}/#{@repo.directory}"
-        @working_repo_path = "/Users/katherly/Documents/working_dirs/#{@remote_repo_path}".gsub("//", "/")
+        @working_repo_path = "/Users/katherly/Documents/working_dirs/#{@remote_repo_path.gsub("/","_")}".gsub("__", "_")
       end
 
       def initialize_bare_remote
@@ -42,17 +42,19 @@ module Utils
       end
 
       def remove_working_directory
-        FileUtils.rm_rf(@working_repo_path) if File.directory?(@working_repo_path)
+        binding.pry()
+        FileUtils.rm_rf(@working_repo_path, :secure => true) if File.directory?(@working_repo_path)
         #TODO: Add logging
       end
 
-      def commit_and_remove_working_directory(commit_message)
-        commit_and_push(commit_message)
-        remove_working_directory
+      def get(dir = @working_repo_path)
+        Dir.chdir(dir)
+        `git annex get .`
       end
 
-      def get
-        `git annex get .`
+      def drop(dir = @working_repo_path)
+        Dir.chdir(dir)
+        `git annex drop .`
       end
 
     end
