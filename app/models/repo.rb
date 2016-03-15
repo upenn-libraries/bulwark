@@ -5,7 +5,7 @@ class Repo < ActiveRecord::Base
 
   before_validation :concatenate_git
 
-  before_save :set_version_control_agent
+  after_create :set_version_control_agent
 
   validates :title, presence: true
   validates :directory, presence: true
@@ -27,7 +27,7 @@ class Repo < ActiveRecord::Base
       ga = Utils::VersionControl::GitAnnex.new(self)
       ga.initialize_bare_remote
       ga.clone
-      build_and_populate_directories(ga.working_repo_path)
+      build_and_populate_directories(ga.working_path)
       ga.commit_and_remove_working_directory("Building out directories")
       return { :success => "Remote successfully created" }
     else
@@ -37,14 +37,13 @@ class Repo < ActiveRecord::Base
 
   def set_metadata_sources
     metadata_sources = Array.new
-    ga = Utils::VersionControl::GitAnnex.new(self)
-    ga.clone
-    Dir.glob("#{ga.working_repo_path}/#{self.metadata_subdirectory}/*") do |file|
+    self.version_control_agent.clone
+    Dir.glob("#{self.version_control_agent.working_path}/#{self.metadata_subdirectory}/*") do |file|
       metadata_sources << file
     end
     self.metadata_sources = metadata_sources
     self.save
-    status = Dir.glob("#{ga.working_repo_path}/#{self.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
+    status = Dir.glob("#{self.version_control_agent.working_path}/#{self.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
     return status
   end
 
@@ -52,7 +51,6 @@ private
   def build_and_populate_directories(working_copy_path)
     #TODO: Config out
     admin_subdirectory = "admin"
-
     Dir.chdir("#{working_copy_path}")
     Dir.mkdir("#{self.metadata_subdirectory}") && FileUtils.touch("#{self.metadata_subdirectory}/.keep")
     Dir.mkdir("#{self.assets_subdirectory}") && FileUtils.touch("#{self.assets_subdirectory}/.keep")
@@ -79,11 +77,10 @@ private
   end
 
   def set_version_control_agent
-    self.version_control_agent = VersionControlAgent.new
-    self.version_control_agent.vc_type = "GitAnnex"
+    self.version_control_agent = VersionControlAgent.new(:vc_type => "GitAnnex")
   end
 
-  # TODO: Determine if this is really the best place because we're dealing with Git bare repo best practices
+  # TODO: Determine if this is really the best place to put this because we're dealing with Git bare repo best practices
   def concatenate_git
     self.directory.concat('.git') unless self.directory =~ /.git$/ || self.directory.nil?
   end

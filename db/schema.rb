@@ -99,11 +99,11 @@ ActiveRecord::Schema.define(version: 20160314191728) do
 
   create_table "version_control_agents", force: :cascade do |t|
     t.string   "vc_type"
-    t.string   "remote_repo_path"
-    t.string   "working_repo_path"
+    t.string   "remote_path"
+    t.string   "working_path"
     t.integer  "repo_id"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
   end
 
   add_index "version_control_agents", ["repo_id"], name: "index_version_control_agents_on_repo_id"

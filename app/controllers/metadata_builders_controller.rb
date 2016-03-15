@@ -3,7 +3,6 @@ class MetadataBuildersController < ApplicationController
   before_action :set_metadata_builder, only: [:edit, :update, :git_annex_commit]
   before_filter :merge_mappings, :only => [:create, :update]
   before_filter :merge_xml, :only => [:create, :update]
-
   before_filter :build_xml, :only => [:create, :update]
 
   def edit

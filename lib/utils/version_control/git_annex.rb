@@ -4,7 +4,7 @@ module Utils
   module VersionControl
     class GitAnnex
 
-      attr_accessor :repo, :remote_repo_path, :working_repo_path
+      attr_accessor :remote_repo_path, :working_repo_path
 
       def initialize(repo)
         @repo = repo
@@ -17,10 +17,8 @@ module Utils
       end
 
       def clone
+        binding.pry()
         Git.clone(@remote_repo_path, @working_repo_path)
-      end
-
-      def checkout
       end
 
       def sync(options = {})
@@ -51,6 +49,10 @@ module Utils
       def commit_and_remove_working_directory(commit_message)
         commit_and_push(commit_message)
         remove_working_directory
+      end
+
+      def get
+        `git annex get .`
       end
 
     end
