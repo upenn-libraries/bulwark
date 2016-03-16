@@ -36,19 +36,6 @@ class Repo < ActiveRecord::Base
   #   end
   # end
 
-  def set_metadata_sources
-    metadata_sources = Array.new
-    self.version_control_agent.clone
-    Dir.glob("#{self.version_control_agent.working_path}/#{self.metadata_subdirectory}/*") do |file|
-      metadata_sources << file
-    end
-    self.metadata_sources = metadata_sources
-    self.save
-    status = Dir.glob("#{self.version_control_agent.working_path}/#{self.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
-    self.version_control_agent.delete_clone
-    return status
-  end
-
 private
   def build_and_populate_directories(working_copy_path)
     #TODO: Config out
@@ -84,8 +71,6 @@ private
 
   def set_metadata_builder
     self.metadata_builder = MetadataBuilder.new(:parent_repo => self.id)
-    self.metadata_builder.save!
-    self.save!
     self.metadata_builder.set_source
     self.metadata_builder.prep_for_mapping
     self.metadata_builder.save!

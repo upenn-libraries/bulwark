@@ -17,7 +17,6 @@ module Utils
       end
 
       def clone
-        binding.pry()
         Git.clone(@remote_repo_path, @working_repo_path)
       end
 
@@ -42,6 +41,7 @@ module Utils
       end
 
       def remove_working_directory
+        Dir.chdir(Rails.root.to_s)
         FileUtils.rm_rf(@working_repo_path, :secure => true) if File.directory?(@working_repo_path)
         #TODO: Add logging
       end

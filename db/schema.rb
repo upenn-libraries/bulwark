@@ -49,7 +49,6 @@ ActiveRecord::Schema.define(version: 20160314191728) do
     t.string   "assets_subdirectory"
     t.string   "metadata_filename"
     t.string   "file_extensions"
-    t.text     "metadata_sources"
     t.integer  "metadata_builder_id"
     t.integer  "version_control_agent_id"
   end

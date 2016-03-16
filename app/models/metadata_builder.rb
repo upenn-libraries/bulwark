@@ -9,6 +9,7 @@ class MetadataBuilder < ActiveRecord::Base
   validates :parent_repo, presence: true
 
   serialize :source
+  serialize :source_mappings
   serialize :field_mappings
   serialize :xml
 
@@ -23,9 +24,14 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def set_source
-    repo = Repo.find(self.parent_repo)
-    repo.set_metadata_sources
-    self.source = repo.metadata_sources
+    metadata_sources = Array.new
+    self.repo.version_control_agent.clone
+    Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*") do |file|
+      metadata_sources << file
+    end
+    status = Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
+    self.repo.version_control_agent.delete_clone
+    self.source = metadata_sources
   end
 
   def prep_for_mapping
