@@ -6,6 +6,7 @@ class Repo < ActiveRecord::Base
   before_validation :concatenate_git
 
   after_create :set_version_control_agent
+  after_create :set_metadata_builder
 
   validates :title, presence: true
   validates :directory, presence: true
@@ -79,6 +80,16 @@ private
 
   def set_version_control_agent
     self.version_control_agent = VersionControlAgent.new(:vc_type => "GitAnnex")
+  end
+
+  def set_metadata_builder
+    self.metadata_builder = MetadataBuilder.new(:parent_repo => self.id)
+    self.metadata_builder.save!
+    self.save!
+    self.metadata_builder.set_source
+    self.metadata_builder.prep_for_mapping
+    self.metadata_builder.save!
+    self.save!
   end
 
   # TODO: Determine if this is really the best place to put this because we're dealing with Git bare repo best practices

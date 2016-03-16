@@ -4,10 +4,9 @@ class MetadataBuilder < ActiveRecord::Base
 
   include Utils
 
-  before_validation :set_source
+  after_create :set_source
 
   validates :parent_repo, presence: true
-  validates :source, presence: true
 
   serialize :source
   serialize :field_mappings
@@ -30,7 +29,7 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def prep_for_mapping
-    convert_metadata
+    self[:source_mappings] = convert_metadata
   end
 
   def to_xml(mapping)
@@ -59,13 +58,9 @@ class MetadataBuilder < ActiveRecord::Base
 
     def convert_metadata
       begin
-        binding.pry()
         repo = Repo.find(self.repo_id)
-        binding.pry()
         repo.version_control_agent.clone
-        binding.pry()
-        repo.version_control_agent.get("#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
-        binding.pry()
+        repo.version_control_agent.get(:get_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
         @mappings_sets = Array.new
         self.source.each do |source|
           pathname = Pathname.new(source)
@@ -87,8 +82,7 @@ class MetadataBuilder < ActiveRecord::Base
             raise "Illegal metadata source unit type"
           end
         end
-        binding.pry()
-        repo.version_control_agent.delete_clone("#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
+        repo.version_control_agent.delete_clone(:drop_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
         return @mappings_sets
       rescue
         raise $!, "Metadata conversion failed due to the following error(s): #{$!}", $!.backtrace

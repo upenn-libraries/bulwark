@@ -35,7 +35,7 @@ class MetadataBuildersController < ApplicationController
   end
 
   def metadata_builder_params
-    params.require(:metadata_builder).permit(:parent_repo, :source, :field_mappings, :xml)
+    params.require(:metadata_builder).permit(:parent_repo, :source, :source_mappings, :field_mappings, :xml)
   end
 
   def merge_mappings

@@ -31,12 +31,12 @@ class VersionControlAgent < ActiveRecord::Base
     @@worker.commit_and_push
   end
 
-  def get(get_location)
-    @@worker.get(get_location)
+  def get(options = {})
+    options[:get_location].nil? ? @@worker.get : @@worker.get(options[:get_location])
   end
 
-  def delete_clone(drop_location)
-    @@worker.drop(drop_location)
+  def delete_clone(options = {})
+    options[:drop_location].nil? ? @@worker.drop : @@worker.drop(options[:drop_location])
     @@worker.remove_working_directory
   end
 

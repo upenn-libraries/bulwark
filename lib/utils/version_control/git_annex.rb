@@ -42,7 +42,6 @@ module Utils
       end
 
       def remove_working_directory
-        binding.pry()
         FileUtils.rm_rf(@working_repo_path, :secure => true) if File.directory?(@working_repo_path)
         #TODO: Add logging
       end
