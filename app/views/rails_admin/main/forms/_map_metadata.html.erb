@@ -4,7 +4,7 @@
     Fill out the fields below to map your metadata to source.
   <% end %>
   <%= f.hidden_field :parent_repo, :value => "#{@object.id}" %>
-  <% @mappings.each do |mappings| %>
+  <% @object.metadata_builder.source_mappings.each do |mappings| %>
     <h3>Mappings for <%= mappings.first.last %></h3>
     <%= f.hidden_field :source_file, :value => "#{mappings.first.last}" %>
     <%= f.label "#{mappings.first.last}[parent_element]", "Parent element:" %>
