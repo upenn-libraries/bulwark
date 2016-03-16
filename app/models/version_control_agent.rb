@@ -2,7 +2,6 @@ class VersionControlAgent < ActiveRecord::Base
 
   belongs_to :repo
 
-  after_create :initialize_worker
 
   def vc_type=(vc_type)
     self[:vc_type] = vc_type
@@ -24,11 +23,15 @@ class VersionControlAgent < ActiveRecord::Base
   end
 
   def push
-    @@worker.push
+    begin
+      @@worker.push
+    rescue
+      @@worker.push_bare
+    end
   end
 
-  def commit
-    @@worker.commit_and_push
+  def commit(message)
+    @@worker.commit(message)
   end
 
   def get(options = {})

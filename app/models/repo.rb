@@ -5,8 +5,7 @@ class Repo < ActiveRecord::Base
 
   before_validation :concatenate_git
 
-  after_create :set_version_control_agent
-  after_create :set_metadata_builder
+  around_create :set_version_control_agent_and_repo
 
   validates :title, presence: true
   validates :directory, presence: true
@@ -23,18 +22,27 @@ class Repo < ActiveRecord::Base
 
   include Filesystem
 
-  # def create_remote
-  #   unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
-  #     ga = Utils::VersionControl::GitAnnex.new(self)
-  #     ga.initialize_bare_remote
-  #     ga.clone
-  #     build_and_populate_directories(ga.working_path)
-  #     ga.commit_and_remove_working_directory("Building out directories")
-  #     return { :success => "Remote successfully created" }
-  #   else
-  #     return { :error => "Remote already exists" }
-  #   end
-  # end
+  def set_version_control_agent_and_repo
+    yield
+    set_version_control_agent
+    self.version_control_agent.initialize_worker
+    create_remote
+    set_metadata_builder
+  end
+
+  def create_remote
+    unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
+      self.version_control_agent.init_bare
+      self.version_control_agent.clone
+      build_and_populate_directories(self.version_control_agent.working_path)
+      self.version_control_agent.commit("Added subdirectories according to the configuration specified in the repo configuration")
+      self.version_control_agent.push
+      self.version_control_agent.delete_clone
+      return { :success => "Remote successfully created" }
+    else
+      return { :error => "Remote already exists" }
+    end
+  end
 
 private
   def build_and_populate_directories(working_copy_path)
@@ -67,6 +75,7 @@ private
 
   def set_version_control_agent
     self.version_control_agent = VersionControlAgent.new(:vc_type => "GitAnnex")
+    self.version_control_agent.save!
   end
 
   def set_metadata_builder
