@@ -24,7 +24,6 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def set_source
-    binding.pry()
     metadata_sources = Array.new
     self.repo.version_control_agent.clone
     Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*") do |file|

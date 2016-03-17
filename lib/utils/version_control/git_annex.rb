@@ -14,6 +14,8 @@ module Utils
 
       def initialize_bare_remote
         `git init --bare #{@remote_repo_path}`
+        Dir.chdir(@remote_repo_path)
+        `git annex init origin`
       end
 
       def clone

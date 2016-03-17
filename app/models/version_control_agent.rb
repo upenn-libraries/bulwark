@@ -23,11 +23,12 @@ class VersionControlAgent < ActiveRecord::Base
   end
 
   def push
-    begin
-      @@worker.push
-    rescue
-      @@worker.push_bare
-    end
+    @@worker.push_bare
+    # begin
+    #   @@worker.push
+    # rescue
+    #   @@worker.push_bare
+    # end
   end
 
   def commit(message)
