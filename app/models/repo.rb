@@ -25,7 +25,6 @@ class Repo < ActiveRecord::Base
   def set_version_control_agent_and_repo
     yield
     set_version_control_agent
-    self.version_control_agent.initialize_worker
     create_remote
     set_metadata_builder
   end
@@ -36,12 +35,20 @@ class Repo < ActiveRecord::Base
       self.version_control_agent.clone
       build_and_populate_directories(self.version_control_agent.working_path)
       self.version_control_agent.commit("Added subdirectories according to the configuration specified in the repo configuration")
-      self.version_control_agent.push
+      self.version_control_agent.push_bare
       self.version_control_agent.delete_clone
       return { :success => "Remote successfully created" }
     else
       return { :error => "Remote already exists" }
     end
+  end
+
+  def detect_metadata_sources
+    binding.pry()
+    self.metadata_builder.set_source
+    binding.pry()
+    @message = self.metadata_builder.source.nil? || self.metadata_builder.source.empty? ? {:error => "No metadata sources detected."} : {:success => "Metadata sources detected.  See below."}
+    return @message
   end
 
 private
