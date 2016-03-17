@@ -5,7 +5,6 @@ class CreateRepos < ActiveRecord::Migration
       t.string :purl
       t.string :prefix
       t.string :description
-
       t.timestamps null: false
     end
   end

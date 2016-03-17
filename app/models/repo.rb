@@ -44,9 +44,8 @@ class Repo < ActiveRecord::Base
   end
 
   def detect_metadata_sources
-    binding.pry()
     self.metadata_builder.set_source
-    binding.pry()
+    self.metadata_builder.save!
     @message = self.metadata_builder.source.nil? || self.metadata_builder.source.empty? ? {:error => "No metadata sources detected."} : {:success => "Metadata sources detected.  See below."}
     return @message
   end
