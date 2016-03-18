@@ -1,8 +1,11 @@
 class Repo < ActiveRecord::Base
 
   has_one :metadata_builder, dependent: :destroy, :validate => false
+  has_one :version_control_agent, dependent: :destroy, :validate => false
 
   before_validation :concatenate_git
+
+  around_create :set_version_control_agent_and_repo
 
   validates :title, presence: true
   validates :directory, presence: true
@@ -19,36 +22,38 @@ class Repo < ActiveRecord::Base
 
   include Filesystem
 
+  def set_version_control_agent_and_repo
+    yield
+    set_version_control_agent
+    create_remote
+    set_metadata_builder
+  end
+
   def create_remote
     unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
-      ga = Utils::VersionControl::GitAnnex.new(self)
-      ga.initialize_bare_remote
-      @@working_copy = ga.clone
-      build_and_populate_directories(ga.working_repo_path)
-      ga.commit_and_remove_working_directory("Building out directories")
+      self.version_control_agent.init_bare
+      self.version_control_agent.clone
+      build_and_populate_directories(self.version_control_agent.working_path)
+      self.version_control_agent.commit("Added subdirectories according to the configuration specified in the repo configuration")
+      self.version_control_agent.push_bare
+      self.version_control_agent.delete_clone
       return { :success => "Remote successfully created" }
     else
       return { :error => "Remote already exists" }
     end
   end
 
-  def set_metadata_sources
-    metadata_sources = Array.new
-    Dir.glob("#{Utils.config.assets_path}/#{self.directory}/#{self.metadata_subdirectory}/*") do |file|
-      metadata_sources << file
-    end
-    self.metadata_sources = metadata_sources
-    self.save
-    status = Dir.glob("#{Utils.config.assets_path}/#{self.directory}/#{self.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
-    return status
+  def detect_metadata_sources
+    self.metadata_builder.set_source
+    self.metadata_builder.save!
+    @message = self.metadata_builder.source.nil? || self.metadata_builder.source.empty? ? {:error => "No metadata sources detected."} : {:success => "Metadata sources detected.  See below."}
+    return @message
   end
 
 private
   def build_and_populate_directories(working_copy_path)
-
     #TODO: Config out
     admin_subdirectory = "admin"
-
     Dir.chdir("#{working_copy_path}")
     Dir.mkdir("#{self.metadata_subdirectory}") && FileUtils.touch("#{self.metadata_subdirectory}/.keep")
     Dir.mkdir("#{self.assets_subdirectory}") && FileUtils.touch("#{self.assets_subdirectory}/.keep")
@@ -74,9 +79,23 @@ private
     return aft
   end
 
-  # TODO: Determine if this is really the best place because we're dealing with Git bare repo best practices
-  def concatenate_git
-    self.directory.concat('.git') unless self.directory =~ /.git$/
+  def set_version_control_agent
+    self.version_control_agent = VersionControlAgent.new(:vc_type => "GitAnnex")
+    self.version_control_agent.save!
   end
+
+  def set_metadata_builder
+    self.metadata_builder = MetadataBuilder.new(:parent_repo => self.id)
+    self.metadata_builder.set_source
+    self.metadata_builder.prep_for_mapping
+    self.metadata_builder.save!
+    self.save!
+  end
+
+  # TODO: Determine if this is really the best place to put this because we're dealing with Git bare repo best practices
+  def concatenate_git
+    self.directory.concat('.git') unless self.directory =~ /.git$/ || self.directory.nil?
+  end
+
 
 end

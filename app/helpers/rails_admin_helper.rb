@@ -1,6 +1,7 @@
 require "rexml/document"
 
 module RailsAdminHelper
+
   include Filesystem
   include Utils
 
@@ -8,9 +9,9 @@ module RailsAdminHelper
     full_path = "#{assets_path_prefix}/#{@object.directory}"
     page_content = content_tag("div", :class => "git-actions") do
       if Dir.exists?(full_path)
-        initialized_p = content_tag("p","Your git remote has been initialized at #{full_path}.  To begin using this remote, run the following commands from the terminal:")
+        initialized_p = content_tag("p","Your git remote has been initialized at #{full_path}.  To begin using this remote, run the following command from the terminal:")
         #TODO: Create config option to store server URL for users creating remotes
-        initialized_pre = content_tag("pre", "git clone #{Utils.config.assets_path}/#{@object.directory}\ncd #{@object.directory}\ngit annex init")
+        initialized_pre = content_tag("pre", "git clone #{Utils.config.assets_path}/#{@object.directory}\ncd #{(@object.directory).gsub(".git","")}")
         concat(initialized_p << initialized_pre)
       else
         # TODO: make construction of the other model's URL stronger for deployment from subdirectories
@@ -21,7 +22,7 @@ module RailsAdminHelper
   end
 
   def render_sources_table(repo)
-    table = _build_table_from_hash(repo.metadata_sources)
+    table = _build_table_from_hash(repo.metadata_builder.source)
     page_content = content_tag("div", table, :class => "metadata-sources-table")
     return page_content
   end
@@ -36,11 +37,6 @@ module RailsAdminHelper
     return array_table.html_safe
   end
 
-  def _build_form_list(repo)
-    metadata_builder = _metadata_builder(repo)
-    @mappings = metadata_builder.prep_for_mapping
-    return @mappings
-  end
 
   def _metadata_builder(repo)
     mb = MetadataBuilder.where(:parent_repo => repo.id).blank? ? MetadataBuilder.create(:parent_repo => repo.id) : MetadataBuilder.find_by(:parent_repo => repo.id)

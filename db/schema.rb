@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160217212120) do
+ActiveRecord::Schema.define(version: 20160314191728) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
@@ -28,10 +28,11 @@ ActiveRecord::Schema.define(version: 20160217212120) do
   create_table "metadata_builders", force: :cascade do |t|
     t.string   "parent_repo"
     t.string   "source"
+    t.text     "source_mappings"
     t.text     "field_mappings"
     t.text     "xml"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
     t.integer  "repo_id"
   end
 
@@ -42,17 +43,18 @@ ActiveRecord::Schema.define(version: 20160217212120) do
     t.string   "directory"
     t.string   "identifier"
     t.string   "description"
-    t.datetime "created_at",            null: false
-    t.datetime "updated_at",            null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
     t.string   "metadata_subdirectory"
     t.string   "assets_subdirectory"
     t.string   "metadata_filename"
     t.string   "file_extensions"
-    t.text     "metadata_sources"
     t.integer  "metadata_builder_id"
+    t.integer  "version_control_agent_id"
   end
 
   add_index "repos", ["metadata_builder_id"], name: "index_repos_on_metadata_builder_id"
+  add_index "repos", ["version_control_agent_id"], name: "index_repos_on_version_control_agent_id"
 
   create_table "roles", force: :cascade do |t|
     t.string "name"
@@ -94,5 +96,16 @@ ActiveRecord::Schema.define(version: 20160217212120) do
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+
+  create_table "version_control_agents", force: :cascade do |t|
+    t.string   "vc_type"
+    t.string   "remote_path"
+    t.string   "working_path"
+    t.integer  "repo_id"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
+  add_index "version_control_agents", ["repo_id"], name: "index_version_control_agents_on_repo_id"
 
 end

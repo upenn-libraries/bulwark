@@ -9,6 +9,7 @@ module Utils
     attr_accessor :metadata_path_label
     attr_accessor :file_path_label
     attr_accessor :imports_local_staging
+    attr_accessor :working_dir
     attr_accessor :repository_prefix
     attr_accessor :split_on
   end
