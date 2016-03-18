@@ -6,12 +6,14 @@ class MetadataBuilder < ActiveRecord::Base
 
   after_create :set_source
 
-  validates :parent_repo, presence: true
+  validate :validate_xml_tags
 
   serialize :source
   serialize :source_mappings
   serialize :field_mappings
   serialize :xml
+
+  @@xml_tags = Array.new
 
   def field_mappings=(field_mappings)
     self[:field_mappings] = eval(field_mappings)
@@ -39,11 +41,13 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def to_xml(mapping)
+    error_message = nil
     xml_content = "<root>"
     fname = mapping.first.last
     mapping.drop(1).each do |row|
       key = row.first
-      field_key = self.field_mappings.nil? ? row.first : self.field_mappings["#{fname}"]["#{key}"]["mapped_value"]
+      field_key = (self.field_mappings.nil? ? row.first : self.field_mappings["#{fname}"]["#{key}"]["mapped_value"])
+      @@xml_tags << [field_key, key]
       row.last.each do |value|
         xml_content << "<#{field_key}>#{value}</#{field_key}>"
       end
@@ -52,10 +56,12 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def build_xml_files(xml_hash)
+    _get_metadata_source
     xml_hash.each do |xml|
-      fname = "tmp/#{xml.first}.xml"
+      fname = "#{xml.first}.xml"
+      xml_content = to_xml(eval(xml.last))
       File.open(fname, "w+") do |file|
-        file << to_xml(eval(xml.last))
+        file << xml_content
       end
     end
   end
@@ -64,9 +70,7 @@ class MetadataBuilder < ActiveRecord::Base
 
     def convert_metadata
       begin
-        repo = Repo.find(self.repo_id)
-        repo.version_control_agent.clone
-        repo.version_control_agent.get(:get_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
+        _get_metadata_source
         @mappings_sets = Array.new
         self.source.each do |source|
           pathname = Pathname.new(source)
@@ -108,6 +112,27 @@ class MetadataBuilder < ActiveRecord::Base
         mappings["#{header}"] = sample_vals
       end
       return mappings
+    end
+
+    def _get_metadata_source
+      repo = Repo.find(self.repo_id)
+      repo.version_control_agent.clone
+      repo.version_control_agent.get(:get_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
+    end
+
+    def validate_xml_tags
+      if @@xml_tags.present?
+        @@xml_tags.each do |xml|
+          tag = xml.first
+          field_name = xml.last
+          error_message = ""
+          error_message << "Valid XML tags cannot start with #{tag.first_three}" unless tag.starts_with_xml?
+          error_message << "Valid XML tags cannot contain spaces" if tag.include?(" ")
+          error_message << "Valid XML tags cannot begin with numbers" if tag.starts_with_number?
+          errors.add(field_name.to_sym, error_message) unless error_message.empty?
+        end
+        binding.pry()
+      end
     end
 
 end

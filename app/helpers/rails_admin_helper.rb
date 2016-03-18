@@ -43,14 +43,19 @@ module RailsAdminHelper
     return mb
   end
 
-  def render_sample_xml(sample_xml_content)
-    sample_xml_docs = ""
-    sample_xml_doc = REXML::Document.new sample_xml_content
-    sample_xml = ""
-    sample_xml_doc.write(sample_xml, 1)
-    xml_code = content_tag(:pre, "#{sample_xml}")
-    sample_xml_docs << content_tag(:div, xml_code, :class => "doc")
-    return sample_xml_docs.html_safe
+  def render_sample_xml(mappings)
+    sample_xml_content, error_message = @object.metadata_builder.to_xml(mappings)
+    unless error_message
+      sample_xml_docs = ""
+      sample_xml_doc = REXML::Document.new sample_xml_content
+      sample_xml = ""
+      sample_xml_doc.write(sample_xml, 1)
+      xml_code = content_tag(:pre, "#{sample_xml}")
+      sample_xml_docs << content_tag(:div, xml_code, :class => "doc")
+      return sample_xml_docs.html_safe
+    else
+      return {:error => error_message}
+    end
   end
 
 end

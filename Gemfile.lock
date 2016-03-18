@@ -533,6 +533,7 @@ DEPENDENCIES
   jettywrapper
   jquery-rails
   launchy
+  nokogiri
   pry-rails (~> 0.3.4)
   qa
   rails (= 4.2.5)

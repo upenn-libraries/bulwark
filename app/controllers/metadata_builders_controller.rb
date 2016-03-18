@@ -22,7 +22,7 @@ class MetadataBuildersController < ApplicationController
     if @message[:error].present?
       redirect_to "admin_repo/", :flash => { :error => @message[:error] }
     elsif @message[:success].present?
-      redirect_to "admin_repo/", :flas => { :success => @message[:success] }
+      redirect_to "admin_repo/", :flash => { :success => @message[:success] }
     end
 
   end
