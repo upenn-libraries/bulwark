@@ -3,6 +3,7 @@
   <%= field_set_tag 'Map source metadata to XML' do %>
     Fill out the fields below to map your metadata to source.
   <% end %>
+  <%= f.hidden_field :parent_repo, :value => "#{@object.id}" %>
   <% @object.metadata_builder.source_mappings.each do |mappings| %>
     <h3>Mappings for <%= mappings.first.last.gsub(@object.version_control_agent.working_path, "") %></h3>
     <%= f.hidden_field :source_file, :value => "#{mappings.first.last}" %>
@@ -17,8 +18,6 @@
       <% end -%>
     <% end -%>
     <%= f.hidden_field "xml[#{mappings.first.last}]", :value => "#{mappings}" %>
-    <%= content_tag(:h3, "Sample output: #{mappings.first.last}") unless @object.metadata_builder.field_mappings.nil? %>
-    <%= content_tag(:div, render_sample_xml(mappings), :class => "xml-rendered") unless @object.metadata_builder.field_mappings.nil? %>
   <% end -%>
   <%= content_tag(:div, f.submit, :class => "form-bottom") %>
 <% end %>

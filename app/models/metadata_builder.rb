@@ -6,7 +6,11 @@ class MetadataBuilder < ActiveRecord::Base
 
   after_create :set_source
 
-  validate :validate_xml_tags
+  validates :parent_repo, presence: true
+
+  validate do
+    errors.add(:base, "One your XML tags is off: #{@@error_message}") if @@error_message
+  end
 
   serialize :source
   serialize :source_mappings
@@ -14,6 +18,7 @@ class MetadataBuilder < ActiveRecord::Base
   serialize :xml
 
   @@xml_tags = Array.new
+  @@error_message = nil
 
   def field_mappings=(field_mappings)
     self[:field_mappings] = eval(field_mappings)
@@ -41,13 +46,12 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def to_xml(mapping)
-    error_message = nil
     xml_content = "<root>"
     fname = mapping.first.last
     mapping.drop(1).each do |row|
       key = row.first
       field_key = (self.field_mappings.nil? ? row.first : self.field_mappings["#{fname}"]["#{key}"]["mapped_value"])
-      @@xml_tags << [field_key, key]
+      @@error_message = _validate_xml_tag(field_key)
       row.last.each do |value|
         xml_content << "<#{field_key}>#{value}</#{field_key}>"
       end
@@ -120,19 +124,12 @@ class MetadataBuilder < ActiveRecord::Base
       repo.version_control_agent.get(:get_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
     end
 
-    def validate_xml_tags
-      if @@xml_tags.present?
-        @@xml_tags.each do |xml|
-          tag = xml.first
-          field_name = xml.last
-          error_message = ""
-          error_message << "Valid XML tags cannot start with #{tag.first_three}" unless tag.starts_with_xml?
-          error_message << "Valid XML tags cannot contain spaces" if tag.include?(" ")
-          error_message << "Valid XML tags cannot begin with numbers" if tag.starts_with_number?
-          errors.add(field_name.to_sym, error_message) unless error_message.empty?
-        end
-        binding.pry()
-      end
+    def _validate_xml_tag(tag)
+      error_message = ""
+      error_message << "Valid XML tags cannot start with #{tag.first_three}" unless tag.starts_with_xml?
+      error_message << "Valid XML tags cannot contain spaces" if tag.include?(" ")
+      error_message << "Valid XML tags cannot begin with numbers" if tag.starts_with_number?
+      return error_message unless error_message.empty?
     end
 
 end
