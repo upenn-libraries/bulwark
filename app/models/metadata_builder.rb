@@ -1,15 +1,15 @@
 class MetadataBuilder < ActiveRecord::Base
 
-  belongs_to :repo
+  belongs_to :repo, :foreign_key => "repo_id"
 
   include Utils
 
-  before_validation :set_source
+  after_create :set_source
 
   validates :parent_repo, presence: true
-  validates :source, presence: true
 
   serialize :source
+  serialize :source_mappings
   serialize :field_mappings
   serialize :xml
 
@@ -24,13 +24,18 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def set_source
-    repo = Repo.find(self.parent_repo)
-    repo.set_metadata_sources
-    self.source = repo.metadata_sources
+    metadata_sources = Array.new
+    self.repo.version_control_agent.clone
+    Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*") do |file|
+      metadata_sources << file
+    end
+    status = Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
+    self.repo.version_control_agent.delete_clone
+    self.source = metadata_sources
   end
 
   def prep_for_mapping
-    convert_metadata
+    self[:source_mappings] = convert_metadata
   end
 
   def to_xml(mapping)
@@ -59,6 +64,9 @@ class MetadataBuilder < ActiveRecord::Base
 
     def convert_metadata
       begin
+        repo = Repo.find(self.repo_id)
+        repo.version_control_agent.clone
+        repo.version_control_agent.get(:get_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
         @mappings_sets = Array.new
         self.source.each do |source|
           pathname = Pathname.new(source)
@@ -66,7 +74,7 @@ class MetadataBuilder < ActiveRecord::Base
           case ext
           when "xlsx"
             xlsx = Roo::Spreadsheet.open(source)
-            tmp_csv = "tmp/#{pathname.basename.to_s}.csv"
+            tmp_csv = "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}/#{pathname.basename.to_s}.csv"
             File.open(tmp_csv, "w+") do |f|
               f.write(xlsx.to_csv)
             end
@@ -80,6 +88,7 @@ class MetadataBuilder < ActiveRecord::Base
             raise "Illegal metadata source unit type"
           end
         end
+        repo.version_control_agent.delete_clone(:drop_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
         return @mappings_sets
       rescue
         raise $!, "Metadata conversion failed due to the following error(s): #{$!}", $!.backtrace
