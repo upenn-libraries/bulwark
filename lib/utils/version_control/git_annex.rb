@@ -4,12 +4,14 @@ module Utils
   module VersionControl
     class GitAnnex
 
+      include Filesystem
+
       attr_accessor :remote_repo_path, :working_repo_path
 
       def initialize(repo)
         @repo = repo
         @remote_repo_path = "#{Utils.config.assets_path}/#{@repo.directory}"
-        @working_repo_path = "/Users/katherly/Documents/working_dirs/#{@remote_repo_path.gsub("/","_")}".gsub("__", "_")
+        @working_repo_path = "#{Utils.config.working_dir}/#{@remote_repo_path.gsub("/","_")}".gsub("__", "_")
       end
 
       def initialize_bare_remote

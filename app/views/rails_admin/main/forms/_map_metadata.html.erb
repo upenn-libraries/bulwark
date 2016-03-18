@@ -5,7 +5,7 @@
   <% end %>
   <%= f.hidden_field :parent_repo, :value => "#{@object.id}" %>
   <% @object.metadata_builder.source_mappings.each do |mappings| %>
-    <h3>Mappings for <%= mappings.first.last %></h3>
+    <h3>Mappings for <%= mappings.first.last.gsub(@object.version_control_agent.working_path, "") %></h3>
     <%= f.hidden_field :source_file, :value => "#{mappings.first.last}" %>
     <%= f.label "#{mappings.first.last}[parent_element]", "Parent element:" %>
     <%= f.text_field "#{mappings.first.last}[parent_element]", :value => "record" %>
