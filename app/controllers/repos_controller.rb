@@ -39,7 +39,7 @@ class ReposController < ApplicationController
   end
 
   def detect_metadata
-    @message = @repo.set_metadata_sources
+    @message = @repo.detect_metadata_sources
     if @message[:error].present?
       redirect_to "/admin_repo/repo/#{@repo.id}/map_metadata", :flash => { :error => @message[:error] }
     elsif @message[:success].present?
@@ -54,6 +54,6 @@ class ReposController < ApplicationController
     end
 
     def repo_params
-      params.require(:repo).permit(:title, :directory, :identifier, :description, :metadata_subdirectory, :assets_subdirectory, :metadata_filename, :file_extensions)
+      params.require(:repo).permit(:title, :directory, :identifier, :description, :metadata_subdirectory, :assets_subdirectory, :metadata_filename, :file_extensions, :version_control_agent)
     end
 end
