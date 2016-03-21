@@ -8,6 +8,10 @@ class MetadataBuildersController < ApplicationController
   def show
   end
 
+  def new
+    @metadata_builder = MetadataBuilder.new
+  end
+
   def edit
   end
 
@@ -16,7 +20,7 @@ class MetadataBuildersController < ApplicationController
       flash[:success] = "Metadata Builder successfully updated"
       redirect_to "/admin_repo/repo/#{@metadata_builder.id}/map_metadata"
     else
-      redirect_to "/admin_repo/repo/#{@metadata_builder.id}/map_metadata", :flash => { :error => "I BROKE" }
+      redirect_to "/admin_repo/repo/#{@metadata_builder.id}/map_metadata", :flash => { :error => @error_message }
     end
   end
 
@@ -51,7 +55,7 @@ class MetadataBuildersController < ApplicationController
 
   def build_xml
     @metadata_builder = MetadataBuilder.find(params[:id])
-    @metadata_builder.build_xml_files(eval(params[:metadata_builder][:xml]))
+    @error_message = @metadata_builder.build_xml_files(eval(params[:metadata_builder][:xml]))
   end
 
 end

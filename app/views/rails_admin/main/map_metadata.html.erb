@@ -1,5 +1,5 @@
 <div class="mapping-dashboard">
   <%= button_to "Detect/refresh metadata source(s)", "/repos/#{@object.id}/detect_metadata", :class => "detect-metadata", :id => @object.id, method: :post %>
   <%= render_sources_table(@object) unless @object.metadata_builder.source.nil? %>
-  <%= render :partial => "rails_admin/main/forms/map_metadata" unless @object.metadata_builder.nil? %>
+  <%= render :partial => "metadata_builders/form", :locals => {metadata_builder:  @object.metadata_builder} unless @object.metadata_builder.nil? %>
 </div>

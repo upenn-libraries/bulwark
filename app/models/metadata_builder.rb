@@ -8,9 +8,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   validates :parent_repo, presence: true
 
-  validate do
-    errors.add(:base, "One your XML tags is off: #{@@error_message}") if @@error_message
-  end
+  validate :check_for_errors
 
   serialize :source
   serialize :source_mappings
@@ -68,6 +66,11 @@ class MetadataBuilder < ActiveRecord::Base
         file << xml_content
       end
     end
+    return @@error_message
+  end
+
+  def check_for_errors
+    errors.add(:parent_element, "XML tag error(s): #{@@error_message}") if @@error_message
   end
 
   private
