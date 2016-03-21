@@ -10,7 +10,6 @@ module RailsAdminHelper
     page_content = content_tag("div", :class => "git-actions") do
       if Dir.exists?(full_path)
         initialized_p = content_tag("p","Your git remote has been initialized at #{full_path}.  To begin using this remote, run the following command from the terminal:")
-        #TODO: Create config option to store server URL for users creating remotes
         initialized_pre = content_tag("pre", "git clone #{Utils.config.assets_path}/#{@object.directory}\ncd #{(@object.directory).gsub(".git","")}")
         concat(initialized_p << initialized_pre)
       else
@@ -52,6 +51,17 @@ module RailsAdminHelper
     xml_code = content_tag(:pre, "#{sample_xml}")
     sample_xml_docs << content_tag(:div, xml_code, :class => "doc")
     return sample_xml_docs.html_safe
+  end
+
+  def render_flash_errors
+    error_list = ""
+    flash[:error].each do |errors|
+      errors.each do |e|
+        error_list << content_tag("li", e)
+      end
+    end
+    binding.pry()
+    flash[:error] = content_tag("ul", error_list.html_safe).html_safe if flash[:error]
   end
 
 end

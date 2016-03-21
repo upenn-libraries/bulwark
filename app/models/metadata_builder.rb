@@ -44,17 +44,33 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def to_xml(mapping)
-    xml_content = "<root>"
     fname = mapping.first.last
     mapping.drop(1).each do |row|
       key = row.first
       field_key = (self.field_mappings.nil? ? row.first : self.field_mappings["#{fname}"]["#{key}"]["mapped_value"])
-      @@error_message = _validate_xml_tag(field_key)
+      @xml_content = "<root>"
       row.last.each do |value|
-        xml_content << "<#{field_key}>#{value}</#{field_key}>"
+        @xml_content << "<#{field_key}>#{value}</#{field_key}>"
+      end
+      @xml_content << "</root>"
+    end
+
+    return @xml_content
+  end
+
+  def verify_xml_tags(tags_submitted)
+    errors = Array.new
+    tag_sets = eval(tags_submitted)
+    tag_sets.each do |tag_set|
+      tag_set.drop(1).each do |tag|
+        tag.each do |val|
+          error = _validate_xml_tag(val.last["mapped_value"])
+          errors << error unless error.nil?
+        end
       end
     end
-    xml_content << "</root>"
+    @@error_message = errors
+    return @@error_message
   end
 
   def build_xml_files(xml_hash)
@@ -62,15 +78,19 @@ class MetadataBuilder < ActiveRecord::Base
     xml_hash.each do |xml|
       fname = "#{xml.first}.xml"
       xml_content = to_xml(eval(xml.last))
-      File.open(fname, "w+") do |file|
-        file << xml_content
+      if xml_content.empty?
+        self.repo.version_control_agent.delete_clone
+        break
+      else
+        File.open(fname, "w+") do |file|
+          file << xml_content
+        end
       end
     end
-    return @@error_message
   end
 
   def check_for_errors
-    errors.add(:parent_element, "XML tag error(s): #{@@error_message}") if @@error_message
+    errors.add(:parent_element, "XML tag error(s): #{@@error_message}") unless @@error_message.empty?
   end
 
   private
@@ -128,10 +148,10 @@ class MetadataBuilder < ActiveRecord::Base
     end
 
     def _validate_xml_tag(tag)
-      error_message = ""
-      error_message << "Valid XML tags cannot start with #{tag.first_three}" unless tag.starts_with_xml?
-      error_message << "Valid XML tags cannot contain spaces" if tag.include?(" ")
-      error_message << "Valid XML tags cannot begin with numbers" if tag.starts_with_number?
+      error_message = Array.new
+      error_message << "Valid XML tags cannot start with #{tag.first_three} (detected in field \"#{tag}\")" if tag.starts_with_xml?
+      error_message << "Valid XML tags cannot contain spaces (detected in field \"#{tag}\")" if tag.include?(" ")
+      error_message << "Valid XML tags cannot begin with numbers (detected in field \"#{tag}\")" if tag.starts_with_number?
       return error_message unless error_message.empty?
     end
 
