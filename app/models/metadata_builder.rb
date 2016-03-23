@@ -37,9 +37,6 @@ class MetadataBuilder < ActiveRecord::Base
     status = Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
     self.repo.version_control_agent.delete_clone
     self.source = metadata_sources
-  end
-
-  def prep_for_mapping
     self[:source_mappings] = convert_metadata
   end
 

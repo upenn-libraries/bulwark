@@ -64,4 +64,8 @@ module RailsAdminHelper
     flash[:error] = content_tag("ul", error_list.html_safe).html_safe if flash[:error]
   end
 
+  def refresh_metadata_from_source
+    @object.metadata_builder.set_source
+  end
+
 end

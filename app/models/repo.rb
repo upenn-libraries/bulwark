@@ -43,13 +43,6 @@ class Repo < ActiveRecord::Base
     end
   end
 
-  def detect_metadata_sources
-    self.metadata_builder.set_source
-    self.metadata_builder.save!
-    @message = self.metadata_builder.source.nil? || self.metadata_builder.source.empty? ? {:error => "No metadata sources detected."} : {:success => "Metadata sources detected.  See below."}
-    return @message
-  end
-
 private
   def build_and_populate_directories(working_copy_path)
     #TODO: Config out
@@ -87,7 +80,6 @@ private
   def set_metadata_builder
     self.metadata_builder = MetadataBuilder.new(:parent_repo => self.id)
     self.metadata_builder.set_source
-    self.metadata_builder.prep_for_mapping
     self.metadata_builder.save!
     self.save!
   end
