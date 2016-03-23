@@ -17,7 +17,6 @@ class MetadataBuildersController < ApplicationController
   def update
     @error_message = @metadata_builder.verify_xml_tags(params[:metadata_builder][:field_mappings])
     if @metadata_builder.update(metadata_builder_params)
-      @metadata_builder.build_xml_files(eval(params[:metadata_builder][:xml]))
       flash[:success] = "Metadata Builder successfully updated"
       redirect_to "/admin_repo/repo/#{@metadata_builder.id}/map_metadata"
     else
@@ -33,7 +32,6 @@ class MetadataBuildersController < ApplicationController
     elsif @message[:success].present?
       redirect_to "admin_repo/", :flash => { :success => @message[:success] }
     end
-
   end
 
 

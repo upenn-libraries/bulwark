@@ -64,7 +64,10 @@ module RailsAdminHelper
   end
 
   def refresh_metadata_from_source
-    @object.metadata_builder.set_source
+    unless flash[:error]
+      @object.metadata_builder.set_source
+      @object.metadata_builder.save!
+    end
   end
 
 end

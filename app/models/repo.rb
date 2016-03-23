@@ -43,6 +43,15 @@ class Repo < ActiveRecord::Base
     end
   end
 
+  def generate_xml_preview
+    begin
+      self.metadata_builder.build_xml_files
+      return { :success => "Sample XML generated.  See output below."}
+    rescue
+      return { :error => "Something went wrong during XML generation."}
+    end
+  end
+
 private
   def build_and_populate_directories(working_copy_path)
     #TODO: Config out

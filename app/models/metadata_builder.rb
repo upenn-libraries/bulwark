@@ -28,6 +28,11 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo = @repo
   end
 
+  def xml=(xml)
+    binding.pry()
+
+  end
+
   def set_source
     metadata_sources = Array.new
     self.repo.version_control_agent.clone
@@ -35,9 +40,9 @@ class MetadataBuilder < ActiveRecord::Base
       metadata_sources << file
     end
     status = Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
-    self.repo.version_control_agent.delete_clone
     self.source = metadata_sources
     self[:source_mappings] = convert_metadata
+    self.repo.version_control_agent.delete_clone
   end
 
   def to_xml(mapping)
@@ -70,20 +75,17 @@ class MetadataBuilder < ActiveRecord::Base
     return @@error_message
   end
 
-  def build_xml_files(xml_hash)
-    _get_metadata_source
+  def build_xml_files
+    self.repo.version_control_agent.clone
+    xml_hash = eval(self.xml)
     xml_hash.each do |xml|
       fname = "#{xml.first}.xml"
       xml_content = to_xml(eval(xml.last))
-      if xml_content.empty?
-        self.repo.version_control_agent.delete_clone
-        break
-      else
-        File.open(fname, "w+") do |file|
-          file << xml_content
-        end
+      File.open(fname, "w+") do |file|
+        file << xml_content
       end
     end
+    self.repo.version_control_agent.delete_clone
   end
 
   def check_for_errors
@@ -96,7 +98,8 @@ class MetadataBuilder < ActiveRecord::Base
 
     def convert_metadata
       begin
-        _get_metadata_source
+        repo = Repo.find(self.repo_id)
+        repo.version_control_agent.get(:get_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
         @mappings_sets = Array.new
         self.source.each do |source|
           pathname = Pathname.new(source)
@@ -118,7 +121,6 @@ class MetadataBuilder < ActiveRecord::Base
             raise "Illegal metadata source unit type"
           end
         end
-        repo.version_control_agent.delete_clone(:drop_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
         return @mappings_sets
       rescue
         raise $!, "Metadata conversion failed due to the following error(s): #{$!}", $!.backtrace
@@ -138,12 +140,6 @@ class MetadataBuilder < ActiveRecord::Base
         mappings["#{header}"] = sample_vals
       end
       return mappings
-    end
-
-    def _get_metadata_source
-      repo = Repo.find(self.repo_id)
-      repo.version_control_agent.clone
-      repo.version_control_agent.get(:get_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
     end
 
     def _validate_xml_tag(tag)

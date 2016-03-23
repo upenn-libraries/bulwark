@@ -24,7 +24,6 @@
         <%= content_tag(:div, "Example values from source: #{p.last.to_s}", :class => "field-tip") %>
       <% end -%>
     <% end -%>
-    <%= f.hidden_field "xml[#{mappings.first.last}]", :value => "#{mappings}" %>
   <% end -%>
   <%= content_tag(:div, f.submit, :class => "form-bottom") %>
 <% end %>

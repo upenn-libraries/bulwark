@@ -7,6 +7,7 @@ Rails.application.routes.draw do
       post :detect_metadata
       post :convert_metadata
       post :save_mappings
+      post :generate_xml_preview
     end
   end
   resources :metadata_builders do

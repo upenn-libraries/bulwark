@@ -1,5 +1,5 @@
 class ReposController < ApplicationController
-  before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log, :prepare_for_ingest, :ingest, :detect_metadata, :convert_metadata]
+  before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log, :prepare_for_ingest, :ingest, :detect_metadata, :convert_metadata, :generate_xml_preview]
 
   def show
     @message = @repo.create_remote
@@ -35,6 +35,15 @@ class ReposController < ApplicationController
       redirect_to "/admin_repo/repo/#{@repo.id}/preprocess", :flash => { :error => @message[:error] }
     elsif @message[:success].present?
       redirect_to "/admin_repo/repo/#{@repo.id}/preprocess", :flash => { :success => @message[:success] }
+    end
+  end
+
+  def generate_xml_preview
+    @message = @repo.generate_xml_preview
+    if @message[:error].present?
+      redirect_to "/admin_repo/repo/#{@repo.id}/generate_xml", :flash => { :error => @message[:error] }
+    elsif @message[:success].present?
+      redirect_to "/admin_repo/repo/#{@repo.id}/generate_xml", :flash => { :success => @message[:success] }
     end
   end
 
