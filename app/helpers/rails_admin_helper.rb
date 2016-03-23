@@ -60,7 +60,6 @@ module RailsAdminHelper
         error_list << content_tag("li", e)
       end
     end
-    binding.pry()
     flash[:error] = content_tag("ul", error_list.html_safe).html_safe if flash[:error]
   end
 

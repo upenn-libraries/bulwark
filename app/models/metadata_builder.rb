@@ -87,7 +87,9 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def check_for_errors
-    errors.add(:parent_element, "XML tag error(s): #{@@error_message}") unless @@error_message.empty?
+    if @@error_message
+      errors.add(:parent_element, "XML tag error(s): #{@@error_message}") unless @@error_message.empty?
+    end
   end
 
   private
