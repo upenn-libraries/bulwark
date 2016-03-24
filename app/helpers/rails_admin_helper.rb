@@ -42,15 +42,19 @@ module RailsAdminHelper
     return mb
   end
 
-  def render_sample_xml(mappings)
-    sample_xml_content = @object.metadata_builder.to_xml(mappings)
-    sample_xml_docs = ""
-    sample_xml_doc = REXML::Document.new sample_xml_content
-    sample_xml = ""
-    sample_xml_doc.write(sample_xml, 1)
-    xml_code = content_tag(:pre, "#{sample_xml}")
-    sample_xml_docs << content_tag(:div, xml_code, :class => "doc")
-    return sample_xml_docs.html_safe
+  def render_sample_xml
+    @object.version_control_agent.clone
+    @object.metadata_builder.source.each do |file|
+      binding.pry()
+    end
+    @object.version_control_agent.delete_clone
+    # sample_xml_docs = ""
+    # sample_xml_doc = REXML::Document.new sample_xml_content
+    # sample_xml = ""
+    # sample_xml_doc.write(sample_xml, 1)
+    # xml_code = content_tag(:pre, "#{sample_xml}")
+    # sample_xml_docs << content_tag(:div, xml_code, :class => "doc")
+    # return sample_xml_docs.html_safe
   end
 
   def render_flash_errors

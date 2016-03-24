@@ -3,6 +3,7 @@ class AddMetadataBuildersModel < ActiveRecord::Migration
     create_table :metadata_builders do |t|
       t.string :parent_repo
       t.string :source
+      t.string :preserve
       t.text :source_mappings
       t.text :field_mappings
       t.text :xml

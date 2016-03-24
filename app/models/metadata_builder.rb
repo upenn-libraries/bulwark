@@ -11,6 +11,7 @@ class MetadataBuilder < ActiveRecord::Base
   validate :check_for_errors
 
   serialize :source
+  serialize :preserve
   serialize :source_mappings
   serialize :field_mappings
   serialize :xml
@@ -26,15 +27,6 @@ class MetadataBuilder < ActiveRecord::Base
     self[:parent_repo] = parent_repo
     @repo = Repo.find(parent_repo)
     self.repo = @repo
-  end
-
-  def xml=(xml)
-    unless @@error_message || @@error_message.empty?
-      binding.pry()
-    else
-      self[:xml] = ""
-    end
-
   end
 
   def set_source
@@ -80,10 +72,13 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def build_xml_files
+    xml_files = Array.new
     self.repo.version_control_agent.clone
     self.source_mappings.each do |file|
       fname = file.first.last
       xml_fname = "#{fname}.xml"
+      tmp_xml_fname = "#{xml_fname}.tmp"
+      xml_files << xml_fname
       @xml_content = "<root>"
       file.drop(1).each do |source|
         tag = self.field_mappings["#{fname}"]["#{source.first}"]["mapped_value"]
@@ -92,13 +87,21 @@ class MetadataBuilder < ActiveRecord::Base
         end
       end
       @xml_content << "</root>"
-      File.open(xml_fname, "w+") do |f|
+
+      File.open(tmp_xml_fname, "w+") do |f|
         f << @xml_content
       end
-      self.repo.version_control_agent.commit("Generated preservation XML for #{fname}")
+
+      File.rename(tmp_xml_fname, xml_fname)
+      begin
+        self.repo.version_control_agent.commit("Generated preservation XML for #{fname}")
+      rescue Git::GitExecuteError
+        return
+      end
     end
     self.repo.version_control_agent.push
     self.repo.version_control_agent.delete_clone
+    set_preserve_files(xml_files)
   end
 
   def check_for_errors
@@ -153,6 +156,12 @@ class MetadataBuilder < ActiveRecord::Base
         mappings["#{header}"] = sample_vals
       end
       return mappings
+    end
+
+    def set_preserve_files(preserve_files_array)
+      binding.pry()
+      self.preserve = preserve_files_array
+      self.preserve.save!
     end
 
     def _validate_xml_tag(tag)

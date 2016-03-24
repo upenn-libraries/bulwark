@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(version: 20160314191728) do
   create_table "metadata_builders", force: :cascade do |t|
     t.string   "parent_repo"
     t.string   "source"
+    t.string   "preserve"
     t.text     "source_mappings"
     t.text     "field_mappings"
     t.text     "xml"

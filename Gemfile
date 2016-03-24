@@ -26,7 +26,6 @@ gem "rails_admin"
 gem "colorize"
 gem "git"
 gem "roo"
-gem "nokogiri"
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
