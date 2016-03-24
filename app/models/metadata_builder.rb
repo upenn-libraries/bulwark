@@ -159,9 +159,8 @@ class MetadataBuilder < ActiveRecord::Base
     end
 
     def set_preserve_files(preserve_files_array)
-      binding.pry()
       self.preserve = preserve_files_array
-      self.preserve.save!
+      self.save!
     end
 
     def _validate_xml_tag(tag)
