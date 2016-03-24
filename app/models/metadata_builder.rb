@@ -92,15 +92,13 @@ class MetadataBuilder < ActiveRecord::Base
         end
       end
       @xml_content << "</root>"
-      binding.pry()
       File.open(xml_fname, "w+") do |f|
-        binding.pry()
         f << @xml_content
       end
-      binding.pry()
+      self.repo.version_control_agent.commit("Generated preservation XML for #{fname}")
     end
-    binding.pry()
-    #self.repo.version_control_agent.delete_clone
+    self.repo.version_control_agent.push
+    self.repo.version_control_agent.delete_clone
   end
 
   def check_for_errors

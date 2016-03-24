@@ -34,7 +34,7 @@ class Repo < ActiveRecord::Base
       self.version_control_agent.init_bare
       self.version_control_agent.clone
       build_and_populate_directories(self.version_control_agent.working_path)
-      self.version_control_agent.commit("Added subdirectories according to the configuration specified in the repo configuration")
+      self.version_control_agent.commit_bare("Added subdirectories according to the configuration specified in the repo configuration")
       self.version_control_agent.push_bare
       self.version_control_agent.delete_clone
       return { :success => "Remote successfully created" }
