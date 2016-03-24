@@ -24,9 +24,9 @@ module Utils
         Git.clone(@remote_repo_path, @working_repo_path)
       end
 
-      def sync(options = {})
+      def sync(options)
         begin
-          Dir.chdir(@working_repo_path) if File.directory?(@working_repo_path)
+          change_dir_working
           `git annex sync #{options}`
         rescue
           puts "Trying to perform git annex sync outside of an annexed repository"
@@ -34,14 +34,29 @@ module Utils
       end
 
       def push_bare
+        change_dir_working
         `git push origin master`
       end
 
       def push
+        change_dir_working
         `git push origin master git-annex`
+        `git annex sync --content`
+      end
+
+      def add
+        `git annex add .`
       end
 
       def commit(commit_message)
+        change_dir_working
+        add
+        working_repo = Git.open(@working_repo_path)
+        working_repo.add(:all => true)
+        working_repo.commit(commit_message)
+      end
+
+      def commit_bare(commit_message)
         working_repo = Git.open(@working_repo_path)
         working_repo.add(:all => true)
         working_repo.commit(commit_message)
@@ -53,6 +68,7 @@ module Utils
         #TODO: Add logging
       end
 
+
       def get(dir = @working_repo_path)
         Dir.chdir(dir)
         `git annex get .`
@@ -61,6 +77,12 @@ module Utils
       def drop(dir = @working_repo_path)
         Dir.chdir(dir)
         `git annex drop .`
+      end
+
+      private
+
+      def change_dir_working
+        Dir.chdir(@working_repo_path) if File.directory?(@working_repo_path)
       end
 
     end

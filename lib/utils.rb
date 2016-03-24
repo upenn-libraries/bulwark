@@ -1,5 +1,6 @@
 require 'roo'
 require 'pathname'
+require 'utils/core_ext'
 
 module Utils
   class << self
@@ -70,6 +71,6 @@ module Utils
     def index
       ActiveFedora::Base.reindex_everything
     end
-    
+
   end
 end
