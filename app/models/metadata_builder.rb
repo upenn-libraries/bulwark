@@ -41,21 +41,6 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.delete_clone
   end
 
-  def to_xml(mapping)
-    fname = mapping.first.last
-    mapping.drop(1).each do |row|
-      key = row.first
-      field_key = (self.field_mappings.nil? ? row.first : self.field_mappings["#{fname}"]["#{key}"]["mapped_value"])
-      @xml_content = "<root>"
-      row.last.each do |value|
-        @xml_content << "<#{field_key}>#{value}</#{field_key}>"
-      end
-      @xml_content << "</root>"
-    end
-
-    return @xml_content
-  end
-
   def verify_xml_tags(tags_submitted)
     errors = Array.new
     tag_sets = eval(tags_submitted)
