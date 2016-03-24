@@ -8,10 +8,16 @@ class MetadataBuilder < ActiveRecord::Base
 
   validates :parent_repo, presence: true
 
+  validate :check_for_errors
+
   serialize :source
+  serialize :preserve
   serialize :source_mappings
   serialize :field_mappings
   serialize :xml
+
+  @@xml_tags = Array.new
+  @@error_message = nil
 
   def field_mappings=(field_mappings)
     self[:field_mappings] = eval(field_mappings)
@@ -30,33 +36,62 @@ class MetadataBuilder < ActiveRecord::Base
       metadata_sources << file
     end
     status = Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
-    self.repo.version_control_agent.delete_clone
     self.source = metadata_sources
-  end
-
-  def prep_for_mapping
     self[:source_mappings] = convert_metadata
+    self.repo.version_control_agent.delete_clone
   end
 
-  def to_xml(mapping)
-    xml_content = "<root>"
-    fname = mapping.first.last
-    mapping.drop(1).each do |row|
-      key = row.first
-      field_key = self.field_mappings.nil? ? row.first : self.field_mappings["#{fname}"]["#{key}"]["mapped_value"]
-      row.last.each do |value|
-        xml_content << "<#{field_key}>#{value}</#{field_key}>"
+  def verify_xml_tags(tags_submitted)
+    errors = Array.new
+    tag_sets = eval(tags_submitted)
+    tag_sets.each do |tag_set|
+      tag_set.drop(1).each do |tag|
+        tag.each do |val|
+          error = _validate_xml_tag(val.last["mapped_value"])
+          errors << error unless error.nil?
+        end
       end
     end
-    xml_content << "</root>"
+    @@error_message = errors
+    return @@error_message
   end
 
-  def build_xml_files(xml_hash)
-    xml_hash.each do |xml|
-      fname = "tmp/#{xml.first}.xml"
-      File.open(fname, "w+") do |file|
-        file << to_xml(eval(xml.last))
+  def build_xml_files
+    xml_files = Array.new
+    self.repo.version_control_agent.clone
+    self.source_mappings.each do |file|
+      fname = file.first.last
+      xml_fname = "#{fname}.xml"
+      tmp_xml_fname = "#{xml_fname}.tmp"
+      xml_files << xml_fname
+      @xml_content = "<root>"
+      file.drop(1).each do |source|
+        tag = self.field_mappings["#{fname}"]["#{source.first}"]["mapped_value"]
+        source.last.each do |field_value|
+          @xml_content << "<#{tag}>#{field_value}</#{tag}>"
+        end
       end
+      @xml_content << "</root>"
+
+      File.open(tmp_xml_fname, "w+") do |f|
+        f << @xml_content
+      end
+
+      File.rename(tmp_xml_fname, xml_fname)
+      begin
+        self.repo.version_control_agent.commit("Generated preservation XML for #{fname}")
+      rescue Git::GitExecuteError
+        return
+      end
+    end
+    self.repo.version_control_agent.push
+    self.repo.version_control_agent.delete_clone
+    set_preserve_files(xml_files)
+  end
+
+  def check_for_errors
+    if @@error_message
+      errors.add(:parent_element, "XML tag error(s): #{@@error_message}") unless @@error_message.empty?
     end
   end
 
@@ -65,7 +100,6 @@ class MetadataBuilder < ActiveRecord::Base
     def convert_metadata
       begin
         repo = Repo.find(self.repo_id)
-        repo.version_control_agent.clone
         repo.version_control_agent.get(:get_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
         @mappings_sets = Array.new
         self.source.each do |source|
@@ -88,7 +122,6 @@ class MetadataBuilder < ActiveRecord::Base
             raise "Illegal metadata source unit type"
           end
         end
-        repo.version_control_agent.delete_clone(:drop_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
         return @mappings_sets
       rescue
         raise $!, "Metadata conversion failed due to the following error(s): #{$!}", $!.backtrace
@@ -108,6 +141,19 @@ class MetadataBuilder < ActiveRecord::Base
         mappings["#{header}"] = sample_vals
       end
       return mappings
+    end
+
+    def set_preserve_files(preserve_files_array)
+      self.preserve = preserve_files_array
+      self.save!
+    end
+
+    def _validate_xml_tag(tag)
+      error_message = Array.new
+      error_message << "Valid XML tags cannot start with #{tag.first_three} (detected in field \"#{tag}\")" if tag.starts_with_xml?
+      error_message << "Valid XML tags cannot contain spaces (detected in field \"#{tag}\")" if tag.include?(" ")
+      error_message << "Valid XML tags cannot begin with numbers (detected in field \"#{tag}\")" if tag.starts_with_number?
+      return error_message unless error_message.empty?
     end
 
 end

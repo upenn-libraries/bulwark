@@ -35,6 +35,11 @@ class VersionControlAgent < ActiveRecord::Base
     @@worker.push
   end
 
+  def commit_bare(message)
+    initialize_worker
+    @@worker.commit_bare(message)
+  end
+
   def commit(message)
     initialize_worker
     @@worker.commit(message)

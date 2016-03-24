@@ -5,6 +5,7 @@ require Rails.root.join('lib', 'rails_admin', 'sign_off_production.rb')
 require Rails.root.join('lib', 'rails_admin', 'report_flagged.rb')
 require Rails.root.join('lib', 'rails_admin', 'preprocess_review.rb')
 require Rails.root.join('lib', 'rails_admin', 'map_metadata.rb')
+require Rails.root.join('lib', 'rails_admin', 'generate_xml.rb')
 
 RailsAdmin.config do |config|
   config.main_app_name = ["Intermediary", "Admin Interface"]
@@ -21,6 +22,7 @@ RailsAdmin.config do |config|
     edit
     delete
     map_metadata
+    generate_xml
     git_review do
       only ["Repo"]
     end

@@ -34,7 +34,7 @@ class Repo < ActiveRecord::Base
       self.version_control_agent.init_bare
       self.version_control_agent.clone
       build_and_populate_directories(self.version_control_agent.working_path)
-      self.version_control_agent.commit("Added subdirectories according to the configuration specified in the repo configuration")
+      self.version_control_agent.commit_bare("Added subdirectories according to the configuration specified in the repo configuration")
       self.version_control_agent.push_bare
       self.version_control_agent.delete_clone
       return { :success => "Remote successfully created" }
@@ -43,11 +43,13 @@ class Repo < ActiveRecord::Base
     end
   end
 
-  def detect_metadata_sources
-    self.metadata_builder.set_source
-    self.metadata_builder.save!
-    @message = self.metadata_builder.source.nil? || self.metadata_builder.source.empty? ? {:error => "No metadata sources detected."} : {:success => "Metadata sources detected.  See below."}
-    return @message
+  def generate_xml_preview
+    begin
+      self.metadata_builder.build_xml_files
+      return { :success => "Sample XML generated.  See output below."}
+    rescue
+      return { :error => "Something went wrong during XML generation."}
+    end
   end
 
 private
@@ -87,7 +89,6 @@ private
   def set_metadata_builder
     self.metadata_builder = MetadataBuilder.new(:parent_repo => self.id)
     self.metadata_builder.set_source
-    self.metadata_builder.prep_for_mapping
     self.metadata_builder.save!
     self.save!
   end
