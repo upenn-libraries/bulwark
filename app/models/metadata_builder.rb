@@ -29,7 +29,11 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def xml=(xml)
-    binding.pry()
+    unless @@error_message || @@error_message.empty?
+      binding.pry()
+    else
+      self[:xml] = ""
+    end
 
   end
 
@@ -77,15 +81,26 @@ class MetadataBuilder < ActiveRecord::Base
 
   def build_xml_files
     self.repo.version_control_agent.clone
-    xml_hash = eval(self.xml)
-    xml_hash.each do |xml|
-      fname = "#{xml.first}.xml"
-      xml_content = to_xml(eval(xml.last))
-      File.open(fname, "w+") do |file|
-        file << xml_content
+    self.source_mappings.each do |file|
+      fname = file.first.last
+      xml_fname = "#{fname}.xml"
+      @xml_content = "<root>"
+      file.drop(1).each do |source|
+        tag = self.field_mappings["#{fname}"]["#{source.first}"]["mapped_value"]
+        source.last.each do |field_value|
+          @xml_content << "<#{tag}>#{field_value}</#{tag}>"
+        end
       end
+      @xml_content << "</root>"
+      binding.pry()
+      File.open(xml_fname, "w+") do |f|
+        binding.pry()
+        f << @xml_content
+      end
+      binding.pry()
     end
-    self.repo.version_control_agent.delete_clone
+    binding.pry()
+    #self.repo.version_control_agent.delete_clone
   end
 
   def check_for_errors
