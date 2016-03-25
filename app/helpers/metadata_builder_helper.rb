@@ -9,4 +9,13 @@ module MetadataBuilderHelper
     end
   end
 
+  def render_xml_or_message
+    if @object.metadata_builder.field_mappings.nil?
+      render :partial => "metadata_builders/no_mappings"
+    else
+      render :partial => "metadata_builders/generate_xml"
+    end
+
+  end
+
 end

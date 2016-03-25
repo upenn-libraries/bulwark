@@ -21,6 +21,10 @@ module RailsAdminHelper
     render_form_or_message
   end
 
+  def render_generate_xml
+    render_xml_or_message
+  end
+
   def _build_table_from_hash(hash_to_use)
     header = "<th>File Path</th>"
     rows = ""
