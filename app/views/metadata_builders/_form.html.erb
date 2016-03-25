@@ -1,8 +1,5 @@
-<h2>Metadata Mapping</h2>
-
 <%= form_for metadata_builder, :validate => true, :html => { :class => "field-mappings", :method => :post}, :url => "/metadata_builders/1" do |f| %>
 <%= render_flash_errors if flash[:error] %>
-
   <%= field_set_tag 'Map source metadata to XML' do %>
     Fill out the fields below to map your metadata to source.
   <% end %>
