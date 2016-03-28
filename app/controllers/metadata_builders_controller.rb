@@ -2,7 +2,6 @@ class MetadataBuildersController < ApplicationController
 
   before_action :set_metadata_builder, only: [:show, :edit, :update, :git_annex_commit]
   before_filter :merge_mappings, :only => [:create, :update]
-  before_filter :merge_xml, :only => [:create, :update]
 
   def show
   end
@@ -42,15 +41,11 @@ class MetadataBuildersController < ApplicationController
   end
 
   def metadata_builder_params
-    params.require(:metadata_builder).permit(:parent_repo, :source, :source_mappings, :field_mappings, :xml)
+    params.require(:metadata_builder).permit(:parent_repo, :source, :source_mappings, :field_mappings)
   end
 
   def merge_mappings
     params[:metadata_builder][:field_mappings] = params[:metadata_builder][:field_mappings].to_s
-  end
-
-  def merge_xml
-    params[:metadata_builder][:xml] = params[:metadata_builder][:xml].to_s
   end
 
 end
