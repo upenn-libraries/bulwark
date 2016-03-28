@@ -81,7 +81,7 @@ class MetadataBuilder < ActiveRecord::Base
       begin
         self.repo.version_control_agent.commit("Generated preservation XML for #{fname}")
       rescue Git::GitExecuteError
-        return
+        next
       end
     end
     self.repo.version_control_agent.push
