@@ -7,8 +7,10 @@
   <% @object.metadata_builder.source_mappings.each do |mappings| %>
     <h3>Mappings for <%= mappings.first.last.gsub(@object.version_control_agent.working_path, "") %></h3>
     <%= f.hidden_field :source_file, :value => "#{mappings.first.last}" %>
-    <%= f.label "#{mappings.first.last}[parent_element]", "Parent element:" %>
-    <%= f.text_field :parent_element, :value => "record" %>
+    <%= f.label "field_mappings[#{mappings.first.last}][root_element][mapped_value]", "Root element:" %>
+    <%= f.text_field "field_mappings[#{mappings.first.last}][root_element][mapped_value]", :value => "records" %>
+    <%= f.label "field_mappings[#{mappings.first.last}][parent_element][mapped_value]", "Parent element per row (optional):" %>
+    <%= f.text_field "field_mappings[#{mappings.first.last}][parent_element][mapped_value]", :value => nil %>
     <% mappings.drop(1).each do |p| %>
       <% val = @object.metadata_builder.field_mappings.nil? ? p.first : @object.metadata_builder.field_mappings["#{mappings.first.last}"]["#{p.first}"]["mapped_value"]  %>
         <%= content_tag :div, :class => "field" do -%>

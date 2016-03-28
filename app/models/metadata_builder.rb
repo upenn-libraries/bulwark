@@ -61,18 +61,23 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.clone
     self.source_mappings.each do |file|
       fname = file.first.last
+      @xml_content = "<root>"
       xml_fname = "#{fname}.xml"
       tmp_xml_fname = "#{xml_fname}.tmp"
       xml_files << xml_fname
-      @xml_content = "<root>"
-      file.drop(1).each do |source|
-        tag = self.field_mappings["#{fname}"]["#{source.first}"]["mapped_value"]
-        source.last.each do |field_value|
-          @xml_content << "<#{tag}>#{field_value}</#{tag}>"
+      if self.field_mappings["#{fname}"]["parent_element"]["mapped_value"].empty?
+        file.drop(1).each do |source|
+          tag = self.field_mappings["#{fname}"]["#{source.first}"]["mapped_value"]
+          source.last.each do |field_value|
+            @xml_content << "<#{tag}>#{field_value}</#{tag}>"
+          end
         end
+      else
+        binding.pry()
+        @xml_content << each_row_values(fname)
+        binding.pry()
       end
       @xml_content << "</root>"
-
       File.open(tmp_xml_fname, "w+") do |f|
         f << @xml_content
       end
@@ -99,23 +104,18 @@ class MetadataBuilder < ActiveRecord::Base
 
     def convert_metadata
       begin
-        repo = Repo.find(self.repo_id)
-        repo.version_control_agent.get(:get_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
+        repo = _get_metadata_repo_content
         @mappings_sets = Array.new
         self.source.each do |source|
           pathname = Pathname.new(source)
           ext = pathname.extname.to_s[1..-1]
           case ext
           when "xlsx"
-            xlsx = Roo::Spreadsheet.open(source)
-            tmp_csv = "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}/#{pathname.basename.to_s}.csv"
-            File.open(tmp_csv, "w+") do |f|
-              f.write(xlsx.to_csv)
-            end
-            @mappings = generate_mapping_options_csv(tmp_csv)
+            tmp_csv = convert_to_csv(source)
+            @mappings = generate_mapping_options_csv(source)
             @mappings_sets << @mappings
           when "csv"
-            @mappings = generate_mapping_options_csv(tmp_csv)
+            @mappings = generate_mapping_options_csv(source)
             @mappings_sets << @mappings
           when "xml"
           else
@@ -130,12 +130,13 @@ class MetadataBuilder < ActiveRecord::Base
 
     def generate_mapping_options_csv(base_file)
       mappings = {}
-      mappings["base_file"] = "#{base_file.sub('tmp/','')}"
-      headers = CSV.open(base_file, 'r') { |csv| csv.first }
+      base_file_csv = "#{base_file}.csv"
+      mappings["base_file"] = "#{base_file}"
+      headers = CSV.open(base_file_csv, 'r') { |csv| csv.first }
       headers.each{|a| mappings[a] = 0}
       headers.each do |header|
         sample_vals = Array.new
-        CSV.foreach(base_file, :headers => true) do |row|
+        CSV.foreach(base_file_csv, :headers => true) do |row|
           sample_vals << row["#{header}"] unless row["#{header}"].nil?
         end
         mappings["#{header}"] = sample_vals
@@ -143,9 +144,41 @@ class MetadataBuilder < ActiveRecord::Base
       return mappings
     end
 
+    def each_row_values(base_file)
+      repo = _get_metadata_repo_content
+      base_file_csv = convert_to_csv(base_file)
+      parent_element = self.field_mappings[base_file]["parent_element"]["mapped_value"]
+      xml_content = ""
+      CSV.foreach(base_file_csv, :headers => true) do |row|
+        xml_content << "<#{parent_element}>"
+        row.to_a.each do |value|
+          tag = self.field_mappings[base_file]["#{value.first}"]["mapped_value"]
+          xml_content << "<#{tag}>#{value.last}</#{tag}>"
+        end
+        xml_content << "</#{parent_element}>"
+      end
+      return xml_content
+
+    end
+
     def set_preserve_files(preserve_files_array)
       self.preserve = preserve_files_array
       self.save!
+    end
+
+    def convert_to_csv(source)
+      xlsx = Roo::Spreadsheet.open(source)
+      tmp_csv = "#{source.to_s}.csv"
+      File.open(tmp_csv, "w+") do |f|
+        f.write(xlsx.to_csv)
+      end
+      return tmp_csv
+    end
+
+    def _get_metadata_repo_content
+      repo = Repo.find(self.repo_id)
+      repo.version_control_agent.get(:get_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
+      return repo
     end
 
     def _validate_xml_tag(tag)
