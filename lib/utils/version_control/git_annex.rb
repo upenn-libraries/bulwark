@@ -21,6 +21,7 @@ module Utils
       end
 
       def clone
+        binding.pry()
         Git.clone(@remote_repo_path, @working_repo_path)
       end
 

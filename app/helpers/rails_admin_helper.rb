@@ -25,17 +25,6 @@ module RailsAdminHelper
     render_xml_or_message
   end
 
-  def _build_table_from_hash(hash_to_use)
-    header = "<th>File Path</th>"
-    rows = ""
-    hash_to_use.each do |row|
-      rows << "<tr>" << "<td>" << row << "</td>" << "</tr>"
-    end
-    array_table = "<table>#{header}#{rows}</table>"
-    return array_table.html_safe
-  end
-
-
   def _metadata_builder(repo)
     mb = MetadataBuilder.where(:parent_repo => repo.id).blank? ? MetadataBuilder.create(:parent_repo => repo.id) : MetadataBuilder.find_by(:parent_repo => repo.id)
     return mb

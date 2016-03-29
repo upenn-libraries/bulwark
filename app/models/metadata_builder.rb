@@ -31,13 +31,19 @@ class MetadataBuilder < ActiveRecord::Base
 
   def set_source
     metadata_sources = Array.new
+    binding.pry()
     self.repo.version_control_agent.clone
+    binding.pry()
     Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*") do |file|
       metadata_sources << file
     end
+    binding.pry()
     status = Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
+    binding.pry()
     self.source = metadata_sources
+    binding.pry()
     self[:source_mappings] = convert_metadata
+    binding.pry()
     self.repo.version_control_agent.delete_clone
   end
 
@@ -167,7 +173,7 @@ class MetadataBuilder < ActiveRecord::Base
 
     def convert_to_csv(source)
       xlsx = Roo::Spreadsheet.open(source)
-      tmp_csv = "#{source.to_s}.csv"
+      tmp_csv = "#{Rails.root}/tmp/#{source.to_s}.csv"
       File.open(tmp_csv, "w+") do |f|
         f.write(xlsx.to_csv)
       end
@@ -175,8 +181,10 @@ class MetadataBuilder < ActiveRecord::Base
     end
 
     def _get_metadata_repo_content
+      binding.pry()
       repo = Repo.find(self.repo_id)
       repo.version_control_agent.get(:get_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
+      binding.pry()
       return repo
     end
 

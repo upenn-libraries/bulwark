@@ -21,8 +21,10 @@ class VersionControlAgent < ActiveRecord::Base
   end
 
   def clone
+    binding.pry()
     initialize_worker
     @@worker.clone
+    binding.pry()
   end
 
   def push_bare
@@ -52,8 +54,10 @@ class VersionControlAgent < ActiveRecord::Base
 
   def delete_clone(options = {})
     initialize_worker
+    binding.pry()
     options[:drop_location].nil? ? @@worker.drop : @@worker.drop(options[:drop_location])
     @@worker.remove_working_directory
+    binding.pry()
   end
 
 
