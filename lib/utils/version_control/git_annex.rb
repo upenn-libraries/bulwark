@@ -65,7 +65,6 @@ module Utils
       def remove_working_directory
         Dir.chdir(Rails.root.to_s)
         FileUtils.rm_rf(@working_repo_path, :secure => true) if File.directory?(@working_repo_path)
-        #TODO: Add logging
       end
 
 

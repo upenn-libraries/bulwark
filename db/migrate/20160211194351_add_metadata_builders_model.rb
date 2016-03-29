@@ -6,7 +6,6 @@ class AddMetadataBuildersModel < ActiveRecord::Migration
       t.string :preserve
       t.text :source_mappings
       t.text :field_mappings
-      t.text :xml
       t.timestamps null: false
     end
   end
