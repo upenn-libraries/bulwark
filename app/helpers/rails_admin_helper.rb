@@ -7,12 +7,6 @@ module RailsAdminHelper
   include Filesystem
   include Utils
 
-  def render_sources_table(repo)
-    table = _build_table_from_hash(repo.metadata_builder.source)
-    page_content = content_tag("div", table, :class => "metadata-sources-table")
-    return page_content
-  end
-
   def render_git_remote_options
     render_git_directions_or_actions
   end
