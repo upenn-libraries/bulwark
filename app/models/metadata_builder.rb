@@ -31,19 +31,13 @@ class MetadataBuilder < ActiveRecord::Base
 
   def set_source
     metadata_sources = Array.new
-    binding.pry()
     self.repo.version_control_agent.clone
-    binding.pry()
     Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*") do |file|
       metadata_sources << file
     end
-    binding.pry()
     status = Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
-    binding.pry()
     self.source = metadata_sources
-    binding.pry()
     self[:source_mappings] = convert_metadata
-    binding.pry()
     self.repo.version_control_agent.delete_clone
   end
 
@@ -117,10 +111,10 @@ class MetadataBuilder < ActiveRecord::Base
           case ext
           when "xlsx"
             tmp_csv = convert_to_csv(source)
-            @mappings = generate_mapping_options_csv(source)
+            @mappings = generate_mapping_options_csv(source, tmp_csv)
             @mappings_sets << @mappings
           when "csv"
-            @mappings = generate_mapping_options_csv(source)
+            @mappings = generate_mapping_options_csv(source, tmp_csv)
             @mappings_sets << @mappings
           when "xml"
           else
@@ -133,15 +127,14 @@ class MetadataBuilder < ActiveRecord::Base
       end
     end
 
-    def generate_mapping_options_csv(base_file)
+    def generate_mapping_options_csv(base_file, tmp_csv)
       mappings = {}
-      base_file_csv = "#{base_file}.csv"
       mappings["base_file"] = "#{base_file}"
-      headers = CSV.open(base_file_csv, 'r') { |csv| csv.first }
+      headers = CSV.open(tmp_csv, 'r') { |csv| csv.first }
       headers.each{|a| mappings[a] = 0}
       headers.each do |header|
         sample_vals = Array.new
-        CSV.foreach(base_file_csv, :headers => true) do |row|
+        CSV.foreach(tmp_csv, :headers => true) do |row|
           sample_vals << row["#{header}"] unless row["#{header}"].nil?
         end
         mappings["#{header}"] = sample_vals
@@ -151,10 +144,10 @@ class MetadataBuilder < ActiveRecord::Base
 
     def each_row_values(base_file)
       repo = _get_metadata_repo_content
-      base_file_csv = convert_to_csv(base_file)
+      tmp_csv = convert_to_csv(base_file)
       parent_element = self.field_mappings[base_file]["parent_element"]["mapped_value"]
       xml_content = ""
-      CSV.foreach(base_file_csv, :headers => true) do |row|
+      CSV.foreach(tmp_csv, :headers => true) do |row|
         xml_content << "<#{parent_element}>"
         row.to_a.each do |value|
           tag = self.field_mappings[base_file]["#{value.first}"]["mapped_value"]
@@ -173,7 +166,7 @@ class MetadataBuilder < ActiveRecord::Base
 
     def convert_to_csv(source)
       xlsx = Roo::Spreadsheet.open(source)
-      tmp_csv = "#{Rails.root}/tmp/#{source.to_s}.csv"
+      tmp_csv = "#{Rails.root}/tmp/#{source.gsub("/","_").to_s}.csv"
       File.open(tmp_csv, "w+") do |f|
         f.write(xlsx.to_csv)
       end
@@ -181,10 +174,8 @@ class MetadataBuilder < ActiveRecord::Base
     end
 
     def _get_metadata_repo_content
-      binding.pry()
       repo = Repo.find(self.repo_id)
       repo.version_control_agent.get(:get_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
-      binding.pry()
       return repo
     end
 
