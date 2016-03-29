@@ -31,7 +31,6 @@ ActiveRecord::Schema.define(version: 20160314191728) do
     t.string   "preserve"
     t.text     "source_mappings"
     t.text     "field_mappings"
-    t.text     "xml"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
     t.integer  "repo_id"

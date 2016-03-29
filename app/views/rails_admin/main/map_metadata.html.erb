@@ -1,4 +1,5 @@
+<h2>Metadata Mapping</h2>
 <% refresh_metadata_from_source %>
 <div class="mapping-dashboard">
-  <%= render :partial => "metadata_builders/form", :locals => {metadata_builder:  @object.metadata_builder} unless @object.metadata_builder.nil? %>
+  <%= render_metadata_builder_form %>
 </div>

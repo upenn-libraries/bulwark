@@ -2,40 +2,22 @@ require "rexml/document"
 
 module RailsAdminHelper
 
+  include MetadataBuilderHelper
+  include RepoHelper
   include Filesystem
   include Utils
 
   def render_git_remote_options
-    full_path = "#{assets_path_prefix}/#{@object.directory}"
-    page_content = content_tag("div", :class => "git-actions") do
-      if Dir.exists?(full_path)
-        initialized_p = content_tag("p","Your git remote has been initialized at #{full_path}.  To begin using this remote, run the following command from the terminal:")
-        initialized_pre = content_tag("pre", "git clone #{Utils.config.assets_path}/#{@object.directory}\ncd #{(@object.directory).gsub(".git","")}")
-        concat(initialized_p << initialized_pre)
-      else
-        # TODO: make construction of the other model's URL stronger for deployment from subdirectories
-        page_content = link_to "Create Remote", "/repos/#{@object.id}"
-      end
-    end
-    return page_content
+    render_git_directions_or_actions
   end
 
-  def render_sources_table(repo)
-    table = _build_table_from_hash(repo.metadata_builder.source)
-    page_content = content_tag("div", table, :class => "metadata-sources-table")
-    return page_content
+  def render_metadata_builder_form
+    render_form_or_message
   end
 
-  def _build_table_from_hash(hash_to_use)
-    header = "<th>File Path</th>"
-    rows = ""
-    hash_to_use.each do |row|
-      rows << "<tr>" << "<td>" << row << "</td>" << "</tr>"
-    end
-    array_table = "<table>#{header}#{rows}</table>"
-    return array_table.html_safe
+  def render_generate_xml
+    render_xml_or_message
   end
-
 
   def _metadata_builder(repo)
     mb = MetadataBuilder.where(:parent_repo => repo.id).blank? ? MetadataBuilder.create(:parent_repo => repo.id) : MetadataBuilder.find_by(:parent_repo => repo.id)

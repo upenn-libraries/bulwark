@@ -1,7 +1,3 @@
-<div class="generate-xml">
-  <%= button_to "Generate XML", "/repos/#{@object.id}/generate_xml_preview", :id => @object.id, method: :post %>
-</div>
+<h2>Generate Preservation XML</h2>
 
-<div class="xml-preview">
-  <%= render_sample_xml if @object.metadata_builder.preserve %>
-</div
+<%= render_generate_xml %> 
