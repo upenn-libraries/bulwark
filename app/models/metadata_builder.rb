@@ -61,7 +61,8 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.clone
     self.source_mappings.each do |file|
       fname = file.first.last
-      @xml_content = "<root>"
+      root_element = self.field_mappings["#{fname}"]["root_element"]["mapped_value"].empty? ? "root" : self.field_mappings["#{fname}"]["root_element"]["mapped_value"]
+      @xml_content = "<#{root_element}>"
       xml_fname = "#{fname}.xml"
       tmp_xml_fname = "#{xml_fname}.tmp"
       xml_files << xml_fname
@@ -73,11 +74,9 @@ class MetadataBuilder < ActiveRecord::Base
           end
         end
       else
-        binding.pry()
         @xml_content << each_row_values(fname)
-        binding.pry()
       end
-      @xml_content << "</root>"
+      @xml_content << "</#{root_element}>"
       File.open(tmp_xml_fname, "w+") do |f|
         f << @xml_content
       end
