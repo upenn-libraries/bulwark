@@ -12,6 +12,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   serialize :source
   serialize :preserve
+  serialize :nested_relationships
   serialize :source_mappings
   serialize :field_mappings
   serialize :xml
@@ -66,7 +67,7 @@ class MetadataBuilder < ActiveRecord::Base
       xml_fname = "#{fname}.xml"
       tmp_xml_fname = "#{xml_fname}.tmp"
       xml_files << xml_fname
-      if self.field_mappings["#{fname}"]["parent_element"]["mapped_value"].empty?
+      if self.field_mappings["#{fname}"]["child_element"]["mapped_value"].empty?
         file.drop(1).each do |source|
           tag = self.field_mappings["#{fname}"]["#{source.first}"]["mapped_value"]
           source.last.each do |field_value|
@@ -95,7 +96,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   def check_for_errors
     if @@error_message
-      errors.add(:parent_element, "XML tag error(s): #{@@error_message}") unless @@error_message.empty?
+      errors.add(:child_element, "XML tag error(s): #{@@error_message}") unless @@error_message.empty?
     end
   end
 
@@ -145,15 +146,15 @@ class MetadataBuilder < ActiveRecord::Base
     def each_row_values(base_file)
       repo = _get_metadata_repo_content
       tmp_csv = convert_to_csv(base_file)
-      parent_element = self.field_mappings[base_file]["parent_element"]["mapped_value"]
+      child_element = self.field_mappings[base_file]["child_element"]["mapped_value"]
       xml_content = ""
       CSV.foreach(tmp_csv, :headers => true) do |row|
-        xml_content << "<#{parent_element}>"
+        xml_content << "<#{child_element}>"
         row.to_a.each do |value|
           tag = self.field_mappings[base_file]["#{value.first}"]["mapped_value"]
           xml_content << "<#{tag}>#{value.last}</#{tag}>"
         end
-        xml_content << "</#{parent_element}>"
+        xml_content << "</#{child_element}>"
       end
       return xml_content
 

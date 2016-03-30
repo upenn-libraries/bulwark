@@ -4,6 +4,7 @@ class AddMetadataBuildersModel < ActiveRecord::Migration
       t.string :parent_repo
       t.string :source
       t.string :preserve
+      t.string :nested_relationships
       t.text :source_mappings
       t.text :field_mappings
       t.timestamps null: false

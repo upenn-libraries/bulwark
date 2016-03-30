@@ -1,3 +1,4 @@
+<p>Perform tasks on objects before ingestion</p>
 <ul>
   <%= content_tag("li", (link_to "Generate checksum log", "/repos/#{@object.id}/checksum_log", :id => @object.id, method: :post)) %>
   <%= content_tag("li", (link_to "Prepare for ingest", "/repos/#{@object.id}/prepare_for_ingest", :id => @object.id, method: :post)) %>
