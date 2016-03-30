@@ -15,13 +15,12 @@ class MetadataBuilder < ActiveRecord::Base
   serialize :nested_relationships
   serialize :source_mappings
   serialize :field_mappings
-  serialize :xml
 
   @@xml_tags = Array.new
   @@error_message = nil
 
-  def nested_relationships
-    read_attribute(:nested_relationships) || ''
+  def nested_relationships=(nested_relationships)
+    self[:nested_relationships] = nested_relationships
   end
 
   def field_mappings=(field_mappings)
@@ -32,6 +31,30 @@ class MetadataBuilder < ActiveRecord::Base
     self[:parent_repo] = parent_repo
     @repo = Repo.find(parent_repo)
     self.repo = @repo
+  end
+
+  def nested_relationships
+    read_attribute(:nested_relationships) || ''
+  end
+
+  def source
+    read_attribute(:source) || ''
+  end
+
+  def preserve
+    read_attribute(:preserve) || ''
+  end
+
+  def source_mappings
+    read_attribute(:source_mappings) || ''
+  end
+
+  def field_mappings
+    read_attribute(:field_mappings) || ''
+  end
+
+  def parent_repo
+    read_attribute(:parent_repo) || ''
   end
 
   def set_source
@@ -100,7 +123,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   def check_for_errors
     if @@error_message
-      errors.add(:child_element, "XML tag error(s): #{@@error_message}") unless @@error_message.empty?
+      errors.add(:source, "XML tag error(s): #{@@error_message}") unless @@error_message.empty?
     end
   end
 

@@ -1,6 +1,6 @@
 class MetadataBuildersController < ApplicationController
 
-  before_action :set_metadata_builder, only: [:show, :edit, :update, :git_annex_commit]
+  before_action :set_metadata_builder, only: [:show, :edit, :update]
   before_filter :merge_mappings, :only => [:create, :update]
 
   def show
@@ -14,7 +14,9 @@ class MetadataBuildersController < ApplicationController
   end
 
   def update
-    @error_message = @metadata_builder.verify_xml_tags(params[:metadata_builder][:field_mappings])
+    binding.pry()
+    @error_message = @metadata_builder.verify_xml_tags(params[:metadata_builder][:field_mappings]) if params[:metadata_builder][:field_mappings].present?
+    binding.pry()
     if @metadata_builder.update(metadata_builder_params)
       flash[:success] = "Metadata Builder successfully updated"
       redirect_to "/admin_repo/repo/#{@metadata_builder.id}/map_metadata"
@@ -24,16 +26,6 @@ class MetadataBuildersController < ApplicationController
     end
   end
 
-  def git_annex_commit
-    @message = @metadata_builder.commit_to_annex
-    if @message[:error].present?
-      redirect_to "admin_repo/", :flash => { :error => @message[:error] }
-    elsif @message[:success].present?
-      redirect_to "admin_repo/", :flash => { :success => @message[:success] }
-    end
-  end
-
-
   private
 
   def set_metadata_builder
@@ -41,7 +33,7 @@ class MetadataBuildersController < ApplicationController
   end
 
   def metadata_builder_params
-    params.require(:metadata_builder).permit(:parent_repo, :source, :source_mappings, :field_mappings)
+    params.require(:metadata_builder).permit(:parent_repo, :source, :source_mappings, :field_mappings, :nested_relationships)
   end
 
   def merge_mappings

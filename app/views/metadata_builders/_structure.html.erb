@@ -1,7 +1,7 @@
 <%= form_for @object.metadata_builder, :validate => true, :html => { :class => "field-mappings", :method => :post}, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
   <% @object.metadata_builder.preserve.each do |file| -%>
-    <%= f.label "field_mappings[#{file}][root_element][mapped_value]", "Root element:" %>
-    <%= f.select :nested_relationships, _prettify(@object.metadata_builder.preserve) %>
-    <%= content_tag(:div, f.submit, :class => "form-bottom") %>
+    <%= f.label :nested_relationships, "Children:" %>
+    <%= f.select :nested_relationships, _prettify(@object.metadata_builder.preserve), {}, { :multiple => true} %>
   <% end -%>
+  <%= content_tag(:div, f.submit, :class => "form-bottom") %>
 <% end -%>
