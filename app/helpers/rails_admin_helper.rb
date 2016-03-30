@@ -37,7 +37,7 @@ module RailsAdminHelper
       sample_xml_doc = REXML::Document.new sample_xml_content
       sample_xml = ""
       sample_xml_doc.write(sample_xml, 1)
-      header = content_tag(:h3, "XML Sample for #{file.gsub(@object.version_control_agent.working_path, "")}")
+      header = content_tag(:h3, "XML Sample for #{_prettify(file)}")
       xml_code = content_tag(:pre, "#{sample_xml}")
       @sample_xml_docs << content_tag(:div, header << xml_code, :class => "doc")
     end

@@ -20,6 +20,10 @@ class MetadataBuilder < ActiveRecord::Base
   @@xml_tags = Array.new
   @@error_message = nil
 
+  def nested_relationships
+    read_attribute(:nested_relationships) || ''
+  end
+
   def field_mappings=(field_mappings)
     self[:field_mappings] = eval(field_mappings)
   end

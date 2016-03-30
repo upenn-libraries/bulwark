@@ -6,7 +6,7 @@
   <%= f.hidden_field :parent_repo, :value => "#{@object.id}" %>
   <% @object.metadata_builder.source_mappings.each do |mappings| %>
   <% root_val, parent_val = _structural_elements(mappings.first.last) %>
-  <h3>Mappings for <%= mappings.first.last.gsub(@object.version_control_agent.working_path, "") %></h3>
+  <h3>Mappings for <%= _prettify(mappings.first.last) %></h3>
     <%= f.hidden_field :source_file, :value => "#{mappings.first.last}" %>
     <%= content_tag :div, :class => "field" do -%>
       <%= f.label "field_mappings[#{mappings.first.last}][root_element][mapped_value]", "Root element:" %>

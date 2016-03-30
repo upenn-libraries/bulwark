@@ -35,4 +35,23 @@ module MetadataBuilderHelper
     end
   end
 
+  def _prettify(file_path_input)
+      if file_path_input.is_a? Array
+        file_path_array = Array.new
+        file_path_input.each do |file_path|
+          file_path_array << _prettified_working_file(file_path)
+        end
+        return file_path_array
+      elsif file_path_input.is_a? String
+        file_path_string = _prettified_working_file(file_path_input)
+        return file_path_string
+      else
+        raise "Invalid argument #{file_path_input}. _prettify can only accept strings and arrays of strings."
+      end
+  end
+
+  def _prettified_working_file(file_path)
+    return file_path.gsub(@object.version_control_agent.working_path, "")
+  end
+
 end
