@@ -29,10 +29,11 @@ ActiveRecord::Schema.define(version: 20160314191728) do
     t.string   "parent_repo"
     t.string   "source"
     t.string   "preserve"
+    t.string   "nested_relationships"
     t.text     "source_mappings"
     t.text     "field_mappings"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
     t.integer  "repo_id"
   end
 
