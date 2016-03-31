@@ -137,16 +137,20 @@ class MetadataBuilder < ActiveRecord::Base
       insert_index = xml_content.index(end_tag)
       xml_content.insert(insert_index, child_xml_content)
       tmp_xml = "#{key_index}.unified.xml"
-      File.open(tmp_xml, "w+") do |f|
+      self.repo.version_control_agent.unlock(tmp_xml) if File.exists?(tmp_xml)
+      File.open(tmp_xml, "w") do |f|
         f.write(xml_content)
       end
       begin
         self.repo.version_control_agent.commit("Generated unified XML for #{key} and #{value} at #{tmp_xml}")
       rescue Git::GitExecuteError
+        self.repo.version_control_agent.delete_clone
         next
       end
       self.repo.version_control_agent.push
       self.repo.version_control_agent.delete_clone
+      set_preserve_files(tmp_xml)
+      self.save!
     end
   end
 
@@ -216,11 +220,6 @@ class MetadataBuilder < ActiveRecord::Base
 
     end
 
-    def set_preserve_files(preserve_files_array)
-      self.preserve = preserve_files_array
-      self.save!
-    end
-
     def convert_to_csv(source)
       xlsx = Roo::Spreadsheet.open(source)
       tmp_csv = "#{Rails.root}/tmp/#{source.gsub("/","_").to_s}.csv"
@@ -228,6 +227,17 @@ class MetadataBuilder < ActiveRecord::Base
         f.write(xlsx.to_csv)
       end
       return tmp_csv
+    end
+
+    def set_preserve_files(pfiles)
+      binding.pry()
+      if self.preserve.present?
+        self.preserve += self.preserve + Array(pfiles).uniq
+      else
+        self.preserve = Array(pfiles).uniq
+      end
+      self.preserve.uniq!
+      self.save!
     end
 
     def _get_metadata_repo_content

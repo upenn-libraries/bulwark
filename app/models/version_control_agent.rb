@@ -62,6 +62,11 @@ class VersionControlAgent < ActiveRecord::Base
     options[:get_location].nil? ? @@worker.get : @@worker.get(options[:get_location])
   end
 
+  def unlock(filename)
+    initialize_worker
+    @@worker.unlock(filename)
+  end
+
   def delete_clone(options = {})
     initialize_worker
     options[:drop_location].nil? ? @@worker.drop : @@worker.drop(options[:drop_location])

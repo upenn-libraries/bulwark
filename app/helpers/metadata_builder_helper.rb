@@ -16,11 +16,9 @@ module MetadataBuilderHelper
     end
   end
 
-  def render_structure_or_message
+  def render_structure_or_not
     if @object.metadata_builder.preserve.present?
       render :partial => "metadata_builders/structure"
-    else
-      render :partial => "metadata_builders/no_xml"
     end
   end
 
