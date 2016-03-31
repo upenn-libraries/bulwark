@@ -5,7 +5,6 @@ Rails.application.routes.draw do
       post :prepare_for_ingest
       post :ingest
       post :detect_metadata
-      post :convert_metadata
       post :save_mappings
       post :generate_xml_preview
     end

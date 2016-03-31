@@ -3,5 +3,5 @@
 </div>
 
 <div class="xml-preview">
-  <%= render_sample_xml if @object.metadata_builder.preserve %>
+  <%= render_sample_xml if @object.metadata_builder.preserve.present? %>
 </div

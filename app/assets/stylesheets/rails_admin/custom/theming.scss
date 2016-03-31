@@ -13,6 +13,10 @@ form.field-mappings .field {
   margin-top: 2em;
 }
 
+form.field-mappings .field label {
+  display: block;
+}
+
 .field-mappings .field-tip {
   color: #524e51;
   font-size: 0.7em;
