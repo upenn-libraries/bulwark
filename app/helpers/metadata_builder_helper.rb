@@ -35,6 +35,15 @@ module MetadataBuilderHelper
     end
   end
 
+  def _nested_relationships_values(parent_file)
+    child_array = Array.new
+    child_candidates = _prettify(@object.metadata_builder.preserve)
+    child_candidates.each do |child|
+      child_array << [child, { parent_file => child }.to_s] unless _prettify(parent_file) == child
+    end
+    return child_array
+  end
+
   def _prettify(file_path_input)
       if file_path_input.is_a? Array
         file_path_array = Array.new

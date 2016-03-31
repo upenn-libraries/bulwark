@@ -14,9 +14,7 @@ class MetadataBuildersController < ApplicationController
   end
 
   def update
-    binding.pry()
     @error_message = @metadata_builder.verify_xml_tags(params[:metadata_builder][:field_mappings]) if params[:metadata_builder][:field_mappings].present?
-    binding.pry()
     if @metadata_builder.update(metadata_builder_params)
       flash[:success] = "Metadata Builder successfully updated"
       redirect_to "/admin_repo/repo/#{@metadata_builder.id}/map_metadata"
@@ -33,11 +31,11 @@ class MetadataBuildersController < ApplicationController
   end
 
   def metadata_builder_params
-    params.require(:metadata_builder).permit(:parent_repo, :source, :source_mappings, :field_mappings, :nested_relationships)
+    params.require(:metadata_builder).permit(:parent_repo, :source, :source_mappings, :field_mappings, :nested_relationships => [])
   end
 
   def merge_mappings
-    params[:metadata_builder][:field_mappings] = params[:metadata_builder][:field_mappings].to_s
+    params[:metadata_builder][:field_mappings] = params[:metadata_builder][:field_mappings].to_s if params[:metadata_builder][:field_mappings].present?
   end
 
 end
