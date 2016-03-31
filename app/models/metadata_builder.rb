@@ -122,6 +122,34 @@ class MetadataBuilder < ActiveRecord::Base
     set_preserve_files(xml_files)
   end
 
+  def generate_parent_child_xml
+    self.nested_relationships.each do |rel|
+      rel = eval(rel)
+      key, value = rel.first
+      metadata_path = "#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}"
+      self.repo.version_control_agent.clone
+      self.repo.version_control_agent.get(:get_location => metadata_path)
+      child_path = "#{self.repo.version_control_agent.working_path}#{value}"
+      xml_content = File.open(key, "r"){|io| io.read}
+      child_xml_content = File.open(child_path, "r"){|io| io.read}
+      key_index = key.gsub(".xml","")
+      end_tag = "</#{self.field_mappings[key_index]["root_element"]["mapped_value"]}>"
+      insert_index = xml_content.index(end_tag)
+      xml_content.insert(insert_index, child_xml_content)
+      tmp_xml = "#{key_index}.unified.xml"
+      File.open(tmp_xml, "w+") do |f|
+        f.write(xml_content)
+      end
+      begin
+        self.repo.version_control_agent.commit("Generated unified XML for #{key} and #{value} at #{tmp_xml}")
+      rescue Git::GitExecuteError
+        next
+      end
+      self.repo.version_control_agent.push
+      self.repo.version_control_agent.delete_clone
+    end
+  end
+
   def check_for_errors
     if @@error_message
       errors.add(:source, "XML tag error(s): #{@@error_message}") unless @@error_message.empty?

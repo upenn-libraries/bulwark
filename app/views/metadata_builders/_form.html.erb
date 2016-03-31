@@ -7,7 +7,6 @@
   <% @object.metadata_builder.source_mappings.each do |mappings| %>
   <% root_val, parent_val = _structural_elements(mappings.first.last) %>
   <h3>Mappings for <%= _prettify(mappings.first.last) %></h3>
-    <%= f.hidden_field :source_file, :value => "#{mappings.first.last}" %>
     <%= content_tag :div, :class => "field" do -%>
       <%= f.label "field_mappings[#{mappings.first.last}][root_element][mapped_value]", "Root element:" %>
       <%= f.text_field "field_mappings[#{mappings.first.last}][root_element][mapped_value]", :value => "#{root_val}" %>
@@ -26,7 +25,6 @@
         <%= content_tag(:div, "Example values from source: #{p.last.to_s}", :class => "field-tip") %>
       <% end -%>
     <% end -%>
-    <%= f.hidden_field "xml[#{mappings.first.last}]", :value => "#{mappings}" %>
   <% end -%>
   <%= content_tag(:div, f.submit, :class => "form-bottom") %>
 <% end %>
