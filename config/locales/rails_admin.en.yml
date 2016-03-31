@@ -23,13 +23,17 @@ en:
         breadcrumb: "Items Flagged"
       preprocess_review:
         title: "Preprocess Review"
-        menu: "Perform tasks on objects before ingestion"
+        menu: "Preprocess Review"
         breadcrumb: "Preprocess Review"
       map_metadata:
         title: "Map Metadata"
-        menu: "Map metadata from source"
+        menu: "Map Metadata"
         breadcrumb: "Map Metadata"
+      structure_metadata:
+        title: "Structure Metadata"
+        menu: "Structure Metadata"
+        breadcrumb: "Structure Metadata"
       generate_xml:
         title: "Generate XML"
-        menu: "Generate base XML from metadata mappings"
+        menu: "Generate XML"
         breadcrumb: "Generate XML"

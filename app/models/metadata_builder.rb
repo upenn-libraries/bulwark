@@ -12,12 +12,17 @@ class MetadataBuilder < ActiveRecord::Base
 
   serialize :source
   serialize :preserve
+  serialize :nested_relationships
   serialize :source_mappings
   serialize :field_mappings
-  serialize :xml
 
   @@xml_tags = Array.new
   @@error_message = nil
+
+  def nested_relationships=(nested_relationships)
+    nested_relationships.reject!(&:empty?)
+    self[:nested_relationships] = nested_relationships
+  end
 
   def field_mappings=(field_mappings)
     self[:field_mappings] = eval(field_mappings)
@@ -27,6 +32,30 @@ class MetadataBuilder < ActiveRecord::Base
     self[:parent_repo] = parent_repo
     @repo = Repo.find(parent_repo)
     self.repo = @repo
+  end
+
+  def nested_relationships
+    read_attribute(:nested_relationships) || ''
+  end
+
+  def source
+    read_attribute(:source) || ''
+  end
+
+  def preserve
+    read_attribute(:preserve) || ''
+  end
+
+  def source_mappings
+    read_attribute(:source_mappings) || ''
+  end
+
+  def field_mappings
+    read_attribute(:field_mappings) || ''
+  end
+
+  def parent_repo
+    read_attribute(:parent_repo) || ''
   end
 
   def set_source
@@ -66,7 +95,7 @@ class MetadataBuilder < ActiveRecord::Base
       xml_fname = "#{fname}.xml"
       tmp_xml_fname = "#{xml_fname}.tmp"
       xml_files << xml_fname
-      if self.field_mappings["#{fname}"]["parent_element"]["mapped_value"].empty?
+      if self.field_mappings["#{fname}"]["child_element"]["mapped_value"].empty?
         file.drop(1).each do |source|
           tag = self.field_mappings["#{fname}"]["#{source.first}"]["mapped_value"]
           source.last.each do |field_value|
@@ -93,9 +122,41 @@ class MetadataBuilder < ActiveRecord::Base
     set_preserve_files(xml_files)
   end
 
+  def generate_parent_child_xml
+    self.nested_relationships.each do |rel|
+      rel = eval(rel)
+      key, value = rel.first
+      metadata_path = "#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}"
+      self.repo.version_control_agent.clone
+      self.repo.version_control_agent.get(:get_location => metadata_path)
+      child_path = "#{self.repo.version_control_agent.working_path}#{value}"
+      xml_content = File.open(key, "r"){|io| io.read}
+      child_xml_content = File.open(child_path, "r"){|io| io.read}
+      key_index = key.gsub(".xml","")
+      end_tag = "</#{self.field_mappings[key_index]["root_element"]["mapped_value"]}>"
+      insert_index = xml_content.index(end_tag)
+      xml_content.insert(insert_index, child_xml_content)
+      tmp_xml = "#{key_index}.unified.xml"
+      self.repo.version_control_agent.unlock(tmp_xml) if File.exists?(tmp_xml)
+      File.open(tmp_xml, "w") do |f|
+        f.write(xml_content)
+      end
+      begin
+        self.repo.version_control_agent.commit("Generated unified XML for #{key} and #{value} at #{tmp_xml}")
+      rescue Git::GitExecuteError
+        self.repo.version_control_agent.delete_clone
+        next
+      end
+      self.repo.version_control_agent.push
+      self.repo.version_control_agent.delete_clone
+      set_preserve_files(tmp_xml)
+      self.save!
+    end
+  end
+
   def check_for_errors
     if @@error_message
-      errors.add(:parent_element, "XML tag error(s): #{@@error_message}") unless @@error_message.empty?
+      errors.add(:source, "XML tag error(s): #{@@error_message}") unless @@error_message.empty?
     end
   end
 
@@ -145,23 +206,18 @@ class MetadataBuilder < ActiveRecord::Base
     def each_row_values(base_file)
       repo = _get_metadata_repo_content
       tmp_csv = convert_to_csv(base_file)
-      parent_element = self.field_mappings[base_file]["parent_element"]["mapped_value"]
+      child_element = self.field_mappings[base_file]["child_element"]["mapped_value"]
       xml_content = ""
       CSV.foreach(tmp_csv, :headers => true) do |row|
-        xml_content << "<#{parent_element}>"
+        xml_content << "<#{child_element}>"
         row.to_a.each do |value|
           tag = self.field_mappings[base_file]["#{value.first}"]["mapped_value"]
           xml_content << "<#{tag}>#{value.last}</#{tag}>"
         end
-        xml_content << "</#{parent_element}>"
+        xml_content << "</#{child_element}>"
       end
       return xml_content
 
-    end
-
-    def set_preserve_files(preserve_files_array)
-      self.preserve = preserve_files_array
-      self.save!
     end
 
     def convert_to_csv(source)
@@ -171,6 +227,17 @@ class MetadataBuilder < ActiveRecord::Base
         f.write(xlsx.to_csv)
       end
       return tmp_csv
+    end
+
+    def set_preserve_files(pfiles)
+      binding.pry()
+      if self.preserve.present?
+        self.preserve += self.preserve + Array(pfiles).uniq
+      else
+        self.preserve = Array(pfiles).uniq
+      end
+      self.preserve.uniq!
+      self.save!
     end
 
     def _get_metadata_repo_content

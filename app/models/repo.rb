@@ -29,6 +29,34 @@ class Repo < ActiveRecord::Base
     set_metadata_builder
   end
 
+  def title
+    read_attribute(:title) || ''
+  end
+
+  def directory
+    read_attribute(:directory) || ''
+  end
+
+  def description
+    read_attribute(:description) || ''
+  end
+
+  def metadata_subdirectory
+    read_attribute(:metadata_subdirectory) || ''
+  end
+
+  def assets_subdirectory
+    read_attribute(:assets_subdirectory) || ''
+  end
+
+  def metadata_filename
+    read_attribute(:metadata_filename) || ''
+  end
+
+  def file_extensions
+    read_attribute(:file_extensions) || ''
+  end
+
   def create_remote
     unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
       self.version_control_agent.init_bare

@@ -73,6 +73,10 @@ module Utils
         `git annex get .`
       end
 
+      def unlock(file)
+        `git annex unlock #{file}`
+      end
+
       def drop(dir = @working_repo_path)
         Dir.chdir(dir)
         `git annex drop .`

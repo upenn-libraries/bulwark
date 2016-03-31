@@ -4,6 +4,18 @@ class VersionControlAgent < ActiveRecord::Base
 
   after_create :initialize_worker_attributes
 
+  def vc_type
+    read_attribute(:vc_type) || ''
+  end
+
+  def remote_path
+    read_attribute(:remote_path) || ''
+  end
+
+  def working_path
+    read_attribute(:working_path) || ''
+  end
+
   def vc_type=(vc_type)
     self[:vc_type] = vc_type
   end
@@ -48,6 +60,11 @@ class VersionControlAgent < ActiveRecord::Base
   def get(options = {})
     initialize_worker
     options[:get_location].nil? ? @@worker.get : @@worker.get(options[:get_location])
+  end
+
+  def unlock(filename)
+    initialize_worker
+    @@worker.unlock(filename)
   end
 
   def delete_clone(options = {})
