@@ -1,3 +1,5 @@
+<h2>Define relationships</h2>
+<p>Structure relationships between multiple metadata source files</p>
 <%= form_for @object.metadata_builder, :validate => true, :method => :post, :html => { :class => "field-mappings"}, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
   <% @object.metadata_builder.preserve.each do |file| -%>
     <%= content_tag :div, :class => "field" do -%>

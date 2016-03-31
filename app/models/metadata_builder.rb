@@ -20,7 +20,8 @@ class MetadataBuilder < ActiveRecord::Base
   @@error_message = nil
 
   def nested_relationships=(nested_relationships)
-    self[:nested_relationships] = eval(nested_relationships)
+    nested_relationships.reject!(&:empty?)
+    self[:nested_relationships] = nested_relationships
   end
 
   def field_mappings=(field_mappings)
