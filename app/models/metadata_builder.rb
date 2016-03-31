@@ -230,7 +230,6 @@ class MetadataBuilder < ActiveRecord::Base
     end
 
     def set_preserve_files(pfiles)
-      binding.pry()
       if self.preserve.present?
         self.preserve += self.preserve + Array(pfiles).uniq
       else

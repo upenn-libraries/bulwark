@@ -80,7 +80,7 @@
           <sv:property sv:name="ns002:date" sv:type="String" sv:multiple="true">
             <sv:value><xsl:value-of select="date" /></sv:value>
           </sv:property>
-          <xsl:apply-templates select="page_structure/page" />
+          <xsl:apply-templates select="pages/page" />
           </sv:node>
         </exsl:document>
       </xsl:copy>
@@ -98,7 +98,7 @@
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
 
-    <xsl:template match="page_structure/page">
+    <xsl:template match="pages/page">
       <sv:node>
       <xsl:attribute name="sv:name"><xsl:value-of select="page_id" /></xsl:attribute>
       <sv:property sv:name="jcr:primaryType" sv:type="Name">

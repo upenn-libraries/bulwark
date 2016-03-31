@@ -40,7 +40,7 @@ module Utils
       fid = options[:fid]
       case type
       when "import"
-        command = "curl -u #{@fedora_user}:#{@fedora_password} -X POST --data-binary @#{file} \"http://localhost:8983/fedora/rest/dev/fcr:import?format=jcr/xml\""
+        command = "curl -u #{@fedora_user}:#{@fedora_password} -X POST --data-binary @#{file} \"#{@fedora_link}/fcr:import?format=jcr/xml\""
       when "file_attach"
         fedora_full_path = "#{@fedora_link}/#{fid}/#{child_container}"
         command = "curl -u #{@fedora_user}:#{@fedora_password}  -X PUT -H \"Content-Type: message/external-body; access-type=URL; URL=\\\"#{file}\\\"\" \"#{fedora_full_path}\""
