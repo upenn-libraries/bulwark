@@ -9,7 +9,7 @@ class Page < ActiveFedora::Base
     index.type :stored_searchable
   end
 
-  property :file_name, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/fileName'), multiple: false do |index|
+  property :file_name, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/fileName'), multiple: true do |index|
     index.as :stored_searchable
     index.type :stored_searchable
   end
@@ -19,11 +19,11 @@ class Page < ActiveFedora::Base
     index.type :integer
   end
 
-  property :ocr_text, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/pageText'), multiple: false do |index|
+  property :ocr_text, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/pageText'), multiple: true do |index|
     index.as :stored_searchable
   end
 
-  property :item_type, predicate: ::RDF::Vocab::DC.type, multiple: false do |index|
+  property :item_type, predicate: ::RDF::Vocab::DC.type, multiple: true do |index|
     index.as :stored_searchable
   end
 

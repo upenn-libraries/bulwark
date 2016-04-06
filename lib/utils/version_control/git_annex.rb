@@ -14,6 +14,10 @@ module Utils
         @working_repo_path = "#{Utils.config.working_dir}/#{@remote_repo_path.gsub("/","_")}".gsub("__", "_")
       end
 
+      def repo
+        @repo || ''
+      end
+
       def initialize_bare_remote
         `git init --bare #{@remote_repo_path}`
         Dir.chdir(@remote_repo_path)

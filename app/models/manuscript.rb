@@ -71,7 +71,7 @@ class Manuscript < ActiveFedora::Base
     index.as :stored_searchable
   end
 
-  property :item_type, predicate: ::RDF::Vocab::DC.type, multiple: false do |index|
+  property :item_type, predicate: ::RDF::Vocab::DC.type, multiple: true do |index|
     index.as :stored_searchable
   end
 
