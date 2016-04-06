@@ -11,8 +11,9 @@ Utils.configure do |config|
 
   if File.exists?(fs_env_file)
     options = fs_yml.fetch(Rails.env).with_indifferent_access
+    config.object_data_path = options.fetch(:object_data_path)
     config.object_admin_path = options.fetch(:object_admin_path)
-    config.object_manifest_location = options.fetch(:object_manifest_location)
+    config.object_semantics_location = options.fetch(:object_semantics_location)
     config.email = options.fetch(:email)
     config.assets_path = options.fetch(:assets_path)
     config.manifest_location = options.fetch(:manifest_location)
