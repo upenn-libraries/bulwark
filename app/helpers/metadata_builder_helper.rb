@@ -30,7 +30,7 @@ module MetadataBuilderHelper
   end
 
   def _structural_elements(file_name)
-    root_default = "record"
+    root_default = ""
     child_default = ""
     if @object.metadata_builder.field_mappings.present?
       root_element = @object.metadata_builder.field_mappings[file_name]["root_element"]["mapped_value"].present? ? @object.metadata_builder.field_mappings[file_name]["root_element"]["mapped_value"] : root_default

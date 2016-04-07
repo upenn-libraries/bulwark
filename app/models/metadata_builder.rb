@@ -89,11 +89,10 @@ class MetadataBuilder < ActiveRecord::Base
     xml_files = Array.new
     self.repo.version_control_agent.clone
     self.source_mappings.each do |file|
+      @xml_content = ""
       fname = file.first.last
-      root_element = self.field_mappings["#{fname}"]["root_element"]["mapped_value"].empty? ? "root" : self.field_mappings["#{fname}"]["root_element"]["mapped_value"]
-      @xml_content = "<#{root_element}>"
       xml_fname = "#{fname}.xml"
-      tmp_xml_fname = "#{xml_fname}.tmp"
+      xml_unified_filename_fname = "#{xml_fname}.tmp"
       xml_files << xml_fname
       if self.field_mappings["#{fname}"]["child_element"]["mapped_value"].empty?
         file.drop(1).each do |source|
@@ -105,12 +104,13 @@ class MetadataBuilder < ActiveRecord::Base
       else
         @xml_content << each_row_values(fname)
       end
-      @xml_content << "</#{root_element}>"
-      File.open(tmp_xml_fname, "w+") do |f|
-        f << @xml_content
+      unless self.field_mappings["#{fname}"]["root_element"]["mapped_value"].empty?
+        root_element = self.field_mappings["#{fname}"]["root_element"]["mapped_value"]
+        @xml_content_final_copy = "<#{root_element}>#{@xml_content}</#{root_element}>"
+      else
+        @xml_content_final_copy = @xml_content
       end
-
-      File.rename(tmp_xml_fname, xml_fname)
+      _build_preservation_xml(xml_fname, @xml_content_final_copy)
       begin
         self.repo.version_control_agent.commit("Generated preservation XML for #{fname}")
       rescue Git::GitExecuteError
@@ -133,23 +133,22 @@ class MetadataBuilder < ActiveRecord::Base
       xml_content = File.open(key, "r"){|io| io.read}
       child_xml_content = File.open(child_path, "r"){|io| io.read}
       key_index = key.gsub(".xml","")
+      binding.pry()
       end_tag = "</#{self.field_mappings[key_index]["root_element"]["mapped_value"]}>"
       insert_index = xml_content.index(end_tag)
       xml_content.insert(insert_index, child_xml_content)
-      tmp_xml = "#{key_index}.unified.xml"
-      self.repo.version_control_agent.unlock(tmp_xml) if File.exists?(tmp_xml)
-      File.open(tmp_xml, "w") do |f|
-        f.write(xml_content)
-      end
+      xml_unified_filename = "#{key_index}.unified.xml"
+      self.repo.version_control_agent.unlock(xml_unified_filename) if File.exists?(xml_unified_filename)
+      _build_preservation_xml(xml_unified_filename,xml_content)
       begin
-        self.repo.version_control_agent.commit("Generated unified XML for #{key} and #{value} at #{tmp_xml}")
+        self.repo.version_control_agent.commit("Generated unified XML for #{key} and #{value} at #{xml_unified_filename}")
       rescue Git::GitExecuteError
         self.repo.version_control_agent.delete_clone
         next
       end
       self.repo.version_control_agent.push
       self.repo.version_control_agent.delete_clone
-      set_preserve_files(tmp_xml)
+      set_preserve_files(xml_unified_filename)
       self.save!
     end
   end
@@ -251,6 +250,16 @@ class MetadataBuilder < ActiveRecord::Base
       error_message << "Valid XML tags cannot contain spaces (detected in field \"#{tag}\")" if tag.include?(" ")
       error_message << "Valid XML tags cannot begin with numbers (detected in field \"#{tag}\")" if tag.starts_with_number?
       return error_message unless error_message.empty?
+    end
+
+    def _build_preservation_xml(filename, content)
+      tmp_filename = "#{filename}.tmp"
+      xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root>"
+      xml_footer = "</root>"
+      File.open(tmp_filename, "w+") do |f|
+        f << xml_header << content << xml_footer
+      end
+      File.rename(tmp_filename, filename)
     end
 
 end
