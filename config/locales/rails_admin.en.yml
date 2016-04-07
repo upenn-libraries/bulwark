@@ -22,9 +22,9 @@ en:
         menu: "Items Flagged -- New/Updated/To Delete"
         breadcrumb: "Items Flagged"
       preprocess_review:
-        title: "Preprocess Review"
-        menu: "Preprocess Review"
-        breadcrumb: "Preprocess Review"
+        title: "Ingest"
+        menu: "Ingest"
+        breadcrumb: "Ingest"
       map_metadata:
         title: "Map Metadata"
         menu: "Map Metadata"

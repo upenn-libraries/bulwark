@@ -19,7 +19,7 @@ class ReposController < ApplicationController
     end
   end
 
-  def prepare_for_ingest
+  def ingest
     @message = Utils.fetch_and_convert_files
     if @message[:error].present?
       redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/preprocess", :flash => { :error => @message[:error] }
@@ -28,15 +28,15 @@ class ReposController < ApplicationController
     end
   end
 
-  def ingest
-    @message = Utils.import
-    Utils.index
-    if @message[:error].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/preprocess", :flash => { :error => @message[:error] }
-    elsif @message[:success].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/preprocess", :flash => { :success => @message[:success] }
-    end
-  end
+  # def ingest
+  #   @message = Utils.import
+  #   Utils.index
+  #   if @message[:error].present?
+  #     redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/preprocess", :flash => { :error => @message[:error] }
+  #   elsif @message[:success].present?
+  #     redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/preprocess", :flash => { :success => @message[:success] }
+  #   end
+  # end
 
   def generate_xml_preview
     @message = @repo.generate_xml_preview
