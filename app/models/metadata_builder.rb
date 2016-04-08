@@ -19,6 +19,9 @@ class MetadataBuilder < ActiveRecord::Base
   @@xml_tags = Array.new
   @@error_message = nil
 
+  @@xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root>"
+  @@xml_footer = "</root>"
+
   def nested_relationships=(nested_relationships)
     nested_relationships.reject!(&:empty?)
     self[:nested_relationships] = nested_relationships
@@ -132,8 +135,8 @@ class MetadataBuilder < ActiveRecord::Base
       child_path = "#{self.repo.version_control_agent.working_path}#{value}"
       xml_content = File.open(key, "r"){|io| io.read}
       child_xml_content = File.open(child_path, "r"){|io| io.read}
+      _strip_headers(xml_content) && _strip_headers(child_xml_content)
       key_index = key.gsub(".xml","")
-      binding.pry()
       end_tag = "</#{self.field_mappings[key_index]["root_element"]["mapped_value"]}>"
       insert_index = xml_content.index(end_tag)
       xml_content.insert(insert_index, child_xml_content)
@@ -254,12 +257,14 @@ class MetadataBuilder < ActiveRecord::Base
 
     def _build_preservation_xml(filename, content)
       tmp_filename = "#{filename}.tmp"
-      xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root>"
-      xml_footer = "</root>"
       File.open(tmp_filename, "w+") do |f|
-        f << xml_header << content << xml_footer
+        f << @@xml_header << content << @@xml_footer
       end
       File.rename(tmp_filename, filename)
+    end
+
+    def _strip_headers(xml)
+      xml.gsub!(@@xml_header, "") && xml.gsub!(@@xml_footer, "")
     end
 
 end
