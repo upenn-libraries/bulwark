@@ -9,7 +9,7 @@ class Page < ActiveFedora::Base
     index.type :stored_searchable
   end
 
-  property :file_name, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/fileName'), multiple: true do |index|
+  property :file_name, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/fileName'), multiple: false do |index|
     index.as :stored_searchable
     index.type :stored_searchable
   end
@@ -30,4 +30,7 @@ class Page < ActiveFedora::Base
   property :parent_manuscript, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/parentManuscript'), multiple: true do |index|
     index.as :stored_searchable
   end
+
+  belongs_to :manuscript, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
+
 end

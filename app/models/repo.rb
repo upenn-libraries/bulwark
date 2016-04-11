@@ -20,7 +20,7 @@ class Repo < ActiveRecord::Base
   serialize :metadata_sources
   serialize :metadata_builder_id
   serialize :ingested
-
+  
   include Filesystem
 
   def set_version_control_agent_and_repo

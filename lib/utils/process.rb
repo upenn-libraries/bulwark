@@ -11,18 +11,13 @@ module Utils
       execute_curl
     end
 
-    def attach_files(file_list, model, child_container = "child")
-      ActiveFedora::Base.where(active_fedora_model_ssi: model).each do |child|
-        begin
-          file_link = ""
-          file_list.each {|f| file_link = f if f.ends_with?(child.file_name)}
-          unless file_link.empty?
-            @command = build_command("file_attach", :file => file_link, :fid => child.id, :child_container => child_container)
-            execute_curl
-          end
-        rescue
-          raise $!, "File attachment failed due to the following error(s): #{$!}", $!.backtrace
-        end
+    def attach_file(repo, parent, child_container = "child")
+      begin
+        file_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.assets_subdirectory}/#{parent.file_name}"
+        @command = build_command("file_attach", :file => file_link, :fid => parent.id, :child_container => child_container)
+        execute_curl
+      rescue
+        raise $!, "File attachment failed due to the following error(s): #{$!}", $!.backtrace
       end
     end
 

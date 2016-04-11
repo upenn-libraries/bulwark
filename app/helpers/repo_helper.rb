@@ -14,9 +14,15 @@ module RepoHelper
   end
 
   def _generate_ingest_link(ingested_id)
-    obj = ActiveFedora::Base.find(ingested_id)
-    truncated_title = "#{obj.title.first[0..100]}..."
-    return link_to(truncated_title, Rails.application.routes.url_helpers.catalog_url(obj, :only_path => true), :target => "_blank", :title => "Opens in a new  tab").html_safe
+    begin
+      obj = ActiveFedora::Base.find(ingested_id)
+      truncated_title = "#{obj.title.first[0..100]}..."
+      return link_to(truncated_title, Rails.application.routes.url_helpers.catalog_url(obj, :only_path => true), :target => "_blank", :title => "Opens in a new  tab").html_safe
+    rescue ActiveFedora::ObjectNotFoundError
+      @object.ingested.delete(ingested_id)
+      @object.save!
+      return nil
+    end
   end
 
 end
