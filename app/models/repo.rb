@@ -19,6 +19,7 @@ class Repo < ActiveRecord::Base
 
   serialize :metadata_sources
   serialize :metadata_builder_id
+  serialize :ingested
 
   include Filesystem
 
@@ -90,6 +91,21 @@ class Repo < ActiveRecord::Base
       return { :success => "Sample XML generated.  See output below."}
     rescue
       return { :error => "Something went wrong during XML generation."}
+    end
+  end
+
+  def ingest(directory)
+    begin
+      ingest_array = Array.new
+      Dir.glob("#{directory}/*").each do |file|
+        Utils::Process.import(file)
+        ingest_array << File.basename(file, File.extname(file))
+      end
+      self.ingested = ingest_array
+      self.save!
+      Utils::Process.reindex
+    rescue
+      raise $!, "Ingest and index failed due to the following error(s): #{$!}", $!.backtrace
     end
   end
 

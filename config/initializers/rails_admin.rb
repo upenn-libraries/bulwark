@@ -18,14 +18,13 @@ RailsAdmin.config do |config|
     new
     export
     bulk_delete
-    show
     edit
     delete
-    map_metadata
-    generate_xml
     git_review do
       only ["Repo"]
     end
+    map_metadata
+    generate_xml
     create_remote do
       only ["Repo"]
     end

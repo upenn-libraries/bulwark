@@ -26,6 +26,10 @@ module Utils
       end
     end
 
+    def reindex
+      ActiveFedora::Base.reindex_everything
+    end
+
     private
 
     @fedora_yml = "#{Rails.root}/config/fedora.yml"

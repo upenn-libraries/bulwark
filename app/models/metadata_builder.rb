@@ -162,6 +162,28 @@ class MetadataBuilder < ActiveRecord::Base
     end
   end
 
+  def transform_and_ingest(array)
+    begin
+      @vca = self.repo.version_control_agent
+      array.each do |p|
+        key, val = p
+        @vca.clone
+        _get_metadata_repo_content
+        @vca.unlock(val)
+        transformed_repo_path = "#{Utils.config.transformed_dir}/#{@vca.remote_path.gsub("/","_")}"
+        Dir.mkdir(transformed_repo_path) && Dir.chdir(transformed_repo_path)
+        `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
+        @vca.reset_hard
+        @vca.delete_clone
+        self.repo.ingest(transformed_repo_path)
+        FileUtils.rm_rf(transformed_repo_path, :secure => true) if File.directory?(transformed_repo_path)
+      end
+      return { :success => "Ingestion complete.  See link(s) below to preview ingested items associated with this repo." }
+    rescue
+      return { :error => "Something went wrong during ingestion.  Check logs for more information." }
+    end
+  end
+
   private
 
     def convert_metadata

@@ -28,6 +28,11 @@ module Utils
         Git.clone(@remote_repo_path, @working_repo_path)
       end
 
+      def reset_hard
+        working_repo = Git.open(@working_repo_path)
+        working_repo.reset_hard
+      end
+
       def sync(options)
         begin
           change_dir_working
@@ -78,7 +83,13 @@ module Utils
       end
 
       def unlock(file)
+        change_dir_working
         `git annex unlock #{file}`
+      end
+
+      def lock(file)
+        change_dir_working
+        `git annex lock #{file}`
       end
 
       def drop(dir = @working_repo_path)

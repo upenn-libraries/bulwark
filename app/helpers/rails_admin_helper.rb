@@ -19,8 +19,16 @@ module RailsAdminHelper
     render_form_or_message("metadata_builders/structure")
   end
 
+  def render_ingest_select_form
+    render_ingest_or_message
+  end
+
   def render_generate_xml
     render_xml_or_message
+  end
+
+  def render_ingest_links
+    render_ingested_list
   end
 
   def _metadata_builder(repo)

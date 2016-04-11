@@ -1,3 +1,9 @@
+<div class="ingest-dashboard">
+  <%= render_ingest_select_form %>
+</div>
+
+<%= render_ingest_links %>
+
 <p>Perform tasks on objects before ingestion</p>
 <ul>
   <%= content_tag("li", (link_to "Ingest to preview layer", "/repos/#{@object.id}/ingest", :id => @object.id, method: :post)) %>

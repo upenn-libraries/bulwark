@@ -1,4 +1,5 @@
 module RepoHelper
+  include Blacklight::BlacklightHelperBehavior
   def render_git_directions_or_actions
     full_path = "#{assets_path_prefix}/#{@object.directory}"
     if Dir.exists?(full_path)
@@ -7,4 +8,11 @@ module RepoHelper
       render :partial => "repos/git_actions"
     end
   end
+
+  def render_ingested_list
+    # docs_array.each do |doc|
+    #   binding.pry()
+    # end
+  end
+
 end

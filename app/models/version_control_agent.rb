@@ -38,6 +38,11 @@ class VersionControlAgent < ActiveRecord::Base
     @@worker.clone
   end
 
+  def reset_hard
+    initialize_worker
+    @@worker.reset_hard
+  end
+
   def push_bare
     initialize_worker
     @@worker.push_bare
@@ -66,6 +71,11 @@ class VersionControlAgent < ActiveRecord::Base
   def unlock(filename)
     initialize_worker
     @@worker.unlock(filename)
+  end
+
+  def lock(filename)
+    initialize_worker
+    @@worker.lock(filename)
   end
 
   def delete_clone(options = {})

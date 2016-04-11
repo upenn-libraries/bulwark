@@ -16,17 +16,18 @@ module MetadataBuilderHelper
     end
   end
 
+  def render_ingest_or_message
+    if @object.metadata_builder.preserve.present?
+      render :partial => "metadata_builders/ingest_select"
+    else
+      render :partial => "metadata_builders/no_xml"
+    end
+  end
+
   def render_structure_or_not
     if @object.metadata_builder.preserve.present?
       render :partial => "metadata_builders/structure"
     end
-  end
-
-  def render_parent_child_form(form, file_name)
-    form.label "field_mappings[#{file_name}][root_element][mapped_value]", "Root element:"
-    form.text_field "field_mappings[#{file_name}][root_element][mapped_value]", :value => "thing"
-    content_tag(:div, form.submit, :class => "form-bottom")
-    return form
   end
 
   def _structural_elements(file_name)

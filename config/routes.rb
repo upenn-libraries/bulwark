@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     member do
       post :update
       post :git_annex_commit
+      post :ingest
     end
   end
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
