@@ -137,10 +137,11 @@ class MetadataBuilder < ActiveRecord::Base
       child_xml_content = File.open(child_path, "r"){|io| io.read}
       _strip_headers(xml_content) && _strip_headers(child_xml_content)
       key_index = key.gsub(".xml","")
+      val_index = key.gsub(".xml","")
       end_tag = "</#{self.field_mappings[key_index]["root_element"]["mapped_value"]}>"
       insert_index = xml_content.index(end_tag)
       xml_content.insert(insert_index, child_xml_content)
-      xml_unified_filename = "#{key_index}.unified.xml"
+      xml_unified_filename = "#{key_index}.#{Time.now.to_i}.xml"
       self.repo.version_control_agent.unlock(xml_unified_filename) if File.exists?(xml_unified_filename)
       _build_preservation_xml(xml_unified_filename,xml_content)
       begin
