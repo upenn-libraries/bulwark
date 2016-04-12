@@ -11,19 +11,18 @@ module Utils
       execute_curl
     end
 
-    def attach_files(file_list, model, child_container = "child")
-      ActiveFedora::Base.where(active_fedora_model_ssi: model).each do |child|
-        begin
-          file_link = ""
-          file_list.each {|f| file_link = f if f.ends_with?(child.file_name)}
-          unless file_link.empty?
-            @command = build_command("file_attach", :file => file_link, :fid => child.id, :child_container => child_container)
-            execute_curl
-          end
-        rescue
-          raise $!, "File attachment failed due to the following error(s): #{$!}", $!.backtrace
-        end
+    def attach_file(repo, parent, child_container = "child")
+      begin
+        file_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.assets_subdirectory}/#{parent.file_name}"
+        @command = build_command("file_attach", :file => file_link, :fid => parent.id, :child_container => child_container)
+        execute_curl
+      rescue
+        raise $!, "File attachment failed due to the following error(s): #{$!}", $!.backtrace
       end
+    end
+
+    def reindex
+      ActiveFedora::Base.reindex_everything
     end
 
     private
@@ -40,7 +39,7 @@ module Utils
       fid = options[:fid]
       case type
       when "import"
-        command = "curl -u #{@fedora_user}:#{@fedora_password} -X POST --data-binary @#{file} \"http://localhost:8983/fedora/rest/dev/fcr:import?format=jcr/xml\""
+        command = "curl -u #{@fedora_user}:#{@fedora_password} -X POST --data-binary \"@#{file}\" \"#{@fedora_link}/fcr:import?format=jcr/xml\""
       when "file_attach"
         fedora_full_path = "#{@fedora_link}/#{fid}/#{child_container}"
         command = "curl -u #{@fedora_user}:#{@fedora_password}  -X PUT -H \"Content-Type: message/external-body; access-type=URL; URL=\\\"#{file}\\\"\" \"#{fedora_full_path}\""

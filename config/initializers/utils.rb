@@ -11,8 +11,9 @@ Utils.configure do |config|
 
   if File.exists?(fs_env_file)
     options = fs_yml.fetch(Rails.env).with_indifferent_access
+    config.object_data_path = options.fetch(:object_data_path)
     config.object_admin_path = options.fetch(:object_admin_path)
-    config.object_manifest_location = options.fetch(:object_manifest_location)
+    config.object_semantics_location = options.fetch(:object_semantics_location)
     config.email = options.fetch(:email)
     config.assets_path = options.fetch(:assets_path)
     config.manifest_location = options.fetch(:manifest_location)
@@ -21,6 +22,7 @@ Utils.configure do |config|
     config.file_path_label = options.fetch(:file_path_label)
     config.imports_local_staging = options.fetch(:imports_local_staging)
     config.working_dir = options.fetch(:working_dir)
+    config.transformed_dir = options.fetch(:transformed_dir)
     config.repository_prefix = options.fetch(:repository_prefix)
     config.split_on = options.fetch(:split_on)
   end

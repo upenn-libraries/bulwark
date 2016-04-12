@@ -1,6 +1,6 @@
 class MetadataBuildersController < ApplicationController
 
-  before_action :set_metadata_builder, only: [:show, :edit, :update]
+  before_action :set_metadata_builder, only: [:show, :edit, :update, :ingest]
   before_filter :merge_mappings, :only => [:create, :update]
 
   def show
@@ -18,10 +18,19 @@ class MetadataBuildersController < ApplicationController
     if @metadata_builder.update(metadata_builder_params)
       @metadata_builder.generate_parent_child_xml if metadata_builder_params["nested_relationships"].present?
       flash[:success] = "Metadata Builder successfully updated"
-      redirect_to "/admin_repo/repo/#{@metadata_builder.id}/map_metadata"
+      redirect_to "/admin_repo/repo/#{@metadata_builder.repo.id}/map_metadata"
     else
       flash[:error] = @error_message
-      redirect_to "/admin_repo/repo/#{@metadata_builder.id}/map_metadata"
+      redirect_to "/admin_repo/repo/#{@metadata_builder.repo.id}/map_metadata"
+    end
+  end
+
+  def ingest
+    @message = @metadata_builder.transform_and_ingest(params[:to_ingest])
+    if @message[:error].present?
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :error => @message[:error] }
+    elsif
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :success => @message[:success] }
     end
   end
 

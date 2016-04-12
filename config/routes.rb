@@ -2,7 +2,6 @@ Rails.application.routes.draw do
   resources :repos do
     member do
       post :checksum_log
-      post :prepare_for_ingest
       post :ingest
       post :detect_metadata
       post :save_mappings
@@ -13,6 +12,7 @@ Rails.application.routes.draw do
     member do
       post :update
       post :git_annex_commit
+      post :ingest
     end
   end
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'

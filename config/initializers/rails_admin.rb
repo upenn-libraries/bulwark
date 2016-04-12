@@ -3,7 +3,7 @@ require Rails.root.join('lib', 'rails_admin', 'create_remote.rb')
 require Rails.root.join('lib', 'rails_admin', 'clone_from_production.rb')
 require Rails.root.join('lib', 'rails_admin', 'sign_off_production.rb')
 require Rails.root.join('lib', 'rails_admin', 'report_flagged.rb')
-require Rails.root.join('lib', 'rails_admin', 'preprocess_review.rb')
+require Rails.root.join('lib', 'rails_admin', 'ingest.rb')
 require Rails.root.join('lib', 'rails_admin', 'map_metadata.rb')
 require Rails.root.join('lib', 'rails_admin', 'generate_xml.rb')
 
@@ -18,18 +18,17 @@ RailsAdmin.config do |config|
     new
     export
     bulk_delete
-    show
     edit
     delete
-    map_metadata
-    generate_xml
     git_review do
       only ["Repo"]
     end
+    map_metadata
+    generate_xml
     create_remote do
       only ["Repo"]
     end
-    preprocess_review do
+    ingest do
       only ["Repo"]
     end
   end

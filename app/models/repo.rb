@@ -19,7 +19,8 @@ class Repo < ActiveRecord::Base
 
   serialize :metadata_sources
   serialize :metadata_builder_id
-
+  serialize :ingested
+  
   include Filesystem
 
   def set_version_control_agent_and_repo
@@ -27,6 +28,19 @@ class Repo < ActiveRecord::Base
     set_version_control_agent
     create_remote
     set_metadata_builder
+  end
+
+  def metadata_subdirectory=(metadata_subdirectory)
+    self[:metadata_subdirectory] = "#{Utils.config.object_data_path}/#{metadata_subdirectory}"
+  end
+
+  def assets_subdirectory=(assets_subdirectory)
+    self[:assets_subdirectory] = "#{Utils.config.object_data_path}/#{assets_subdirectory}"
+  end
+
+  def nested_relationships=(nested_relationships)
+    nested_relationships.reject!(&:empty?)
+    self[:nested_relationships] = nested_relationships
   end
 
   def title
@@ -80,23 +94,41 @@ class Repo < ActiveRecord::Base
     end
   end
 
+  def ingest(directory)
+    begin
+      ingest_array = Array.new
+      Dir.glob("#{directory}/*").each do |file|
+        Utils::Process.import(file)
+        ingest_array << File.basename(file, File.extname(file))
+      end
+      self.ingested = ingest_array
+      self.save!
+      Utils::Process.reindex
+    rescue
+      raise $!, "Ingest and index failed due to the following error(s): #{$!}", $!.backtrace
+    end
+  end
+
 private
   def build_and_populate_directories(working_copy_path)
-    #TODO: Config out
-    admin_subdirectory = "admin"
+    admin_directory = "#{Utils.config.object_admin_path}"
+    data_directory = "#{Utils.config.object_data_path}"
+    metadata_subdirectory = "#{self.metadata_subdirectory}"
+    assets_subdirectory = "#{self.assets_subdirectory}"
     Dir.chdir("#{working_copy_path}")
-    Dir.mkdir("#{self.metadata_subdirectory}") && FileUtils.touch("#{self.metadata_subdirectory}/.keep")
-    Dir.mkdir("#{self.assets_subdirectory}") && FileUtils.touch("#{self.assets_subdirectory}/.keep")
-    Dir.mkdir("#{admin_subdirectory}")
-    populate_admin_manifest("#{admin_subdirectory}")
+    Dir.mkdir("#{admin_directory}")
+    Dir.mkdir("#{data_directory}")
+    Dir.mkdir("#{metadata_subdirectory}") && FileUtils.touch("#{metadata_subdirectory}/.keep")
+    Dir.mkdir("#{assets_subdirectory}") && FileUtils.touch("#{assets_subdirectory}/.keep")
+    populate_admin_manifest("#{admin_directory}")
   end
 
   def populate_admin_manifest(admin_path)
-    manifest_path = "#{admin_path}/manifest.txt"
+    filesystem_semantics_path = "#{admin_path}/#{Utils.config.object_semantics_location}"
     file_types = define_file_types
     metadata_line = "#{Utils.config.metadata_path_label}: #{self.metadata_subdirectory}/#{metadata_filename}"
     assets_line = "#{Utils.config.file_path_label}: #{self.assets_subdirectory}/#{file_types}"
-    File.open(manifest_path, "w+") do |file|
+    File.open(filesystem_semantics_path, "w+") do |file|
       file.puts("#{metadata_line}\n#{assets_line}")
     end
   end

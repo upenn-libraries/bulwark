@@ -3,6 +3,10 @@ class Manuscript < ActiveFedora::Base
   validates :title, presence: true
   validates :identifier, presence: true
 
+  around_create :associate_pages
+
+  has_many :pages
+
   property :abstract, predicate: ::RDF::Vocab::DC.abstract, multiple: false do |index|
     index.as :stored_searchable
   end
@@ -71,7 +75,7 @@ class Manuscript < ActiveFedora::Base
     index.as :stored_searchable
   end
 
-  property :item_type, predicate: ::RDF::Vocab::DC.type, multiple: false do |index|
+  property :item_type, predicate: ::RDF::Vocab::DC.type, multiple: true do |index|
     index.as :stored_searchable
   end
 
@@ -80,7 +84,28 @@ class Manuscript < ActiveFedora::Base
   end
 
   def init
-    self.item_type ||= "Image"
+    self.item_type ||= "Manuscript"
   end
+
+  def associate_pages
+    yield
+    attach_pages
+  end
+
+  def attach_pages
+    Page.find(:parent_manuscript => self.id).each do |page|
+      page.manuscript = self
+      page.save!
+      repo = self.get_repo_association
+      Utils::Process.attach_file(repo, page, "pageImage")
+    end
+  end
+
+  protected
+
+  def get_repo_association
+    repo = Repo.where("ingested = ?", [self.id].to_yaml).first
+  end
+
 
 end

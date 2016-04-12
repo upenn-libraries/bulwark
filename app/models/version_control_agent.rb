@@ -21,9 +21,10 @@ class VersionControlAgent < ActiveRecord::Base
   end
 
   def initialize_worker_attributes
-    initialize_worker
-    self.remote_path = @@worker.remote_repo_path
-    self.working_path = @@worker.working_repo_path
+    remote_repo_path = "#{Utils.config.assets_path}/#{self.repo.directory}"
+    working_repo_path = "#{Utils.config.working_dir}/#{remote_repo_path.gsub("/","_")}".gsub("__", "_")
+    self.remote_path = remote_repo_path
+    self.working_path = working_repo_path
     self.save!
   end
 
@@ -35,6 +36,11 @@ class VersionControlAgent < ActiveRecord::Base
   def clone
     initialize_worker
     @@worker.clone
+  end
+
+  def reset_hard
+    initialize_worker
+    @@worker.reset_hard
   end
 
   def push_bare
@@ -67,6 +73,11 @@ class VersionControlAgent < ActiveRecord::Base
     @@worker.unlock(filename)
   end
 
+  def lock(filename)
+    initialize_worker
+    @@worker.lock(filename)
+  end
+
   def delete_clone(options = {})
     initialize_worker
     options[:drop_location].nil? ? @@worker.drop : @@worker.drop(options[:drop_location])
@@ -75,7 +86,7 @@ class VersionControlAgent < ActiveRecord::Base
 
 
   def initialize_worker
-    @@worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo) unless defined?(@@worker)
+    @@worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo) unless (defined?(@@worker) && @@worker.repo == repo)
   end
 
 end
