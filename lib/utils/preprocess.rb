@@ -24,12 +24,12 @@ module Utils
         file_list = Dir.glob("#{parent_directory}/#{@manifest["#{Utils.config.file_path_label}"]}")
         return file_list
       rescue
-        puts "File list could not be generated, as the manifest has not been created.  Run `Utils::Preprocess.build_for_preprocessing(#{parent_directory})` or `Utils::Preprocess.get_filesystem_manifest_hash(#{parent_directory}/#{Utils.config.object_manifest_location}) before calling this method to resolve.`"
+        puts "File list could not be generated, as the manifest has not been created.  Run `Utils::Preprocess.build_for_preprocessing(#{parent_directory})` or `Utils::Preprocess.get_filesystem_manifest_hash(#{parent_directory}/#{Utils.config.object_semantics_location}) before calling this method to resolve.`"
       end
     end
 
     def build_for_preprocessing(parent_directory)
-      manifest_path = "#{parent_directory}/#{Utils.config.object_manifest_location}"
+      manifest_path = "#{parent_directory}/#{Utils.config.object_semantics_location}"
       manifest = get_filesystem_manifest_hash(manifest_path)
       file_list = get_file_list(parent_directory)
       return manifest, file_list

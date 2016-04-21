@@ -14,6 +14,10 @@ module Utils
         @working_repo_path = "#{Utils.config.working_dir}/#{@remote_repo_path.gsub("/","_")}".gsub("__", "_")
       end
 
+      def repo
+        @repo || ''
+      end
+
       def initialize_bare_remote
         `git init --bare #{@remote_repo_path}`
         Dir.chdir(@remote_repo_path)
@@ -22,6 +26,11 @@ module Utils
 
       def clone
         Git.clone(@remote_repo_path, @working_repo_path)
+      end
+
+      def reset_hard
+        working_repo = Git.open(@working_repo_path)
+        working_repo.reset_hard
       end
 
       def sync(options)
@@ -74,7 +83,13 @@ module Utils
       end
 
       def unlock(file)
+        change_dir_working
         `git annex unlock #{file}`
+      end
+
+      def lock(file)
+        change_dir_working
+        `git annex lock #{file}`
       end
 
       def drop(dir = @working_repo_path)

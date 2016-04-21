@@ -19,15 +19,18 @@ class Page < ActiveFedora::Base
     index.type :integer
   end
 
-  property :ocr_text, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/pageText'), multiple: false do |index|
+  property :ocr_text, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/pageText'), multiple: true do |index|
     index.as :stored_searchable
   end
 
-  property :item_type, predicate: ::RDF::Vocab::DC.type, multiple: false do |index|
+  property :item_type, predicate: ::RDF::Vocab::DC.type, multiple: true do |index|
     index.as :stored_searchable
   end
 
   property :parent_manuscript, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/parentManuscript'), multiple: true do |index|
     index.as :stored_searchable
   end
+
+  belongs_to :manuscript, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
+
 end

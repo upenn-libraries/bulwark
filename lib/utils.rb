@@ -29,8 +29,9 @@ module Utils
       end
     end
 
-    def fetch_and_convert_files
+    def fetch_and_convert_files(repo)
       begin
+        binding.pry()
         Dir.glob "#{Utils.config.assets_path}/*" do |directory|
           begin
             manifest, file_list = Utils::Preprocess.build_for_preprocessing(directory)
