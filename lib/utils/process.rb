@@ -8,7 +8,19 @@ module Utils
 
     def import(file)
       @command = build_command("import", :file => file)
-      execute_curl
+      status = execute_curl
+      if(status == "Item already exists") then
+        obj = ActiveFedora::Base.find(File.basename(file,".xml"))
+        uri_to_delete = obj.translate_id_to_uri.call(obj.id)
+        obj.delete
+        obj.update_index
+        @command = build_command("delete", :object_uri => uri_to_delete)
+        execute_curl
+        @command = build_command("delete_tombstone", :object_uri => uri_to_delete)
+        execute_curl
+        import(file)
+      end
+      return status
     end
 
     def attach_file(repo, parent, child_container = "child")
@@ -37,12 +49,17 @@ module Utils
       child_container = options[:child_container]
       file = options[:file]
       fid = options[:fid]
+      object_uri = options[:object_uri]
       case type
       when "import"
         command = "curl -u #{@fedora_user}:#{@fedora_password} -X POST --data-binary \"@#{file}\" \"#{@fedora_link}/fcr:import?format=jcr/xml\""
       when "file_attach"
         fedora_full_path = "#{@fedora_link}/#{fid}/#{child_container}"
         command = "curl -u #{@fedora_user}:#{@fedora_password}  -X PUT -H \"Content-Type: message/external-body; access-type=URL; URL=\\\"#{file}\\\"\" \"#{fedora_full_path}\""
+      when "delete"
+        command = "curl -u #{@fedora_user}:#{@fedora_password} -X DELETE \"#{object_uri}\""
+      when "delete_tombstone"
+        command = "curl -u #{@fedora_user}:#{@fedora_password} -X DELETE \"#{object_uri}/fcr:tombstone\""
       else
         raise "Invalid command type specified.  Command not built."
       end
