@@ -89,12 +89,9 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def build_xml_files
-    binding.pry()
     xml_files = Array.new
     self.repo.version_control_agent.clone
-    binding.pry()
     self[:source_mappings] = convert_metadata
-    binding.pry()
     self.source_mappings.each do |file|
       @xml_content = ""
       fname = file.first.last
@@ -124,10 +121,8 @@ class MetadataBuilder < ActiveRecord::Base
         next
       end
     end
-    binding.pry()
     self.repo.version_control_agent.push
     self.repo.version_control_agent.delete_clone
-    binding.pry()
     generate_parent_child_xml if self.nested_relationships.present?
     set_preserve_files(xml_files)
   end
