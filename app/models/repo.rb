@@ -20,7 +20,7 @@ class Repo < ActiveRecord::Base
   serialize :metadata_sources
   serialize :metadata_builder_id
   serialize :ingested
-  
+
   include Filesystem
 
   def set_version_control_agent_and_repo
@@ -98,12 +98,13 @@ class Repo < ActiveRecord::Base
     begin
       ingest_array = Array.new
       Dir.glob("#{directory}/*").each do |file|
-        Utils::Process.import(file)
+        @status = Utils::Process.import(file)
         ingest_array << File.basename(file, File.extname(file))
       end
       self.ingested = ingest_array
       self.save!
       Utils::Process.reindex
+      return @status
     rescue
       raise $!, "Ingest and index failed due to the following error(s): #{$!}", $!.backtrace
     end

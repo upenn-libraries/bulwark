@@ -176,10 +176,10 @@ class MetadataBuilder < ActiveRecord::Base
         `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
         @vca.reset_hard
         @vca.delete_clone
-        self.repo.ingest(transformed_repo_path)
+        @status = self.repo.ingest(transformed_repo_path)
         FileUtils.rm_rf(transformed_repo_path, :secure => true) if File.directory?(transformed_repo_path)
       end
-      return { :success => "Ingestion complete.  See link(s) below to preview ingested items associated with this repo." }
+      return @status.present? ? {:success => "Item re-ingested into the repository.  See link(s) below to preview ingested items associated with this repo."} : {:success => "Ingestion complete.  See link(s) below to preview ingested items associated with this repo." }
     rescue
       return { :error => "Something went wrong during ingestion.  Check logs for more information." }
     end
