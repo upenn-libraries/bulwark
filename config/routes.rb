@@ -16,8 +16,10 @@ Rails.application.routes.draw do
       post :preserve
       post :set_source
       post :set_preserve
+      post :clear_files
     end
   end
+
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
   root to: "catalog#index"
   blacklight_for :catalog

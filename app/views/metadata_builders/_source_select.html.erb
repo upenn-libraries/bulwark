@@ -1,3 +1,4 @@
+<h2>Designate source metadata files</h2>
 <div class="source-select-form">
   <%= form_for @object.metadata_builder, :validate => true, :method => :post, :url => "/metadata_builders/#{@object.metadata_builder.id}/set_source" do |f| %>
     <% @object.metadata_builder.available_metadata_files.each do |preserve| %>

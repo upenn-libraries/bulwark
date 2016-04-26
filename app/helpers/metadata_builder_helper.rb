@@ -38,6 +38,10 @@ module MetadataBuilderHelper
     render :partial => "metadata_builders/preserve_select"
   end
 
+  def render_clear_out_form
+    render :partial => "metadata_builders/clear_out"
+  end
+
   def _structural_elements(file_name)
     root_default = ""
     child_default = ""
