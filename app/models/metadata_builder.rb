@@ -71,12 +71,21 @@ class MetadataBuilder < ActiveRecord::Base
     return available_metadata_files
   end
 
-  def set_source
+  def set_source(source_files)
+    self.source = source_files.values
+    self.save!
+  end
+
+  def set_preserve(preserve_files)
+    self.preserve = preserve_files.values
+    self.save!
+  end
+
+
+#TODO: Deprecated -- remove
+  def set_source_get_mappings
     metadata_sources = Array.new
     self.repo.version_control_agent.clone
-
-    #TODO -- let this be defined by the user, not by what's in the directory.
-
     Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*") do |file|
       metadata_sources << file
     end

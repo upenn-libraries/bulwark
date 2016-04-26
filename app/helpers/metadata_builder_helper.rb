@@ -30,6 +30,14 @@ module MetadataBuilderHelper
     end
   end
 
+  def render_source_select_form
+    render :partial => "metadata_builders/source_select"
+  end
+
+  def render_preserve_select_form
+    render :partial => "metadata_builders/preserve_select"
+  end
+
   def _structural_elements(file_name)
     root_default = ""
     child_default = ""

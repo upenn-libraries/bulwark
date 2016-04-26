@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       post :git_annex_commit
       post :ingest
       post :preserve
+      post :set_source
     end
   end
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
