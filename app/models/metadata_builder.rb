@@ -61,9 +61,22 @@ class MetadataBuilder < ActiveRecord::Base
     read_attribute(:parent_repo) || ''
   end
 
+  def available_metadata_files
+    available_metadata_files = Array.new
+    self.repo.version_control_agent.clone
+    Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*") do |file|
+      available_metadata_files << file
+    end
+    self.repo.version_control_agent.delete_clone
+    return available_metadata_files
+  end
+
   def set_source
     metadata_sources = Array.new
     self.repo.version_control_agent.clone
+
+    #TODO -- let this be defined by the user, not by what's in the directory.
+
     Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*") do |file|
       metadata_sources << file
     end

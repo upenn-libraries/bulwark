@@ -13,6 +13,7 @@ Rails.application.routes.draw do
       post :update
       post :git_annex_commit
       post :ingest
+      post :preserve
     end
   end
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
