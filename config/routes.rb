@@ -15,6 +15,7 @@ Rails.application.routes.draw do
       post :ingest
       post :preserve
       post :set_source
+      post :set_preserve
     end
   end
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'

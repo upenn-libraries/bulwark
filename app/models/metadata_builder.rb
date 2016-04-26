@@ -77,6 +77,7 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def set_preserve(preserve_files)
+    binding.pry()
     self.preserve = preserve_files.values
     self.save!
   end
