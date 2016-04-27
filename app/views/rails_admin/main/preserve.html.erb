@@ -1,0 +1,5 @@
+<%= render_source_select_form %>
+
+<%= render_preserve_select_form if @object.metadata_builder.source.present? %>
+
+<%= render_clear_out_form if @object.metadata_builder.preserve.present? %>

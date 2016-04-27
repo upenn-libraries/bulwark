@@ -149,7 +149,6 @@ private
 
   def set_metadata_builder
     self.metadata_builder = MetadataBuilder.new(:parent_repo => self.id)
-    self.metadata_builder.set_source
     self.metadata_builder.save!
     self.save!
   end

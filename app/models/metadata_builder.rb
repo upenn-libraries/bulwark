@@ -4,8 +4,6 @@ class MetadataBuilder < ActiveRecord::Base
 
   include Utils
 
-  after_create :set_source
-
   validates :parent_repo, presence: true
 
   validate :check_for_errors
@@ -61,15 +59,48 @@ class MetadataBuilder < ActiveRecord::Base
     read_attribute(:parent_repo) || ''
   end
 
-  def set_source
-    metadata_sources = Array.new
+  def available_metadata_files
+    available_metadata_files = Array.new
     self.repo.version_control_agent.clone
     Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*") do |file|
-      metadata_sources << file
+      available_metadata_files << file
     end
-    status = Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*").empty? ? { :error => "No metadata sources detected." } : { :success => "Metadata sources detected -- see output below." }
-    self.source = metadata_sources
-    self[:source_mappings] = convert_metadata
+    self.repo.version_control_agent.delete_clone
+    return available_metadata_files
+  end
+
+  def unidentified_files
+    identified = (self.source + self.preserve).uniq!
+    unidentified = self.available_metadata_files - identified
+    return unidentified
+  end
+
+  def set_source(source_files)
+    self.source = source_files.values
+    self.save!
+  end
+
+  def set_preserve(preserve_files)
+    self.preserve = preserve_files.values
+    self.save!
+  end
+
+  def set_metadata_mappings
+    self.repo.version_control_agent.clone
+    self.source_mappings = convert_metadata
+    self.save!
+    self.repo.version_control_agent.delete_clone
+  end
+
+  def clear_unidentified_files
+    unidentified_files = self.unidentified_files
+    self.repo.version_control_agent.clone
+    unidentified_files.each do |f|
+      self.repo.version_control_agent.unlock(f)
+      self.repo.version_control_agent.drop(:drop_location => f) && `rm -rf #{f}`
+    end
+    self.repo.version_control_agent.commit("Removed files not identified as metadata source and/or for long-term preservation: #{unidentified_files}")
+    self.repo.version_control_agent.push
     self.repo.version_control_agent.delete_clone
   end
 
@@ -90,6 +121,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   def build_xml_files
     xml_files = Array.new
+    self.set_metadata_mappings
     self.repo.version_control_agent.clone
     self.source_mappings.each do |file|
       @xml_content = ""
@@ -122,6 +154,7 @@ class MetadataBuilder < ActiveRecord::Base
     end
     self.repo.version_control_agent.push
     self.repo.version_control_agent.delete_clone
+    generate_parent_child_xml if self.nested_relationships.present?
     set_preserve_files(xml_files)
   end
 

@@ -6,6 +6,7 @@ require Rails.root.join('lib', 'rails_admin', 'report_flagged.rb')
 require Rails.root.join('lib', 'rails_admin', 'ingest.rb')
 require Rails.root.join('lib', 'rails_admin', 'map_metadata.rb')
 require Rails.root.join('lib', 'rails_admin', 'generate_xml.rb')
+require Rails.root.join('lib', 'rails_admin', 'preserve.rb')
 
 RailsAdmin.config do |config|
   config.main_app_name = ["Intermediary", "Admin Interface"]
@@ -29,6 +30,9 @@ RailsAdmin.config do |config|
       only ["Repo"]
     end
     ingest do
+      only ["Repo"]
+    end
+    preserve do
       only ["Repo"]
     end
   end

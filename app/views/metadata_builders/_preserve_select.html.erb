@@ -1,0 +1,12 @@
+<h2>Designate files for long-term preservation</h2>
+<div class="source-select-form">
+  <%= form_for @object.metadata_builder, :validate => true, :method => :post, :url => "/metadata_builders/#{@object.metadata_builder.id}/set_preserve" do |f| %>
+    <% @object.metadata_builder.available_metadata_files.each do |preserve| %>
+    <div class="checkbox">
+      <%= check_box_tag "preserve_files[#{_prettify(preserve)}]", preserve %>
+      <%= label "preserve_files[#{_prettify(preserve)}]", _prettify(preserve) %>
+    </div>
+    <% end %>
+    <%= f.submit "Mark files designated for long-term preservation" %>
+  <% end -%>
+</div>
