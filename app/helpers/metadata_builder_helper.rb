@@ -1,14 +1,14 @@
 module MetadataBuilderHelper
 
   def render_form_or_message(partial)
-    if @object.metadata_builder.source.empty?
-      render :partial => "metadata_builders/no_source"
-    else
+    if @object.metadata_builder.source.present?
       render :partial => partial, :locals => {metadata_builder: @object.metadata_builder}
+    else
+      render :partial => "metadata_builders/no_source"
     end
   end
 
-  def render_xml_or_message
+  def render_generate_xml
     if @object.metadata_builder.field_mappings.present?
       render :partial => "metadata_builders/generate_xml"
     else
@@ -24,9 +24,17 @@ module MetadataBuilderHelper
     end
   end
 
+  def render_metadata_mapping_form
+    if @object.metadata_builder.source.present?
+      render :partial => "metadata_builders/form"
+    end
+  end
+
   def render_structure_or_not
     if @object.metadata_builder.preserve.present?
       render :partial => "metadata_builders/structure"
+    else
+      render :partial => "metadata_builders/no_source"
     end
   end
 

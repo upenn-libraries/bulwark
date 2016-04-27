@@ -85,13 +85,15 @@ class MetadataBuilder < ActiveRecord::Base
     self.save!
   end
 
-  def set_mappings
+  def set_metadata_mappings
+    self.repo.version_control_agent.clone
     self.source_mappings = convert_metadata
+    self.save!
+    self.repo.version_control_agent.delete_clone
   end
 
   def clear_unidentified_files
     unidentified_files = self.unidentified_files
-    binding.pry()
     self.repo.version_control_agent.clone
     unidentified_files.each do |f|
       self.repo.version_control_agent.unlock(f)
@@ -99,7 +101,6 @@ class MetadataBuilder < ActiveRecord::Base
     end
     self.repo.version_control_agent.commit("Removed files not identified as metadata source and/or for long-term preservation: #{unidentified_files}")
     self.repo.version_control_agent.push
-    binding.pry()
     self.repo.version_control_agent.delete_clone
   end
 
@@ -120,8 +121,8 @@ class MetadataBuilder < ActiveRecord::Base
 
   def build_xml_files
     xml_files = Array.new
+    self.set_metadata_mappings
     self.repo.version_control_agent.clone
-    self[:source_mappings] = convert_metadata
     self.source_mappings.each do |file|
       @xml_content = ""
       fname = file.first.last

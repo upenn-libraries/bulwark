@@ -1,3 +1,1 @@
-<p>Generate base XML from metadata mappings</p>
-
-<%= render_generate_xml %>
+<%= render_generate_xml if @object.metadata_builder.source.present? %>

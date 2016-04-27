@@ -23,10 +23,6 @@ module RailsAdminHelper
     render_ingest_or_message
   end
 
-  def render_generate_xml
-    render_xml_or_message
-  end
-
   def render_ingest_links
     render_ingested_list
   end
@@ -65,7 +61,7 @@ module RailsAdminHelper
 
   def refresh_metadata_from_source
     unless flash[:error]
-      @object.metadata_builder.set_source
+      @object.metadata_builder.set_metadata_mappings
       @object.metadata_builder.save!
     end
   end
