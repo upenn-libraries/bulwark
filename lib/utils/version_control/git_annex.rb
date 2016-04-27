@@ -78,8 +78,11 @@ module Utils
 
 
       def get(dir = @working_repo_path)
-        Dir.chdir(dir)
-        `git annex get .`
+        get_drop_calls(dir, "get")
+      end
+
+      def drop(dir = @working_repo_path)
+        get_drop_calls(dir, "drop")
       end
 
       def unlock(file)
@@ -92,15 +95,20 @@ module Utils
         `git annex lock #{file}`
       end
 
-      def drop(dir = @working_repo_path)
-        Dir.chdir(dir)
-        `git annex drop .`
-      end
-
       private
 
       def change_dir_working
         Dir.chdir(@working_repo_path) if File.directory?(@working_repo_path)
+      end
+
+      def get_drop_calls(dir, action)
+        if File.directory?(dir)
+          Dir.chdir(dir)
+          `git annex #{action} .`
+        else
+          Dir.chdir(File.dirname(dir))
+          `git annex #{action} #{File.basename(dir)}`
+        end
       end
 
     end

@@ -37,3 +37,7 @@ en:
         title: "Generate XML"
         menu: "Generate XML"
         breadcrumb: "Generate XML"
+      preserve:
+        title: "Designate Preservation Files"
+        menu: "Designate Preservation Files"
+        breadcrumb: "Designate Preservation Files"
