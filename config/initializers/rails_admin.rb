@@ -1,4 +1,4 @@
-require Rails.root.join('lib', 'rails_admin', 'git_review.rb')
+require Rails.root.join('lib', 'rails_admin', 'git_actions.rb')
 require Rails.root.join('lib', 'rails_admin', 'create_remote.rb')
 require Rails.root.join('lib', 'rails_admin', 'clone_from_production.rb')
 require Rails.root.join('lib', 'rails_admin', 'sign_off_production.rb')
@@ -21,7 +21,10 @@ RailsAdmin.config do |config|
     bulk_delete
     edit
     delete
-    git_review do
+    git_actions do
+      only ["Repo"]
+    end
+    preserve do
       only ["Repo"]
     end
     map_metadata
@@ -30,9 +33,6 @@ RailsAdmin.config do |config|
       only ["Repo"]
     end
     ingest do
-      only ["Repo"]
-    end
-    preserve do
       only ["Repo"]
     end
   end

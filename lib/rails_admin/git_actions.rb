@@ -4,7 +4,7 @@ require 'rails_admin/config/actions/base'
 module RailsAdmin
   module Config
     module Actions
-      class GitReview < RailsAdmin::Config::Actions::Base
+      class GitActions < RailsAdmin::Config::Actions::Base
 
          RailsAdmin::Config::Actions.register(self)
 
@@ -13,7 +13,7 @@ module RailsAdmin
          end
 
          register_instance_option :route_fragment do
-           'git_review'
+           'git_actions'
          end
 
         register_instance_option :member? do
