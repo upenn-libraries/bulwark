@@ -40,6 +40,30 @@ module MetadataBuilderHelper
     end
   end
 
+  def render_sample_xml
+    @object.version_control_agent.clone
+    @object.version_control_agent.get(:get_location => "#{@object.version_control_agent.working_path}/#{@object.metadata_subdirectory}")
+    @sample_xml_docs = ""
+    @file_links = Array.new
+    @object.metadata_builder.preserve.each do |file|
+      @file_links << link_to(_prettify(file), "##{file}")
+      anchor_tag = content_tag(:a, "", :name=> file)
+      sample_xml_content = File.open(file, "r"){|io| io.read}
+      sample_xml_doc = REXML::Document.new sample_xml_content
+      sample_xml = ""
+      sample_xml_doc.write(sample_xml, 1)
+      header = content_tag(:h3, "XML Sample for #{_prettify(file)}")
+      xml_code = content_tag(:pre, "#{sample_xml}")
+      @sample_xml_docs << content_tag(:div, anchor_tag << header << xml_code, :class => "doc")
+    end
+    @object.version_control_agent.delete_clone
+    @file_links_html = ""
+    @file_links.each do |file_link|
+      @file_links_html << content_tag(:li, file_link.html_safe)
+    end
+    return content_tag(:ul, @file_links_html.html_safe) << @sample_xml_docs.html_safe
+  end
+
   def _structural_elements(file_name)
     root_default = ""
     child_default = ""
