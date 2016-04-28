@@ -8,9 +8,9 @@ module MetadataBuilderHelper
     end
   end
 
-  def render_generate_xml
-    if @object.metadata_builder.field_mappings.present?
-      render :partial => "metadata_builders/generate_xml"
+  def render_preview_xml
+    if @object.metadata_builder.preserve.present?
+      render :partial => "metadata_builders/preview_xml"
     else
       render :partial => "metadata_builders/no_mappings"
     end

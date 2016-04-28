@@ -4,12 +4,12 @@ require 'rails_admin/config/actions/base'
 module RailsAdmin
   module Config
     module Actions
-      class GenerateXml < RailsAdmin::Config::Actions::Base
+      class PreviewXml < RailsAdmin::Config::Actions::Base
 
          RailsAdmin::Config::Actions.register(self)
 
          register_instance_option :route_fragment do
-           'generate_xml'
+           'preview_xml'
          end
 
         register_instance_option :member? do
