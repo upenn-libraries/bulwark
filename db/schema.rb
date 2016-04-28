@@ -51,6 +51,7 @@ ActiveRecord::Schema.define(version: 20160314191728) do
     t.string   "metadata_filename"
     t.string   "file_extensions"
     t.string   "ingested"
+    t.string   "preservation_filename"
     t.integer  "metadata_builder_id"
     t.integer  "version_control_agent_id"
   end

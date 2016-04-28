@@ -27,27 +27,17 @@ module MetadataBuilderHelper
   def render_metadata_mapping_form
     if @object.metadata_builder.source.present?
       render :partial => "metadata_builders/form"
-    end
-  end
-
-  def render_structure_or_not
-    if @object.metadata_builder.preserve.present?
-      render :partial => "metadata_builders/structure"
     else
       render :partial => "metadata_builders/no_source"
     end
   end
 
   def render_source_select_form
-    render :partial => "metadata_builders/source_select"
-  end
-
-  def render_preserve_select_form
-    render :partial => "metadata_builders/preserve_select"
-  end
-
-  def render_clear_out_form
-    render :partial => "metadata_builders/clear_out"
+    if @object.metadata_builder.available_metadata_files.present?
+      render :partial => "metadata_builders/source_select"
+    else
+      render :partial => "metadata_builders/no_available_metadata_files"
+    end
   end
 
   def _structural_elements(file_name)
@@ -64,7 +54,7 @@ module MetadataBuilderHelper
 
   def _nested_relationships_values(parent_file)
     child_array = Array.new
-    child_candidates = _prettify(@object.metadata_builder.preserve)
+    child_candidates = _prettify(@object.metadata_builder.source)
     child_candidates.each do |child|
       child_array << [child, { parent_file => child }.to_s] unless _prettify(parent_file) == child
     end

@@ -3,7 +3,6 @@ module Utils
     attr_accessor :object_data_path
     attr_accessor :object_admin_path
     attr_accessor :object_semantics_location
-    attr_accessor :preservation_xml_filename_prefix
     attr_accessor :email
     attr_accessor :assets_path
     attr_accessor :manifest_location

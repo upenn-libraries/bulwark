@@ -64,6 +64,10 @@ RailsAdmin.config do |config|
       required(true)
       help "Required - comma-separated list of accepted file extensions for assets to be served to production from the assets subdirectory.  Example: jpeg,tif"
     end
+    field :preservation_filename do
+      required(true)
+      help "Required - Filename for long-term preservation XML file"
+    end
   end
 
 end

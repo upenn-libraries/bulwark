@@ -13,6 +13,7 @@ class Repo < ActiveRecord::Base
   validates :assets_subdirectory, presence: true
   validates :metadata_filename, presence: true
   validates :file_extensions, presence: true
+  validates :preservation_filename, presence: true
 
   validates :title, multiple: false
   validates :directory, multiple: false
@@ -41,6 +42,10 @@ class Repo < ActiveRecord::Base
   def nested_relationships=(nested_relationships)
     nested_relationships.reject!(&:empty?)
     self[:nested_relationships] = nested_relationships
+  end
+
+  def preservation_filename=(preservation_filename)
+    self[:preservation_filename] = preservation_filename.concat(".xml") unless preservation_filename.ends_with?(".xml")
   end
 
   def title

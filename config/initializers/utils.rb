@@ -14,7 +14,6 @@ Utils.configure do |config|
     config.object_data_path = options.fetch(:object_data_path)
     config.object_admin_path = options.fetch(:object_admin_path)
     config.object_semantics_location = options.fetch(:object_semantics_location)
-    config.preservation_xml_filename_prefix = options.fetch(:preservation_xml_filename_prefix)
     config.email = options.fetch(:email)
     config.assets_path = options.fetch(:assets_path)
     config.manifest_location = options.fetch(:manifest_location)
