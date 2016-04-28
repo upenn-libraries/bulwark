@@ -29,14 +29,10 @@ en:
         title: "Map Metadata"
         menu: "Map Metadata"
         breadcrumb: "Map Metadata"
-      structure_metadata:
-        title: "Structure Metadata"
-        menu: "Structure Metadata"
-        breadcrumb: "Structure Metadata"
-      generate_xml:
-        title: "Generate XML"
-        menu: "Generate XML"
-        breadcrumb: "Generate XML"
+      preview_xml:
+        title: "Preview XML"
+        menu: "Preview XML"
+        breadcrumb: "Preview XML"
       preserve:
         title: "Designate Preservation Files"
         menu: "Designate Preservation Files"

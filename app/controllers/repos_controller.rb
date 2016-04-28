@@ -1,5 +1,5 @@
 class ReposController < ApplicationController
-  before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log, :prepare_for_ingest, :ingest, :detect_metadata, :generate_xml_preview]
+  before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log, :prepare_for_ingest, :ingest, :detect_metadata, :preview_xml_preview]
 
   def show
     @message = @repo.create_remote
@@ -19,12 +19,12 @@ class ReposController < ApplicationController
     end
   end
 
-  def generate_xml_preview
-    @message = @repo.generate_xml_preview
+  def preview_xml_preview
+    @message = @repo.preview_xml_preview
     if @message[:error].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/generate_xml", :flash => { :error => @message[:error] }
+      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/preview_xml", :flash => { :error => @message[:error] }
     elsif @message[:success].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/generate_xml", :flash => { :success => @message[:success] }
+      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/preview_xml", :flash => { :success => @message[:success] }
     end
   end
 
@@ -44,6 +44,6 @@ class ReposController < ApplicationController
     end
 
     def repo_params
-      params.require(:repo).permit(:title, :directory, :identifier, :description, :metadata_subdirectory, :assets_subdirectory, :metadata_filename, :file_extensions, :version_control_agent)
+      params.require(:repo).permit(:title, :directory, :identifier, :description, :metadata_subdirectory, :assets_subdirectory, :metadata_filename, :file_extensions, :version_control_agent, :preservation_filename)
     end
 end

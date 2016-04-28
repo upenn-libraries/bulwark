@@ -5,7 +5,7 @@ require Rails.root.join('lib', 'rails_admin', 'sign_off_production.rb')
 require Rails.root.join('lib', 'rails_admin', 'report_flagged.rb')
 require Rails.root.join('lib', 'rails_admin', 'ingest.rb')
 require Rails.root.join('lib', 'rails_admin', 'map_metadata.rb')
-require Rails.root.join('lib', 'rails_admin', 'generate_xml.rb')
+require Rails.root.join('lib', 'rails_admin', 'preview_xml.rb')
 require Rails.root.join('lib', 'rails_admin', 'preserve.rb')
 
 RailsAdmin.config do |config|
@@ -25,7 +25,7 @@ RailsAdmin.config do |config|
       only ["Repo"]
     end
     map_metadata
-    generate_xml
+    preview_xml
     create_remote do
       only ["Repo"]
     end
@@ -63,6 +63,10 @@ RailsAdmin.config do |config|
     field :file_extensions do
       required(true)
       help "Required - comma-separated list of accepted file extensions for assets to be served to production from the assets subdirectory.  Example: jpeg,tif"
+    end
+    field :preservation_filename do
+      required(true)
+      help "Required - Filename for long-term preservation XML file"
     end
   end
 

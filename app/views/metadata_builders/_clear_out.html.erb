@@ -1,6 +1,0 @@
-<h2>Clear out artifacts not for long-term preservation or metadata sources</h2>
-<p>The following files have not been identified as metadata sources or designated for long-term preservation and will be deleted:</p>
-<%= render :partial => "metadata_builders/unidentified_files" %>
-<%= form_for @object.metadata_builder, :validate => true, :method => :post, :url => "/metadata_builders/#{@object.metadata_builder.id}/clear_files" do |f| %>
-  <%= f.submit "Delete unidentified files" %>
-<% end %>

@@ -8,9 +8,9 @@ module MetadataBuilderHelper
     end
   end
 
-  def render_generate_xml
-    if @object.metadata_builder.field_mappings.present?
-      render :partial => "metadata_builders/generate_xml"
+  def render_preview_xml
+    if @object.metadata_builder.preserve.present?
+      render :partial => "metadata_builders/preview_xml"
     else
       render :partial => "metadata_builders/no_mappings"
     end
@@ -27,27 +27,41 @@ module MetadataBuilderHelper
   def render_metadata_mapping_form
     if @object.metadata_builder.source.present?
       render :partial => "metadata_builders/form"
-    end
-  end
-
-  def render_structure_or_not
-    if @object.metadata_builder.preserve.present?
-      render :partial => "metadata_builders/structure"
     else
       render :partial => "metadata_builders/no_source"
     end
   end
 
   def render_source_select_form
-    render :partial => "metadata_builders/source_select"
+    if @object.metadata_builder.available_metadata_files.present?
+      render :partial => "metadata_builders/source_select"
+    else
+      render :partial => "metadata_builders/no_available_metadata_files"
+    end
   end
 
-  def render_preserve_select_form
-    render :partial => "metadata_builders/preserve_select"
-  end
-
-  def render_clear_out_form
-    render :partial => "metadata_builders/clear_out"
+  def render_sample_xml
+    @object.version_control_agent.clone
+    @object.version_control_agent.get(:get_location => "#{@object.version_control_agent.working_path}/#{@object.metadata_subdirectory}")
+    @sample_xml_docs = ""
+    @file_links = Array.new
+    Dir.glob("#{@object.version_control_agent.working_path}/#{@object.metadata_subdirectory}/*.xml").each do |file|
+      @file_links << link_to(_prettify(file), "##{file}")
+      anchor_tag = content_tag(:a, "", :name=> file)
+      sample_xml_content = File.open(file, "r"){|io| io.read}
+      sample_xml_doc = REXML::Document.new sample_xml_content
+      sample_xml = ""
+      sample_xml_doc.write(sample_xml, 1)
+      header = content_tag(:h3, "XML Sample for #{_prettify(file)}")
+      xml_code = content_tag(:pre, "#{sample_xml}")
+      @sample_xml_docs << content_tag(:div, anchor_tag << header << xml_code, :class => "doc")
+    end
+    @object.version_control_agent.delete_clone
+    @file_links_html = ""
+    @file_links.each do |file_link|
+      @file_links_html << content_tag(:li, file_link.html_safe)
+    end
+    return content_tag(:ul, @file_links_html.html_safe) << @sample_xml_docs.html_safe
   end
 
   def _structural_elements(file_name)
@@ -64,7 +78,7 @@ module MetadataBuilderHelper
 
   def _nested_relationships_values(parent_file)
     child_array = Array.new
-    child_candidates = _prettify(@object.metadata_builder.preserve)
+    child_candidates = _prettify(@object.metadata_builder.source)
     child_candidates.each do |child|
       child_array << [child, { parent_file => child }.to_s] unless _prettify(parent_file) == child
     end
