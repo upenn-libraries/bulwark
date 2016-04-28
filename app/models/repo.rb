@@ -108,11 +108,14 @@ class Repo < ActiveRecord::Base
       end
       self.ingested = ingest_array
       self.save!
-      Utils::Process.reindex
       return @status
     rescue
       raise $!, "Ingest and index failed due to the following error(s): #{$!}", $!.backtrace
     end
+  end
+
+  def reindex
+    ActiveFedora::Base.reindex_everything
   end
 
 private
