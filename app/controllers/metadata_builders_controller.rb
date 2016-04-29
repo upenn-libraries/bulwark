@@ -17,15 +17,14 @@ class MetadataBuildersController < ApplicationController
     @error_message = @metadata_builder.verify_xml_tags(params[:metadata_builder][:field_mappings]) if params[:metadata_builder][:field_mappings].present?
     if @metadata_builder.update(metadata_builder_params)
       @metadata_builder.build_xml_files
-      redirect_to "/admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :success => "Metadata mappings successfully updated.  See XML preview below."}
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :success => "Metadata mappings successfully updated.  See XML preview below."}
     else
-      redirect_to "/admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :error => @error_message }
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :error => @error_message }
     end
   end
 
   def ingest
     @message = @metadata_builder.transform_and_ingest(params[:to_ingest])
-
     #Calling the reindex code from Utils::Process doesn't refresh but shelling out to rake task of same does?
     `rake fedora:solr:reindex`
     if @message[:error].present?

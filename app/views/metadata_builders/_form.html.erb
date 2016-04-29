@@ -14,7 +14,6 @@
       <%= content_tag(:div, "Root element of the XML schema generated -- defaults to \"root\" if left blank.", :class => "field-tip") %>
     <% end -%>
     <%= content_tag :div, :class => "field" do -%>
-    <%= binding.pry() %>
       <%= f.label "field_mappings[#{mappings.first.last}][child_element][mapped_value]", "Child element of root, applied per row (optional):" %>
       <%= f.text_field "field_mappings[#{mappings.first.last}][child_element][mapped_value]", :value => "#{parent_val}" %>
       <%= content_tag(:div, "Optional -- Parent of each row of values in metadata source spreadsheet; Child of the root element.", :class => "field-tip") %>

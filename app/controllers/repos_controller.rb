@@ -4,9 +4,9 @@ class ReposController < ApplicationController
   def show
     @message = @repo.create_remote
     if @message[:error].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_review", :flash => { :error => @message[:error] }
+      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_actions", :flash => { :error => @message[:error] }
     elsif @message[:success].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_review", :flash => { :success => @message[:success] }
+      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_actions", :flash => { :success => @message[:success] }
     end
   end
 

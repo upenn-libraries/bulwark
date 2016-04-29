@@ -56,10 +56,10 @@
             <sv:value>bypassAdmin</sv:value>
           </sv:property>
           <sv:property sv:name="ns002:abstract" sv:type="String" sv:multiple="false">
-            <sv:value><xsl:value-of select="abstract" /></sv:value>
+            <xsl:apply-templates select="abstract" />
           </sv:property>
           <sv:property sv:name="ns002:coverage" sv:type="String" sv:multiple="false">
-            <sv:value><xsl:value-of select="coverage" /></sv:value>
+            <xsl:apply-templates select="coverage" />
           </sv:property>
           <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="false">
             <sv:value><xsl:apply-templates select="identifier"/></sv:value>
@@ -77,15 +77,23 @@
             <sv:value>Manuscript</sv:value>
           </sv:property>
           <sv:property sv:name="ns002:title" sv:type="String" sv:multiple="false">
-            <sv:value><xsl:value-of select="title" /></sv:value>
+            <xsl:apply-templates select="title" />
           </sv:property>
           <sv:property sv:name="ns002:date" sv:type="String" sv:multiple="false">
-            <sv:value><xsl:value-of select="date" /></sv:value>
+            <xsl:apply-templates select="date" />
           </sv:property>
           <xsl:apply-templates select="pages/page" />
           </sv:node>
         </exsl:document>
       </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="abstract">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="coverage">
+      <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
 
     <xsl:template match="language">
@@ -97,6 +105,14 @@
     </xsl:template>
 
     <xsl:template match="file_list/file">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="title">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="date">
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
 
