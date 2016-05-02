@@ -175,6 +175,8 @@ class MetadataBuilder < ActiveRecord::Base
       xml_unified_filename = "#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/#{self.repo.preservation_filename}"
       self.repo.version_control_agent.unlock(xml_unified_filename) if File.exists?(xml_unified_filename)
       _build_preservation_xml(xml_unified_filename,xml_content)
+      FileUtils.rm(key_xml_path)
+      FileUtils.rm(child_xml_path)
       begin
         self.repo.version_control_agent.commit("Generated unified XML for #{key} and #{value} at #{xml_unified_filename}")
       rescue Git::GitExecuteError
