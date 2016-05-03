@@ -16,15 +16,17 @@ class MetadataBuildersController < ApplicationController
   def update
     @error_message = @metadata_builder.verify_xml_tags(params[:metadata_builder][:field_mappings]) if params[:metadata_builder][:field_mappings].present?
     if @metadata_builder.update(metadata_builder_params)
-      @metadata_builder.generate_parent_child_xml if metadata_builder_params["nested_relationships"].present?
-      redirect_to "/admin_repo/repo/#{@metadata_builder.repo.id}/map_metadata", :flash => { :success => "Metadata Builder successfully updated"}
+      @metadata_builder.build_xml_files
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :success => "Metadata mappings successfully updated.  See XML preview below."}
     else
-      redirect_to "/admin_repo/repo/#{@metadata_builder.repo.id}/map_metadata", :flash => { :error => @error_message }
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :error => @error_message }
     end
   end
 
   def ingest
     @message = @metadata_builder.transform_and_ingest(params[:to_ingest])
+    #Calling the reindex code from Utils::Process doesn't refresh but shelling out to rake task of same does?
+    `rake fedora:solr:reindex`
     if @message[:error].present?
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :error => @message[:error] }
     elsif @message[:success].present?

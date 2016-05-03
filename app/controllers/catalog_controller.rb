@@ -70,6 +70,7 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('abstract', :stored_searchable, type: :string), :label => 'Abstract'
     config.add_show_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
     config.add_show_field solr_name('language', :stored_searchable, type: :string), :label => 'Language', :link_to_search => solr_name('language', :facetable)
+    config.add_show_field solr_name('coverage', :stored_searchable, type: :string), :label => 'Coverage', :link_to_search => solr_name('coverage', :facetable)
     config.add_show_field solr_name('file_location', :stored_searchable, type: :string), :label => 'File Location'
 
     # "fielded" search configuration. Used by pulldown among other places.

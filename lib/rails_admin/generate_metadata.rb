@@ -4,7 +4,7 @@ require 'rails_admin/config/actions/base'
 module RailsAdmin
   module Config
     module Actions
-      class GitReview < RailsAdmin::Config::Actions::Base
+      class GenerateMetadata < RailsAdmin::Config::Actions::Base
 
          RailsAdmin::Config::Actions.register(self)
 
@@ -13,7 +13,7 @@ module RailsAdmin
          end
 
          register_instance_option :route_fragment do
-           'git_review'
+           'generate_metadata'
          end
 
         register_instance_option :member? do
@@ -21,7 +21,7 @@ module RailsAdmin
         end
 
         register_instance_option :link_icon do
-         'fa fa-git'
+         'fa fa-table'
         end
 
         register_instance_option :http_methods do

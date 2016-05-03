@@ -1,13 +1,13 @@
 <% refresh_metadata_from_source %>
 <%= form_for @object.metadata_builder, :validate => true, :html => { :class => "field-mappings", :method => :post}, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
-<%= render_flash_errors if flash[:error] %>
+  <%= render_flash_errors if flash[:error] %>
   <%= field_set_tag 'Map source metadata to XML' do %>
-    Fill out the fields below to map your metadata to source.
+    Fill out the fields below to field values from metadata source files to XML.
   <% end %>
   <%= f.hidden_field :parent_repo, :value => "#{@object.id}" %>
   <% @object.metadata_builder.source_mappings.each do |mappings| %>
-  <% root_val, parent_val = _structural_elements(mappings.first.last) %>
-  <h3>Mappings for <%= _prettify(mappings.first.last) %></h3>
+    <% root_val, parent_val = _structural_elements(mappings.first.last) %>
+    <h3>Mappings for <%= _prettify(mappings.first.last) %></h3>
     <%= content_tag :div, :class => "field" do -%>
       <%= f.label "field_mappings[#{mappings.first.last}][root_element][mapped_value]", "Root element:" %>
       <%= f.text_field "field_mappings[#{mappings.first.last}][root_element][mapped_value]", :value => "#{root_val}" %>
@@ -27,5 +27,13 @@
       <% end -%>
     <% end -%>
   <% end -%>
-  <%= content_tag(:div, f.submit, :class => "form-bottom") %>
+  <h2>Define relationships</h2>
+  <p>Structure relationships between multiple metadata source files</p>
+    <% @object.metadata_builder.source.each do |file| -%>
+      <%= content_tag :div, :class => "field" do -%>
+        <%= f.label :nested_relationships, "Child/children of #{_prettify(file)}:" %>
+        <%= f.select :nested_relationships, _nested_relationships_values(file), {}, { :multiple => true} %>
+      <% end -%>
+    <% end -%>
+  <%= content_tag(:div, (f.submit "Save metadata mappings and generate preservation XML"), :class => "form-bottom") %>
 <% end %>

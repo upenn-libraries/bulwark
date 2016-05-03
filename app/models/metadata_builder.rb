@@ -88,8 +88,8 @@ class MetadataBuilder < ActiveRecord::Base
   def set_metadata_mappings
     self.repo.version_control_agent.clone
     self.source_mappings = convert_metadata
-    self.save!
     self.repo.version_control_agent.delete_clone
+    self.save!
   end
 
   def clear_unidentified_files
@@ -153,9 +153,9 @@ class MetadataBuilder < ActiveRecord::Base
       end
     end
     self.repo.version_control_agent.push
-    self.repo.version_control_agent.delete_clone
     generate_parent_child_xml if self.nested_relationships.present?
     set_preserve_files(xml_files)
+    self.repo.version_control_agent.delete_clone
   end
 
   def generate_parent_child_xml
@@ -163,28 +163,26 @@ class MetadataBuilder < ActiveRecord::Base
       rel = eval(rel)
       key, value = rel.first
       metadata_path = "#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}"
-      self.repo.version_control_agent.clone
       self.repo.version_control_agent.get(:get_location => metadata_path)
-      child_path = "#{self.repo.version_control_agent.working_path}#{value}"
-      xml_content = File.open(key, "r"){|io| io.read}
-      child_xml_content = File.open(child_path, "r"){|io| io.read}
+      key_xml_path = "#{key}.xml"
+      child_xml_path = "#{self.repo.version_control_agent.working_path}#{value}.xml"
+      xml_content = File.open(key_xml_path, "r"){|io| io.read}
+      child_xml_content = File.open(child_xml_path, "r"){|io| io.read}
       _strip_headers(xml_content) && _strip_headers(child_xml_content)
-      key_index = key.gsub(".xml","")
-      val_index = key.gsub(".xml","")
-      end_tag = "</#{self.field_mappings[key_index]["root_element"]["mapped_value"]}>"
+      end_tag = "</#{self.field_mappings[key]["root_element"]["mapped_value"]}>"
       insert_index = xml_content.index(end_tag)
       xml_content.insert(insert_index, child_xml_content)
-      xml_unified_filename = "#{key_index}.#{Time.now.to_i}.xml"
+      xml_unified_filename = "#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/#{self.repo.preservation_filename}"
       self.repo.version_control_agent.unlock(xml_unified_filename) if File.exists?(xml_unified_filename)
       _build_preservation_xml(xml_unified_filename,xml_content)
+      FileUtils.rm(key_xml_path)
+      FileUtils.rm(child_xml_path)
       begin
         self.repo.version_control_agent.commit("Generated unified XML for #{key} and #{value} at #{xml_unified_filename}")
       rescue Git::GitExecuteError
-        self.repo.version_control_agent.delete_clone
         next
       end
       self.repo.version_control_agent.push
-      self.repo.version_control_agent.delete_clone
       set_preserve_files(xml_unified_filename)
       self.save!
     end
@@ -207,9 +205,9 @@ class MetadataBuilder < ActiveRecord::Base
         transformed_repo_path = "#{Utils.config.transformed_dir}/#{@vca.remote_path.gsub("/","_")}"
         Dir.mkdir(transformed_repo_path) && Dir.chdir(transformed_repo_path)
         `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
+        @status = self.repo.ingest(transformed_repo_path)
         @vca.reset_hard
         @vca.delete_clone
-        @status = self.repo.ingest(transformed_repo_path)
         FileUtils.rm_rf(transformed_repo_path, :secure => true) if File.directory?(transformed_repo_path)
       end
       return @status.present? ? {:success => "Item re-ingested into the repository.  See link(s) below to preview ingested items associated with this repo."} : {:success => "Ingestion complete.  See link(s) below to preview ingested items associated with this repo." }
