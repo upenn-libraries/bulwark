@@ -56,10 +56,6 @@ RailsAdmin.config do |config|
       required(true)
       help "Required - subdirectory within the directory specified above that will serve as the location for the assets to be processed by the application"
     end
-    field :metadata_filename do
-      required(true)
-      help "Required - name of the metadata file in the metadata subdirectory to be processed by the application"
-    end
     field :file_extensions do
       required(true)
       help "Required - comma-separated list of accepted file extensions for assets to be served to production from the assets subdirectory.  Example: jpeg,tif"
