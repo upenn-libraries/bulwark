@@ -25,10 +25,10 @@ en:
         title: "Ingest"
         menu: "Ingest"
         breadcrumb: "Ingest"
-      map_metadata:
-        title: "Map Metadata"
-        menu: "Map Metadata"
-        breadcrumb: "Map Metadata"
+      generate_metadata:
+        title: "Generate Metadata"
+        menu: "Generate Metadata"
+        breadcrumb: "Generate Metadata"
       preview_xml:
         title: "Preview XML"
         menu: "Preview XML"

@@ -24,7 +24,7 @@ module MetadataBuilderHelper
     end
   end
 
-  def render_metadata_mapping_form
+  def render_metadata_generation_form
     if @object.metadata_builder.source.present?
       render :partial => "metadata_builders/form"
     else

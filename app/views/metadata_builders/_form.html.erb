@@ -2,7 +2,7 @@
 <%= form_for @object.metadata_builder, :validate => true, :html => { :class => "field-mappings", :method => :post}, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
   <%= render_flash_errors if flash[:error] %>
   <%= field_set_tag 'Map source metadata to XML' do %>
-    Fill out the fields below to map your metadata to source.
+    Fill out the fields below to field values from metadata source files to XML.
   <% end %>
   <%= f.hidden_field :parent_repo, :value => "#{@object.id}" %>
   <% @object.metadata_builder.source_mappings.each do |mappings| %>
@@ -35,5 +35,5 @@
         <%= f.select :nested_relationships, _nested_relationships_values(file), {}, { :multiple => true} %>
       <% end -%>
     <% end -%>
-  <%= content_tag(:div, f.submit, :class => "form-bottom") %>
+  <%= content_tag(:div, (f.submit "Save metadata mappings and generate preservation XML"), :class => "form-bottom") %>
 <% end %>
