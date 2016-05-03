@@ -11,7 +11,6 @@ class Repo < ActiveRecord::Base
   validates :directory, presence: true
   validates :metadata_subdirectory, presence: true
   validates :assets_subdirectory, presence: true
-  validates :metadata_filename, presence: true
   validates :file_extensions, presence: true
   validates :preservation_filename, presence: true
 
@@ -108,11 +107,14 @@ class Repo < ActiveRecord::Base
       end
       self.ingested = ingest_array
       self.save!
-      Utils::Process.reindex
       return @status
     rescue
       raise $!, "Ingest and index failed due to the following error(s): #{$!}", $!.backtrace
     end
+  end
+
+  def reindex
+    ActiveFedora::Base.reindex_everything
   end
 
 private

@@ -11,14 +11,6 @@ module RailsAdminHelper
     render_git_directions_or_actions
   end
 
-  def render_metadata_builder_mapping_form
-    render_form_or_message("metadata_builders/form")
-  end
-
-  def render_metadata_builder_structure_form
-    render_form_or_message("metadata_builders/structure")
-  end
-
   def render_ingest_select_form
     render_ingest_or_message
   end

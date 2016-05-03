@@ -1,10 +1,10 @@
 en:
   admin:
     actions:
-      git_review:
-        title: "Git Review of Repo"
-        menu: "Git Review"
-        breadcrumb: "Git Review"
+      git_actions:
+        title: "Git Actions"
+        menu: "Git Actions"
+        breadcrumb: "Git Actions"
       create_remote:
         title: "Create Remote Repository"
         menu: "Create Remote Repository"
@@ -25,15 +25,15 @@ en:
         title: "Ingest"
         menu: "Ingest"
         breadcrumb: "Ingest"
-      map_metadata:
-        title: "Map Metadata"
-        menu: "Map Metadata"
-        breadcrumb: "Map Metadata"
+      generate_metadata:
+        title: "Generate Metadata"
+        menu: "Generate Metadata"
+        breadcrumb: "Generate Metadata"
       preview_xml:
         title: "Preview XML"
         menu: "Preview XML"
         breadcrumb: "Preview XML"
       preserve:
-        title: "Designate Preservation Files"
-        menu: "Designate Preservation Files"
-        breadcrumb: "Designate Preservation Files"
+        title: "Designate Source Metadata Files"
+        menu: "Designate Source Metadata Files"
+        breadcrumb: "Designate Source Metadata Files"
