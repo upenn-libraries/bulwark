@@ -26,7 +26,7 @@ class MetadataBuildersController < ApplicationController
   def ingest
     @message = @metadata_builder.transform_and_ingest(params[:to_ingest])
     #Calling the reindex code from Utils::Process doesn't refresh but shelling out to rake task of same does?
-    #`rake fedora:solr:reindex`
+    `rake fedora:solr:reindex`
     if @message[:error].present?
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :error => @message[:error] }
     elsif @message[:success].present?
