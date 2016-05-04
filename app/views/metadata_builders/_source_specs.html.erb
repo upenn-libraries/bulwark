@@ -3,19 +3,15 @@
     <% @object.metadata_builder.source.each do |source| %>
     <h3>Information for <%= _prettify(source) %></h3>
     <div class="source-type">
-
-      <%= field_set_tag "What kind of spreadsheet is this?" %>
-      <%= label "source_type[#{source}]", "Vertical" %>
-      <%= radio_button_tag "source_type[#{source}]", "vertical" %>
-      <%= label "source_type[#{source}]", "Horizontal" %>
-      <%= radio_button_tag "source_type[#{source}]", "horizontal" %>
+      <%= label_tag "source_type[#{source}]", "Source type" %>
+      <%= select_tag "source_type[#{source}]", options_for_select(MetadataBuilder.sheet_types) %>
     </div>
     <div class="source-coordinates">
       <%= field_set_tag "Where do the field mappings begin?" %>
       <%= label_tag "source_coordinates[#{source}][x]", "X Coordinate" %>
-      <%= text_field_tag "source_coordinates[#{source}][x]" %>
+      <%= number_field_tag "source_coordinates[#{source}][x]" %>
       <%= label_tag "source_coordinates[#{source}][y]", "Y Coordinate" %>
-      <%= text_field_tag "source_coordinates[#{source}][y]" %>
+      <%= number_field_tag "source_coordinates[#{source}][y]" %>
     </div>
     <% end %>
     <%= f.submit %>

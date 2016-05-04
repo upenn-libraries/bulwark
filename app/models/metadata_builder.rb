@@ -37,24 +37,6 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo = @repo
   end
 
-  def source_type=(source_type)
-    source_type.each do |s|
-      key, val = s
-      binding.pry()
-      unless self.source.include?(key) && self.sheet_types.include?(val)
-        errors.add(:source_type, "Invalid source type mapping.")
-
-      end
-
-    end
-
-  end
-
-  def source_coordinates=(source_coordinates)
-    binding.pry()
-
-  end
-
   def nested_relationships
     read_attribute(:nested_relationships) || ''
   end
