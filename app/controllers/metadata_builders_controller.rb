@@ -1,6 +1,6 @@
 class MetadataBuildersController < ApplicationController
 
-  before_action :set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files]
+  before_action :set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :source_specs, :set_preserve, :clear_files]
   before_filter :merge_mappings, :only => [:create, :update]
 
   def show
@@ -37,6 +37,11 @@ class MetadataBuildersController < ApplicationController
   def set_source
     @metadata_builder.set_source(params[:source_files])
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preserve", :flash => { :success => "Metadata sources set successfully." }
+  end
+
+  def source_specs
+    @metadata_builder.set_source_specs(params)
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preserve", :flash => { :success => "Information about metadata sources saved successfully." }
   end
 
   def set_preserve

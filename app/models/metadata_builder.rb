@@ -9,6 +9,8 @@ class MetadataBuilder < ActiveRecord::Base
   validate :check_for_errors
 
   serialize :source
+  serialize :source_type
+  serialize :source_coordinates
   serialize :preserve
   serialize :nested_relationships
   serialize :source_mappings
@@ -35,12 +37,38 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo = @repo
   end
 
+  def source_type=(source_type)
+    source_type.each do |s|
+      key, val = s
+      binding.pry()
+      unless self.source.include?(key) && self.sheet_types.include?(val)
+        errors.add(:source_type, "Invalid source type mapping.")
+
+      end
+
+    end
+
+  end
+
+  def source_coordinates=(source_coordinates)
+    binding.pry()
+
+  end
+
   def nested_relationships
     read_attribute(:nested_relationships) || ''
   end
 
   def source
     read_attribute(:source) || ''
+  end
+
+  def source_type
+    read_attribute(:source_type) || ''
+  end
+
+  def source_coordinates
+    read_attribute(:source_coordinates) || ''
   end
 
   def preserve
@@ -77,6 +105,12 @@ class MetadataBuilder < ActiveRecord::Base
 
   def set_source(source_files)
     self.source = source_files.values
+    self.save!
+  end
+
+  def set_source_specs(source_specs)
+    self.source_type = source_specs["source_type"]
+    self.source_coordinates = source_specs["source_coordinates"]
     self.save!
   end
 
@@ -319,6 +353,10 @@ class MetadataBuilder < ActiveRecord::Base
 
     def _strip_headers(xml)
       xml.gsub!(@@xml_header, "") && xml.gsub!(@@xml_footer, "")
+    end
+
+    def self.sheet_types
+      sheet_types = [["Horizontal", "horizontal"], ["Vertical", "vertical"]]
     end
 
 end

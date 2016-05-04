@@ -1,7 +1,7 @@
 <div class="ingest-select-form">
   <%= form_for @object.metadata_builder, :validate => true, :method => :post, :url => "/metadata_builders/#{@object.metadata_builder.id}/ingest" do |f| %>
     <% @object.metadata_builder.preserve.each do |preserve| %>
-    <div class="checkbox">
+    <div class="checkbox-ingest">
       <%= check_box_tag "to_ingest[#{_prettify(preserve)}]", preserve %>
       <%= label "to_ingest[#{_prettify(preserve)}]", _prettify(preserve) %>
     </div>
