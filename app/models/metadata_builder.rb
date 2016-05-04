@@ -243,13 +243,8 @@ class MetadataBuilder < ActiveRecord::Base
           ext = pathname.extname.to_s[1..-1]
           case ext
           when "xlsx"
-            tmp_csv = convert_to_csv(source)
-            @mappings = generate_mapping_options_csv(source, tmp_csv)
+            @mappings = generate_mapping_options_xlsx(source)
             @mappings_sets << @mappings
-          when "csv"
-            @mappings = generate_mapping_options_csv(source, tmp_csv)
-            @mappings_sets << @mappings
-          when "xml"
           else
             raise "Illegal metadata source unit type"
           end
@@ -273,6 +268,35 @@ class MetadataBuilder < ActiveRecord::Base
         mappings["#{header}"] = sample_vals
       end
       return mappings
+    end
+
+    def generate_mapping_options_xlsx(source)
+      mappings = {}
+      mappings["base_file"] = "#{source}"
+      headers = Array.new
+      iterator = 0
+
+      x_start = _offset(self.source_coordinates[source]["x_start"].to_i)
+      y_start = _offset(self.source_coordinates[source]["y_start"].to_i)
+
+      x_stop = _offset(self.source_coordinates[source]["x_stop"].to_i)
+      y_stop = _offset(self.source_coordinates[source]["y_stop"].to_i)
+
+      workbook = RubyXL::Parser.parse(source)
+      case self.source_type[source]
+      when "horizontal"
+        while((x_stop >= (x_start+iterator)) && (workbook[0][y_start][x_start+iterator].present?))
+          headers << workbook[0][y_start][x_start+iterator].value
+          iterator += 1
+        end
+      when "vertical"
+        while((y_stop >= (y_start+iterator)) && (workbook[0][y_start+iterator].present?))
+          headers << workbook[0][y_start+iterator][x_start].value
+          iterator += 1
+        end
+      else
+        raise "Illegal source type for #{source}"
+      end
     end
 
     def each_row_values(base_file)
@@ -335,6 +359,11 @@ class MetadataBuilder < ActiveRecord::Base
 
     def _strip_headers(xml)
       xml.gsub!(@@xml_header, "") && xml.gsub!(@@xml_footer, "")
+    end
+
+    def _offset(coordinate)
+      coordinate = coordinate-1 unless coordinate == 0
+      return coordinate
     end
 
     def self.sheet_types

@@ -447,6 +447,9 @@ GEM
       rspec-mocks (~> 3.4.0)
       rspec-support (~> 3.4.0)
     rspec-support (3.4.1)
+    rubyXL (3.3.17)
+      nokogiri (>= 1.4.4)
+      rubyzip (>= 1.1.6)
     rubyzip (1.2.0)
     safe_yaml (1.0.4)
     sass (3.2.19)
@@ -539,6 +542,7 @@ DEPENDENCIES
   roo
   rsolr (~> 1.0.6)
   rspec-rails
+  rubyXL
   sass-rails (< 5.0)
   sdoc (~> 0.4.0)
   spring

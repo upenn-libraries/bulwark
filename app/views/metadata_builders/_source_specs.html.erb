@@ -8,10 +8,17 @@
     </div>
     <div class="source-coordinates">
       <%= field_set_tag "Where do the field mappings begin?" %>
-      <%= label_tag "source_coordinates[#{source}][x]", "X Coordinate" %>
-      <%= number_field_tag "source_coordinates[#{source}][x]" %>
-      <%= label_tag "source_coordinates[#{source}][y]", "Y Coordinate" %>
-      <%= number_field_tag "source_coordinates[#{source}][y]" %>
+      <%= label_tag "source_coordinates[#{source}][x_start]", "X Coordinate" %>
+      <%= number_field_tag "source_coordinates[#{source}][x_start]" %>
+      <%= label_tag "source_coordinates[#{source}][y_start]", "Y Coordinate" %>
+      <%= number_field_tag "source_coordinates[#{source}][y_start]" %>
+    </div>
+    <div class="source-coordinates">
+      <%= field_set_tag "Where do the field mappings end?" %>
+      <%= label_tag "source_coordinates[#{source}][x_stop]", "X Coordinate" %>
+      <%= number_field_tag "source_coordinates[#{source}][x_stop]" %>
+      <%= label_tag "source_coordinates[#{source}][y_stop]", "Y Coordinate" %>
+      <%= number_field_tag "source_coordinates[#{source}][y_stop]" %>
     </div>
     <% end %>
     <%= f.submit %>

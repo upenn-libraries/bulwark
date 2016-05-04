@@ -40,7 +40,6 @@ class MetadataBuildersController < ApplicationController
   end
 
   def source_specs
-    binding.pry()
     @metadata_builder.set_source_specs(params)
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preserve", :flash => { :success => "Information about metadata sources saved successfully." }
   end
