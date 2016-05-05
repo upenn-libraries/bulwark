@@ -283,6 +283,7 @@ class MetadataBuilder < ActiveRecord::Base
       y_stop = _offset(self.source_coordinates[source]["y_stop"].to_i)
 
       workbook = RubyXL::Parser.parse(source)
+
       case self.source_type[source]
       when "horizontal"
         while((x_stop >= (x_start+iterator)) && (workbook[0][y_start][x_start+iterator].present?))
@@ -300,7 +301,15 @@ class MetadataBuilder < ActiveRecord::Base
         end
       when "vertical"
         while((y_stop >= (y_start+iterator)) && (workbook[0][y_start+iterator].present?))
-          headers << workbook[0][y_start+iterator][x_start].value
+          header = workbook[0][y_start+iterator][x_start].value
+          headers << header
+          vals = Array.new
+          vals_iterator = 1
+          while(workbook[0][y_start+iterator].present? && workbook[0][y_start+iterator][x_start+vals_iterator].present?) do
+            vals << workbook[0][y_start+iterator][x_start+vals_iterator].value
+            vals_iterator += 1
+          end
+          mappings[header] = vals
           iterator += 1
         end
       else
