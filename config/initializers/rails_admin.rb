@@ -58,8 +58,8 @@ RailsAdmin.config do |config|
     end
     field :file_extensions, :enum do
       required(true)
-      enum do
-        ['jpeg', 'tif']
+      enum_method do
+        :load_file_extensions
       end
       multiple do
         true
@@ -68,8 +68,8 @@ RailsAdmin.config do |config|
     end
     field :metadata_source_extensions, :enum do
       required(true)
-      enum do
-        ['xlsx']
+      enum_method do
+        :load_metadata_source_extensions
       end
       multiple do
         false

@@ -2,6 +2,7 @@
   <%= form_for @object.metadata_builder, :validate => true, :method => :post, :url => "/metadata_builders/#{@object.metadata_builder.id}/source_specs" do |f| %>
     <% @object.metadata_builder.source.each do |source| %>
     <h3>Information for <%= _prettify(source) %></h3>
+    <%= field_set_tag "Define the orientation of the field mappings:" %>
     <div class="source-type">
       <% MetadataBuilder.sheet_types.each do |mb| %>
         <div class="visual-illustration">

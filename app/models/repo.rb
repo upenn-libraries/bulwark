@@ -22,6 +22,7 @@ class Repo < ActiveRecord::Base
   serialize :ingested
 
   include Filesystem
+  include FileExtensions
 
   def set_version_control_agent_and_repo
     yield
@@ -119,6 +120,14 @@ class Repo < ActiveRecord::Base
 
   def reindex
     ActiveFedora::Base.reindex_everything
+  end
+
+  def load_file_extensions
+    return asset_file_extensions
+  end
+
+  def load_metadata_source_extensions
+    return metadata_source_file_extensions
   end
 
 private

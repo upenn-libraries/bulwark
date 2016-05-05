@@ -1,0 +1,4 @@
+development:
+  allowed_extensions:
+    assets: "jpeg,tif"
+    metadata_sources: "xlsx"
