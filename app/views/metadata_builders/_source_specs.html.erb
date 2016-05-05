@@ -4,22 +4,22 @@
     <h3>Information for <%= _prettify(source) %></h3>
     <div class="source-type">
       <%= label_tag "source_type[#{source}]", "Source type" %>
-      <%= select_tag "source_type[#{source}]", options_for_select(MetadataBuilder.sheet_types) %>
+      <%= select_tag "source_type[#{source}]", options_for_select(MetadataBuilder.sheet_types, default = "#{@object.metadata_builder.source_type[source]}") %>
     </div>
     <div class="source-coordinates">
-      <% val = @object.metadata_builder.source_coordinates.present? ? @object.metadata_builder.source_coordinates["#{source}"]["x_start"] : "1" %>
+      <% vals = @object.metadata_builder.source_coordinates %>
       <%= field_set_tag "Where do the field mappings begin?" %>
       <%= label_tag "source_coordinates[#{source}][x_start]", "X Coordinate" %>
-      <%= number_field_tag "source_coordinates[#{source}][x_start]", value = val %>
+      <%= number_field_tag "source_coordinates[#{source}][x_start]", value = vals["#{source}"]["x_start"] %>
       <%= label_tag "source_coordinates[#{source}][y_start]", "Y Coordinate" %>
-      <%= number_field_tag "source_coordinates[#{source}][y_start]" %>
+      <%= number_field_tag "source_coordinates[#{source}][y_start]", value = vals["#{source}"]["y_start"]%>
     </div>
     <div class="source-coordinates">
       <%= field_set_tag "Where do the field mappings end?" %>
       <%= label_tag "source_coordinates[#{source}][x_stop]", "X Coordinate" %>
-      <%= number_field_tag "source_coordinates[#{source}][x_stop]" %>
+      <%= number_field_tag "source_coordinates[#{source}][x_stop]", value = vals["#{source}"]["x_stop"] %>
       <%= label_tag "source_coordinates[#{source}][y_stop]", "Y Coordinate" %>
-      <%= number_field_tag "source_coordinates[#{source}][y_stop]" %>
+      <%= number_field_tag "source_coordinates[#{source}][y_stop]", value = vals["#{source}"]["y_stop"] %>
     </div>
     <% end %>
     <%= f.submit %>

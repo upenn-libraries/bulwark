@@ -33,7 +33,7 @@
         <% @object.metadata_builder.source.each do |file| -%>
           <%= content_tag :div, :class => "field" do -%>
             <%= f.label :nested_relationships, "Child/children of #{_prettify(file)}:" %>
-            <%= f.select :nested_relationships, _nested_relationships_values(file), {}, { :multiple => true} %>
+            <%= f.select :nested_relationships, _nested_relationships_values(file), {}, { :multiple => true } %>
           <% end -%>
         <% end -%>
     <% end -%>
