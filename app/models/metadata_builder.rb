@@ -72,7 +72,7 @@ class MetadataBuilder < ActiveRecord::Base
   def available_metadata_files
     available_metadata_files = Array.new
     self.repo.version_control_agent.clone
-    Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*") do |file|
+    Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*.#{self.repo.metadata_source_extensions}") do |file|
       available_metadata_files << file
     end
     self.repo.version_control_agent.delete_clone
@@ -86,7 +86,7 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def set_source(source_files)
-    self.source = source_files.values
+    self.source = source_files
     self.save!
   end
 
@@ -275,22 +275,18 @@ class MetadataBuilder < ActiveRecord::Base
       mappings["base_file"] = "#{source}"
       headers = Array.new
       iterator = 0
-
       x_start = _offset(self.source_coordinates[source]["x_start"].to_i)
       y_start = _offset(self.source_coordinates[source]["y_start"].to_i)
-
       x_stop = _offset(self.source_coordinates[source]["x_stop"].to_i)
       y_stop = _offset(self.source_coordinates[source]["y_stop"].to_i)
-
       workbook = RubyXL::Parser.parse(source)
-
       case self.source_type[source]
       when "horizontal"
         while((x_stop >= (x_start+iterator)) && (workbook[0][y_start][x_start+iterator].present?))
           header = workbook[0][y_start][x_start+iterator].value
           headers << header
           vals = Array.new
-          #This variable could eventually be user-defined in order to let the user set the values offset
+          #This variable could be user-defined in order to let the user set the values offset
           vals_iterator = 1
           while(workbook[0][y_start+vals_iterator].present? && workbook[0][y_start+vals_iterator][x_start+iterator].present?) do
             vals << workbook[0][y_start+vals_iterator][x_start+iterator].value

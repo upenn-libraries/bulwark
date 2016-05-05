@@ -38,6 +38,10 @@ class Repo < ActiveRecord::Base
     self[:assets_subdirectory] = "#{Utils.config.object_data_path}/#{assets_subdirectory}"
   end
 
+  def file_extensions=(file_extensions)
+    self[:file_extensions] = file_extensions.reject(&:empty?).join(",")
+  end
+
   def nested_relationships=(nested_relationships)
     nested_relationships.reject!(&:empty?)
     self[:nested_relationships] = nested_relationships
@@ -67,12 +71,12 @@ class Repo < ActiveRecord::Base
     read_attribute(:assets_subdirectory) || ''
   end
 
-  def metadata_filename
-    read_attribute(:metadata_filename) || ''
-  end
-
   def file_extensions
     read_attribute(:file_extensions) || ''
+  end
+
+  def metadata_source_extensions
+    read_attribute(:metadata_source_extensions) || ''
   end
 
   def create_remote
@@ -134,7 +138,7 @@ private
   def populate_admin_manifest(admin_path)
     filesystem_semantics_path = "#{admin_path}/#{Utils.config.object_semantics_location}"
     file_types = define_file_types
-    metadata_line = "#{Utils.config.metadata_path_label}: #{self.metadata_subdirectory}/#{metadata_filename}"
+    metadata_line = "#{Utils.config.metadata_path_label}: #{self.metadata_subdirectory}/#{self.metadata_source_extensions}"
     assets_line = "#{Utils.config.file_path_label}: #{self.assets_subdirectory}/#{file_types}"
     File.open(filesystem_semantics_path, "w+") do |file|
       file.puts("#{metadata_line}\n#{assets_line}")

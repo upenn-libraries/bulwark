@@ -2,8 +2,8 @@
   <%= form_for @object.metadata_builder, :validate => true, :method => :post, :url => "/metadata_builders/#{@object.metadata_builder.id}/set_source" do |f| %>
     <% @preserve = @object.metadata_builder.available_metadata_files %>
     <div class="md-source-select">
-      <%= label "source_files[#{@preserve}]", "Select metadata sources:" %>
-      <%= select_tag "source_files[#{@preserve}]", options_for_select(_prettify(@preserve).zip(@preserve), default = @object.metadata_builder.source), { :multiple => true } %>
+      <%= f.label :source, "Select metadata sources:" %>
+      <%= f.select :source, _prettify(@preserve).zip(@preserve), {}, { :multiple => true }  %>
     </div>
     <%= f.submit "Mark files to be designated as metadata sources" %>
   <% end -%>

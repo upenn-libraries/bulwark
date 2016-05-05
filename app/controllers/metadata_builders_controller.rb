@@ -35,7 +35,7 @@ class MetadataBuildersController < ApplicationController
   end
 
   def set_source
-    @metadata_builder.set_source(params[:source_files])
+    @metadata_builder.set_source(params[:metadata_builder][:source].reject!(&:empty?))
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preserve", :flash => { :success => "Metadata sources set successfully." }
   end
 
@@ -61,7 +61,7 @@ class MetadataBuildersController < ApplicationController
   end
 
   def metadata_builder_params
-    params.require(:metadata_builder).permit(:parent_repo, :source, :source_mappings, :field_mappings, :nested_relationships => [])
+    params.require(:metadata_builder).permit(:parent_repo, :source_mappings, :field_mappings, :source => [], :nested_relationships => [])
   end
 
   def merge_mappings

@@ -3,23 +3,36 @@
     <% @object.metadata_builder.source.each do |source| %>
     <h3>Information for <%= _prettify(source) %></h3>
     <div class="source-type">
-      <%= label_tag "source_type[#{source}]", "Source type" %>
-      <%= select_tag "source_type[#{source}]", options_for_select(MetadataBuilder.sheet_types, default = "#{@object.metadata_builder.source_type[source]}") %>
+      <% MetadataBuilder.sheet_types.each do |mb| %>
+        <div class="visual-illustration">
+          <div id="<%= mb.last %>"></div>
+          <div class="input-fields">
+            <%= label_tag "source_type[#{source}]", "#{mb.first}"%>
+            <%= radio_button_tag "source_type[#{source}]", "#{mb.last}", @object.metadata_builder.source_type["#{source}"] == mb.last ? true : false %>
+          </div>
+        </div>
+      <% end -%>
     </div>
     <div class="source-coordinates">
       <% vals = @object.metadata_builder.source_coordinates %>
-      <%= field_set_tag "Where do the field mappings begin?" %>
+      <div class="visual-illustration">
+        <div id="xy-start"></div>
+      </div>
+      <%= field_set_tag "Define the X & Y coordinates of the cell at which field mappings begin:" %>
       <%= label_tag "source_coordinates[#{source}][x_start]", "X Coordinate" %>
-      <%= number_field_tag "source_coordinates[#{source}][x_start]", value = vals["#{source}"]["x_start"] %>
+      <%= number_field_tag "source_coordinates[#{source}][x_start]", value = vals.present? ? vals["#{source}"]["x_start"] : 1 %>
       <%= label_tag "source_coordinates[#{source}][y_start]", "Y Coordinate" %>
-      <%= number_field_tag "source_coordinates[#{source}][y_start]", value = vals["#{source}"]["y_start"]%>
+      <%= number_field_tag "source_coordinates[#{source}][y_start]", value = vals.present? ? vals["#{source}"]["y_start"] : 1%>
     </div>
     <div class="source-coordinates">
-      <%= field_set_tag "Where do the field mappings end?" %>
+      <div class="visual-illustration">
+        <div id="xy-stop"></div>
+      </div>
+      <%= field_set_tag "Define the X & Y coordinates of the cell at which field mappings begin:" %>
       <%= label_tag "source_coordinates[#{source}][x_stop]", "X Coordinate" %>
-      <%= number_field_tag "source_coordinates[#{source}][x_stop]", value = vals["#{source}"]["x_stop"] %>
+      <%= number_field_tag "source_coordinates[#{source}][x_stop]", value = vals.present? ? vals["#{source}"]["x_stop"] : 1 %>
       <%= label_tag "source_coordinates[#{source}][y_stop]", "Y Coordinate" %>
-      <%= number_field_tag "source_coordinates[#{source}][y_stop]", value = vals["#{source}"]["y_stop"] %>
+      <%= number_field_tag "source_coordinates[#{source}][y_stop]", value = vals.present? ? vals["#{source}"]["y_stop"]: 1 %>
     </div>
     <% end %>
     <%= f.submit %>

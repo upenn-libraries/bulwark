@@ -42,3 +42,58 @@ form.field-mappings .field label {
 .mapping-dashboard .field-mappings .form-bottom{
   clear: both;
 }
+
+.md-source-select label {
+  display: block;
+}
+
+.source-type .input-fields {
+  clear: both;
+}
+
+.source-type {
+  margin-bottom: 14.5em;
+}
+.source-type .visual-illustration{
+  width: 200px;
+  float:left;
+}
+
+.source-type .visual-illustration #vertical, .source-type .visual-illustration #horizontal {
+  float: left;
+  width: 120px;
+  height: 100px;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-position: top right;
+}
+
+.source-coordinates .visual-illustration #xy-start, .source-coordinates .visual-illustration #xy-stop {
+  float: left;
+  width: 120px;
+  height: 100px;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-position: top right;
+}
+
+.source-type .visual-illustration #vertical{
+  background-image: asset-url("vertical.png");
+}
+
+.source-type .visual-illustration #horizontal{
+  background-image: asset-url("horizontal.png");
+}
+
+.source-coordinates {
+  clear:both;
+  margin-bottom: 100px;
+}
+
+.source-coordinates .visual-illustration #xy-start{
+  background-image: asset-url("xy_start.png");
+}
+
+.source-coordinates .visual-illustration #xy-stop{
+  background-image: asset-url("xy_stop.png");
+}
