@@ -286,7 +286,16 @@ class MetadataBuilder < ActiveRecord::Base
       case self.source_type[source]
       when "horizontal"
         while((x_stop >= (x_start+iterator)) && (workbook[0][y_start][x_start+iterator].present?))
-          headers << workbook[0][y_start][x_start+iterator].value
+          header = workbook[0][y_start][x_start+iterator].value
+          headers << header
+          vals = Array.new
+          #This variable could eventually be user-defined in order to let the user set the values offset
+          vals_iterator = 1
+          while(workbook[0][y_start+vals_iterator].present? && workbook[0][y_start+vals_iterator][x_start+iterator].present?) do
+            vals << workbook[0][y_start+vals_iterator][x_start+iterator].value
+            vals_iterator += 1
+          end
+          mappings[header] = vals
           iterator += 1
         end
       when "vertical"
@@ -297,6 +306,7 @@ class MetadataBuilder < ActiveRecord::Base
       else
         raise "Illegal source type for #{source}"
       end
+      return mappings
     end
 
     def each_row_values(base_file)
@@ -367,7 +377,7 @@ class MetadataBuilder < ActiveRecord::Base
     end
 
     def self.sheet_types
-      sheet_types = [["Horizontal", "horizontal"], ["Vertical", "vertical"]]
+      sheet_types = [["Vertical", "vertical"], ["Horizontal", "horizontal"]]
     end
 
 end
