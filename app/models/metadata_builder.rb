@@ -275,10 +275,7 @@ class MetadataBuilder < ActiveRecord::Base
       mappings["base_file"] = "#{source}"
       headers = Array.new
       iterator = 0
-      x_start = _offset(self.source_coordinates[source]["x_start"].to_i)
-      y_start = _offset(self.source_coordinates[source]["y_start"].to_i)
-      x_stop = _offset(self.source_coordinates[source]["x_stop"].to_i)
-      y_stop = _offset(self.source_coordinates[source]["y_stop"].to_i)
+      x_start, y_start, x_stop, y_stop = _load_xy_coordinates(source)
       workbook = RubyXL::Parser.parse(source)
       case self.source_type[source]
       when "horizontal"
@@ -292,8 +289,8 @@ class MetadataBuilder < ActiveRecord::Base
             vals << workbook[0][y_start+vals_iterator][x_start+iterator].value
             vals_iterator += 1
           end
-          mappings[header] = vals
           iterator += 1
+          mappings[header] = vals
         end
       when "vertical"
         while((y_stop >= (y_start+iterator)) && (workbook[0][y_start+iterator].present?))
@@ -309,24 +306,43 @@ class MetadataBuilder < ActiveRecord::Base
           iterator += 1
         end
       else
-        raise "Illegal source type for #{source}"
+        raise "Illegal source type #{self.source_type[source]} for #{source}"
       end
       return mappings
     end
 
-    def each_row_values(base_file)
+    def each_row_values(source)
       repo = _get_metadata_repo_content
-      tmp_csv = convert_to_csv(base_file)
-      child_element = self.field_mappings[base_file]["child_element"]["mapped_value"]
+      workbook = RubyXL::Parser.parse(source)
+      child_element = self.field_mappings[source]["child_element"]["mapped_value"]
       xml_content = ""
-      CSV.foreach(tmp_csv, :headers => true) do |row|
-        xml_content << "<#{child_element}>"
-        row.to_a.each do |value|
-          tag = self.field_mappings[base_file]["#{value.first}"]["mapped_value"]
-          xml_content << "<#{tag}>#{value.last}</#{tag}>"
+      case self.source_type[source]
+      when "horizontal"
+        x_start, y_start, x_stop, y_stop = _load_xy_coordinates(source)
+        headers = workbook[0][y_start].cells.collect { |cell| cell.value }
+        workbook[0].sheet_data.rows.drop(1).each do |row|
+          xml_content << "<#{child_element}>"
+          column_index = x_start
+          row.cells.each do |cell|
+            column_index = cell.present? ? cell.column : column_index+1
+            cell_value = cell.present? ? cell.value : ""
+            xml_content << "<#{headers[column_index]}>#{cell_value}</#{headers[column_index]}>"
+          end
+          xml_content << "</#{child_element}>"
         end
-        xml_content << "</#{child_element}>"
+      when "vertical"
+      else
+        raise "Illegal source type #{self.source_type[source]} for #{source}"
       end
+
+      # CSV.foreach(tmp_csv, :headers => true) do |row|
+      #   xml_content << "<#{child_element}>"
+      #   row.to_a.each do |value|
+      #     tag = self.field_mappings[source]["#{value.first}"]["mapped_value"]
+      #     xml_content << "<#{tag}>#{value.last}</#{tag}>"
+      #   end
+      #   xml_content << "</#{child_element}>"
+      # end
       return xml_content
 
     end
@@ -374,6 +390,14 @@ class MetadataBuilder < ActiveRecord::Base
 
     def _strip_headers(xml)
       xml.gsub!(@@xml_header, "") && xml.gsub!(@@xml_footer, "")
+    end
+
+    def _load_xy_coordinates(source)
+      x_start = _offset(self.source_coordinates[source]["x_start"].to_i)
+      y_start = _offset(self.source_coordinates[source]["y_start"].to_i)
+      x_stop = _offset(self.source_coordinates[source]["x_stop"].to_i)
+      y_stop = _offset(self.source_coordinates[source]["y_stop"].to_i)
+      return x_start, y_start, x_stop, y_stop
     end
 
     def _offset(coordinate)
