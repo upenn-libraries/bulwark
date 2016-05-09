@@ -29,6 +29,7 @@ ActiveRecord::Schema.define(version: 20160314191728) do
     t.string   "parent_repo"
     t.string   "source"
     t.text     "source_type"
+    t.text     "source_num_objects"
     t.text     "source_coordinates"
     t.string   "preserve"
     t.string   "nested_relationships"

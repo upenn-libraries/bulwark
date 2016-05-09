@@ -10,6 +10,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   serialize :source
   serialize :source_type
+  serialize :source_num_objects
   serialize :source_coordinates
   serialize :preserve
   serialize :nested_relationships
@@ -18,6 +19,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   @@xml_tags = Array.new
   @@error_message = nil
+
 
   @@xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root>"
   @@xml_footer = "</root>"
@@ -47,6 +49,10 @@ class MetadataBuilder < ActiveRecord::Base
 
   def source_type
     read_attribute(:source_type) || ''
+  end
+
+  def source_num_objects
+    read_attribute(:source_num_objects) || ''
   end
 
   def source_coordinates
@@ -92,6 +98,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   def set_source_specs(source_specs)
     self.source_type = source_specs["source_type"]
+    self.source_num_objects = source_specs["source_num_objects"]
     self.source_coordinates = source_specs["source_coordinates"]
     self.save!
   end
@@ -153,7 +160,7 @@ class MetadataBuilder < ActiveRecord::Base
           end
         end
       else
-        @xml_content << each_row_values(fname)
+        @xml_content << child_values(fname)
       end
       unless self.field_mappings["#{fname}"]["root_element"]["mapped_value"].empty?
         root_element = self.field_mappings["#{fname}"]["root_element"]["mapped_value"]
@@ -311,38 +318,89 @@ class MetadataBuilder < ActiveRecord::Base
       return mappings
     end
 
-    def each_row_values(source)
+    def child_values(source)
+      repo = _get_metadata_repo_content
+      workbook = RubyXL::Parser.parse(source)
+      child_element = self.field_mappings[source]["child_element"]["mapped_value"]
+      x_start, y_start, x_stop, y_stop = _load_xy_coordinates(source)
+      xml_content = ""
+      case self.source_type[source]
+      when "horizontal"
+        binding.pry()
+      when "vertical"
+        self.source_num_objects[source].to_i.times do |i|
+          xml_content << "<#{child_element}>"
+          xml_content << _get_column_values(workbook, i, x_start, y_start, x_stop, y_stop)
+          xml_content << "</#{child_element}>"
+        end
+      else
+        raise "Illegal source type #{self.source_type[source]} for #{source}"
+      end
+      return xml_content
+    end
+
+    def _get_column_values(workbook, index, x_start, y_start, x_stop, y_stop)
+      iterator = 0
+      column_value = ""
+      headers = Array.new
+      while workbook[0][y_start+iterator].present? do
+        headers << workbook[0][y_start+iterator][x_start]
+        iterator += 1
+      end
+      offset = 1
+      headers.each_with_index do |header,h_index|
+        field_val = workbook[0][y_start+h_index][index+offset].present? ? workbook[0][y_start+h_index][index+offset].value : ""
+        column_value << "<#{header.value}>#{field_val}</#{header.value}>"
+      end
+      return column_value
+    end
+
+    def child_values_depr(source)
       repo = _get_metadata_repo_content
       workbook = RubyXL::Parser.parse(source)
       child_element = self.field_mappings[source]["child_element"]["mapped_value"]
       xml_content = ""
+      x_start, y_start, x_stop, y_stop = _load_xy_coordinates(source)
       case self.source_type[source]
       when "horizontal"
-        x_start, y_start, x_stop, y_stop = _load_xy_coordinates(source)
         headers = workbook[0][y_start].cells.collect { |cell| cell.value }
         workbook[0].sheet_data.rows.drop(1).each do |row|
-          xml_content << "<#{child_element}>"
-          column_index = x_start
-          row.cells.each do |cell|
-            column_index = cell.present? ? cell.column : column_index+1
-            cell_value = cell.present? ? cell.value : ""
-            xml_content << "<#{headers[column_index]}>#{cell_value}</#{headers[column_index]}>"
+          if row.present?
+            xml_content << "<#{child_element}>"
+            column_index = x_start
+            row.cells.each do |cell|
+              column_index = cell.present? ? cell.column : column_index+1
+              cell_value = cell.present? ? cell.value : ""
+              xml_content << "<#{headers[column_index]}>#{cell_value}</#{headers[column_index]}>"
+            end
+            xml_content << "</#{child_element}>"
           end
-          xml_content << "</#{child_element}>"
         end
       when "vertical"
+        iterator = 0
+        headers = Array.new
+        while workbook[0][y_start+iterator].present? do
+          headers << workbook[0][y_start+iterator][x_start]
+          iterator += 1
+        end
+        child_objects_iterator = 1
+        while workbook[0][y_start][x_start+child_objects_iterator].present? do
+          vals_iterator = 0
+          offset = 1
+          xml_content << "<#{child_element}>"
+          x_start += 1
+          headers.each do |header|
+            if workbook[0][y_start+vals_iterator][x_start].present?
+              xml_content << "<#{header.value}>#{workbook[0][y_start+vals_iterator][x_start].value}</#{header.value}>" if workbook[0][y_start+vals_iterator][x_start].present?
+            end
+            vals_iterator += 1
+          end
+          xml_content << "</#{child_element}>"
+          child_objects_iterator += 1
+        end
       else
         raise "Illegal source type #{self.source_type[source]} for #{source}"
       end
-
-      # CSV.foreach(tmp_csv, :headers => true) do |row|
-      #   xml_content << "<#{child_element}>"
-      #   row.to_a.each do |value|
-      #     tag = self.field_mappings[source]["#{value.first}"]["mapped_value"]
-      #     xml_content << "<#{tag}>#{value.last}</#{tag}>"
-      #   end
-      #   xml_content << "</#{child_element}>"
-      # end
       return xml_content
 
     end

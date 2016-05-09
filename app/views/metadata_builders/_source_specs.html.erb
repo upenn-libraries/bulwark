@@ -35,6 +35,13 @@
       <%= label_tag "source_coordinates[#{source}][y_stop]", "Y Coordinate" %>
       <%= number_field_tag "source_coordinates[#{source}][y_stop]", value = vals.present? ? vals["#{source}"]["y_stop"]: 1 %>
     </div>
+
+    <div class="source-num-objects">
+      <%= field_set_tag "Other specifications:" %>
+      <%= label_tag "source_num_objects[#{source}]", "How many objects are described in this source?" %>
+      <%= number_field_tag "source_num_objects[#{source}]", value = @object.metadata_builder.source_num_objects.present? ? @object.metadata_builder.source_num_objects["#{source}"] : 1 %>
+    </div>
+
     <% end %>
     <%= f.submit %>
   <% end -%>
