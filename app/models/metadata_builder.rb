@@ -326,7 +326,11 @@ class MetadataBuilder < ActiveRecord::Base
       xml_content = ""
       case self.source_type[source]
       when "horizontal"
-        binding.pry()
+        self.source_num_objects[source].to_i.times do |i|
+          xml_content << "<#{child_element}>"
+          xml_content << _get_row_values(workbook, i, x_start, y_start, x_stop, y_stop)
+          xml_content << "</#{child_element}>"
+        end
       when "vertical"
         self.source_num_objects[source].to_i.times do |i|
           xml_content << "<#{child_element}>"
@@ -339,18 +343,30 @@ class MetadataBuilder < ActiveRecord::Base
       return xml_content
     end
 
+    def _get_row_values(workbook, index, x_start, y_start, x_stop, y_stop)
+      headers = workbook[0][y_start].cells.collect { |cell| cell.value }
+      row_value = ""
+      offset = 1
+      headers.each_with_index do |header,h_index|
+        field_val = workbook[0][y_start+index+offset][x_start+h_index].present? ? workbook[0][y_start+index+offset][x_start+h_index].value : ""
+        row_value << "<#{header}>#{field_val}</#{header}>"
+      end
+      binding.pry()
+      return row_value
+    end
+
     def _get_column_values(workbook, index, x_start, y_start, x_stop, y_stop)
       iterator = 0
       column_value = ""
       headers = Array.new
       while workbook[0][y_start+iterator].present? do
-        headers << workbook[0][y_start+iterator][x_start]
+        headers << workbook[0][y_start+iterator][x_start].value
         iterator += 1
       end
       offset = 1
       headers.each_with_index do |header,h_index|
         field_val = workbook[0][y_start+h_index][index+offset].present? ? workbook[0][y_start+h_index][index+offset].value : ""
-        column_value << "<#{header.value}>#{field_val}</#{header.value}>"
+        column_value << "<#{header}>#{field_val}</#{header}>"
       end
       return column_value
     end
