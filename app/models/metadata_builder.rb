@@ -233,7 +233,7 @@ class MetadataBuilder < ActiveRecord::Base
         @vca.delete_clone
         FileUtils.rm_rf(transformed_repo_path, :secure => true) if File.directory?(transformed_repo_path)
       end
-      return @status.present? ? {:success => "Item re-ingested into the repository.  See link(s) below to preview ingested items associated with this repo."} : {:success => "Ingestion complete.  See link(s) below to preview ingested items associated with this repo." }
+      return @status
     rescue
       return { :error => "Something went wrong during ingestion.  Check logs for more information." }
     end
@@ -351,7 +351,6 @@ class MetadataBuilder < ActiveRecord::Base
         field_val = workbook[0][y_start+index+offset][x_start+h_index].present? ? workbook[0][y_start+index+offset][x_start+h_index].value : ""
         row_value << "<#{header}>#{field_val}</#{header}>"
       end
-      binding.pry()
       return row_value
     end
 
@@ -369,65 +368,6 @@ class MetadataBuilder < ActiveRecord::Base
         column_value << "<#{header}>#{field_val}</#{header}>"
       end
       return column_value
-    end
-
-    def child_values_depr(source)
-      repo = _get_metadata_repo_content
-      workbook = RubyXL::Parser.parse(source)
-      child_element = self.field_mappings[source]["child_element"]["mapped_value"]
-      xml_content = ""
-      x_start, y_start, x_stop, y_stop = _load_xy_coordinates(source)
-      case self.source_type[source]
-      when "horizontal"
-        headers = workbook[0][y_start].cells.collect { |cell| cell.value }
-        workbook[0].sheet_data.rows.drop(1).each do |row|
-          if row.present?
-            xml_content << "<#{child_element}>"
-            column_index = x_start
-            row.cells.each do |cell|
-              column_index = cell.present? ? cell.column : column_index+1
-              cell_value = cell.present? ? cell.value : ""
-              xml_content << "<#{headers[column_index]}>#{cell_value}</#{headers[column_index]}>"
-            end
-            xml_content << "</#{child_element}>"
-          end
-        end
-      when "vertical"
-        iterator = 0
-        headers = Array.new
-        while workbook[0][y_start+iterator].present? do
-          headers << workbook[0][y_start+iterator][x_start]
-          iterator += 1
-        end
-        child_objects_iterator = 1
-        while workbook[0][y_start][x_start+child_objects_iterator].present? do
-          vals_iterator = 0
-          offset = 1
-          xml_content << "<#{child_element}>"
-          x_start += 1
-          headers.each do |header|
-            if workbook[0][y_start+vals_iterator][x_start].present?
-              xml_content << "<#{header.value}>#{workbook[0][y_start+vals_iterator][x_start].value}</#{header.value}>" if workbook[0][y_start+vals_iterator][x_start].present?
-            end
-            vals_iterator += 1
-          end
-          xml_content << "</#{child_element}>"
-          child_objects_iterator += 1
-        end
-      else
-        raise "Illegal source type #{self.source_type[source]} for #{source}"
-      end
-      return xml_content
-
-    end
-
-    def convert_to_csv(source)
-      xlsx = Roo::Spreadsheet.open(source)
-      tmp_csv = "#{Rails.root}/tmp/#{source.gsub("/","_").to_s}.csv"
-      File.open(tmp_csv, "w+") do |f|
-        f.write(xlsx.to_csv)
-      end
-      return tmp_csv
     end
 
     def set_preserve_files(pfiles)
