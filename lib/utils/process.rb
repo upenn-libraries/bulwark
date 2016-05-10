@@ -11,8 +11,10 @@ module Utils
       status_type = :error
       status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
       unless status_message.present?
-        obj = ActiveFedora::Base.find(File.basename(file,".xml"))
-        obj.update_index
+        descs = ActiveFedora::Base.descendant_uris(ActiveFedora::Base.id_to_uri(File.basename(file,".xml")))
+        descs.each do |desc|
+          ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(desc)).update_index
+        end
         status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo."
         status_type = :success
       end
