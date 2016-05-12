@@ -28,6 +28,9 @@ ActiveRecord::Schema.define(version: 20160314191728) do
   create_table "metadata_builders", force: :cascade do |t|
     t.string   "parent_repo"
     t.string   "source"
+    t.text     "source_type"
+    t.text     "source_num_objects"
+    t.text     "source_coordinates"
     t.string   "preserve"
     t.string   "nested_relationships"
     t.text     "source_mappings"
@@ -44,12 +47,12 @@ ActiveRecord::Schema.define(version: 20160314191728) do
     t.string   "directory"
     t.string   "identifier"
     t.string   "description"
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
     t.string   "metadata_subdirectory"
     t.string   "assets_subdirectory"
-    t.string   "metadata_filename"
     t.string   "file_extensions"
+    t.string   "metadata_source_extensions"
     t.string   "ingested"
     t.string   "preservation_filename"
     t.integer  "metadata_builder_id"

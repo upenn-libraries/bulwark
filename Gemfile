@@ -25,6 +25,8 @@ gem "blacklight_range_limit"
 gem "rails_admin"
 gem "colorize"
 gem "git"
+gem "rubyXL"
+
 gem "roo"
 
 # Use jquery as the JavaScript library

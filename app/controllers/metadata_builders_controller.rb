@@ -1,6 +1,6 @@
 class MetadataBuildersController < ApplicationController
 
-  before_action :set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files]
+  before_action :set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :source_specs, :set_preserve, :clear_files]
   before_filter :merge_mappings, :only => [:create, :update]
 
   def show
@@ -25,8 +25,6 @@ class MetadataBuildersController < ApplicationController
 
   def ingest
     @message = @metadata_builder.transform_and_ingest(params[:to_ingest])
-    #Calling the reindex code from Utils::Process doesn't refresh but shelling out to rake task of same does?
-    `rake fedora:solr:reindex`
     if @message[:error].present?
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :error => @message[:error] }
     elsif @message[:success].present?
@@ -35,8 +33,13 @@ class MetadataBuildersController < ApplicationController
   end
 
   def set_source
-    @metadata_builder.set_source(params[:source_files])
+    @metadata_builder.set_source(params[:metadata_builder][:source].reject!(&:empty?))
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preserve", :flash => { :success => "Metadata sources set successfully." }
+  end
+
+  def source_specs
+    @metadata_builder.set_source_specs(params)
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preserve", :flash => { :success => "Information about metadata sources saved successfully." }
   end
 
   def set_preserve
@@ -56,7 +59,7 @@ class MetadataBuildersController < ApplicationController
   end
 
   def metadata_builder_params
-    params.require(:metadata_builder).permit(:parent_repo, :source, :source_mappings, :field_mappings, :nested_relationships => [])
+    params.require(:metadata_builder).permit(:parent_repo, :source_mappings, :field_mappings, :source => [], :nested_relationships => [])
   end
 
   def merge_mappings

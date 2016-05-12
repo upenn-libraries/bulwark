@@ -22,6 +22,9 @@
 # Ignore filesystem.yml
 filesystem.yml
 
+# Ignore file_extensions.yml
+file_extensions.yml
+
 # Ignore fedora.yml
 config/fedora.yml
 
