@@ -3,6 +3,7 @@ class AddColumns < ActiveRecord::Migration
     add_column :repos, :metadata_subdirectory, :string
     add_column :repos, :assets_subdirectory, :string
     add_column :repos, :file_extensions, :string
+    add_column :repos, :metadata_source_extensions, :string
     add_column :repos, :ingested, :string
     add_column :repos, :preservation_filename, :string
 

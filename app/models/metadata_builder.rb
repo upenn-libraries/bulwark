@@ -9,6 +9,9 @@ class MetadataBuilder < ActiveRecord::Base
   validate :check_for_errors
 
   serialize :source
+  serialize :source_type
+  serialize :source_num_objects
+  serialize :source_coordinates
   serialize :preserve
   serialize :nested_relationships
   serialize :source_mappings
@@ -16,6 +19,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   @@xml_tags = Array.new
   @@error_message = nil
+
 
   @@xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root>"
   @@xml_footer = "</root>"
@@ -43,6 +47,18 @@ class MetadataBuilder < ActiveRecord::Base
     read_attribute(:source) || ''
   end
 
+  def source_type
+    read_attribute(:source_type) || ''
+  end
+
+  def source_num_objects
+    read_attribute(:source_num_objects) || ''
+  end
+
+  def source_coordinates
+    read_attribute(:source_coordinates) || ''
+  end
+
   def preserve
     read_attribute(:preserve) || ''
   end
@@ -62,7 +78,7 @@ class MetadataBuilder < ActiveRecord::Base
   def available_metadata_files
     available_metadata_files = Array.new
     self.repo.version_control_agent.clone
-    Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*") do |file|
+    Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*.#{self.repo.metadata_source_extensions}") do |file|
       available_metadata_files << file
     end
     self.repo.version_control_agent.delete_clone
@@ -76,7 +92,14 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def set_source(source_files)
-    self.source = source_files.values
+    self.source = source_files
+    self.save!
+  end
+
+  def set_source_specs(source_specs)
+    self.source_type = source_specs["source_type"]
+    self.source_num_objects = source_specs["source_num_objects"]
+    self.source_coordinates = source_specs["source_coordinates"]
     self.save!
   end
 
@@ -137,7 +160,7 @@ class MetadataBuilder < ActiveRecord::Base
           end
         end
       else
-        @xml_content << each_row_values(fname)
+        @xml_content << child_values(fname)
       end
       unless self.field_mappings["#{fname}"]["root_element"]["mapped_value"].empty?
         root_element = self.field_mappings["#{fname}"]["root_element"]["mapped_value"]
@@ -210,7 +233,7 @@ class MetadataBuilder < ActiveRecord::Base
         @vca.delete_clone
         FileUtils.rm_rf(transformed_repo_path, :secure => true) if File.directory?(transformed_repo_path)
       end
-      return @status.present? ? {:success => "Item re-ingested into the repository.  See link(s) below to preview ingested items associated with this repo."} : {:success => "Ingestion complete.  See link(s) below to preview ingested items associated with this repo." }
+      return @status
     rescue
       return { :error => "Something went wrong during ingestion.  Check logs for more information." }
     end
@@ -227,13 +250,8 @@ class MetadataBuilder < ActiveRecord::Base
           ext = pathname.extname.to_s[1..-1]
           case ext
           when "xlsx"
-            tmp_csv = convert_to_csv(source)
-            @mappings = generate_mapping_options_csv(source, tmp_csv)
+            @mappings = generate_mapping_options_xlsx(source)
             @mappings_sets << @mappings
-          when "csv"
-            @mappings = generate_mapping_options_csv(source, tmp_csv)
-            @mappings_sets << @mappings
-          when "xml"
           else
             raise "Illegal metadata source unit type"
           end
@@ -259,30 +277,97 @@ class MetadataBuilder < ActiveRecord::Base
       return mappings
     end
 
-    def each_row_values(base_file)
-      repo = _get_metadata_repo_content
-      tmp_csv = convert_to_csv(base_file)
-      child_element = self.field_mappings[base_file]["child_element"]["mapped_value"]
-      xml_content = ""
-      CSV.foreach(tmp_csv, :headers => true) do |row|
-        xml_content << "<#{child_element}>"
-        row.to_a.each do |value|
-          tag = self.field_mappings[base_file]["#{value.first}"]["mapped_value"]
-          xml_content << "<#{tag}>#{value.last}</#{tag}>"
+    def generate_mapping_options_xlsx(source)
+      mappings = {}
+      mappings["base_file"] = "#{source}"
+      headers = Array.new
+      iterator = 0
+      x_start, y_start, x_stop, y_stop = _load_xy_coordinates(source)
+      workbook = RubyXL::Parser.parse(source)
+      case self.source_type[source]
+      when "horizontal"
+        while((x_stop >= (x_start+iterator)) && (workbook[0][y_start][x_start+iterator].present?))
+          header = workbook[0][y_start][x_start+iterator].value
+          headers << header
+          vals = Array.new
+          #This variable could be user-defined in order to let the user set the values offset
+          vals_iterator = 1
+          while(workbook[0][y_start+vals_iterator].present? && workbook[0][y_start+vals_iterator][x_start+iterator].present?) do
+            vals << workbook[0][y_start+vals_iterator][x_start+iterator].value
+            vals_iterator += 1
+          end
+          iterator += 1
+          mappings[header] = vals
         end
-        xml_content << "</#{child_element}>"
+      when "vertical"
+        while((y_stop >= (y_start+iterator)) && (workbook[0][y_start+iterator].present?))
+          header = workbook[0][y_start+iterator][x_start].value
+          headers << header
+          vals = Array.new
+          vals_iterator = 1
+          while(workbook[0][y_start+iterator].present? && workbook[0][y_start+iterator][x_start+vals_iterator].present?) do
+            vals << workbook[0][y_start+iterator][x_start+vals_iterator].value
+            vals_iterator += 1
+          end
+          mappings[header] = vals
+          iterator += 1
+        end
+      else
+        raise "Illegal source type #{self.source_type[source]} for #{source}"
       end
-      return xml_content
-
+      return mappings
     end
 
-    def convert_to_csv(source)
-      xlsx = Roo::Spreadsheet.open(source)
-      tmp_csv = "#{Rails.root}/tmp/#{source.gsub("/","_").to_s}.csv"
-      File.open(tmp_csv, "w+") do |f|
-        f.write(xlsx.to_csv)
+    def child_values(source)
+      repo = _get_metadata_repo_content
+      workbook = RubyXL::Parser.parse(source)
+      child_element = self.field_mappings[source]["child_element"]["mapped_value"]
+      x_start, y_start, x_stop, y_stop = _load_xy_coordinates(source)
+      xml_content = ""
+      case self.source_type[source]
+      when "horizontal"
+        self.source_num_objects[source].to_i.times do |i|
+          xml_content << "<#{child_element}>"
+          xml_content << _get_row_values(workbook, i, x_start, y_start, x_stop, y_stop)
+          xml_content << "</#{child_element}>"
+        end
+      when "vertical"
+        self.source_num_objects[source].to_i.times do |i|
+          xml_content << "<#{child_element}>"
+          xml_content << _get_column_values(workbook, i, x_start, y_start, x_stop, y_stop)
+          xml_content << "</#{child_element}>"
+        end
+      else
+        raise "Illegal source type #{self.source_type[source]} for #{source}"
       end
-      return tmp_csv
+      return xml_content
+    end
+
+    def _get_row_values(workbook, index, x_start, y_start, x_stop, y_stop)
+      headers = workbook[0][y_start].cells.collect { |cell| cell.value }
+      row_value = ""
+      offset = 1
+      headers.each_with_index do |header,h_index|
+        field_val = workbook[0][y_start+index+offset][x_start+h_index].present? ? workbook[0][y_start+index+offset][x_start+h_index].value : ""
+        row_value << "<#{header}>#{field_val}</#{header}>"
+      end
+      return row_value
+    end
+
+    def _get_column_values(workbook, index, x_start, y_start, x_stop, y_stop)
+      iterator = 0
+      column_value = ""
+      headers = Array.new
+      while workbook[0][y_start+iterator].present? do
+        headers << workbook[0][y_start+iterator][x_start].value
+        iterator += 1
+      end
+      offset = 1
+      headers.each_with_index do |header,h_index|
+        field_val = workbook[0][y_start+h_index][index+offset].present? ? workbook[0][y_start+h_index][index+offset].value : ""
+        column_value << "<#{header}>#{field_val}</#{header}>"
+      end
+      return column_value
     end
 
     def set_preserve_files(pfiles)
@@ -319,6 +404,23 @@ class MetadataBuilder < ActiveRecord::Base
 
     def _strip_headers(xml)
       xml.gsub!(@@xml_header, "") && xml.gsub!(@@xml_footer, "")
+    end
+
+    def _load_xy_coordinates(source)
+      x_start = _offset(self.source_coordinates[source]["x_start"].to_i)
+      y_start = _offset(self.source_coordinates[source]["y_start"].to_i)
+      x_stop = _offset(self.source_coordinates[source]["x_stop"].to_i)
+      y_stop = _offset(self.source_coordinates[source]["y_stop"].to_i)
+      return x_start, y_start, x_stop, y_stop
+    end
+
+    def _offset(coordinate)
+      coordinate = coordinate-1 unless coordinate == 0
+      return coordinate
+    end
+
+    def self.sheet_types
+      sheet_types = [["Vertical", "vertical"], ["Horizontal", "horizontal"]]
     end
 
 end

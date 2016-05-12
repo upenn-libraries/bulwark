@@ -8,8 +8,17 @@ module Utils
 
     def import(file)
       @command = build_command("import", :file => file)
-      status = execute_curl
-      if(status == "Item already exists") then
+      status_type = :error
+      status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
+      unless status_message.present?
+        descs = ActiveFedora::Base.descendant_uris(ActiveFedora::Base.id_to_uri(File.basename(file,".xml")))
+        descs.each do |desc|
+          ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(desc)).update_index
+        end
+        status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo."
+        status_type = :success
+      end
+      if(status_message == "Item already exists") then
         obj = ActiveFedora::Base.find(File.basename(file,".xml"))
         uri_to_delete = obj.translate_id_to_uri.call(obj.id)
         obj.delete
@@ -20,7 +29,7 @@ module Utils
         execute_curl
         import(file)
       end
-      return status
+      return {status_type => status_message}
     end
 
     def attach_file(repo, parent, child_container = "child")
@@ -31,6 +40,12 @@ module Utils
       rescue
         raise $!, "File attachment failed due to the following error(s): #{$!}", $!.backtrace
       end
+    end
+
+    def contains_blanks(file)
+      status = File.read(file) =~ /<sv:node sv:name="">/
+      return status.nil? ? false : true
+
     end
 
     private

@@ -1,0 +1,48 @@
+<div class="source-specs-form">
+  <%= form_for @object.metadata_builder, :validate => true, :method => :post, :url => "/metadata_builders/#{@object.metadata_builder.id}/source_specs" do |f| %>
+    <% @object.metadata_builder.source.each do |source| %>
+    <h3>Information for <%= _prettify(source) %></h3>
+    <%= field_set_tag "Define the orientation of the field mappings:" %>
+    <div class="source-type">
+      <% MetadataBuilder.sheet_types.each do |mb| %>
+        <div class="visual-illustration">
+          <div id="<%= mb.last %>"></div>
+          <div class="input-fields">
+            <%= label_tag "source_type[#{source}]", "#{mb.first}"%>
+            <%= radio_button_tag "source_type[#{source}]", "#{mb.last}", @object.metadata_builder.source_type["#{source}"] == mb.last ? true : false %>
+          </div>
+        </div>
+      <% end -%>
+    </div>
+    <div class="source-coordinates">
+      <% vals = @object.metadata_builder.source_coordinates %>
+      <div class="visual-illustration">
+        <div id="xy-start"></div>
+      </div>
+      <%= field_set_tag "Define the X & Y coordinates of the cell at which field mappings begin:" %>
+      <%= label_tag "source_coordinates[#{source}][x_start]", "X Coordinate" %>
+      <%= number_field_tag "source_coordinates[#{source}][x_start]", value = vals.present? ? vals["#{source}"]["x_start"] : 1 %>
+      <%= label_tag "source_coordinates[#{source}][y_start]", "Y Coordinate" %>
+      <%= number_field_tag "source_coordinates[#{source}][y_start]", value = vals.present? ? vals["#{source}"]["y_start"] : 1%>
+    </div>
+    <div class="source-coordinates">
+      <div class="visual-illustration">
+        <div id="xy-stop"></div>
+      </div>
+      <%= field_set_tag "Define the X & Y coordinates of the cell at which field mappings begin:" %>
+      <%= label_tag "source_coordinates[#{source}][x_stop]", "X Coordinate" %>
+      <%= number_field_tag "source_coordinates[#{source}][x_stop]", value = vals.present? ? vals["#{source}"]["x_stop"] : 1 %>
+      <%= label_tag "source_coordinates[#{source}][y_stop]", "Y Coordinate" %>
+      <%= number_field_tag "source_coordinates[#{source}][y_stop]", value = vals.present? ? vals["#{source}"]["y_stop"]: 1 %>
+    </div>
+
+    <div class="source-num-objects">
+      <%= field_set_tag "Other specifications:" %>
+      <%= label_tag "source_num_objects[#{source}]", "How many objects are described in this source?" %>
+      <%= number_field_tag "source_num_objects[#{source}]", value = @object.metadata_builder.source_num_objects.present? ? @object.metadata_builder.source_num_objects["#{source}"] : 1 %>
+    </div>
+
+    <% end %>
+    <%= f.submit %>
+  <% end -%>
+</div>

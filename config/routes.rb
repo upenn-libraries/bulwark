@@ -15,6 +15,7 @@ Rails.application.routes.draw do
       post :ingest
       post :preserve
       post :set_source
+      post :source_specs
       post :set_preserve
       post :clear_files
     end
