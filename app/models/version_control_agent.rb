@@ -33,9 +33,9 @@ class VersionControlAgent < ActiveRecord::Base
     @@worker.initialize_bare_remote
   end
 
-  def clone
+  def clone(options = {})
     initialize_worker
-    @@worker.clone
+    options[:destination].nil? ? @@worker.clone : @@worker.clone(options[:destination])
   end
 
   def reset_hard
@@ -66,6 +66,11 @@ class VersionControlAgent < ActiveRecord::Base
   def get(options = {})
     initialize_worker
     options[:get_location].nil? ? @@worker.get : @@worker.get(options[:get_location])
+  end
+
+  def sync_content
+    initialize_worker
+    @@worker.sync("--content")
   end
 
   def drop(options = {})

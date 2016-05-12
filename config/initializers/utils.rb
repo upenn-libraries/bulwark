@@ -16,6 +16,7 @@ Utils.configure do |config|
     config.object_semantics_location = options.fetch(:object_semantics_location)
     config.email = options.fetch(:email)
     config.assets_path = options.fetch(:assets_path)
+    config.assets_display_path = options.fetch(:assets_display_path)
     config.manifest_location = options.fetch(:manifest_location)
     config.federated_fs_path = options.fetch(:federated_fs_path)
     config.metadata_path_label = options.fetch(:metadata_path_label)

@@ -24,8 +24,8 @@ module Utils
         `git annex init origin`
       end
 
-      def clone
-        Git.clone(@remote_repo_path, @working_repo_path)
+      def clone(destination = @working_repo_path)
+        Git.clone(@remote_repo_path, destination)
       end
 
       def reset_hard
@@ -33,9 +33,8 @@ module Utils
         working_repo.reset_hard
       end
 
-      def sync(options)
+      def sync(options = "")
         begin
-          change_dir_working
           `git annex sync #{options}`
         rescue
           puts "Trying to perform git annex sync outside of an annexed repository"
