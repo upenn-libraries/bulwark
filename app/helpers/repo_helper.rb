@@ -24,5 +24,4 @@ module RepoHelper
       return nil
     end
   end
-
 end

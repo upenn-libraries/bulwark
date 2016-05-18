@@ -8,28 +8,24 @@ module Utils
 
     def import(file)
       @command = build_command("import", :file => file)
-      status_type = :error
-      status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
-      unless status_message.present?
-        descs = ActiveFedora::Base.descendant_uris(ActiveFedora::Base.id_to_uri(File.basename(file,".xml")))
-        descs.each do |desc|
-          ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(desc)).update_index
-        end
-        status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo."
-        status_type = :success
+      @oid = File.basename(file,".xml")
+      @status_type = :error
+      @status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
+      unless @status_message.present?
+        object_and_descendants_action(@oid, "update_index")
+        @status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo."
+        @status_type = :success
       end
-      if(status_message == "Item already exists") then
+      if(@status_message == "Item already exists") then
         obj = ActiveFedora::Base.find(File.basename(file,".xml"))
         uri_to_delete = obj.translate_id_to_uri.call(obj.id)
-        obj.delete
-        obj.update_index
-        @command = build_command("delete", :object_uri => uri_to_delete)
-        execute_curl
+        object_and_descendants_action(@oid, "delete")
         @command = build_command("delete_tombstone", :object_uri => uri_to_delete)
         execute_curl
         import(file)
+        object_and_descendants_action(@oid, "update_index")
       end
-      return {status_type => status_message}
+      return {@status_type => @status_message}
     end
 
     def attach_file(repo, parent, child_container = "child")
@@ -80,6 +76,16 @@ module Utils
     def execute_curl
       `#{@command}`
     end
+
+    def object_and_descendants_action(parent_id, action)
+      descs = ActiveFedora::Base.descendant_uris(ActiveFedora::Base.id_to_uri(parent_id))
+      descs.rotate!
+      descs.each do |desc|
+        ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(desc)).send(action)
+      end
+
+    end
+
 
   end
 end
