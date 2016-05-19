@@ -29,16 +29,6 @@ module Utils
       end
     end
 
-    def import
-      begin
-        Dir.glob "#{Utils.config.imports_local_staging}/#{Utils.config.repository_prefix}*.xml" do |file|
-          Utils::Process.import(file)
-        end
-        return {:success => "All items imported successfully."}
-      rescue
-        return {:error => "Something went wrong during ingest.  Consult Fedora logs."}
-      end
-    end
 
     def index
       ActiveFedora::Base.reindex_everything

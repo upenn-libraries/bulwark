@@ -13,11 +13,12 @@ module Utils
       @status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
       unless @status_message.present?
         object_and_descendants_action(@oid, "update_index")
+        ActiveFedora::Base.find(@oid).attach_files
         @status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo."
         @status_type = :success
       end
       if(@status_message == "Item already exists") then
-        obj = ActiveFedora::Base.find(File.basename(file,".xml"))
+        obj = ActiveFedora::Base.find(@oid)
         object_and_descendants_action(@oid, "delete")
         @command = build_command("delete_tombstone", :object_uri => obj.translate_id_to_uri.call(obj.id))
         execute_curl
@@ -34,12 +35,6 @@ module Utils
       rescue
         raise $!, "File attachment failed due to the following error(s): #{$!}", $!.backtrace
       end
-    end
-
-    def contains_blanks(file)
-      status = File.read(file) =~ /<sv:node sv:name="">/
-      return status.nil? ? false : true
-
     end
 
     private
@@ -73,6 +68,11 @@ module Utils
 
     def execute_curl
       `#{@command}`
+    end
+
+    def contains_blanks(file)
+      status = File.read(file) =~ /<sv:node sv:name="">/
+      return status.nil? ? false : true
     end
 
     def object_and_descendants_action(parent_id, action)
