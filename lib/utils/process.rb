@@ -18,12 +18,10 @@ module Utils
       end
       if(@status_message == "Item already exists") then
         obj = ActiveFedora::Base.find(File.basename(file,".xml"))
-        uri_to_delete = obj.translate_id_to_uri.call(obj.id)
         object_and_descendants_action(@oid, "delete")
-        @command = build_command("delete_tombstone", :object_uri => uri_to_delete)
+        @command = build_command("delete_tombstone", :object_uri => obj.translate_id_to_uri.call(obj.id))
         execute_curl
         import(file)
-        object_and_descendants_action(@oid, "update_index")
       end
       return {@status_type => @status_message}
     end
@@ -78,12 +76,20 @@ module Utils
     end
 
     def object_and_descendants_action(parent_id, action)
-      descs = ActiveFedora::Base.descendant_uris(ActiveFedora::Base.id_to_uri(parent_id))
+      uri = ActiveFedora::Base.id_to_uri(parent_id)
+      refresh_ldp_contains(uri)
+      descs = ActiveFedora::Base.descendant_uris(uri)
       descs.rotate!
       descs.each do |desc|
         ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(desc)).send(action)
       end
+    end
 
+    def refresh_ldp_contains(container_uri)
+      resource = Ldp::Resource::RdfSource.new(ActiveFedora.fedora.connection, container_uri)
+      orm = Ldp::Orm.new(resource)
+      orm.graph.delete
+      orm.save
     end
 
 
