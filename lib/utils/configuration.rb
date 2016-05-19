@@ -5,6 +5,7 @@ module Utils
     attr_accessor :object_semantics_location
     attr_accessor :email
     attr_accessor :assets_path
+    attr_accessor :assets_display_path
     attr_accessor :manifest_location
     attr_accessor :federated_fs_path
     attr_accessor :metadata_path_label

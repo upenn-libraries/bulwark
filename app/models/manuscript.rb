@@ -3,8 +3,6 @@ class Manuscript < ActiveFedora::Base
   validates :title, presence: true
   validates :identifier, presence: true
 
-  around_create :associate_pages
-
   has_many :pages
 
   property :abstract, predicate: ::RDF::Vocab::DC.abstract, multiple: false do |index|
@@ -87,12 +85,14 @@ class Manuscript < ActiveFedora::Base
     self.item_type ||= "Manuscript"
   end
 
-  def associate_pages
-    yield
-    attach_pages
-  end
-
-  def attach_pages
+##########
+#
+# Each content type should specify their own attach_files method
+# leveraging the Utils::Process module's attach_file method to
+# attach assets
+#
+##########
+  def attach_files
     Page.find(:parent_manuscript => self.id).each do |page|
       page.manuscript = self
       page.save!

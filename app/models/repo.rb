@@ -111,6 +111,7 @@ class Repo < ActiveRecord::Base
         ingest_array << File.basename(file, File.extname(file))
       end
       self.ingested = ingest_array
+      refresh_assets
       self.save!
       return @status
     rescue
@@ -171,6 +172,17 @@ private
     self.metadata_builder = MetadataBuilder.new(:parent_repo => self.id)
     self.metadata_builder.save!
     self.save!
+  end
+
+  def refresh_assets
+    display_path = "#{Utils.config.assets_display_path}/#{self.directory}"
+    if File.directory?("#{Utils.config.assets_display_path}/#{self.directory}")
+      Dir.chdir(display_path)
+      self.version_control_agent.sync_content
+    else
+      self.version_control_agent.clone(:destination => display_path)
+      refresh_assets
+    end
   end
 
   # TODO: Determine if this is really the best place to put this because we're dealing with Git bare repo best practices

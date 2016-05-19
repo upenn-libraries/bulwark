@@ -8,28 +8,23 @@ module Utils
 
     def import(file)
       @command = build_command("import", :file => file)
-      status_type = :error
-      status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
-      unless status_message.present?
-        descs = ActiveFedora::Base.descendant_uris(ActiveFedora::Base.id_to_uri(File.basename(file,".xml")))
-        descs.each do |desc|
-          ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(desc)).update_index
-        end
-        status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo."
-        status_type = :success
+      @oid = File.basename(file,".xml")
+      @status_type = :error
+      @status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
+      unless @status_message.present?
+        object_and_descendants_action(@oid, "update_index")
+        ActiveFedora::Base.find(@oid).attach_files
+        @status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo."
+        @status_type = :success
       end
-      if(status_message == "Item already exists") then
-        obj = ActiveFedora::Base.find(File.basename(file,".xml"))
-        uri_to_delete = obj.translate_id_to_uri.call(obj.id)
-        obj.delete
-        obj.update_index
-        @command = build_command("delete", :object_uri => uri_to_delete)
-        execute_curl
-        @command = build_command("delete_tombstone", :object_uri => uri_to_delete)
+      if(@status_message == "Item already exists") then
+        obj = ActiveFedora::Base.find(@oid)
+        object_and_descendants_action(@oid, "delete")
+        @command = build_command("delete_tombstone", :object_uri => obj.translate_id_to_uri.call(obj.id))
         execute_curl
         import(file)
       end
-      return {status_type => status_message}
+      return {@status_type => @status_message}
     end
 
     def attach_file(repo, parent, child_container = "child")
@@ -40,12 +35,6 @@ module Utils
       rescue
         raise $!, "File attachment failed due to the following error(s): #{$!}", $!.backtrace
       end
-    end
-
-    def contains_blanks(file)
-      status = File.read(file) =~ /<sv:node sv:name="">/
-      return status.nil? ? false : true
-
     end
 
     private
@@ -80,6 +69,29 @@ module Utils
     def execute_curl
       `#{@command}`
     end
+
+    def contains_blanks(file)
+      status = File.read(file) =~ /<sv:node sv:name="">/
+      return status.nil? ? false : true
+    end
+
+    def object_and_descendants_action(parent_id, action)
+      uri = ActiveFedora::Base.id_to_uri(parent_id)
+      refresh_ldp_contains(uri)
+      descs = ActiveFedora::Base.descendant_uris(uri)
+      descs.rotate!
+      descs.each do |desc|
+        ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(desc)).send(action)
+      end
+    end
+
+    def refresh_ldp_contains(container_uri)
+      resource = Ldp::Resource::RdfSource.new(ActiveFedora.fedora.connection, container_uri)
+      orm = Ldp::Orm.new(resource)
+      orm.graph.delete
+      orm.save
+    end
+
 
   end
 end
