@@ -61,7 +61,12 @@ module Utils
         add
         working_repo = Git.open(@working_repo_path)
         working_repo.add(:all => true)
-        working_repo.commit(commit_message)
+        begin
+          working_repo.commit(commit_message)
+        rescue => ex
+          return if ex.message.include?("no changes" || "nothing to commit")
+        end
+
       end
 
       def commit_bare(commit_message)
