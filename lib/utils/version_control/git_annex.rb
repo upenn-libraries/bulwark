@@ -25,7 +25,12 @@ module Utils
       end
 
       def clone(destination = @working_repo_path)
-        Git.clone(@remote_repo_path, destination)
+        begin
+          Git.clone(@remote_repo_path, destination)
+        rescue => exception
+          error_message(exception.message)
+        end
+
       end
 
       def reset_hard
@@ -63,10 +68,9 @@ module Utils
         working_repo.add(:all => true)
         begin
           working_repo.commit(commit_message)
-        rescue => ex
-          return if ex.message.include?("no changes" || "nothing to commit")
+        rescue => exception
+          error_message(exception.message)
         end
-
       end
 
       def commit_bare(commit_message)
@@ -80,7 +84,6 @@ module Utils
         Dir.chdir(Rails.root.to_s)
         FileUtils.rm_rf(@working_repo_path, :secure => true) if File.directory?(@working_repo_path)
       end
-
 
       def get(dir = @working_repo_path)
         get_drop_calls(dir, "get")
@@ -113,6 +116,20 @@ module Utils
         else
           Dir.chdir(File.dirname(dir))
           `git annex #{action} #{File.basename(dir)}`
+        end
+      end
+
+      def error_message(message)
+        case(message)
+        when /no changes/
+          raise Utils::UtilsExecuteError.new("Nothing staged for commit.")
+        when /nothing to commit/
+          raise Utils::UtilsExecuteError.new("No changes to content, nothing to commit.")
+        when /does not exist/
+          raise Utils::UtilsExecuteError.new("Git remote does not exist.  Could not clone to perform tasks.")
+        when /already exists and is not an empty directory/
+          binding.pry()
+          raise Utils::UtilsExecuteError.new("Git remote did not successfully delete from working directory")
         end
       end
 

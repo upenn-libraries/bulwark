@@ -218,9 +218,9 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def transform_and_ingest(array)
-    begin
-      @vca = self.repo.version_control_agent
-      array.each do |p|
+    @vca = self.repo.version_control_agent
+    array.each do |p|
+      begin
         key, val = p
         @vca.clone
         _get_metadata_repo_content
@@ -232,11 +232,11 @@ class MetadataBuilder < ActiveRecord::Base
         @vca.reset_hard
         @vca.delete_clone
         FileUtils.rm_rf(transformed_repo_path, :secure => true) if File.directory?(transformed_repo_path)
+      rescue
+        raise $!, "Ingest failed due to the following error(s): #{$!}", $!.backtrace
       end
-      return @status
-    rescue
-      return { :error => "Something went wrong during ingestion.  Check logs for more information." }
     end
+    return @status
   end
 
   private
