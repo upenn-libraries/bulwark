@@ -31,7 +31,7 @@ module RailsAdminHelper
         error_list << content_tag("li", e)
       end
     end
-    flash[:error] = content_tag("ul", error_list.html_safe).html_safe if flash[:error]
+    flash.try([:error]){ flash[:error] = content_tag("ul", error_list.html_safe).html_safe }
   end
 
   def refresh_metadata_from_source
