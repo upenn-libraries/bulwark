@@ -13,6 +13,7 @@ Utils.configure do |config|
     options = fs_yml.fetch(Rails.env).with_indifferent_access
     config.object_data_path = options.fetch(:object_data_path)
     config.object_admin_path = options.fetch(:object_admin_path)
+    config.object_derivatives_path = options.fetch(:object_derivatives_path)
     config.object_semantics_location = options.fetch(:object_semantics_location)
     config.email = options.fetch(:email)
     config.assets_path = options.fetch(:assets_path)

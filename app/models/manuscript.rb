@@ -92,19 +92,12 @@ class Manuscript < ActiveFedora::Base
 # attach assets
 #
 ##########
-  def attach_files
+  def attach_files(repo)
     Page.find(:parent_manuscript => self.id).each do |page|
       page.manuscript = self
       page.save!
-      repo = self.get_repo_association
       Utils::Process.attach_file(repo, page, "pageImage")
     end
-  end
-
-  protected
-
-  def get_repo_association
-    repo = Repo.where("ingested = ?", [self.id].to_yaml).first
   end
 
 

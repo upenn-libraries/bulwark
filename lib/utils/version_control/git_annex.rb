@@ -52,8 +52,8 @@ module Utils
         `git annex sync --content`
       end
 
-      def add
-        `git annex add .`
+      def add(dir = @working_repo_path)
+        get_drop_calls(dir, "add")
       end
 
       def commit(commit_message)
