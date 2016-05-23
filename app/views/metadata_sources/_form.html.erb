@@ -8,8 +8,8 @@
       <div class="visual-illustration">
         <div id="<%= mb.last %>"></div>
         <div class="input-fields">
-          <%= f.label :view_type, mb.last, :value => mb.first %>
-          <%= f.radio_button :view_type, mb.last %>
+          <%= f.label :view_type, mb.first, :value => mb.last %>
+          <%= f.radio_button :view_type, mb.last  %>
         </div>
       </div>
       <% end -%>
@@ -40,7 +40,7 @@
     <div class="source-num-objects">
       <%= field_set_tag "Other specifications:" do %>
       <%= f.label :num_objects, "How many objects are described in this source?" %>
-      <%= f.number_field :num_objects, :value => source.try(:num_objects).present? || 1 %>
+      <%= f.number_field :num_objects %>
       <% end -%>
     </div>
     <%= f.submit "Update this Source" %>

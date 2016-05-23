@@ -31,7 +31,7 @@ class MetadataSourcesController < ApplicationController
   end
 
   def metadata_source_params
-    params.require(:metadata_source).permit(:type, :num_objects, :x_start, :y_start, :x_stop, :y_stop, :original_mappings, :user_defined_mappings, :children => [])
+    params.require(:metadata_source).permit(:view_type, :num_objects, :x_start, :y_start, :x_stop, :y_stop, :original_mappings, :user_defined_mappings, :children => [])
   end
 
 end

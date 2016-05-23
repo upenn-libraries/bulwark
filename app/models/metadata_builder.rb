@@ -94,16 +94,17 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def set_source(source_files)
-    source_files.each do |source|
-      self.metadata_source << MetadataSource.create(:path => source)
-    end
+    #TODO: Consider removing
+    self.source = source_files
     self.save!
-  end
 
-  def set_source_specs(source_specs)
-    self.source_type = source_specs["source_type"]
-    self.source_num_objects = source_specs["source_num_objects"]
-    self.source_coordinates = source_specs["source_coordinates"]
+    self.metadata_source.each do |mb_source|
+      mb_source.delete unless source_files.include?(mb_source.path)
+    end
+
+    source_files.each do |source|
+      self.metadata_source << MetadataSource.create(:path => source) unless MetadataSource.where(path: source).exists?
+    end
     self.save!
   end
 
