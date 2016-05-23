@@ -4,12 +4,6 @@ require 'utils/core_ext'
 
 module Utils
 
-  class UtilsExecuteError < StandardError
-    def initialize(data)
-      @data = data
-    end
-  end
-
   class << self
 
     def config
