@@ -10,7 +10,7 @@ module RepoHelper
   end
 
   def render_ingested_list
-    render :partial => "repos/ingested_links"
+    render :partial => "repos/ingested_links" if @object.try(:ingested).present?
   end
 
   def _generate_ingest_link(ingested_id)

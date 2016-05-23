@@ -26,6 +26,7 @@ gem "rails_admin"
 gem "colorize"
 gem "git"
 gem "rubyXL"
+gem "mini_magick"
 
 gem "roo"
 

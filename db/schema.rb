@@ -51,6 +51,7 @@ ActiveRecord::Schema.define(version: 20160314191728) do
     t.datetime "updated_at",                 null: false
     t.string   "metadata_subdirectory"
     t.string   "assets_subdirectory"
+    t.string   "derivatives_subdirectory"
     t.string   "file_extensions"
     t.string   "metadata_source_extensions"
     t.string   "ingested"

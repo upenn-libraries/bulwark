@@ -218,25 +218,21 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def transform_and_ingest(array)
-    begin
-      @vca = self.repo.version_control_agent
-      array.each do |p|
-        key, val = p
-        @vca.clone
-        _get_metadata_repo_content
-        @vca.unlock(val)
-        transformed_repo_path = "#{Utils.config.transformed_dir}/#{@vca.remote_path.gsub("/","_")}"
-        Dir.mkdir(transformed_repo_path) && Dir.chdir(transformed_repo_path)
-        `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
-        @status = self.repo.ingest(transformed_repo_path)
-        @vca.reset_hard
-        @vca.delete_clone
-        FileUtils.rm_rf(transformed_repo_path, :secure => true) if File.directory?(transformed_repo_path)
-      end
-      return @status
-    rescue
-      return { :error => "Something went wrong during ingestion.  Check logs for more information." }
+    @vca = self.repo.version_control_agent
+    array.each do |p|
+      key, val = p
+      @vca.clone
+      _get_metadata_repo_content
+      @vca.unlock(val)
+      transformed_repo_path = "#{Utils.config.transformed_dir}/#{@vca.remote_path.gsub("/","_")}"
+      Dir.mkdir(transformed_repo_path) && Dir.chdir(transformed_repo_path)
+      `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
+      @status = self.repo.ingest(transformed_repo_path)
+      @vca.reset_hard
+      @vca.delete_clone
+      FileUtils.rm_rf(transformed_repo_path, :secure => true) if File.directory?(transformed_repo_path)
     end
+    return @status
   end
 
   private

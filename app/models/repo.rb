@@ -26,9 +26,14 @@ class Repo < ActiveRecord::Base
 
   def set_version_control_agent_and_repo
     yield
+    set_defaults
     set_version_control_agent
     create_remote
     set_metadata_builder
+  end
+
+  def set_defaults
+    self[:derivatives_subdirectory] = "#{Utils.config.object_derivatives_path}"
   end
 
   def metadata_subdirectory=(metadata_subdirectory)
@@ -107,7 +112,7 @@ class Repo < ActiveRecord::Base
     begin
       ingest_array = Array.new
       Dir.glob("#{directory}/*").each do |file|
-        @status = Utils::Process.import(file)
+        @status = Utils::Process.import(file, self)
         ingest_array << File.basename(file, File.extname(file))
       end
       self.ingested = ingest_array
@@ -137,11 +142,13 @@ private
     data_directory = "#{Utils.config.object_data_path}"
     metadata_subdirectory = "#{self.metadata_subdirectory}"
     assets_subdirectory = "#{self.assets_subdirectory}"
+    derivatives_subdirectory = "#{self.derivatives_subdirectory}"
     Dir.chdir("#{working_copy_path}")
     Dir.mkdir("#{admin_directory}")
     Dir.mkdir("#{data_directory}")
     Dir.mkdir("#{metadata_subdirectory}") && FileUtils.touch("#{metadata_subdirectory}/.keep")
     Dir.mkdir("#{assets_subdirectory}") && FileUtils.touch("#{assets_subdirectory}/.keep")
+    Dir.mkdir("#{derivatives_subdirectory}") && FileUtils.touch("#{derivatives_subdirectory}/.keep")
     populate_admin_manifest("#{admin_directory}")
   end
 

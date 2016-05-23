@@ -58,6 +58,11 @@ class VersionControlAgent < ActiveRecord::Base
     @@worker.commit_bare(message)
   end
 
+  def add(options)
+    initialize_worker
+    options[:get_location].nil? ? @@worker.add : @@worker.add(options[:add_location])
+  end
+
   def commit(message)
     initialize_worker
     @@worker.commit(message)
