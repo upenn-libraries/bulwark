@@ -8,7 +8,7 @@
       <div class="visual-illustration">
         <div id="<%= mb.last %>"></div>
         <div class="input-fields">
-          <%= f.label :view_type, mb.first, :value => mb.last %>
+          <%= f.label :view_type, mb.first %>
           <%= f.radio_button :view_type, mb.last  %>
         </div>
       </div>
@@ -22,7 +22,7 @@
         <%= f.label :x_start %>
         <%= f.number_field :x_start %>
         <%= f.label :y_start %>
-        <%= f.number_field :y_start %>
+          <%= f.number_field :y_start%>
         <% end -%>
       </div>
     </div>

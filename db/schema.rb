@@ -47,16 +47,16 @@ ActiveRecord::Schema.define(version: 20160523141604) do
   create_table "metadata_sources", force: :cascade do |t|
     t.string   "path"
     t.string   "view_type"
-    t.integer  "num_objects"
-    t.integer  "x_start"
-    t.integer  "y_start"
-    t.integer  "x_stop"
-    t.integer  "y_stop"
+    t.integer  "num_objects",           default: 1
+    t.integer  "x_start",               default: 1
+    t.integer  "y_start",               default: 1
+    t.integer  "x_stop",                default: 1
+    t.integer  "y_stop",                default: 1
     t.text     "original_mappings"
     t.text     "user_defined_mappings"
     t.text     "children"
-    t.datetime "created_at",            null: false
-    t.datetime "updated_at",            null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
     t.integer  "metadata_builder_id"
   end
 
