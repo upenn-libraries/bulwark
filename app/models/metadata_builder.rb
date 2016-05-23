@@ -95,7 +95,9 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def set_source(source_files)
-    self.source = source_files
+    source_files.each do |source|
+      self.metadata_source << MetadataSource.create(:path => source)
+    end
     self.save!
   end
 
