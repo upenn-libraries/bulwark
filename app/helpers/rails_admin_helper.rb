@@ -3,6 +3,7 @@ require "rexml/document"
 module RailsAdminHelper
 
   include MetadataBuilderHelper
+  include MetadataSourceHelper
   include RepoHelper
   include Filesystem
   include Utils

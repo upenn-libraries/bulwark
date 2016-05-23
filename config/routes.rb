@@ -21,6 +21,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :metadata_sources
+
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
   root to: "catalog#index"
   blacklight_for :catalog

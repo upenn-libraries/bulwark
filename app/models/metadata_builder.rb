@@ -4,7 +4,6 @@ class MetadataBuilder < ActiveRecord::Base
 
   has_many :metadata_source, dependent: :destroy, :validate => false
 
-
   include Utils
 
   validates :parent_repo, presence: true

@@ -40,12 +40,6 @@ module MetadataBuilderHelper
     end
   end
 
-  def render_source_specs_form
-    if @object.metadata_builder.source.present?
-      render :partial => "metadata_builders/source_specs"
-    end
-  end
-
   def render_sample_xml
     @object.version_control_agent.clone
     @object.version_control_agent.get(:get_location => "#{@object.version_control_agent.working_path}/#{@object.metadata_subdirectory}")
