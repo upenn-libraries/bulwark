@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160314191728) do
+ActiveRecord::Schema.define(version: 20160523135944) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
@@ -38,9 +38,25 @@ ActiveRecord::Schema.define(version: 20160314191728) do
     t.datetime "created_at",           null: false
     t.datetime "updated_at",           null: false
     t.integer  "repo_id"
+    t.integer  "metadata_source_id"
   end
 
+  add_index "metadata_builders", ["metadata_source_id"], name: "index_metadata_builders_on_metadata_source_id"
   add_index "metadata_builders", ["repo_id"], name: "index_metadata_builders_on_repo_id"
+
+  create_table "metadata_sources", force: :cascade do |t|
+    t.string   "path"
+    t.string   "type"
+    t.integer  "num_objects"
+    t.integer  "x_start"
+    t.integer  "y_start"
+    t.integer  "x_stop"
+    t.integer  "y_stop"
+    t.text     "original_mappings"
+    t.text     "user_defined_mappings"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
 
   create_table "repos", force: :cascade do |t|
     t.string   "title"
