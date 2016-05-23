@@ -2,6 +2,9 @@ class MetadataBuilder < ActiveRecord::Base
 
   belongs_to :repo, :foreign_key => "repo_id"
 
+  has_many :metadata_source, dependent: :destroy, :validate => false
+
+
   include Utils
 
   validates :parent_repo, presence: true

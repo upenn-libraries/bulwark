@@ -1,4 +1,5 @@
 class MetadataSource < ActiveRecord::Base
+
   belongs_to :metadata_builder, :foreign_key => "metadata_builder_id"
 
   include Utils
