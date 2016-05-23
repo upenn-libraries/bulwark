@@ -53,6 +53,8 @@ ActiveRecord::Schema.define(version: 20160523141604) do
     t.integer  "x_stop",                default: 1
     t.integer  "y_stop",                default: 1
     t.text     "original_mappings"
+    t.string   "root_element"
+    t.string   "parent_element"
     t.text     "user_defined_mappings"
     t.text     "children"
     t.datetime "created_at",                        null: false

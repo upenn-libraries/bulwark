@@ -31,10 +31,6 @@ class MetadataBuilder < ActiveRecord::Base
     self[:nested_relationships] = nested_relationships
   end
 
-  def field_mappings=(field_mappings)
-    self[:field_mappings] = eval(field_mappings)
-  end
-
   def parent_repo=(parent_repo)
     self[:parent_repo] = parent_repo
     @repo = Repo.find(parent_repo)
@@ -110,13 +106,6 @@ class MetadataBuilder < ActiveRecord::Base
 
   def set_preserve(preserve_files)
     self.preserve = preserve_files.values
-    self.save!
-  end
-
-  def set_metadata_mappings
-    self.repo.version_control_agent.clone
-    self.source_mappings = convert_metadata
-    self.repo.version_control_agent.delete_clone
     self.save!
   end
 
@@ -241,42 +230,6 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   private
-
-    def convert_metadata
-      begin
-        repo = _get_metadata_repo_content
-        @mappings_sets = Array.new
-        self.source.each do |source|
-          pathname = Pathname.new(source)
-          ext = pathname.extname.to_s[1..-1]
-          case ext
-          when "xlsx"
-            @mappings = generate_mapping_options_xlsx(source)
-            @mappings_sets << @mappings
-          else
-            raise "Illegal metadata source unit type"
-          end
-        end
-        return @mappings_sets
-      rescue
-        raise $!, "Metadata conversion failed due to the following error(s): #{$!}", $!.backtrace
-      end
-    end
-
-    def generate_mapping_options_csv(base_file, tmp_csv)
-      mappings = {}
-      mappings["base_file"] = "#{base_file}"
-      headers = CSV.open(tmp_csv, 'r') { |csv| csv.first }
-      headers.each{|a| mappings[a] = 0}
-      headers.each do |header|
-        sample_vals = Array.new
-        CSV.foreach(tmp_csv, :headers => true) do |row|
-          sample_vals << row["#{header}"] unless row["#{header}"].nil?
-        end
-        mappings["#{header}"] = sample_vals
-      end
-      return mappings
-    end
 
     def generate_mapping_options_xlsx(source)
       mappings = {}

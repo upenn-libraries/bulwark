@@ -24,14 +24,6 @@ module MetadataBuilderHelper
     end
   end
 
-  def render_metadata_generation_form
-    if @object.metadata_builder.source.present?
-      render :partial => "metadata_builders/form"
-    else
-      render :partial => "metadata_builders/no_source"
-    end
-  end
-
   def render_source_select_form
     if @object.metadata_builder.available_metadata_files.present?
       render :partial => "metadata_builders/source_select"
@@ -74,15 +66,6 @@ module MetadataBuilderHelper
     else
       return root_default, child_default
     end
-  end
-
-  def _nested_relationships_values(parent_file)
-    child_array = Array.new
-    child_candidates = _prettify(@object.metadata_builder.source)
-    child_candidates.each do |child|
-      child_array << [child, { parent_file => child }.to_s] unless _prettify(parent_file) == child
-    end
-    return child_array
   end
 
   def _prettify(file_path_input)

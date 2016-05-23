@@ -9,6 +9,8 @@ class CreateMetadataSources < ActiveRecord::Migration
       t.integer :x_stop, :default => 1
       t.integer :y_stop, :default => 1
       t.text :original_mappings
+      t.string :root_element
+      t.string :parent_element
       t.text :user_defined_mappings
       t.text :children
       t.timestamps null: false
