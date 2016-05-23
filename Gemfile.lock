@@ -535,6 +535,7 @@ DEPENDENCIES
   jettywrapper
   jquery-rails
   launchy
+  mini_magick
   pry-rails (~> 0.3.4)
   qa
   rails (= 4.2.5)

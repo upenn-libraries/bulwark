@@ -6,14 +6,15 @@ module Utils
 
     extend self
 
-    def import(file)
+    def import(file, repo)
       @command = build_command("import", :file => file)
       @oid = File.basename(file,".xml")
       @status_type = :error
       @status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
       unless @status_message.present?
         object_and_descendants_action(@oid, "update_index")
-        ActiveFedora::Base.find(@oid).attach_files
+        ActiveFedora::Base.find(@oid).attach_files(repo)
+        repo.version_control_agent.push
         @status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo."
         @status_type = :success
       end
@@ -29,9 +30,15 @@ module Utils
 
     def attach_file(repo, parent, child_container = "child")
       begin
-        file_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.assets_subdirectory}/#{parent.file_name}"
-        @command = build_command("file_attach", :file => file_link, :fid => parent.id, :child_container => child_container)
+        file_link = "#{repo.version_control_agent.working_path}/#{repo.assets_subdirectory}/#{parent.file_name}"
+        derivatives_destination = "#{repo.version_control_agent.working_path}/#{repo.derivatives_subdirectory}"
+        repo.version_control_agent.get(:get_location => file_link)
+        repo.version_control_agent.unlock(file_link)
+        derivative_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives.generate_access_copy(file_link, derivatives_destination, :width => "380",:height => "500")}"
+        @command = build_command("file_attach", :file => derivative_link, :fid => parent.id, :child_container => child_container)
         execute_curl
+        repo.version_control_agent.add(:add_location => "#{derivatives_destination}")
+        repo.version_control_agent.commit("Generated derivative for #{parent.file_name}")
       rescue
         raise $!, "File attachment failed due to the following error(s): #{$!}", $!.backtrace
       end

@@ -25,7 +25,12 @@ module Utils
       end
 
       def clone(destination = @working_repo_path)
-        Git.clone(@remote_repo_path, destination)
+        begin
+          Git.clone(@remote_repo_path, destination)
+        rescue => exception
+          raise Utils::Error::VersionControl.new(error_message(exception.message))
+        end
+
       end
 
       def reset_hard
@@ -52,8 +57,8 @@ module Utils
         `git annex sync --content`
       end
 
-      def add
-        `git annex add .`
+      def add(dir = @working_repo_path)
+        get_drop_calls(dir, "add")
       end
 
       def commit(commit_message)
@@ -61,7 +66,15 @@ module Utils
         add
         working_repo = Git.open(@working_repo_path)
         working_repo.add(:all => true)
-        working_repo.commit(commit_message)
+        begin
+          working_repo.commit(commit_message)
+        rescue => exception
+          if exception.message.include?("nothing to commit, working directory clean")
+            return
+          else
+            raise Utils::Error::VersionControl.new(error_message(exception.message))
+          end
+        end
       end
 
       def commit_bare(commit_message)
@@ -75,7 +88,6 @@ module Utils
         Dir.chdir(Rails.root.to_s)
         FileUtils.rm_rf(@working_repo_path, :secure => true) if File.directory?(@working_repo_path)
       end
-
 
       def get(dir = @working_repo_path)
         get_drop_calls(dir, "get")
@@ -109,6 +121,18 @@ module Utils
           Dir.chdir(File.dirname(dir))
           `git annex #{action} #{File.basename(dir)}`
         end
+      end
+
+      def error_message(message)
+        case(message)
+        when /no changes/
+          error_message = "Nothing staged for commit."
+        when /does not exist/
+          error_message = "Git remote does not exist.  Could not clone to perform tasks."
+        when /already exists and is not an empty directory/
+          error_message = "Leftover Git remote clone in working directory"
+        end
+        return error_message
       end
 
     end
