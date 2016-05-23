@@ -220,21 +220,17 @@ class MetadataBuilder < ActiveRecord::Base
   def transform_and_ingest(array)
     @vca = self.repo.version_control_agent
     array.each do |p|
-      begin
-        key, val = p
-        @vca.clone
-        _get_metadata_repo_content
-        @vca.unlock(val)
-        transformed_repo_path = "#{Utils.config.transformed_dir}/#{@vca.remote_path.gsub("/","_")}"
-        Dir.mkdir(transformed_repo_path) && Dir.chdir(transformed_repo_path)
-        `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
-        @status = self.repo.ingest(transformed_repo_path)
-        @vca.reset_hard
-        @vca.delete_clone
-        FileUtils.rm_rf(transformed_repo_path, :secure => true) if File.directory?(transformed_repo_path)
-      rescue
-        raise $!, "Ingest failed due to the following error(s): #{$!}", $!.backtrace
-      end
+      key, val = p
+      @vca.clone
+      _get_metadata_repo_content
+      @vca.unlock(val)
+      transformed_repo_path = "#{Utils.config.transformed_dir}/#{@vca.remote_path.gsub("/","_")}"
+      Dir.mkdir(transformed_repo_path) && Dir.chdir(transformed_repo_path)
+      `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
+      @status = self.repo.ingest(transformed_repo_path)
+      @vca.reset_hard
+      @vca.delete_clone
+      FileUtils.rm_rf(transformed_repo_path, :secure => true) if File.directory?(transformed_repo_path)
     end
     return @status
   end

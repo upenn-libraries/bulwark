@@ -28,7 +28,7 @@ module Utils
         begin
           Git.clone(@remote_repo_path, destination)
         rescue => exception
-          error_message(exception.message)
+          raise Utils::Error::VersionControl.new(error_message(exception.message))
         end
 
       end
@@ -69,7 +69,11 @@ module Utils
         begin
           working_repo.commit(commit_message)
         rescue => exception
-          error_message(exception.message)
+          if exception.message.include?("nothing to commit, working directory clean")
+            return
+          else
+            raise Utils::Error::VersionControl.new(error_message(exception.message))
+          end
         end
       end
 
@@ -122,15 +126,13 @@ module Utils
       def error_message(message)
         case(message)
         when /no changes/
-          raise Utils::UtilsExecuteError.new("Nothing staged for commit.")
-        when /nothing to commit/
-          raise Utils::UtilsExecuteError.new("No changes to content, nothing to commit.")
+          error_message = "Nothing staged for commit."
         when /does not exist/
-          raise Utils::UtilsExecuteError.new("Git remote does not exist.  Could not clone to perform tasks.")
+          error_message = "Git remote does not exist.  Could not clone to perform tasks."
         when /already exists and is not an empty directory/
-          binding.pry()
-          raise Utils::UtilsExecuteError.new("Git remote did not successfully delete from working directory")
+          error_message = "Leftover Git remote clone in working directory"
         end
+        return error_message
       end
 
     end
