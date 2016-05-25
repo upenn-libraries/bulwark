@@ -89,9 +89,7 @@ class MetadataSource < ActiveRecord::Base
       source.set_metadata_mappings
       source.generate_and_build_xml
     end
-    binding.pry()
     self.generate_parent_child_xml
-    binding.pry()
     self.metadata_builder.repo.version_control_agent.delete_clone
   end
 

@@ -97,12 +97,7 @@ class Manuscript < ActiveFedora::Base
     Page.find(:parent_manuscript => self.id).each do |page|
       page.manuscript = self
       page.save!
-      file_link = "#{repo.version_control_agent.working_path}/#{repo.assets_subdirectory}/#{page.file_name}"
-      if File.exist?(file_link)
-        Utils::Process.attach_file(repo, page, file_link, "pageImage")
-      else
-        return "No file at #{repo.assets_subdirectory}/#{page.file_name} detected, nothing attached."
-      end
+      Utils::Process.attach_file(repo, page, page.file_name, "pageImage")
     end
   end
 

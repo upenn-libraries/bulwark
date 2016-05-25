@@ -1,47 +1,49 @@
 module Utils
   module Process
 
-    def initialize
-    end
+    @@status_message
+    @@status_type
 
     extend self
 
     def import(file, repo)
       @command = build_command("import", :file => file)
       @oid = File.basename(file,".xml")
-      @status_type = :error
-      @status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
-      unless @status_message.present?
+      @@status_type = :error
+      @@status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
+      unless @@status_message.present?
         object_and_descendants_action(@oid, "update_index")
-        @status_message = ActiveFedora::Base.find(@oid).attach_files(repo)
-        if @status_message.present?
-          @status_type = :error
-        else
-          @status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo."
-          @status_type = :success
-        end
+        @@status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo."
+        @@status_type = :success
+        ActiveFedora::Base.find(@oid).attach_files(repo)
         repo.version_control_agent.push
       end
-      if(@status_message == "Item already exists") then
+      if(@@status_message == "Item already exists") then
         obj = ActiveFedora::Base.find(@oid)
         object_and_descendants_action(@oid, "delete")
         @command = build_command("delete_tombstone", :object_uri => obj.translate_id_to_uri.call(obj.id))
         execute_curl
         import(file)
       end
-      return {@status_type => @status_message}
+      return {@@status_type => @@status_message}
     end
 
-    def attach_file(repo, parent, file_link, child_container = "child")
+    def attach_file(repo, parent, file_name, child_container = "child")
       begin
-        derivatives_destination = "#{repo.version_control_agent.working_path}/#{repo.derivatives_subdirectory}"
+        file_link = "#{repo.version_control_agent.working_path}/#{repo.assets_subdirectory}/#{file_name}"
         repo.version_control_agent.get(:get_location => file_link)
         repo.version_control_agent.unlock(file_link)
-        derivative_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives.generate_access_copy(file_link, derivatives_destination, :width => "380",:height => "500")}"
-        @command = build_command("file_attach", :file => derivative_link, :fid => parent.id, :child_container => child_container)
-        execute_curl
-        repo.version_control_agent.add(:add_location => "#{derivatives_destination}")
-        repo.version_control_agent.commit("Generated derivative for #{parent.file_name}")
+        if File.exist?(file_link)
+          derivatives_destination = "#{repo.version_control_agent.working_path}/#{repo.derivatives_subdirectory}"
+          derivative_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives.generate_access_copy(file_link, derivatives_destination, :width => "380",:height => "500")}"
+          @command = build_command("file_attach", :file => derivative_link, :fid => parent.id, :child_container => child_container)
+          execute_curl
+          repo.version_control_agent.add(:add_location => "#{derivatives_destination}")
+          repo.version_control_agent.commit("Generated derivative for #{parent.file_name}")
+        else
+          @@status_message = "No images detected at #{repo.assets_subdirectory}/#{file_name}.  No derivatives made or attached."
+          @@status_type = :error
+        end
       rescue
         raise $!, "File attachment failed due to the following error(s): #{$!}", $!.backtrace
       end
