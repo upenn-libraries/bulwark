@@ -1,7 +1,6 @@
 class MetadataBuildersController < ApplicationController
 
   before_action :set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :source_specs, :set_preserve, :clear_files]
-  before_filter :merge_mappings, :only => [:create, :update]
 
   def show
   end
@@ -60,10 +59,6 @@ class MetadataBuildersController < ApplicationController
 
   def metadata_builder_params
     params.require(:metadata_builder).permit(:parent_repo, :source_mappings, :field_mappings, :source => [], :nested_relationships => [])
-  end
-
-  def merge_mappings
-    params[:metadata_builder][:field_mappings] = params[:metadata_builder][:field_mappings].to_s if params[:metadata_builder][:field_mappings].present?
   end
 
 end

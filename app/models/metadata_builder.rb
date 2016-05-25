@@ -10,35 +10,15 @@ class MetadataBuilder < ActiveRecord::Base
 
   validate :check_for_errors
 
-  serialize :source
-  serialize :source_type
-  serialize :source_num_objects
-  serialize :source_coordinates
-  serialize :preserve
-  serialize :nested_relationships
-  serialize :source_mappings
-  serialize :field_mappings
+  serialize :preserve, Array
 
   @@xml_tags = Array.new
   @@error_message = nil
-
-
-  @@xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root>"
-  @@xml_footer = "</root>"
-
-  def nested_relationships=(nested_relationships)
-    nested_relationships.reject!(&:empty?)
-    self[:nested_relationships] = nested_relationships
-  end
 
   def parent_repo=(parent_repo)
     self[:parent_repo] = parent_repo
     @repo = Repo.find(parent_repo)
     self.repo = @repo
-  end
-
-  def nested_relationships
-    read_attribute(:nested_relationships) || ''
   end
 
   def source
@@ -90,16 +70,15 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def set_source(source_files)
-    #TODO: Consider removing
+    #TODO: Consider removing from MetadataBuilder
     self.source = source_files
     self.save!
 
     self.metadata_source.each do |mb_source|
       mb_source.delete unless source_files.include?(mb_source.path)
     end
-
     source_files.each do |source|
-      self.metadata_source << MetadataSource.create(:path => source) unless MetadataSource.where(path: source).exists?
+      self.metadata_source << MetadataSource.create(:path => source) unless MetadataSource.where(:path => source).pluck(:path).present?
     end
     self.save!
   end
@@ -136,75 +115,6 @@ class MetadataBuilder < ActiveRecord::Base
     return @@error_message
   end
 
-  def build_xml_files
-    xml_files = Array.new
-    self.set_metadata_mappings
-    self.repo.version_control_agent.clone
-    self.source_mappings.each do |file|
-      @xml_content = ""
-      fname = file.first.last
-      xml_fname = "#{fname}.xml"
-      xml_unified_filename_fname = "#{xml_fname}.tmp"
-      xml_files << xml_fname
-      if self.field_mappings["#{fname}"]["child_element"]["mapped_value"].empty?
-        file.drop(1).each do |source|
-          tag = self.field_mappings["#{fname}"]["#{source.first}"]["mapped_value"]
-          source.last.each do |field_value|
-            @xml_content << "<#{tag}>#{field_value}</#{tag}>"
-          end
-        end
-      else
-        @xml_content << child_values(fname)
-      end
-      unless self.field_mappings["#{fname}"]["root_element"]["mapped_value"].empty?
-        root_element = self.field_mappings["#{fname}"]["root_element"]["mapped_value"]
-        @xml_content_final_copy = "<#{root_element}>#{@xml_content}</#{root_element}>"
-      else
-        @xml_content_final_copy = @xml_content
-      end
-      _build_preservation_xml(xml_fname, @xml_content_final_copy)
-      begin
-        self.repo.version_control_agent.commit("Generated preservation XML for #{fname}")
-      rescue Git::GitExecuteError
-        next
-      end
-    end
-    self.repo.version_control_agent.push
-    generate_parent_child_xml if self.nested_relationships.present?
-    set_preserve_files(xml_files)
-    self.repo.version_control_agent.delete_clone
-  end
-
-  def generate_parent_child_xml
-    self.nested_relationships.each do |rel|
-      rel = eval(rel)
-      key, value = rel.first
-      metadata_path = "#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}"
-      self.repo.version_control_agent.get(:get_location => metadata_path)
-      key_xml_path = "#{key}.xml"
-      child_xml_path = "#{self.repo.version_control_agent.working_path}#{value}.xml"
-      xml_content = File.open(key_xml_path, "r"){|io| io.read}
-      child_xml_content = File.open(child_xml_path, "r"){|io| io.read}
-      _strip_headers(xml_content) && _strip_headers(child_xml_content)
-      end_tag = "</#{self.field_mappings[key]["root_element"]["mapped_value"]}>"
-      insert_index = xml_content.index(end_tag)
-      xml_content.insert(insert_index, child_xml_content)
-      xml_unified_filename = "#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/#{self.repo.preservation_filename}"
-      self.repo.version_control_agent.unlock(xml_unified_filename) if File.exists?(xml_unified_filename)
-      _build_preservation_xml(xml_unified_filename,xml_content)
-      FileUtils.rm(key_xml_path)
-      FileUtils.rm(child_xml_path)
-      begin
-        self.repo.version_control_agent.commit("Generated unified XML for #{key} and #{value} at #{xml_unified_filename}")
-      rescue Git::GitExecuteError
-        next
-      end
-      self.repo.version_control_agent.push
-      set_preserve_files(xml_unified_filename)
-      self.save!
-    end
-  end
-
   def check_for_errors
     if @@error_message
       errors.add(:source, "XML tag error(s): #{@@error_message}") unless @@error_message.empty?
@@ -216,7 +126,7 @@ class MetadataBuilder < ActiveRecord::Base
     array.each do |p|
       key, val = p
       @vca.clone
-      _get_metadata_repo_content
+      @vca.get(val)
       @vca.unlock(val)
       transformed_repo_path = "#{Utils.config.transformed_dir}/#{@vca.remote_path.gsub("/","_")}"
       Dir.mkdir(transformed_repo_path) && Dir.chdir(transformed_repo_path)
@@ -231,115 +141,6 @@ class MetadataBuilder < ActiveRecord::Base
 
   private
 
-    def generate_mapping_options_xlsx(source)
-      mappings = {}
-      mappings["base_file"] = "#{source}"
-      headers = Array.new
-      iterator = 0
-      x_start, y_start, x_stop, y_stop = _load_xy_coordinates(source)
-      workbook = RubyXL::Parser.parse(source)
-      case self.source_type[source]
-      when "horizontal"
-        while((x_stop >= (x_start+iterator)) && (workbook[0][y_start][x_start+iterator].present?))
-          header = workbook[0][y_start][x_start+iterator].value
-          headers << header
-          vals = Array.new
-          #This variable could be user-defined in order to let the user set the values offset
-          vals_iterator = 1
-          while(workbook[0][y_start+vals_iterator].present? && workbook[0][y_start+vals_iterator][x_start+iterator].present?) do
-            vals << workbook[0][y_start+vals_iterator][x_start+iterator].value
-            vals_iterator += 1
-          end
-          iterator += 1
-          mappings[header] = vals
-        end
-      when "vertical"
-        while((y_stop >= (y_start+iterator)) && (workbook[0][y_start+iterator].present?))
-          header = workbook[0][y_start+iterator][x_start].value
-          headers << header
-          vals = Array.new
-          vals_iterator = 1
-          while(workbook[0][y_start+iterator].present? && workbook[0][y_start+iterator][x_start+vals_iterator].present?) do
-            vals << workbook[0][y_start+iterator][x_start+vals_iterator].value
-            vals_iterator += 1
-          end
-          mappings[header] = vals
-          iterator += 1
-        end
-      else
-        raise "Illegal source type #{self.source_type[source]} for #{source}"
-      end
-      return mappings
-    end
-
-    def child_values(source)
-      repo = _get_metadata_repo_content
-      workbook = RubyXL::Parser.parse(source)
-      child_element = self.field_mappings[source]["child_element"]["mapped_value"]
-      x_start, y_start, x_stop, y_stop = _load_xy_coordinates(source)
-      xml_content = ""
-      case self.source_type[source]
-      when "horizontal"
-        self.source_num_objects[source].to_i.times do |i|
-          xml_content << "<#{child_element}>"
-          xml_content << _get_row_values(workbook, i, x_start, y_start, x_stop, y_stop)
-          xml_content << "</#{child_element}>"
-        end
-      when "vertical"
-        self.source_num_objects[source].to_i.times do |i|
-          xml_content << "<#{child_element}>"
-          xml_content << _get_column_values(workbook, i, x_start, y_start, x_stop, y_stop)
-          xml_content << "</#{child_element}>"
-        end
-      else
-        raise "Illegal source type #{self.source_type[source]} for #{source}"
-      end
-      return xml_content
-    end
-
-    def _get_row_values(workbook, index, x_start, y_start, x_stop, y_stop)
-      headers = workbook[0][y_start].cells.collect { |cell| cell.value }
-      row_value = ""
-      offset = 1
-      headers.each_with_index do |header,h_index|
-        field_val = workbook[0][y_start+index+offset][x_start+h_index].present? ? workbook[0][y_start+index+offset][x_start+h_index].value : ""
-        row_value << "<#{header}>#{field_val}</#{header}>"
-      end
-      return row_value
-    end
-
-    def _get_column_values(workbook, index, x_start, y_start, x_stop, y_stop)
-      iterator = 0
-      column_value = ""
-      headers = Array.new
-      while workbook[0][y_start+iterator].present? do
-        headers << workbook[0][y_start+iterator][x_start].value
-        iterator += 1
-      end
-      offset = 1
-      headers.each_with_index do |header,h_index|
-        field_val = workbook[0][y_start+h_index][index+offset].present? ? workbook[0][y_start+h_index][index+offset].value : ""
-        column_value << "<#{header}>#{field_val}</#{header}>"
-      end
-      return column_value
-    end
-
-    def set_preserve_files(pfiles)
-      if self.preserve.present?
-        self.preserve += self.preserve + Array(pfiles).uniq
-      else
-        self.preserve = Array(pfiles).uniq
-      end
-      self.preserve.uniq!
-      self.save!
-    end
-
-    def _get_metadata_repo_content
-      repo = Repo.find(self.repo_id)
-      repo.version_control_agent.get(:get_location => "#{repo.version_control_agent.working_path}/#{repo.metadata_subdirectory}")
-      return repo
-    end
-
     def _validate_xml_tag(tag)
       error_message = Array.new
       error_message << "Valid XML tags cannot start with #{tag.first_three} (detected in field \"#{tag}\")" if tag.starts_with_xml?
@@ -348,33 +149,5 @@ class MetadataBuilder < ActiveRecord::Base
       return error_message unless error_message.empty?
     end
 
-    def _build_preservation_xml(filename, content)
-      tmp_filename = "#{filename}.tmp"
-      File.open(tmp_filename, "w+") do |f|
-        f << @@xml_header << content << @@xml_footer
-      end
-      File.rename(tmp_filename, filename)
-    end
-
-    def _strip_headers(xml)
-      xml.gsub!(@@xml_header, "") && xml.gsub!(@@xml_footer, "")
-    end
-
-    def _load_xy_coordinates(source)
-      x_start = _offset(self.source_coordinates[source]["x_start"].to_i)
-      y_start = _offset(self.source_coordinates[source]["y_start"].to_i)
-      x_stop = _offset(self.source_coordinates[source]["x_stop"].to_i)
-      y_stop = _offset(self.source_coordinates[source]["y_stop"].to_i)
-      return x_start, y_start, x_stop, y_stop
-    end
-
-    def _offset(coordinate)
-      coordinate = coordinate-1 unless coordinate == 0
-      return coordinate
-    end
-
-    def self.sheet_types
-      sheet_types = [["Vertical", "vertical"], ["Horizontal", "horizontal"]]
-    end
 
 end

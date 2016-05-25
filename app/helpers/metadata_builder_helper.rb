@@ -37,7 +37,8 @@ module MetadataBuilderHelper
     @object.version_control_agent.get(:get_location => "#{@object.version_control_agent.working_path}/#{@object.metadata_subdirectory}")
     @sample_xml_docs = ""
     @file_links = Array.new
-    Dir.glob("#{@object.version_control_agent.working_path}/#{@object.metadata_subdirectory}/*.xml").each do |file|
+    @object.metadata_builder.preserve.each do |file_name|
+      file = "#{@object.version_control_agent.working_path}/#{@object.metadata_subdirectory}/#{file_name}"
       @file_links << link_to(_prettify(file), "##{file}")
       anchor_tag = content_tag(:a, "", :name=> file)
       sample_xml_content = File.open(file, "r"){|io| io.read}

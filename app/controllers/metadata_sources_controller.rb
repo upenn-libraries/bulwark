@@ -18,13 +18,15 @@ class MetadataSourcesController < ApplicationController
   end
 
   def update
-    binding.pry()
     if @metadata_source.update(metadata_source_params)
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_source.metadata_builder.repo.id}/preserve", :flash => { :success => "Metadata source successfully updated." }
+      @metadata_source.build_xml_files if @metadata_source.user_defined_mappings.present?
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_source.metadata_builder.repo.id}/preview_xml", :flash => { :success => "Metadata source successfully updated." }
     else
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_source.metadata_builder.repo.id}/preserve", :flash => { :error => "Metadata source was not updated." }
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_source.metadata_builder.repo.id}/preview_xml", :flash => { :error => "Metadata source was not updated." }
     end
   end
+
+
 
   private
 

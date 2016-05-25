@@ -25,13 +25,12 @@ module MetadataSourceHelper
 
   def nested_relationships_values(parent_file)
     child_array = []
-    child_candidates = []
-    @object.metadata_builder.metadata_source.each do |source|
-      child_candidates << source.path
+    child_candidates = Hash.new
+    MetadataSource.pluck(:path, :id).each do |source|
+      child_candidates[source.first] = source.last unless source.first == parent_file
     end
-    child_candidates.delete_if{|x| x == parent_file}
     child_candidates.each do |child|
-      child_array << [_prettify(child), child]
+      child_array << [_prettify(child.first), child.last]
     end
     return child_array
   end

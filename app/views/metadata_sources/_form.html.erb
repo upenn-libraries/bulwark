@@ -4,7 +4,7 @@
     <%= form_for source, :validate => true, :url => "/metadata_sources/#{source.id}" do |f| %>
     <%= field_set_tag "Define the orientation of the field mappings:" do %>
     <div class="source-type">
-      <% MetadataBuilder.sheet_types.each do |mb| %>
+      <% MetadataSource.sheet_types.each do |mb| %>
       <div class="visual-illustration">
         <div id="<%= mb.last %>"></div>
         <div class="input-fields">

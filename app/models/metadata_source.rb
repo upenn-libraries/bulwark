@@ -1,12 +1,17 @@
 class MetadataSource < ActiveRecord::Base
 
+  attr_accessor :xml_header, :xml_footer
+
   belongs_to :metadata_builder, :foreign_key => "metadata_builder_id"
 
   include Utils
 
-  serialize :original_mappings
-  serialize :user_defined_mappings
-  serialize :children
+  serialize :original_mappings, Hash
+  serialize :user_defined_mappings, Hash
+  serialize :children, Array
+
+  $xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root>"
+  $xml_footer = "</root>"
 
   def path
     read_attribute(:path) || ''
@@ -71,6 +76,73 @@ class MetadataSource < ActiveRecord::Base
     self.save!
   end
 
+  def build_xml_files
+    self.generate_and_build_xml
+    self.children.each do |child|
+      source = MetadataSource.find(child)
+      source.generate_and_build_xml
+    end
+    self.generate_parent_child_xml
+  end
+
+  def generate_and_build_xml
+    self.set_metadata_mappings
+    self.metadata_builder.repo.version_control_agent.clone
+    @xml_content = ""
+    fname = self.path
+    xml_fname = "#{fname}.xml"
+    unless self.children.empty?
+      self.user_defined_mappings.each do |mapping|
+        tag = mapping.last["mapped_value"]
+        self.original_mappings[mapping.first].each do |field_value|
+          @xml_content << "<#{tag}>#{field_value}</#{tag}>"
+        end
+      end
+    else
+      self.metadata_builder.repo.version_control_agent.get(:get_location => fname)
+      @xml_content << child_values(fname)
+    end
+    if self.root_element.present?
+      @xml_content_final_copy = "<#{root_element}>#{@xml_content}</#{root_element}>"
+    else
+      @xml_content_final_copy = @xml_content
+    end
+    build_preservation_xml(xml_fname, @xml_content_final_copy)
+    self.metadata_builder.preserve ||= xml_fname
+    self.metadata_builder.repo.version_control_agent.commit("Generated preservation XML for #{fname}")
+    self.metadata_builder.repo.version_control_agent.push
+    self.metadata_builder.repo.version_control_agent.delete_clone
+  end
+
+  def generate_parent_child_xml
+    self.metadata_builder.repo.version_control_agent.clone
+    self.children.each do |child|
+      metadata_path = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
+      child_path = MetadataSource.where(:id => 2).pluck(:path).first
+      key_xml_path = "#{self.path}.xml"
+      child_xml_path = "#{child_path}.xml"
+      self.metadata_builder.repo.version_control_agent.get(:get_location => key_xml_path)
+      self.metadata_builder.repo.version_control_agent.get(:get_location => child_xml_path)
+      xml_content = File.open(key_xml_path, "r"){|io| io.read}
+      child_xml_content = File.open(child_xml_path, "r"){|io| io.read}
+      strip_headers(xml_content) && strip_headers(child_xml_content)
+      end_tag = "</#{self.root_element}>"
+      insert_index = xml_content.index(end_tag)
+      xml_content.insert(insert_index, child_xml_content)
+      xml_unified_filename = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"
+      self.metadata_builder.repo.version_control_agent.unlock(xml_unified_filename) if File.exists?(xml_unified_filename)
+      build_preservation_xml(xml_unified_filename,xml_content)
+      FileUtils.rm(key_xml_path)
+      FileUtils.rm(child_xml_path)
+      self.metadata_builder.repo.version_control_agent.commit("Generated unified XML for #{self.path} and #{child_path} at #{xml_unified_filename}")
+      self.metadata_builder.repo.version_control_agent.push
+      binding.pry()
+      self.metadata_builder.preserve ||= (xml_unified_filename)
+      self.save!
+      self.metadata_builder.repo.version_control_agent.delete_clone
+    end
+  end
+
   private
 
     def convert_metadata
@@ -130,12 +202,78 @@ class MetadataSource < ActiveRecord::Base
       return mappings
     end
 
+    def child_values(source)
+      workbook = RubyXL::Parser.parse(source)
+      x_start, y_start, x_stop, y_stop = offset
+      xml_content = ""
+      case self.view_type
+      when "horizontal"
+        self.num_objects.times do |i|
+          xml_content << "<#{self.parent_element}>"
+          xml_content << get_row_values(workbook, i, x_start, y_start, x_stop, y_stop)
+          xml_content << "</#{self.parent_element}>"
+        end
+      when "vertical"
+        self.num_objects.times do |i|
+          xml_content << "<#{self.parent_element}>"
+          xml_content << get_column_values(workbook, i, x_start, y_start, x_stop, y_stop)
+          xml_content << "</#{self.parent_element}>"
+        end
+      else
+        raise "Illegal source type #{self.source_type[source]} for #{source}"
+      end
+      return xml_content
+    end
+
+    def get_row_values(workbook, index, x_start, y_start, x_stop, y_stop)
+      headers = workbook[0][y_start].cells.collect { |cell| cell.value }
+      row_value = ""
+      offset = 1
+      headers.each_with_index do |header,h_index|
+        field_val = workbook[0][y_start+index+offset][x_start+h_index].present? ? workbook[0][y_start+index+offset][x_start+h_index].value : ""
+        row_value << "<#{header}>#{field_val}</#{header}>"
+      end
+      return row_value
+    end
+
+    def get_column_values(workbook, index, x_start, y_start, x_stop, y_stop)
+      iterator = 0
+      column_value = ""
+      headers = Array.new
+      while workbook[0][y_start+iterator].present? do
+        headers << workbook[0][y_start+iterator][x_start].value
+        iterator += 1
+      end
+      offset = 1
+      headers.each_with_index do |header,h_index|
+        field_val = workbook[0][y_start+h_index][index+offset].present? ? workbook[0][y_start+h_index][index+offset].value : ""
+        column_value << "<#{header}>#{field_val}</#{header}>"
+      end
+      return column_value
+    end
+
+    def build_preservation_xml(filename, content)
+      tmp_filename = "#{filename}.tmp"
+      File.open(tmp_filename, "w+") do |f|
+        f << $xml_header << content << $xml_footer
+      end
+      File.rename(tmp_filename, filename)
+    end
+
     def offset
       x_start = self.x_start - 1
       y_start = self.y_start - 1
       x_stop = self.x_stop - 1
       y_stop = self.y_stop - 1
       return x_start, y_start, x_stop, y_stop
+    end
+
+    def strip_headers(xml)
+      xml.gsub!($xml_header, "") && xml.gsub!($xml_footer, "")
+    end
+
+    def self.sheet_types
+      sheet_types = [["Vertical", "vertical"], ["Horizontal", "horizontal"]]
     end
 
 end

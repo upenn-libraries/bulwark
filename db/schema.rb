@@ -67,7 +67,6 @@ ActiveRecord::Schema.define(version: 20160523141604) do
   create_table "repos", force: :cascade do |t|
     t.string   "title"
     t.string   "directory"
-    t.string   "identifier"
     t.string   "description"
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
