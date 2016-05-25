@@ -70,9 +70,13 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def set_metadata_mappings
-    self.metadata_builder.repo.version_control_agent.clone
+    fresh_clone = false
+    unless File.exist?(self.metadata_builder.repo.version_control_agent.working_path)
+      self.metadata_builder.repo.version_control_agent.clone
+      fresh_clone = true
+    end
     self.original_mappings = convert_metadata
-    self.metadata_builder.repo.version_control_agent.delete_clone
+    self.metadata_builder.repo.version_control_agent.delete_clone if fresh_clone
     self.save!
   end
 
@@ -83,11 +87,11 @@ class MetadataSource < ActiveRecord::Base
     self.children.each do |child|
       source = MetadataSource.find(child)
       source.set_metadata_mappings
-      source.metadata_builder.repo.version_control_agent.clone
       source.generate_and_build_xml
-      source.metadata_builder.repo.version_control_agent.delete_clone
     end
+    binding.pry()
     self.generate_parent_child_xml
+    binding.pry()
     self.metadata_builder.repo.version_control_agent.delete_clone
   end
 
