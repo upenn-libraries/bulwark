@@ -23,7 +23,7 @@ module Utils
         object_and_descendants_action(@oid, "delete")
         @command = build_command("delete_tombstone", :object_uri => obj.translate_id_to_uri.call(obj.id))
         execute_curl
-        import(file)
+        import(file, repo)
       end
       return {@@status_type => @@status_message}
     end
