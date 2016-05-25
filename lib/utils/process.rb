@@ -13,10 +13,14 @@ module Utils
       @status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
       unless @status_message.present?
         object_and_descendants_action(@oid, "update_index")
-        ActiveFedora::Base.find(@oid).attach_files(repo)
+        @status_message = ActiveFedora::Base.find(@oid).attach_files(repo)
+        if @status_message.present?
+          @status_type = :error
+        else
+          @status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo."
+          @status_type = :success
+        end
         repo.version_control_agent.push
-        @status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo."
-        @status_type = :success
       end
       if(@status_message == "Item already exists") then
         obj = ActiveFedora::Base.find(@oid)
@@ -28,9 +32,8 @@ module Utils
       return {@status_type => @status_message}
     end
 
-    def attach_file(repo, parent, child_container = "child")
+    def attach_file(repo, parent, file_link, child_container = "child")
       begin
-        file_link = "#{repo.version_control_agent.working_path}/#{repo.assets_subdirectory}/#{parent.file_name}"
         derivatives_destination = "#{repo.version_control_agent.working_path}/#{repo.derivatives_subdirectory}"
         repo.version_control_agent.get(:get_location => file_link)
         repo.version_control_agent.unlock(file_link)

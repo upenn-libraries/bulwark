@@ -89,14 +89,20 @@ class Manuscript < ActiveFedora::Base
 #
 # Each content type should specify their own attach_files method
 # leveraging the Utils::Process module's attach_file method to
-# attach assets
+# attach assets, and return an error message as a string if the asset
+# does not exist
 #
 ##########
   def attach_files(repo)
     Page.find(:parent_manuscript => self.id).each do |page|
       page.manuscript = self
       page.save!
-      Utils::Process.attach_file(repo, page, "pageImage")
+      file_link = "#{repo.version_control_agent.working_path}/#{repo.assets_subdirectory}/#{page.file_name}"
+      if File.exist?(file_link)
+        Utils::Process.attach_file(repo, page, file_link, "pageImage")
+      else
+        return "No file at #{repo.assets_subdirectory}/#{page.file_name} detected, nothing attached."
+      end
     end
   end
 

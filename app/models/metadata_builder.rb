@@ -10,7 +10,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   validate :check_for_errors
 
-  serialize :preserve, Array
+  serialize :preserve, Set
 
   @@xml_tags = Array.new
   @@error_message = nil
@@ -126,7 +126,7 @@ class MetadataBuilder < ActiveRecord::Base
     array.each do |p|
       key, val = p
       @vca.clone
-      @vca.get(val)
+      @vca.get(:get_location => val)
       @vca.unlock(val)
       transformed_repo_path = "#{Utils.config.transformed_dir}/#{@vca.remote_path.gsub("/","_")}"
       Dir.mkdir(transformed_repo_path) && Dir.chdir(transformed_repo_path)
