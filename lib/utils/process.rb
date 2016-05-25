@@ -29,23 +29,35 @@ module Utils
     end
 
     def attach_file(repo, parent, file_name, child_container = "child")
-      begin
-        file_link = "#{repo.version_control_agent.working_path}/#{repo.assets_subdirectory}/#{file_name}"
-        repo.version_control_agent.get(:get_location => file_link)
-        repo.version_control_agent.unlock(file_link)
-        if File.exist?(file_link)
-          derivatives_destination = "#{repo.version_control_agent.working_path}/#{repo.derivatives_subdirectory}"
-          derivative_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives.generate_access_copy(file_link, derivatives_destination, :width => "380",:height => "500")}"
-          @command = build_command("file_attach", :file => derivative_link, :fid => parent.id, :child_container => child_container)
-          execute_curl
-          repo.version_control_agent.add(:add_location => "#{derivatives_destination}")
-          repo.version_control_agent.commit("Generated derivative for #{parent.file_name}")
-        else
+      file_link = "#{repo.version_control_agent.working_path}/#{repo.assets_subdirectory}/#{file_name}"
+      repo.version_control_agent.get(:get_location => file_link)
+      repo.version_control_agent.unlock(file_link)
+      validated = validate_file(file_link)
+      if(File.exist?(file_link) && validated)
+        derivatives_destination = "#{repo.version_control_agent.working_path}/#{repo.derivatives_subdirectory}"
+        derivative_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives.generate_access_copy(file_link, derivatives_destination, :width => "380",:height => "500")}"
+        @command = build_command("file_attach", :file => derivative_link, :fid => parent.id, :child_container => child_container)
+        execute_curl
+        repo.version_control_agent.add(:add_location => "#{derivatives_destination}")
+        repo.version_control_agent.commit("Generated derivative for #{parent.file_name}")
+      else
+        @@status_type = :error
+        if validated
           @@status_message = "No images detected at #{repo.assets_subdirectory}/#{file_name}.  No derivatives made or attached."
-          @@status_type = :error
+        else
+          @@status_message = "Image #{repo.assets_subdirectory}/#{file_name} did not pass validation.  No derivatives made or attached."
         end
-      rescue
-        raise $!, "File attachment failed due to the following error(s): #{$!}", $!.backtrace
+      end
+    end
+
+    protected
+
+    def validate_file(file)
+      begin
+        MiniMagick::Image.open(file)
+        return true
+      rescue MiniMagick::Invalid
+        return false
       end
     end
 

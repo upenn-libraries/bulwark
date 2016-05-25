@@ -4,9 +4,9 @@ module Utils
     extend self
 
     def generate_access_copy(file, directory, options = {})
+      fname = "#{File.basename(file,".*")}.jpeg"
       width = options[:width] || "100"
       height = options[:height] || "200"
-      fname = "#{File.basename(file,".*")}.jpeg"
       image = MiniMagick::Image.open(file)
       image.resize "#{width}x#{height}"
       image.format "jpeg"
