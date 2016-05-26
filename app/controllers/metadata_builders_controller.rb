@@ -24,11 +24,7 @@ class MetadataBuildersController < ApplicationController
 
   def ingest
     @message = @metadata_builder.transform_and_ingest(params[:to_ingest])
-    if @message[:error].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :error => @message[:error] }
-    elsif @message[:success].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :success => @message[:success] }
-    end
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { @message.keys.first => @message.values.first }
   end
 
   def set_source

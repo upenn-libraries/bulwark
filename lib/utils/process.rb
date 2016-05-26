@@ -13,7 +13,7 @@ module Utils
       @@status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
       unless @@status_message.present?
         object_and_descendants_action(@oid, "update_index")
-        @@status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo."
+        @@status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo.\n"
         @@status_type = :success
         ActiveFedora::Base.find(@oid).attach_files(repo)
         repo.version_control_agent.push
@@ -32,7 +32,7 @@ module Utils
       file_link = "#{repo.version_control_agent.working_path}/#{repo.assets_subdirectory}/#{file_name}"
       repo.version_control_agent.get(:get_location => file_link)
       repo.version_control_agent.unlock(file_link)
-      validated = validate_file(file_link)
+      validated = validate_file(file_link) if File.exist?(file_link)
       if(File.exist?(file_link) && validated)
         derivatives_destination = "#{repo.version_control_agent.working_path}/#{repo.derivatives_subdirectory}"
         derivative_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives.generate_access_copy(file_link, derivatives_destination, :width => "380",:height => "500")}"
@@ -41,11 +41,11 @@ module Utils
         repo.version_control_agent.add(:add_location => "#{derivatives_destination}")
         repo.version_control_agent.commit("Generated derivative for #{parent.file_name}")
       else
-        @@status_type = :error
-        if validated
-          @@status_message = "No images detected at #{repo.assets_subdirectory}/#{file_name}.  No derivatives made or attached."
+        @@status_type = :warning
+        if File.exist?(file_link)
+          @@status_message << "Image #{repo.assets_subdirectory}/#{file_name} did not pass validation.  No derivatives made or attached.\n"
         else
-          @@status_message = "Image #{repo.assets_subdirectory}/#{file_name} did not pass validation.  No derivatives made or attached."
+          @@status_message << "Image #{repo.assets_subdirectory}/#{file_name} not detected in file directory.  No derivatives made or attached.\n"
         end
       end
     end
