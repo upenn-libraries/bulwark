@@ -1,5 +1,4 @@
 <% flash.each do |key, value| %>
-<%= binding.pry() %>
   <div class="alert alert-<%= key %>">
     <% value.each do |val| %>
      <div class="message"><%= val %></div>

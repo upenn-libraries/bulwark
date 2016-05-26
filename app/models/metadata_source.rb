@@ -162,7 +162,7 @@ class MetadataSource < ActiveRecord::Base
     self.send(:user_defined_mappings).each do |mapping|
       error_messages = validate_xml_tag(mapping.last["mapped_value"])
       error_messages.each do |e|
-        errors.add("user_defined_mappings[#{mapping.first}][mapped_value]".parameterize.underscore.to_sym, "XML tag error(s): #{e}")
+        errors.add(:user_defined_mappings, " error(s): #{e}")
       end
     end
   end
@@ -171,10 +171,9 @@ class MetadataSource < ActiveRecord::Base
 
     def validate_xml_tag(tag)
       error_message = Array.new
-      error_message << "Valid XML tags cannot start with #{tag.first_three} (detected in field \"#{tag}\")\n" if tag.starts_with_xml?
-      error_message << "Valid XML tags cannot contain spaces (detected in field \"#{tag}\")" if tag.include?(" ")
-      error_message << "Valid XML tags cannot begin with numbers (detected in field \"#{tag}\")\n" if tag.starts_with_number?
-      error_message << "Valid XML tags can only contain letters, numbers, underscores, hyphens, and periods (detected in field \"#{tag}\")\n" if tag.contains_xml_invalid_characters?
+      error_message << "Invalid tag \"#{tag}\" - valid XML tags cannot start with #{tag.first_three}" if tag.starts_with_xml?
+      error_message << "Invalid tag \"#{tag}\" - valid XML tags cannot begin with numbers" if tag.starts_with_number?
+      error_message << "Invalid tag \"#{tag}\" - valid XML tags can only contain letters, numbers, underscores, hyphens, and periods" if tag.contains_xml_invalid_characters?
       return error_message
     end
 
