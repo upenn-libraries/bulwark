@@ -46,7 +46,7 @@ ActiveRecord::Schema.define(version: 20160523141604) do
 
   create_table "metadata_sources", force: :cascade do |t|
     t.string   "path"
-    t.string   "view_type"
+    t.string   "view_type",             default: "horizontal"
     t.integer  "num_objects",           default: 1
     t.integer  "x_start",               default: 1
     t.integer  "y_start",               default: 1
@@ -57,8 +57,8 @@ ActiveRecord::Schema.define(version: 20160523141604) do
     t.string   "parent_element"
     t.text     "user_defined_mappings"
     t.text     "children"
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
     t.integer  "metadata_builder_id"
   end
 

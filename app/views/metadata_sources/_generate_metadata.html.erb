@@ -1,7 +1,6 @@
 <% @object.metadata_builder.metadata_source.each do |source| %>
   <% refresh_metadata_from_source %>
   <%= form_for source, :validate => true, :html => { :class => "field-mappings" }, :url => "/metadata_sources/#{source.id}" do |f| %>
-    <%= render_flash_errors if flash[:error] %>
     <%= field_set_tag 'Map source metadata to XML' do %>
       Fill out the fields below to field values from metadata source files to XML.
     <% end %>

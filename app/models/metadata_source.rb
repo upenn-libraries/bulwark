@@ -6,6 +6,8 @@ class MetadataSource < ActiveRecord::Base
 
   include Utils
 
+  validate :xml_tags
+
   serialize :original_mappings, Hash
   serialize :user_defined_mappings, Hash
   serialize :children, Array
@@ -144,7 +146,28 @@ class MetadataSource < ActiveRecord::Base
     end
   end
 
+  protected
+
+  def xml_tags
+    full_error_message = ""
+    self.send(:user_defined_mappings).each do |mapping|
+      error_messages = validate_xml_tag(mapping.last["mapped_value"])
+      error_messages.each do |e|
+        errors.add(:user_defined_mappings, "XML tag error(s): #{e}")
+      end
+    end
+  end
+
   private
+
+    def validate_xml_tag(tag)
+      error_message = Array.new
+      error_message << "Valid XML tags cannot start with #{tag.first_three} (detected in field \"#{tag}\")" if tag.starts_with_xml?
+      error_message << "Valid XML tags cannot contain spaces (detected in field \"#{tag}\")" if tag.include?(" ")
+      error_message << "Valid XML tags cannot begin with numbers (detected in field \"#{tag}\")" if tag.starts_with_number?
+      error_message << "Valid XML tags can only contain letters, numbers, underscores, hyphens, and periods (detected in field \"#{tag}\")" if tag.contains_xml_invalid_characters?
+      return error_message
+    end
 
     def convert_metadata
       begin
@@ -153,7 +176,7 @@ class MetadataSource < ActiveRecord::Base
         case ext
         when "xlsx"
           self.metadata_builder.repo.version_control_agent.get(:get_location => "#{self.path}")
-          @mappings = generate_mapping_options_xlsx(self)
+          @mappings = generate_mapping_options_xlsx
         else
           raise "Illegal metadata source unit type"
         end
@@ -163,7 +186,7 @@ class MetadataSource < ActiveRecord::Base
       end
     end
 
-    def generate_mapping_options_xlsx(source)
+    def generate_mapping_options_xlsx
       mappings = {}
       headers = []
       iterator = 0

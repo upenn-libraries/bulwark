@@ -25,14 +25,4 @@ module RailsAdminHelper
     return mb
   end
 
-  def render_flash_errors
-    error_list = ""
-    flash[:error].each do |errors|
-      errors.each do |e|
-        error_list << content_tag("li", e)
-      end
-    end
-    flash[:error] = content_tag("ul", error_list.html_safe).html_safe if flash.try(:error).present?
-  end
-
 end

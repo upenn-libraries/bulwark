@@ -8,6 +8,11 @@ String.class_eval do
     true if Float(self.initial) rescue false
   end
 
+  def contains_xml_invalid_characters?
+    regex = self =~ /[^a-zA-Z0-9_.-].*$/
+    regex.present? ? true : false
+  end
+
   def initial
     self[0]
   end

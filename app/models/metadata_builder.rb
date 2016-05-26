@@ -8,8 +8,6 @@ class MetadataBuilder < ActiveRecord::Base
 
   validates :parent_repo, presence: true
 
-  validate :check_for_errors
-
   serialize :preserve, Set
 
   @@xml_tags = Array.new
@@ -83,11 +81,6 @@ class MetadataBuilder < ActiveRecord::Base
     self.save!
   end
 
-  def set_preserve(preserve_files)
-    self.preserve = preserve_files.values
-    self.save!
-  end
-
   def clear_unidentified_files
     unidentified_files = self.unidentified_files
     self.repo.version_control_agent.clone
@@ -98,27 +91,6 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.commit("Removed files not identified as metadata source and/or for long-term preservation: #{unidentified_files}")
     self.repo.version_control_agent.push
     self.repo.version_control_agent.delete_clone
-  end
-
-  def verify_xml_tags(tags_submitted)
-    errors = Array.new
-    tag_sets = eval(tags_submitted)
-    tag_sets.each do |tag_set|
-      tag_set.drop(1).each do |tag|
-        tag.each do |val|
-          error = _validate_xml_tag(val.last["mapped_value"])
-          errors << error unless error.nil?
-        end
-      end
-    end
-    @@error_message = errors
-    return @@error_message
-  end
-
-  def check_for_errors
-    if @@error_message
-      errors.add(:source, "XML tag error(s): #{@@error_message}") unless @@error_message.empty?
-    end
   end
 
   def transform_and_ingest(array)
@@ -138,16 +110,5 @@ class MetadataBuilder < ActiveRecord::Base
     end
     return @status
   end
-
-  private
-
-    def _validate_xml_tag(tag)
-      error_message = Array.new
-      error_message << "Valid XML tags cannot start with #{tag.first_three} (detected in field \"#{tag}\")" if tag.starts_with_xml?
-      error_message << "Valid XML tags cannot contain spaces (detected in field \"#{tag}\")" if tag.include?(" ")
-      error_message << "Valid XML tags cannot begin with numbers (detected in field \"#{tag}\")" if tag.starts_with_number?
-      return error_message unless error_message.empty?
-    end
-
 
 end
