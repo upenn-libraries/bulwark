@@ -28,15 +28,9 @@ ActiveRecord::Schema.define(version: 20160523141604) do
   create_table "metadata_builders", force: :cascade do |t|
     t.string   "parent_repo"
     t.string   "source"
-    t.text     "source_type"
-    t.text     "source_num_objects"
-    t.text     "source_coordinates"
     t.string   "preserve"
-    t.string   "nested_relationships"
-    t.text     "source_mappings"
-    t.text     "field_mappings"
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
     t.integer  "repo_id"
     t.integer  "metadata_source_id"
   end

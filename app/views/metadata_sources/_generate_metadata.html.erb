@@ -43,6 +43,6 @@
         <%= f.select :children, nested_relationships_values(source.path), {}, { :multiple => true } %>
       <% end -%>
     <% end -%>
-    <%= content_tag(:div, (f.submit "Save metadata mappings and generate preservation XML"), :class => "form-bottom") %>
   <% end -%>
+  <%= content_tag(:div, (f.submit "Save metadata mappings and generate preservation XML"), :class => "form-bottom") %>
 <% end -%>

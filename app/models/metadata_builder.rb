@@ -3,6 +3,7 @@ class MetadataBuilder < ActiveRecord::Base
   belongs_to :repo, :foreign_key => "repo_id"
 
   has_many :metadata_source, dependent: :destroy, :validate => false
+  accepts_nested_attributes_for :metadata_source, allow_destroy: true
 
   include Utils
 

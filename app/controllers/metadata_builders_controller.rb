@@ -2,20 +2,24 @@ class MetadataBuildersController < ApplicationController
 
   before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files]
 
+  before_save :set_metadata_source_params
+
   def show
   end
 
   def new
     @metadata_builder = MetadataBuilder.new
+    @metadata_builder.metadata_source.build!
   end
 
   def edit
   end
 
   def update
-    @error_message = @metadata_builder.verify_xml_tags(params[:metadata_builder][:field_mappings]) if params[:metadata_builder][:field_mappings].present?
     if @metadata_builder.update(metadata_builder_params)
-      @metadata_builder.build_xml_files
+      @metadata_builder.metadata_source.each do |source|
+        # set params?
+      end
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :success => "Metadata mappings successfully updated.  See XML preview below."}
     else
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :error => @error_message }
@@ -49,7 +53,8 @@ class MetadataBuildersController < ApplicationController
   end
 
   def metadata_builder_params
-    params.require(:metadata_builder).permit(:parent_repo)
+    params.require(:metadata_builder).permit(:parent_repo,
+      :metadata_source_attributes => [:view_type, :num_objects, :x_start, :y_start, :x_stop, :y_stop, :original_mappings, :root_element, :parent_element, :user_defined_mappings, :children => []])
   end
 
 end
