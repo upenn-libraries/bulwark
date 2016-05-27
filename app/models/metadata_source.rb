@@ -77,7 +77,7 @@ class MetadataSource < ActiveRecord::Base
       self.metadata_builder.repo.version_control_agent.clone
       fresh_clone = true
     end
-    self.original_mappings = convert_metadata
+    self.original_mappings = _convert_metadata
     self.metadata_builder.repo.version_control_agent.delete_clone if fresh_clone
     self.save!
   end
@@ -108,14 +108,14 @@ class MetadataSource < ActiveRecord::Base
       end
     else
       self.metadata_builder.repo.version_control_agent.get(:get_location => fname)
-      @xml_content << child_values(fname)
+      @xml_content << _child_values(fname)
     end
     if self.root_element.present?
       @xml_content_final_copy = "<#{root_element}>#{@xml_content}</#{root_element}>"
     else
       @xml_content_final_copy = @xml_content
     end
-    build_preservation_xml(xml_fname, @xml_content_final_copy)
+    _build_preservation_xml(xml_fname, @xml_content_final_copy)
     self.metadata_builder.preserve.add(xml_fname)
     self.metadata_builder.save!
     self.metadata_builder.repo.version_control_agent.commit("Generated preservation XML for #{fname}")
@@ -132,13 +132,13 @@ class MetadataSource < ActiveRecord::Base
       self.metadata_builder.repo.version_control_agent.get(:get_location => child_xml_path)
       xml_content = File.open(key_xml_path, "r"){|io| io.read}
       child_xml_content = File.open(child_xml_path, "r"){|io| io.read}
-      strip_headers(xml_content) && strip_headers(child_xml_content)
+      _strip_headers(xml_content) && _strip_headers(child_xml_content)
       end_tag = "</#{self.root_element}>"
       insert_index = xml_content.index(end_tag)
       xml_content.insert(insert_index, child_xml_content)
       xml_unified_filename = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"
       self.metadata_builder.repo.version_control_agent.unlock(xml_unified_filename) if File.exists?(xml_unified_filename)
-      build_preservation_xml(xml_unified_filename,xml_content)
+      _build_preservation_xml(xml_unified_filename,xml_content)
       self.metadata_builder.repo.version_control_agent.commit("Generated unified XML for #{self.path} and #{child_path} at #{xml_unified_filename}")
       self.metadata_builder.repo.version_control_agent.push
       self.metadata_builder.preserve.add(xml_unified_filename)
@@ -160,7 +160,7 @@ class MetadataSource < ActiveRecord::Base
   def xml_tags
     full_error_message = ""
     self.send(:user_defined_mappings).each do |mapping|
-      error_messages = validate_xml_tag(mapping.last["mapped_value"])
+      error_messages = _validate_xml_tag(mapping.last["mapped_value"])
       error_messages.each do |e|
         errors.add(:user_defined_mappings, " error(s): #{e}")
       end
@@ -169,7 +169,7 @@ class MetadataSource < ActiveRecord::Base
 
   private
 
-    def validate_xml_tag(tag)
+    def _validate_xml_tag(tag)
       error_message = Array.new
       error_message << "Invalid tag \"#{tag}\" - valid XML tags cannot start with #{tag.first_three}" if tag.starts_with_xml?
       error_message << "Invalid tag \"#{tag}\" - valid XML tags cannot begin with numbers" if tag.starts_with_number?
@@ -177,14 +177,14 @@ class MetadataSource < ActiveRecord::Base
       return error_message
     end
 
-    def convert_metadata
+    def _convert_metadata
       begin
         pathname = Pathname.new(self.path)
         ext = pathname.extname.to_s[1..-1]
         case ext
         when "xlsx"
           self.metadata_builder.repo.version_control_agent.get(:get_location => "#{self.path}")
-          @mappings = generate_mapping_options_xlsx
+          @mappings = _generate_mapping_options_xlsx
         else
           raise "Illegal metadata source unit type"
         end
@@ -194,11 +194,11 @@ class MetadataSource < ActiveRecord::Base
       end
     end
 
-    def generate_mapping_options_xlsx
+    def _generate_mapping_options_xlsx
       mappings = {}
       headers = []
       iterator = 0
-      x_start, y_start, x_stop, y_stop = offset
+      x_start, y_start, x_stop, y_stop = _offset
       workbook = RubyXL::Parser.parse(self.path)
       case self.view_type
       when "horizontal"
@@ -206,7 +206,7 @@ class MetadataSource < ActiveRecord::Base
           header = workbook[0][y_start][x_start+iterator].value
           headers << header
           vals = []
-          #This variable could be user-defined in order to let the user set the values offset
+          #This variable could be user-defined in order to let the user set the values _offset
           vals_iterator = 1
           while(workbook[0][y_start+vals_iterator].present? && workbook[0][y_start+vals_iterator][x_start+iterator].present?) do
             vals << workbook[0][y_start+vals_iterator][x_start+iterator].value
@@ -234,21 +234,21 @@ class MetadataSource < ActiveRecord::Base
       return mappings
     end
 
-    def child_values(source)
+    def _child_values(source)
       workbook = RubyXL::Parser.parse(source)
-      x_start, y_start, x_stop, y_stop = offset
+      x_start, y_start, x_stop, y_stop = _offset
       xml_content = ""
       case self.view_type
       when "horizontal"
         self.num_objects.times do |i|
           xml_content << "<#{self.parent_element}>"
-          xml_content << get_row_values(workbook, i, x_start, y_start, x_stop, y_stop)
+          xml_content << _get_row_values(workbook, i, x_start, y_start, x_stop, y_stop)
           xml_content << "</#{self.parent_element}>"
         end
       when "vertical"
         self.num_objects.times do |i|
           xml_content << "<#{self.parent_element}>"
-          xml_content << get_column_values(workbook, i, x_start, y_start, x_stop, y_stop)
+          xml_content << _get_column_values(workbook, i, x_start, y_start, x_stop, y_stop)
           xml_content << "</#{self.parent_element}>"
         end
       else
@@ -257,18 +257,18 @@ class MetadataSource < ActiveRecord::Base
       return xml_content
     end
 
-    def get_row_values(workbook, index, x_start, y_start, x_stop, y_stop)
+    def _get_row_values(workbook, index, x_start, y_start, x_stop, y_stop)
       headers = workbook[0][y_start].cells.collect { |cell| cell.value }
       row_value = ""
-      offset = 1
+      _offset = 1
       headers.each_with_index do |header,h_index|
-        field_val = workbook[0][y_start+index+offset][x_start+h_index].present? ? workbook[0][y_start+index+offset][x_start+h_index].value : ""
+        field_val = workbook[0][y_start+index+_offset][x_start+h_index].present? ? workbook[0][y_start+index+_offset][x_start+h_index].value : ""
         row_value << "<#{header}>#{field_val}</#{header}>"
       end
       return row_value
     end
 
-    def get_column_values(workbook, index, x_start, y_start, x_stop, y_stop)
+    def _get_column_values(workbook, index, x_start, y_start, x_stop, y_stop)
       iterator = 0
       column_value = ""
       headers = Array.new
@@ -276,15 +276,15 @@ class MetadataSource < ActiveRecord::Base
         headers << workbook[0][y_start+iterator][x_start].value
         iterator += 1
       end
-      offset = 1
+      _offset = 1
       headers.each_with_index do |header,h_index|
-        field_val = workbook[0][y_start+h_index][index+offset].present? ? workbook[0][y_start+h_index][index+offset].value : ""
+        field_val = workbook[0][y_start+h_index][index+_offset].present? ? workbook[0][y_start+h_index][index+_offset].value : ""
         column_value << "<#{header}>#{field_val}</#{header}>"
       end
       return column_value
     end
 
-    def build_preservation_xml(filename, content)
+    def _build_preservation_xml(filename, content)
       tmp_filename = "#{filename}.tmp"
       File.open(tmp_filename, "w+") do |f|
         f << $xml_header << content << $xml_footer
@@ -292,7 +292,7 @@ class MetadataSource < ActiveRecord::Base
       File.rename(tmp_filename, filename)
     end
 
-    def offset
+    def _offset
       x_start = self.x_start - 1
       y_start = self.y_start - 1
       x_stop = self.x_stop - 1
@@ -300,7 +300,7 @@ class MetadataSource < ActiveRecord::Base
       return x_start, y_start, x_stop, y_stop
     end
 
-    def strip_headers(xml)
+    def _strip_headers(xml)
       xml.gsub!($xml_header, "") && xml.gsub!($xml_footer, "")
     end
 

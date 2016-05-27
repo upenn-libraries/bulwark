@@ -1,6 +1,6 @@
 class MetadataBuildersController < ApplicationController
 
-  before_action :set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files]
+  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files]
 
   def show
   end
@@ -44,7 +44,7 @@ class MetadataBuildersController < ApplicationController
 
   private
 
-  def set_metadata_builder
+  def _set_metadata_builder
     @metadata_builder = MetadataBuilder.find(params[:id])
   end
 

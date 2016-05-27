@@ -5,7 +5,7 @@ class VersionControlAgentsController < ApplicationController
   end
 
   private
-    def set_version_control_agent
+    def _set_version_control_agent
       @version_control_agent = VersionControlAgent.find(params[:id])
     end
 

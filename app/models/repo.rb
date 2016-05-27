@@ -3,7 +3,7 @@ class Repo < ActiveRecord::Base
   has_one :metadata_builder, dependent: :destroy, :validate => false
   has_one :version_control_agent, dependent: :destroy, :validate => false
 
-  before_validation :concatenate_git
+  before_validation :_concatenate_git
 
   around_create :set_version_control_agent_and_repo
 
@@ -27,9 +27,9 @@ class Repo < ActiveRecord::Base
   def set_version_control_agent_and_repo
     yield
     set_defaults
-    set_version_control_agent
+    _set_version_control_agent
     create_remote
-    set_metadata_builder
+    _set_metadata_builder
   end
 
   def set_defaults
@@ -89,7 +89,7 @@ class Repo < ActiveRecord::Base
     unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
       self.version_control_agent.init_bare
       self.version_control_agent.clone
-      build_and_populate_directories(self.version_control_agent.working_path)
+      _build_and_populate_directories(self.version_control_agent.working_path)
       self.version_control_agent.commit_bare("Added subdirectories according to the configuration specified in the repo configuration")
       self.version_control_agent.push_bare
       self.version_control_agent.delete_clone
@@ -116,7 +116,7 @@ class Repo < ActiveRecord::Base
         ingest_array << File.basename(file, File.extname(file))
       end
       self.ingested = ingest_array
-      refresh_assets
+      _refresh_assets
       self.save!
       return @status
     rescue
@@ -137,7 +137,7 @@ class Repo < ActiveRecord::Base
   end
 
 private
-  def build_and_populate_directories(working_copy_path)
+  def _build_and_populate_directories(working_copy_path)
     admin_directory = "#{Utils.config.object_admin_path}"
     data_directory = "#{Utils.config.object_data_path}"
     metadata_subdirectory = "#{self.metadata_subdirectory}"
@@ -149,12 +149,12 @@ private
     Dir.mkdir("#{metadata_subdirectory}") && FileUtils.touch("#{metadata_subdirectory}/.keep")
     Dir.mkdir("#{assets_subdirectory}") && FileUtils.touch("#{assets_subdirectory}/.keep")
     Dir.mkdir("#{derivatives_subdirectory}") && FileUtils.touch("#{derivatives_subdirectory}/.keep")
-    populate_admin_manifest("#{admin_directory}")
+    _populate_admin_manifest("#{admin_directory}")
   end
 
-  def populate_admin_manifest(admin_path)
+  def _populate_admin_manifest(admin_path)
     filesystem_semantics_path = "#{admin_path}/#{Utils.config.object_semantics_location}"
-    file_types = define_file_types
+    file_types = _define_file_types
     metadata_line = "#{Utils.config.metadata_path_label}: #{self.metadata_subdirectory}/#{self.metadata_source_extensions}"
     assets_line = "#{Utils.config.file_path_label}: #{self.assets_subdirectory}/#{file_types}"
     File.open(filesystem_semantics_path, "w+") do |file|
@@ -162,7 +162,7 @@ private
     end
   end
 
-  def define_file_types
+  def _define_file_types
     ft = self.file_extensions.split(",")
     ft.map! { |f| ".#{f}"}
     aft = ft.join(',')
@@ -170,30 +170,30 @@ private
     return aft
   end
 
-  def set_version_control_agent
+  def _set_version_control_agent
     self.version_control_agent = VersionControlAgent.new(:vc_type => "GitAnnex")
     self.version_control_agent.save!
   end
 
-  def set_metadata_builder
+  def _set_metadata_builder
     self.metadata_builder = MetadataBuilder.new(:parent_repo => self.id)
     self.metadata_builder.save!
     self.save!
   end
 
-  def refresh_assets
+  def _refresh_assets
     display_path = "#{Utils.config.assets_display_path}/#{self.directory}"
     if File.directory?("#{Utils.config.assets_display_path}/#{self.directory}")
       Dir.chdir(display_path)
       self.version_control_agent.sync_content
     else
       self.version_control_agent.clone(:destination => display_path)
-      refresh_assets
+      _refresh_assets
     end
   end
 
   # TODO: Determine if this is really the best place to put this because we're dealing with Git bare repo best practices
-  def concatenate_git
+  def _concatenate_git
     self.directory.concat('.git') unless self.directory =~ /.git$/ || self.directory.nil?
   end
 
