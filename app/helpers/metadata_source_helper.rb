@@ -30,7 +30,7 @@ module MetadataSourceHelper
       child_candidates[source.first] = source.last unless source.first == parent_file
     end
     child_candidates.each do |child|
-      child_array << [_prettify(child.first), child.last]
+      child_array << [prettify(child.first), child.last]
     end
     return child_array
   end

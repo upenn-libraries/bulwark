@@ -1,6 +1,6 @@
 <% @object.metadata_builder.metadata_source.each do |source| %>
   <div class="source-specs-form">
-    <h3>Information for <%= _prettify(source.path) %></h3>
+    <h3>Information for <%= prettify(source.path) %></h3>
     <%= form_for source, :validate => true, :url => "/metadata_sources/#{source.id}" do |f| %>
     <%= field_set_tag "Define the orientation of the field mappings:" do %>
     <div class="source-type">

@@ -38,13 +38,13 @@ module MetadataBuilderHelper
     @sample_xml_docs = ""
     @file_links = Array.new
     @object.metadata_builder.preserve.each do |file|
-      @file_links << link_to(_prettify(file), "##{file}")
+      @file_links << link_to(prettify(file), "##{file}")
       anchor_tag = content_tag(:a, "", :name=> file)
       sample_xml_content = File.open(file, "r"){|io| io.read}
       sample_xml_doc = REXML::Document.new sample_xml_content
       sample_xml = ""
       sample_xml_doc.write(sample_xml, 1)
-      header = content_tag(:h3, "XML Sample for #{_prettify(file)}")
+      header = content_tag(:h3, "XML Sample for #{prettify(file)}")
       xml_code = content_tag(:pre, "#{sample_xml}")
       @sample_xml_docs << content_tag(:div, anchor_tag << header << xml_code, :class => "doc")
     end
@@ -56,19 +56,7 @@ module MetadataBuilderHelper
     return content_tag(:ul, @file_links_html.html_safe) << @sample_xml_docs.html_safe
   end
 
-  def _structural_elements(file_name)
-    root_default = ""
-    child_default = ""
-    if @object.metadata_builder.field_mappings.present?
-      root_element = @object.metadata_builder.field_mappings[file_name]["root_element"]["mapped_value"].present? ? @object.metadata_builder.field_mappings[file_name]["root_element"]["mapped_value"] : root_default
-      child_element = @object.metadata_builder.field_mappings[file_name]["child_element"]["mapped_value"].present? ? @object.metadata_builder.field_mappings[file_name]["child_element"]["mapped_value"] : child_default
-      return root_element, child_element
-    else
-      return root_default, child_default
-    end
-  end
-
-  def _prettify(file_path_input)
+  def prettify(file_path_input)
       if file_path_input.is_a? Array
         file_path_array = Array.new
         file_path_input.each do |file_path|
@@ -79,9 +67,11 @@ module MetadataBuilderHelper
         file_path_string = _prettified_working_file(file_path_input)
         return file_path_string
       else
-        raise "Invalid argument #{file_path_input}. _prettify can only accept strings and arrays of strings."
+        raise "Invalid argument #{file_path_input}. prettify can only accept strings and arrays of strings."
       end
   end
+
+  private
 
   def _prettified_working_file(file_path)
     return file_path.gsub(@object.version_control_agent.working_path, "")

@@ -19,32 +19,8 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo = @repo
   end
 
-  def source
-    read_attribute(:source) || ''
-  end
-
-  def source_type
-    read_attribute(:source_type) || ''
-  end
-
-  def source_num_objects
-    read_attribute(:source_num_objects) || ''
-  end
-
-  def source_coordinates
-    read_attribute(:source_coordinates) || ''
-  end
-
   def preserve
     read_attribute(:preserve) || ''
-  end
-
-  def source_mappings
-    read_attribute(:source_mappings) || ''
-  end
-
-  def field_mappings
-    read_attribute(:field_mappings) || ''
   end
 
   def parent_repo

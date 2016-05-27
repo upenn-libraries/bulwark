@@ -2,8 +2,8 @@
   <%= form_for @object.metadata_builder, :validate => true, :method => :post, :url => "/metadata_builders/#{@object.metadata_builder.id}/ingest" do |f| %>
     <% @object.metadata_builder.preserve.each do |preserve| %>
     <div class="checkbox">
-      <%= check_box_tag "to_ingest[#{_prettify(preserve)}]", preserve %>
-      <%= label "to_ingest[#{_prettify(preserve)}]", _prettify(preserve) %>
+      <%= check_box_tag "to_ingest[#{prettify(preserve)}]", preserve %>
+      <%= label "to_ingest[#{prettify(preserve)}]", prettify(preserve) %>
     </div>
     <% end %>
     <%= f.submit "Mark files for ingest" %>
