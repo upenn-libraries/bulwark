@@ -98,15 +98,3 @@ form.field-mappings .field label {
 .source-coordinates .visual-illustration #xy-stop{
   background-image: asset-url("xy_stop.png");
 }
-
-
-/* Errors */
-
-.alert.alert-error .message{
-  border: 3px #995a62 solid;
-  border-radius: 10px;
-  margin: 5px;
-  padding: 5px;
-  background-color: #ffe6e6;
-  color: #732832;
-}

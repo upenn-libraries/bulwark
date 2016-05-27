@@ -1,10 +1,12 @@
 <% flash.each do |key, value| %>
   <div class="alert alert-<%= key %>">
+    <ul>
     <% value.each do |val| %>
-     <div class="message"><%= val %></div>
+     <li><%= val %></li>
     <% end -%>
+  </ul>
   </div>
-<% end %>
+<% end -%>
   <% @object.metadata_builder.metadata_source.each do |source| %>
   <% refresh_metadata_from_source %>
   <%= form_for source, :validate => true, :html => { :class => "field-mappings" }, :url => "/metadata_sources/#{source.id}" do |f| %>
