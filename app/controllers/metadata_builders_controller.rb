@@ -1,6 +1,6 @@
 class MetadataBuildersController < ApplicationController
 
-  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files]
+  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files, :generate_metadata]
 
   def show
   end
@@ -20,6 +20,10 @@ class MetadataBuildersController < ApplicationController
     else
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :error => @error_message }
     end
+  end
+
+  def generate_metadata
+    @metadata_builder.update(metadata_builder_params)
   end
 
   def ingest

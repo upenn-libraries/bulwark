@@ -67,10 +67,6 @@ class MetadataSource < ActiveRecord::Base
     read_attribute(:user_defined_mappings) || ''
   end
 
-  def user_defined_mappings=(user_defined_mappings)
-    self[:user_defined_mappings] = eval(user_defined_mappings)
-  end
-
   def set_metadata_mappings
     fresh_clone = false
     unless File.exist?(self.metadata_builder.repo.version_control_agent.working_path)

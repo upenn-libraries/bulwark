@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       post :source_specs
       post :set_preserve
       post :clear_files
+      post :generate_metadata
     end
   end
 

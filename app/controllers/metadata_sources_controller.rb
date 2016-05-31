@@ -3,7 +3,6 @@ class MetadataSourcesController < ApplicationController
   layout 'application'
 
   before_action :set_metadata_source, only: [:show, :edit, :update]
-  before_filter :user_defined_mappings_conversion, :only => [:create, :update]
 
   def show
   end
@@ -32,14 +31,6 @@ class MetadataSourcesController < ApplicationController
 
   def set_metadata_source
     @metadata_source = MetadataSource.find(params[:id])
-  end
-
-  def user_defined_mappings_conversion
-    if params[:metadata_source].present?
-      params[:metadata_source][:user_defined_mappings] = params[:metadata_source][:user_defined_mappings].to_s if params[:metadata_source][:user_defined_mappings].present?
-    elsif params[:metadata_builder].present?
-      params[:metadata_builder][:metadata_source_attributes][:user_defined_mappings] = params[:metadata_builder][:metadata_source_attributes][:user_defined_mappings].to_s if params[:metadata_builder][:metadata_source_attributes][:user_defined_mappings].present?
-    end
   end
 
   def metadata_source_params
