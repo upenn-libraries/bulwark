@@ -76,6 +76,13 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.delete_clone
   end
 
+  def refresh_metadata_from_source
+    self.metadata_source.each do |source |
+      source.set_metadata_mappings
+      source.save!
+    end
+  end
+
   def build_xml_files
     self.metadata_source.each do |source|
       source.build_xml

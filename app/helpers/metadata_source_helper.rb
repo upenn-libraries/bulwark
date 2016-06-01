@@ -14,15 +14,6 @@ module MetadataSourceHelper
     end
   end
 
-  def refresh_metadata_from_source
-    unless flash[:error]
-      @object.metadata_builder.metadata_source.each do |source |
-        source.set_metadata_mappings
-        source.save!
-        end
-    end
-  end
-
   def nested_relationships_values(parent_file)
     child_array = []
     child_candidates = Hash.new

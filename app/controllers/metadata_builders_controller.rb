@@ -1,6 +1,6 @@
 class MetadataBuildersController < ApplicationController
 
-  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files, :generate_metadata, :generate_preview_xml]
+  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files, :refresh_metadata, :generate_metadata, :generate_preview_xml]
 
   def show
   end
@@ -22,6 +22,11 @@ class MetadataBuildersController < ApplicationController
     end
   end
 
+  def refresh_metadata
+    @metadata_builder.refresh_metadata_from_source
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata refreshed.  See output below."}
+  end
+
   def generate_metadata
     @metadata_builder.update(metadata_builder_params)
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata mappings successfully updated."}
@@ -40,11 +45,6 @@ class MetadataBuildersController < ApplicationController
   def set_source
     @metadata_builder.set_source(params[:metadata_builder][:source].reject!(&:empty?))
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preserve", :flash => { :success => "Metadata sources set successfully." }
-  end
-
-  def set_preserve
-    @metadata_builder.set_preserve(params[:preserve_files])
-    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preserve", :flash => { :success => "Preservation files designated successfully." }
   end
 
   def clear_files

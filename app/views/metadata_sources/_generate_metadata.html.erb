@@ -8,9 +8,12 @@
   </ul>
   </div>
 <% end -%>
-<% refresh_metadata_from_source %>
 
-<%= form_for @object.metadata_builder, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
+<%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :method => :post, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}/refresh_metadata" do |f| %>
+  <%= f.submit "Refresh metadata" %>
+<% end %>
+
+<%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
   <% @object.metadata_builder.metadata_source.each do |source| %>
     <%= f.fields_for :metadata_source, source do |s| %>
 
@@ -49,5 +52,5 @@
     <% end -%>
   <% end -%>
   <% end -%>
-  <%= content_tag(:div, (f.submit "Save metadata mappings and generate preservation XML"), :class => "form-bottom") %>
+  <%= content_tag(:div, (f.submit "Save metadata mappings"), :class => "form-bottom") %>
   <% end -%>

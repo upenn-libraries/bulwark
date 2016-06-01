@@ -9,12 +9,11 @@ Rails.application.routes.draw do
   resources :metadata_builders do
     member do
       post :update
-      post :git_annex_commit
       post :ingest
       post :preserve
       post :set_source
-      post :set_preserve
       post :clear_files
+      post :refresh_metadata
       post :generate_preview_xml
     end
   end
