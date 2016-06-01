@@ -38,8 +38,12 @@ class MetadataBuildersController < ApplicationController
   end
 
   def ingest
-    @message = @metadata_builder.transform_and_ingest(params[:to_ingest])
-    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { @message.keys.first => @message.values.first }
+    if params[:to_ingest].present?
+      @message = @metadata_builder.transform_and_ingest(params[:to_ingest])
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { @message.keys.first => @message.values.first }
+    else
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :error => "Select at least one file to ingest."}
+    end
   end
 
   def set_source

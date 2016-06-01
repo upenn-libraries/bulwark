@@ -128,6 +128,7 @@ class Repo < ActiveRecord::Base
   end
 
 private
+
   def _build_and_populate_directories(working_copy_path)
     admin_directory = "#{Utils.config.object_admin_path}"
     data_directory = "#{Utils.config.object_data_path}"
