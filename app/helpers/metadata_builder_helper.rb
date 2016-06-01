@@ -1,15 +1,7 @@
 module MetadataBuilderHelper
 
-  def render_form_or_message(partial)
-    if @object.metadata_builder.source.present?
-      render :partial => partial, :locals => {metadata_builder: @object.metadata_builder}
-    else
-      render :partial => "metadata_builders/no_source"
-    end
-  end
-
   def render_preview_xml
-    if @object.metadata_builder.preserve.present?
+    if MetadataSource.where(:metadata_builder_id => @object.metadata_builder.id).pluck(:user_defined_mappings).present?
       render :partial => "metadata_builders/preview_xml"
     else
       render :partial => "metadata_builders/no_mappings"

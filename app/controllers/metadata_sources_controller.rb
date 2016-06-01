@@ -20,7 +20,6 @@ class MetadataSourcesController < ApplicationController
 
   def update
     if @metadata_source.update(metadata_source_params)
-      @metadata_source.build_xml_files if @metadata_source.user_defined_mappings.present?
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_source.metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata source successfully updated." }
     else
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_source.metadata_builder.repo.id}/generate_metadata", :flash => {:danger => @metadata_source.errors.full_messages }

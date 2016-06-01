@@ -4,8 +4,6 @@ Rails.application.routes.draw do
       post :checksum_log
       post :ingest
       post :detect_metadata
-      post :save_mappings
-      post :generate_xml_preview
     end
   end
   resources :metadata_builders do
@@ -15,10 +13,9 @@ Rails.application.routes.draw do
       post :ingest
       post :preserve
       post :set_source
-      post :source_specs
       post :set_preserve
       post :clear_files
-      post :generate_metadata
+      post :generate_preview_xml
     end
   end
 

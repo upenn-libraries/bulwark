@@ -1,18 +1,24 @@
 class MetadataBuilder < ActiveRecord::Base
 
   belongs_to :repo, :foreign_key => "repo_id"
-
   has_many :metadata_source, dependent: :destroy, :validate => false
   accepts_nested_attributes_for :metadata_source, allow_destroy: true
+
+  around_create :set_preserve
 
   include Utils
 
   validates :parent_repo, presence: true
-
   serialize :preserve, Set
 
   @@xml_tags = Array.new
   @@error_message = nil
+
+  def set_preserve
+    preserve_full_path = "#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/#{self.repo.preservation_filename}"
+    self.preserve.add(preserve_full_path)
+    yield
+  end
 
   def parent_repo=(parent_repo)
     self[:parent_repo] = parent_repo
@@ -68,6 +74,12 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.commit("Removed files not identified as metadata source and/or for long-term preservation: #{unidentified_files}")
     self.repo.version_control_agent.push
     self.repo.version_control_agent.delete_clone
+  end
+
+  def build_xml_files
+    self.metadata_source.each do |source|
+      source.build_xml
+    end
   end
 
   def transform_and_ingest(array)

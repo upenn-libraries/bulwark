@@ -1,6 +1,6 @@
 class MetadataBuildersController < ApplicationController
 
-  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files, :generate_metadata]
+  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files, :generate_metadata, :generate_preview_xml]
 
   def show
   end
@@ -16,14 +16,20 @@ class MetadataBuildersController < ApplicationController
   def update
     if @metadata_builder.update(metadata_builder_params)
       _update_metadata_sources if params[:metadata_builder][:metadata_source_attributes].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :success => "Metadata mappings successfully updated.  See XML preview below."}
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata Builder updated successfully."}
     else
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :error => @error_message }
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :error => @error_message }
     end
   end
 
   def generate_metadata
     @metadata_builder.update(metadata_builder_params)
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata mappings successfully updated."}
+  end
+
+  def generate_preview_xml
+    @metadata_builder.build_xml_files
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :success => "Preservation XML generated successfully.  See preview below."}
   end
 
   def ingest

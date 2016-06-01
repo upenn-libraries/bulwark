@@ -78,7 +78,7 @@ class MetadataSource < ActiveRecord::Base
     self.save!
   end
 
-  def build_xml_files
+  def build_xml
     self.set_metadata_mappings
     self.metadata_builder.repo.version_control_agent.clone
     self.generate_and_build_xml
@@ -112,7 +112,6 @@ class MetadataSource < ActiveRecord::Base
       @xml_content_final_copy = @xml_content
     end
     _build_preservation_xml(xml_fname, @xml_content_final_copy)
-    self.metadata_builder.preserve.add(xml_fname)
     self.metadata_builder.save!
     self.metadata_builder.repo.version_control_agent.commit("Generated preservation XML for #{fname}")
     self.metadata_builder.repo.version_control_agent.push
@@ -137,7 +136,6 @@ class MetadataSource < ActiveRecord::Base
       _build_preservation_xml(xml_unified_filename,xml_content)
       self.metadata_builder.repo.version_control_agent.commit("Generated unified XML for #{self.path} and #{child_path} at #{xml_unified_filename}")
       self.metadata_builder.repo.version_control_agent.push
-      self.metadata_builder.preserve.add(xml_unified_filename)
       self.metadata_builder.save!
     end
   end
