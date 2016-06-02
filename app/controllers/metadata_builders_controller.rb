@@ -17,8 +17,8 @@ class MetadataBuildersController < ApplicationController
     if @metadata_builder.update(metadata_builder_params)
       _update_metadata_sources if params[:metadata_builder][:metadata_source_attributes].present?
       if @metadata_builder.errors.present?
-        errors_rendered = Array[*@metadata_builder.errors.messages.values.flatten(1)].join(I18n.t('application_messages.error_messages.new_line'))
-        redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :error => errors_rendered}
+        errors_rendered = Array[*@metadata_builder.errors.messages.values.flatten(1)].join(";  ").html_safe
+        redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :error => errors_rendered }
       else
         redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata Builder updated successfully."}
       end
