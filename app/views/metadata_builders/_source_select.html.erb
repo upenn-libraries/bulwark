@@ -3,7 +3,7 @@
     <% @preserve = @object.metadata_builder.available_metadata_files %>
     <div class="md-source-select">
       <%= f.label :source, "Select metadata sources:" %>
-      <%= f.select :source, _prettify(@preserve).zip(@preserve), {}, { :multiple => true }  %>
+      <%= f.select :source, prettify(@preserve).zip(@preserve), {}, { :multiple => true }  %>
     </div>
     <%= f.submit "Mark files to be designated as metadata sources" %>
   <% end -%>

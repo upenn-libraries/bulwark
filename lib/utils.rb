@@ -1,14 +1,7 @@
 require 'roo'
 require 'pathname'
-require 'utils/core_ext'
 
 module Utils
-
-  class UtilsExecuteError < StandardError
-    def initialize(data)
-      @data = data
-    end
-  end
 
   class << self
 
@@ -36,10 +29,8 @@ module Utils
       end
     end
 
-
     def index
       ActiveFedora::Base.reindex_everything
     end
-
   end
 end

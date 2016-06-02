@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160314191728) do
+ActiveRecord::Schema.define(version: 20160523141604) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
@@ -28,24 +28,39 @@ ActiveRecord::Schema.define(version: 20160314191728) do
   create_table "metadata_builders", force: :cascade do |t|
     t.string   "parent_repo"
     t.string   "source"
-    t.text     "source_type"
-    t.text     "source_num_objects"
-    t.text     "source_coordinates"
     t.string   "preserve"
-    t.string   "nested_relationships"
-    t.text     "source_mappings"
-    t.text     "field_mappings"
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
     t.integer  "repo_id"
+    t.integer  "metadata_source_id"
   end
 
+  add_index "metadata_builders", ["metadata_source_id"], name: "index_metadata_builders_on_metadata_source_id"
   add_index "metadata_builders", ["repo_id"], name: "index_metadata_builders_on_repo_id"
+
+  create_table "metadata_sources", force: :cascade do |t|
+    t.string   "path"
+    t.string   "view_type",             default: "horizontal"
+    t.integer  "num_objects",           default: 1
+    t.integer  "x_start",               default: 1
+    t.integer  "y_start",               default: 1
+    t.integer  "x_stop",                default: 1
+    t.integer  "y_stop",                default: 1
+    t.text     "original_mappings"
+    t.string   "root_element"
+    t.string   "parent_element"
+    t.text     "user_defined_mappings"
+    t.text     "children"
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.integer  "metadata_builder_id"
+  end
+
+  add_index "metadata_sources", ["metadata_builder_id"], name: "index_metadata_sources_on_metadata_builder_id"
 
   create_table "repos", force: :cascade do |t|
     t.string   "title"
     t.string   "directory"
-    t.string   "identifier"
     t.string   "description"
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false

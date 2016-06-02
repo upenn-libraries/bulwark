@@ -3,38 +3,23 @@ class ReposController < ApplicationController
 
   def show
     @message = @repo.create_remote
-    if @message[:error].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_actions", :flash => { :error => @message[:error] }
-    elsif @message[:success].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_actions", :flash => { :success => @message[:success] }
-    end
+    redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_actions", :flash => { @message.keys.first => @message.values.first }
   end
 
   def checksum_log
     @message = Utils.generate_checksum_log("#{Utils.config.assets_path}/#{@repo.directory}")
-    if @message[:error].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/ingest", :flash => { :error => @message[:error] }
-    elsif @message[:success].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/ingest", :flash => { :success => @message[:success] }
-    end
+    redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/ingest", :flash => { @message.keys.first => @message.values.first }
+
   end
 
   def preview_xml_preview
     @message = @repo.preview_xml_preview
-    if @message[:error].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/preview_xml", :flash => { :error => @message[:error] }
-    elsif @message[:success].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/preview_xml", :flash => { :success => @message[:success] }
-    end
+    redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/preview_xml", :flash => { @message.keys.first => @message.values.first }
   end
 
   def detect_metadata
     @message = @repo.detect_metadata_sources
-    if @message[:error].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/map_metadata", :flash => { :error => @message[:error] }
-    elsif @message[:success].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/map_metadata", :flash => { :success => @message[:success] }
-    end
+    redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/map_metadata", :flash => { @message.keys.first => @message.values.first }
   end
 
 

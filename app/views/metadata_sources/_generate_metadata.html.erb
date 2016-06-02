@@ -1,0 +1,45 @@
+<%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :method => :post, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}/refresh_metadata" do |f| %>
+  <%= f.submit "Refresh metadata" %>
+<% end %>
+
+<%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
+  <% @object.metadata_builder.metadata_source.each do |source| %>
+    <%= f.fields_for :metadata_source, source do |s| %>
+
+    <%= field_set_tag 'Map source metadata to XML' do %>
+      Fill out the fields below to field values from metadata source files to XML.
+    <% end %>
+    <h3>Mappings for <%= prettify(source.path) %></h3>
+    <%= content_tag :div, :class => "field" do -%>
+      <%= s.label :root_element, "Root element:" %>
+      <%= s.text_field :root_element %>
+      <%= content_tag(:div, "Root element of the XML schema generated -- defaults to \"root\" if left blank.", :class => "field-tip") %>
+    <% end -%>
+    <%= content_tag :div, :class => "field" do -%>
+      <%= s.label :parent_element, "Child element of root, applied per row (optional):" %>
+      <%= s.text_field :parent_element %>
+      <%= content_tag(:div, "Optional -- Parent of each row of values in metadata source spreadsheet; Child of the root element.", :class => "field-tip") %>
+    <% end -%>
+
+    <% source.original_mappings.each do |p| %>
+      <% val = source.user_defined_mappings.present? ? source.user_defined_mappings["#{p.first}"]["mapped_value"] : p.first %>
+      <%= content_tag :div, :class => "field" do -%>
+        <%= s.label "user_defined_mappings[#{p.first}][mapped_value]", "\"#{p.first}\" should map to:" %>
+        <%= s.text_field "user_defined_mappings[#{p.first}][mapped_value]", :value => "#{val}" %>
+        <%= content_tag(:div, "Example values from source: #{p.last.to_s}", :class => "field-tip") %>
+      <% end -%>
+    <% end -%>
+
+
+    <% if @object.metadata_builder.metadata_source.size > 1 %>
+      <h2>Define relationships</h2>
+      <p>Structure relationships between multiple metadata source files</p>
+      <%= content_tag :div, :class => "field" do -%>
+        <%= s.label :children, "Child/children of #{prettify(source.path)}:" %>
+        <%= s.select :children, nested_relationships_values(source.path), {}, { :multiple => true } %>
+      <% end -%>
+    <% end -%>
+  <% end -%>
+  <% end -%>
+  <%= content_tag(:div, (f.submit "Save metadata mappings"), :class => "form-bottom") %>
+  <% end -%>
