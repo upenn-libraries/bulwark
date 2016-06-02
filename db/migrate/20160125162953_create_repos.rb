@@ -3,7 +3,6 @@ class CreateRepos < ActiveRecord::Migration
     create_table :repos do |t|
       t.string :title
       t.string :purl
-      t.string :prefix
       t.string :description
       t.timestamps null: false
     end
