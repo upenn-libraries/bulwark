@@ -6,7 +6,7 @@ class MetadataSource < ActiveRecord::Base
 
   include Utils
 
-  validate :xml_tags
+  validates :user_defined_mappings, :xml_tags => true
 
   serialize :original_mappings, Hash
   serialize :user_defined_mappings, Hash
@@ -149,27 +149,7 @@ class MetadataSource < ActiveRecord::Base
     return parsed
   end
 
-  protected
-
-  def xml_tags
-    full_error_message = ""
-    self.send(:user_defined_mappings).each do |mapping|
-      error_messages = _validate_xml_tag(mapping.last["mapped_value"])
-      error_messages.each do |e|
-        errors.add(:user_defined_mappings, " error(s): #{e}")
-      end
-    end
-  end
-
   private
-
-    def _validate_xml_tag(tag)
-      error_message = Array.new
-      error_message << "Invalid tag \"#{tag}\" - valid XML tags cannot start with #{tag.first_three}" if tag.starts_with_xml?
-      error_message << "Invalid tag \"#{tag}\" - valid XML tags cannot begin with numbers" if tag.starts_with_number?
-      error_message << "Invalid tag \"#{tag}\" - valid XML tags can only contain letters, numbers, underscores, hyphens, and periods" if tag.contains_xml_invalid_characters?
-      return error_message
-    end
 
     def _convert_metadata
       begin

@@ -1,14 +1,16 @@
 class MetadataBuilder < ActiveRecord::Base
 
   belongs_to :repo, :foreign_key => "repo_id"
-  has_many :metadata_source, dependent: :destroy, :validate => false
+  has_many :metadata_source, dependent: :destroy
   accepts_nested_attributes_for :metadata_source, allow_destroy: true
+  validates_associated :metadata_source
 
   around_create :set_preserve
 
   include Utils
 
   validates :parent_repo, presence: true
+
   serialize :preserve, Set
 
   @@xml_tags = Array.new

@@ -1,6 +1,5 @@
 require 'roo'
 require 'pathname'
-require 'utils/core_ext'
 
 module Utils
 

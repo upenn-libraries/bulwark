@@ -16,9 +16,14 @@ class MetadataBuildersController < ApplicationController
   def update
     if @metadata_builder.update(metadata_builder_params)
       _update_metadata_sources if params[:metadata_builder][:metadata_source_attributes].present?
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata Builder updated successfully."}
+      if @metadata_builder.errors.present?
+        errors_rendered = Array[*@metadata_builder.errors.messages.values.flatten(1)].join(I18n.t('application_messages.error_messages.new_line'))
+        redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :error => errors_rendered}
+      else
+        redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata Builder updated successfully."}
+      end
     else
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :error => @error_message }
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :error => "Metadata Builder was not updated successfully."}
     end
   end
 
@@ -73,6 +78,9 @@ class MetadataBuildersController < ApplicationController
       hash_params = Hash[hash_params_strings.map{|k,v| [k.to_sym, v]}]
       metadata_source = MetadataSource.find(hash_params[:id])
       metadata_source.update(hash_params)
+      metadata_source.errors.messages.each do |key, message|
+        @metadata_builder.errors[:base] << message
+      end
     end
   end
 
