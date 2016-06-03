@@ -2,6 +2,7 @@ require "rexml/document"
 
 module RailsAdminHelper
 
+  include CatalogHelper
   include MetadataBuilderHelper
   include MetadataSourceHelper
   include RepoHelper
