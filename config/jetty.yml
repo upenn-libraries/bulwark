@@ -4,5 +4,5 @@ default:
   java_opts:
     - "-Xmx512m"
     - "-XX:MaxPermSize=128m"
-    - "-Dfcrepo.modeshape.configuration=file:///Users/katherly/Documents/Rails/head/config/repository.json"
+    - "-Dfcrepo.modeshape.configuration=file:///Users/katherly/Documents/Rails/colenda/config/repository.json"
 
