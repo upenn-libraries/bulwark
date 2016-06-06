@@ -1,6 +1,11 @@
 <% @object.ingested.each do |ingest| -%>
   <% @document = ActiveFedora::Base.find(ingest) %>
   <% @document.attribute_names.each do |a_name| -%>
-  <%= @document.try(a_name)%>
+    <strong><%= a_name.capitalize if @document.try(a_name).present? %></strong>
+    <% Array[@document.try(a_name)].flatten(1).each do |value| %>
+      <div>
+        <%= value %>
+      </div>
+    <% end -%>
   <% end -%>
 <% end -%>
