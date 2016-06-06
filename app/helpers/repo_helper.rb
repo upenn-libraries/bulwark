@@ -1,5 +1,6 @@
 module RepoHelper
-  include Blacklight::BlacklightHelperBehavior
+  include BlacklightHelper
+
   def render_git_directions_or_actions
     full_path = "#{assets_path_prefix}/#{@object.directory}"
     if Dir.exists?(full_path)
@@ -10,7 +11,10 @@ module RepoHelper
   end
 
   def render_ingested_list
-    render :partial => "repos/ingested_links" if @object.try(:ingested).present?
+    if @object.try(:ingested).present?
+      render :partial => "repos/ingested_links"
+      render :partial => "base_models/preview"
+    end
   end
 
   def _generate_ingest_link(ingested_id)
