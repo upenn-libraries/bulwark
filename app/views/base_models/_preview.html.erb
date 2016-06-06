@@ -1,6 +1,7 @@
 <% @object.ingested.each do |ingest| -%>
+  <h3>Alphabetized metadata-only preview of <%= ingest %></h3>
   <% @document = ActiveFedora::Base.find(ingest) %>
-  <% @document.attribute_names.each do |a_name| -%>
+  <% @document.attribute_names.sort.each do |a_name| -%>
     <strong><%= a_name.capitalize if @document.try(a_name).present? %></strong>
     <% Array[@document.try(a_name)].flatten(1).each do |value| %>
       <div>

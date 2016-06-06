@@ -1,0 +1,6 @@
+<% obj = ActiveFedora::Base.find(@document.id) %>
+<%= form_for obj do |f| %>
+  <%= f.label :review_status, "Review Status" %>
+  <%= f.text_area :review_status %>
+  <%= f.submit %>
+<% end -%>

@@ -1,0 +1,20 @@
+class ManuscriptsController < ApplicationController
+  include BaseModelsController
+  before_action :set_manuscript, only: [:update]
+  def update
+    if @manuscript.update(manuscript_params)
+      redirect_to catalog_url
+    end
+  end
+
+  private
+
+  def set_manuscript
+    @manuscript = Manuscript.find(params[:id])
+  end
+
+  def manuscript_params
+    params.require(:manuscript).permit(:review_status)
+  end
+
+end

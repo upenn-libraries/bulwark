@@ -13,6 +13,11 @@ module RepoHelper
   def render_ingested_list
     if @object.try(:ingested).present?
       render :partial => "repos/ingested_links"
+    end
+  end
+
+  def render_preview_ingested
+    if @object.try(:ingested).present?
       render :partial => "base_models/preview"
     end
   end
