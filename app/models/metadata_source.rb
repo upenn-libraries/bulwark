@@ -120,7 +120,7 @@ class MetadataSource < ActiveRecord::Base
   def generate_parent_child_xml
     self.children.each do |child|
       metadata_path = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
-      child_path = MetadataSource.where(:id => 2).pluck(:path).first
+      child_path = MetadataSource.where(:id => child).pluck(:path).first
       key_xml_path = "#{self.path}.xml"
       child_xml_path = "#{child_path}.xml"
       self.metadata_builder.repo.version_control_agent.get(:get_location => key_xml_path)
@@ -237,7 +237,7 @@ class MetadataSource < ActiveRecord::Base
       _offset = 1
       headers.each_with_index do |header,h_index|
         field_val = workbook[0][y_start+index+_offset][x_start+h_index].present? ? workbook[0][y_start+index+_offset][x_start+h_index].value : ""
-        row_value << "<#{header}>#{field_val}</#{header}>"
+        row_value << "<#{self.user_defined_mappings[header]["mapped_value"]}>#{field_val}</#{self.user_defined_mappings[header]["mapped_value"]}>" if self.user_defined_mappings[header].present?
       end
       return row_value
     end
@@ -253,7 +253,7 @@ class MetadataSource < ActiveRecord::Base
       _offset = 1
       headers.each_with_index do |header,h_index|
         field_val = workbook[0][y_start+h_index][index+_offset].present? ? workbook[0][y_start+h_index][index+_offset].value : ""
-        column_value << "<#{header}>#{field_val}</#{header}>"
+        column_value << "<#{self.user_defined_mappings[header]["mapped_value"]}>#{field_val}</#{self.user_defined_mappings[header]["mapped_value"]}>"
       end
       return column_value
     end
