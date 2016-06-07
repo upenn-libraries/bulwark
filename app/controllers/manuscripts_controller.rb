@@ -2,8 +2,13 @@ class ManuscriptsController < ApplicationController
   include BaseModelsController
   before_action :set_manuscript, only: [:update]
   def update
-    if @manuscript.update(manuscript_params)
-      redirect_to catalog_url
+    if manuscript_params[:review_status].present?
+      binding.pry()
+      @manuscript.review_status << manuscript_params[:review_status]
+    else
+      if @manuscript.update(manuscript_params)
+        redirect_to catalog_url
+      end
     end
   end
 
