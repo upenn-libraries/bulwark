@@ -10,6 +10,14 @@ module RepoHelper
     end
   end
 
+  def render_ingest_or_message
+    if @object.preserve_exists?
+      render :partial => "repos/ingest_select"
+    else
+      render :partial => "repos/no_xml"
+    end
+  end
+
   def render_ingested_list
     if @object.try(:ingested).present?
       render :partial => "repos/ingested_links"
@@ -22,7 +30,7 @@ module RepoHelper
     end
   end
 
-  def _generate_ingest_link(ingested_id)
+  def generate_ingest_link(ingested_id)
     begin
       obj = ActiveFedora::Base.find(ingested_id)
       truncated_title = "#{obj.title.first[0..100]}..."

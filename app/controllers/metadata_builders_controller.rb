@@ -33,8 +33,8 @@ class MetadataBuildersController < ApplicationController
   end
 
   def generate_metadata
-    @metadata_builder.update(metadata_builder_params)
-    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata mappings successfully updated."}
+    @message = @metadata_builder.update(metadata_builder_params)
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { @message.keys.first => @message.values.first }
   end
 
   def generate_preview_xml

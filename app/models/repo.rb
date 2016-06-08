@@ -127,6 +127,10 @@ class Repo < ActiveRecord::Base
     return metadata_source_file_extensions
   end
 
+  def preserve_exists?
+    return _check_if_preserve_exists
+  end
+
 private
 
   def _build_and_populate_directories(working_copy_path)
@@ -182,6 +186,16 @@ private
       self.version_control_agent.clone(:destination => display_path)
       _refresh_assets
     end
+  end
+
+  def _check_if_preserve_exists
+    self.version_control_agent.clone
+    self.metadata_builder.preserve.each {|f| @fname = f if File.basename(f) == self.preservation_filename}
+    self.version_control_agent.get(:get_location => @fname)
+    exist_status = File.exists?(@fname)
+    self.version_control_agent.drop
+    self.version_control_agent.delete_clone
+    return exist_status
   end
 
   # TODO: Determine if this is really the best place to put this because we're dealing with Git bare repo best practices

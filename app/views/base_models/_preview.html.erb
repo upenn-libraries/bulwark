@@ -4,9 +4,9 @@
   <% @document.attribute_names.sort.each do |a_name| -%>
     <strong><%= a_name.capitalize if @document.try(a_name).present? %></strong>
     <% Array[@document.try(a_name)].flatten(1).each do |value| %>
-      <div>
-        <%= value %>
-      </div>
+      <ul>
+        <li><%= value %></li>
+      </ul>
     <% end -%>
   <% end -%>
 <% end -%>
