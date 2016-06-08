@@ -98,3 +98,10 @@ form.field-mappings .field label {
 .source-coordinates .visual-illustration #xy-stop{
   background-image: asset-url("xy_stop.png");
 }
+
+.field-mappings .file-path, .edit_metadata_builder .file-path{
+  color: #000000;
+  background-color: #e0e0e0;
+  font-family: monospace;
+  font-size: 120%;
+}
