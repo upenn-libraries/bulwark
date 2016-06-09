@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     member do
       post :checksum_log
       post :ingest
+      post :review_status
       post :detect_metadata
     end
   end
@@ -18,10 +19,6 @@ Rails.application.routes.draw do
       post :refresh_metadata
       post :generate_preview_xml
     end
-  end
-
-  resources :manuscripts do
-    post :update
   end
 
   resources :metadata_sources

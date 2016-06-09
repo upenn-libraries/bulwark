@@ -1,4 +1,4 @@
-class Manuscript < BaseModel
+class Manuscript < ActiveFedora::Base
 
   validates :title, presence: true
   validates :identifier, presence: true

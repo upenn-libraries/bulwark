@@ -26,7 +26,7 @@ module RepoHelper
 
   def render_preview_ingested
     if @object.try(:ingested).present?
-      render :partial => "base_models/preview"
+      render :partial => "repos/review_and_preview"
     end
   end
 

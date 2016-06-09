@@ -1,5 +1,5 @@
 class ReposController < ApplicationController
-  before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log, :prepare_for_ingest, :ingest, :detect_metadata, :preview_xml_preview]
+  before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log, :ingest, :review_status, :detect_metadata, :preview_xml_preview]
 
   def show
     @message = @repo.create_remote
@@ -9,7 +9,11 @@ class ReposController < ApplicationController
   def checksum_log
     @message = Utils.generate_checksum_log("#{Utils.config.assets_path}/#{@repo.directory}")
     redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/ingest", :flash => { @message.keys.first => @message.values.first }
+  end
 
+  def review_status
+    @message = @repo.update(repo_params)
+    redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/ingest", :flash => { :success => "Review status note added." }
   end
 
   def preview_xml_preview
@@ -29,6 +33,6 @@ class ReposController < ApplicationController
     end
 
     def repo_params
-      params.require(:repo).permit(:title, :directory, :identifier, :description, :metadata_subdirectory, :assets_subdirectory, :metadata_filename, :file_extensions, :version_control_agent, :preservation_filename)
+      params.require(:repo).permit(:title, :directory, :identifier, :description, :metadata_subdirectory, :assets_subdirectory, :metadata_filename, :file_extensions, :version_control_agent, :preservation_filename, :review_status)
     end
 end

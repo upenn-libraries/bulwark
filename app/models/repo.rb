@@ -1,3 +1,5 @@
+require 'sanitize'
+
 class Repo < ActiveRecord::Base
 
   has_one :metadata_builder, dependent: :destroy, :validate => false
@@ -17,9 +19,10 @@ class Repo < ActiveRecord::Base
   validates :title, multiple: false
   validates :directory, multiple: false
 
-  serialize :metadata_sources
-  serialize :metadata_builder_id
-  serialize :ingested
+  serialize :metadata_sources, Array
+  serialize :metadata_builder_id, Array
+  serialize :ingested, Array
+  serialize :review_status, Array
 
   include Filesystem
   include FileExtensions
@@ -83,6 +86,14 @@ class Repo < ActiveRecord::Base
 
   def metadata_source_extensions
     read_attribute(:metadata_source_extensions) || ''
+  end
+
+  def review_status
+    read_attribute(:review_status) || ''
+  end
+
+  def review_status=(review_status)
+    self[:review_status].push(Sanitize.fragment(review_status, Sanitize::Config::RESTRICTED)) if review_status.present?
   end
 
   def create_remote
