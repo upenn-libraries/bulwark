@@ -1,25 +1,25 @@
 <% @object.ingested.each do |ingest| -%>
-<% @document = ActiveFedora::Base.find(ingest) %>
-<%= form_for @object, :validate => true, :html => {:class => "ingest-review"}, :method => :post, :url => "/repos/#{@object.id}/review_status" do |f| %>
-<%= f.label :review_status, "Review Status" %>
-<%= f.text_area :review_status, :value => nil %>
-<%= f.submit "Update Review Status for #{@document.identifier.first}" %>
-<% end -%>
+  <% @document = ActiveFedora::Base.find(ingest) %>
+    <%= form_for @object, :validate => true, :html => {:class => "ingest-review"}, :method => :post, :url => "/repos/#{@object.id}/review_status" do |f| %>
+    <%= f.label :review_status, "Review Status" %>
+    <%= f.text_area :review_status, :value => nil %>
+    <%= f.submit "Update Review Status for #{@document.identifier.first}" %>
+  <% end -%>
 
   <h3>Review Status</h3>
   <ul>
-  <% @object.review_status.each do |review| %>
-    <li><%= review %></li>
-  <% end -%>
-</ul>
+    <% @object.review_status.each do |review| %>
+      <li><%= review %></li>
+    <% end -%>
+  </ul>
 
   <h3>Alphabetized metadata-only preview of <%= ingest %></h3>
   <% @document.attribute_names.sort.each do |a_name| -%>
     <strong><%= a_name.capitalize if @document.try(a_name).present? %></strong>
     <ul>
-    <% Array[@document.try(a_name)].flatten(1).each do |value| %>
+      <% Array[@document.try(a_name)].flatten(1).each do |value| %>
         <li><%= value %></li>
-    <% end -%>
-  </ul>
+      <% end -%>
+    </ul>
   <% end -%>
 <% end -%>

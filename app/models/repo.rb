@@ -21,7 +21,6 @@ class Repo < ActiveRecord::Base
 
   serialize :metadata_sources, Array
   serialize :metadata_builder_id, Array
-  serialize :ingested, Array
   serialize :review_status, Array
 
   include Filesystem
@@ -112,12 +111,9 @@ class Repo < ActiveRecord::Base
 
   def ingest(directory)
     begin
-      ingest_array = Array.new
-      Dir.glob("#{directory}/*").each do |file|
-        @status = Utils::Process.import(file, self)
-        ingest_array << File.basename(file, File.extname(file))
-      end
-      self.ingested = ingest_array
+      file = "#{directory}/#{self.preservation_filename}"
+      @status = Utils::Process.import(file, self)
+      self.ingested = File.basename(file, File.extname(file))
       _refresh_assets
       self.save!
       return @status
