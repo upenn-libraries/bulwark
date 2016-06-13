@@ -146,6 +146,10 @@ class Repo < ActiveRecord::Base
     return _check_if_preserve_exists
   end
 
+  def update_object_review_status
+    _update_object_review_status
+  end
+
 private
 
   def _build_and_populate_directories(working_copy_path)

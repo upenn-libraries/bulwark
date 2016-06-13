@@ -109,8 +109,9 @@ class MetadataSource < ActiveRecord::Base
     if self.root_element.present?
       @xml_content_final_copy = "<#{root_element}>#{@xml_content}</#{root_element}>"
     else
-      @xml_content_final_copy = @xml_content
+      @xml_content_final_copy = "#{@xml_content}"
     end
+    @xml_content_final_copy
     _build_preservation_xml(xml_fname, @xml_content_final_copy)
     self.metadata_builder.save!
     self.metadata_builder.repo.version_control_agent.commit("Generated preservation XML for #{fname}")
@@ -138,6 +139,14 @@ class MetadataSource < ActiveRecord::Base
       self.metadata_builder.repo.version_control_agent.push
       self.metadata_builder.save!
     end
+  end
+
+  def generate_review_status_xml
+    review_status_xml = ""
+    self.metadata_builder.repo.review_status.each do |review_status|
+      review_status_xml << "<review_status>#{review_status}</review_status>"
+    end
+    return review_status_xml
   end
 
   def parse_error_messages(error_messages)
@@ -260,6 +269,10 @@ class MetadataSource < ActiveRecord::Base
 
     def _build_preservation_xml(filename, content)
       tmp_filename = "#{filename}.tmp"
+      if File.basename(filename) == self.metadata_builder.repo.preservation_filename
+        xml_review_status = generate_review_status_xml
+        content << xml_review_status
+      end
       File.open(tmp_filename, "w+") do |f|
         f << $xml_header << content << $xml_footer
       end
