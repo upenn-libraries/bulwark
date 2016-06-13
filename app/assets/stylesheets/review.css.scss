@@ -4,7 +4,16 @@
 *
 */
 
+.blacklight-catalog-show .review-status,
+.blacklight-catalog-show .review-status .panel-heading,
+.blacklight-catalog-show .review-status .panel-body {
+  border-color: #4a819c;
+}
 
-.blacklight-catalog-show .review-status{
+.blacklight-catalog-show .review-status .panel-heading {
+  background-color: #a3c5d5;
+}
 
+.blacklight-catalog-show .review-status .panel-body {
+  background-color: #e2f0f6;
 }

@@ -4,5 +4,7 @@
 
 <div id="sidebar" class="<%= show_sidebar_classes %>">
    <%= render_document_sidebar_partial %>
-   <%= render_review_box %>
+   <% if current_user %>
+     <%= render_review_box %>
+   <% end %>
 </div>

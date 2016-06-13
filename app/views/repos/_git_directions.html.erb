@@ -1,4 +1,4 @@
 <div class="git-directions">
   <p>Your git remote has been initialized at <%= "#{full_path}" %>.  To begin using this remote, run the following command from the terminal:
-  <pre>git clone <%= "#{full_path}\ncd #{(@object.directory).gsub(".git","")}" %></pre></p>
+  <pre>git clone <%= "#{full_path}\ncd #{(@object.directory).gsub(".git","")}/#{Utils.config.object_data_path}" %></pre></p>
 </div>

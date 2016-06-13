@@ -4,7 +4,10 @@
   background-color: #e4e4e4;
 }
 
-.metadata-sources-table table, .metadata-sources-table th, .metadata-sources-table tr, .metadata-sources-table td {
+.metadata-sources-table table,
+.metadata-sources-table th,
+.metadata-sources-table tr,
+.metadata-sources-table td {
   border: 1px solid #000000;
   padding: 0.5em;
 }
@@ -43,8 +46,13 @@ form.field-mappings .field label {
   clear: both;
 }
 
-.md-source-select label, .ingest-review label, .ingest-review input {
+.md-source-select label{
   display: block;
+}
+.ingest-review {
+  label, input {
+    display: block;
+  }
 }
 
 .source-type .input-fields {
@@ -69,13 +77,15 @@ form.field-mappings .field label {
   background-position: top right;
 }
 
-.source-coordinates .visual-illustration #xy-start, .source-coordinates .visual-illustration #xy-stop {
-  float: left;
-  width: 120px;
-  height: 100px;
-  background-size: 100%;
-  background-repeat: no-repeat;
-  background-position: top right;
+.source-coordinates .visual-illustration {
+  #xy-start,  #xy-stop {
+    float: left;
+    width: 120px;
+    height: 100px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: top right;
+  }
 }
 
 .source-type .visual-illustration #vertical{
