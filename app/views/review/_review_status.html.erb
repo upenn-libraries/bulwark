@@ -1,0 +1,17 @@
+<div class="panel panel-default show-tools">
+  <div class="panel-heading">
+    Review Status
+  </div>
+  <div class="panel-body">
+    <% if local_assigns.has_key? :stats %>
+    <ul class="review-status">
+      <% stats.each do |stat| %>
+        <li>
+          <%= stat %>
+        </li>
+      <% end %>
+    </ul>
+    <% end -%>
+    <%= render_review_link(repo_id) if local_assigns.has_key? :repo_id %>
+  </div>
+</div>

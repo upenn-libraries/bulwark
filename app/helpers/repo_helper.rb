@@ -41,4 +41,15 @@ module RepoHelper
       return nil
     end
   end
+
+  def render_review_status(repo)
+    if repo.try(:ingested).present?
+      render :partial => "review/review_status", :locals => { :stats => repo.review_status, :repo_id => repo.id }
+    end
+  end
+
+  def render_review_link(repo_id)
+    return link_to("Update Review Status for this Object", "#{root_url}/admin_repo/repo/#{repo_id}/ingest")
+  end
+
 end

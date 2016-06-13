@@ -21,6 +21,11 @@ module RailsAdminHelper
     render_ingested_list
   end
 
+  def render_review_box
+    repo = Repo.where("ingested = ?", [@document.id].to_yaml).first!
+    render_review_status(repo)
+  end
+
   def _metadata_builder(repo)
     mb = MetadataBuilder.where(:parent_repo => repo.id).blank? ? MetadataBuilder.create(:parent_repo => repo.id) : MetadataBuilder.find_by(:parent_repo => repo.id)
     return mb
