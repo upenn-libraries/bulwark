@@ -1,5 +1,5 @@
 # Colenda
-Colenda is a Hydra head providing administrative digital asset and metadata generation, management, review, and ingest to a repository with a public facing capability.  It is based on Hydra 9.1.0 and Fedora 4.5.0 and currently .  
+Colenda is a Hydra head providing administrative digital asset and metadata generation, management, review, and ingest to a repository with a public facing capability.  It leverages Hydra-PCDM, is based on Hydra 9.1.0 and Fedora 4.5.0, and currently relies on hydra-jetty in development.  
 
 ## System Dependencies for the Application
 * [Git](https://git-scm.com/) - The application supports robust versioning of content and metadata through the use of git for version control.
