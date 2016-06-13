@@ -4,7 +4,4 @@
 
 <%= render_ingest_links %>
 
-<p>Perform other tasks on objects</p>
-<ul>
-  <%= content_tag("li", (link_to "Generate checksum log", "/repos/#{@object.id}/checksum_log", :id => @object.id, method: :post)) %>
-</ul>
+<%= render_preview_ingested %>

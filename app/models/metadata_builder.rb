@@ -1,4 +1,5 @@
 class MetadataBuilder < ActiveRecord::Base
+  include ActionView::Helpers::UrlHelper
 
   belongs_to :repo, :foreign_key => "repo_id"
   has_many :metadata_source, dependent: :destroy
@@ -86,8 +87,13 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def build_xml_files
-    self.metadata_source.each do |source|
-      source.build_xml
+    if self.metadata_source.pluck(:user_defined_mappings).all? { |h| h.present? }
+      self.metadata_source.each do |source|
+        source.build_xml
+      end
+      return {:success => "Preservation XML generated successfully.  See preview below."}
+    else
+      return {:error => "Metadata mappings have not been generated.  No preservation XML could be generated."}
     end
   end
 

@@ -1,4 +1,5 @@
 require 'git'
+require 'shellwords'
 
 module Utils
   module VersionControl
@@ -47,22 +48,22 @@ module Utils
       end
 
       def push_bare
-        change_dir_working
+        _change_dir_working
         `git push origin master`
       end
 
       def push
-        change_dir_working
+        _change_dir_working
         `git push origin master git-annex`
         `git annex sync --content`
       end
 
       def add(dir = @working_repo_path)
-        get_drop_calls(dir, "add")
+        _get_drop_calls(dir, "add")
       end
 
       def commit(commit_message)
-        change_dir_working
+        _change_dir_working
         add
         working_repo = Git.open(@working_repo_path)
         working_repo.add(:all => true)
@@ -90,30 +91,31 @@ module Utils
       end
 
       def get(dir = @working_repo_path)
-        get_drop_calls(dir, "get")
+        _get_drop_calls(dir, "get")
       end
 
       def drop(dir = @working_repo_path)
-        get_drop_calls(dir, "drop")
+        _get_drop_calls(dir, "drop")
       end
 
       def unlock(file)
-        change_dir_working
-        `git annex unlock #{file}`
+        _change_dir_working
+        `git annex unlock #{_sanitize(file)}`
       end
 
       def lock(file)
-        change_dir_working
-        `git annex lock #{file}`
+        _change_dir_working
+        `git annex lock #{_sanitize(file)}`
       end
 
       private
 
-      def change_dir_working
+      def _change_dir_working
         Dir.chdir(@working_repo_path) if File.directory?(@working_repo_path)
       end
 
-      def get_drop_calls(dir, action)
+      def _get_drop_calls(dir, action)
+        dir = _sanitize(dir)
         if File.directory?(dir)
           Dir.chdir(dir)
           `git annex #{action} .`
@@ -133,6 +135,11 @@ module Utils
           error_message = "Leftover Git remote clone in working directory"
         end
         return error_message
+      end
+
+      def _sanitize(file_string)
+        sanitized_file_string = Shellwords.escape(file_string)
+        return sanitized_file_string
       end
 
     end

@@ -4,9 +4,11 @@
   background-color: #e4e4e4;
 }
 
-.metadata-sources-table table, .metadata-sources-table th, .metadata-sources-table tr, .metadata-sources-table td {
-  border: 1px solid #000000;
-  padding: 0.5em;
+.metadata-sources-table {
+  table, th, tr, td {
+    border: 1px solid #000000;
+    padding: 0.5em;
+  }
 }
 
 form.field-mappings .field {
@@ -43,8 +45,13 @@ form.field-mappings .field label {
   clear: both;
 }
 
-.md-source-select label {
+.md-source-select label{
   display: block;
+}
+.ingest-review {
+  label, input {
+    display: block;
+  }
 }
 
 .source-type .input-fields {
@@ -60,22 +67,26 @@ form.field-mappings .field label {
   float:left;
 }
 
-.source-type .visual-illustration #vertical, .source-type .visual-illustration #horizontal {
-  float: left;
-  width: 120px;
-  height: 100px;
-  background-size: 100%;
-  background-repeat: no-repeat;
-  background-position: top right;
+.source-type .visual-illustration {
+  #vertical,  #horizontal {
+    float: left;
+    width: 120px;
+    height: 100px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: top right;
+  }
 }
 
-.source-coordinates .visual-illustration #xy-start, .source-coordinates .visual-illustration #xy-stop {
-  float: left;
-  width: 120px;
-  height: 100px;
-  background-size: 100%;
-  background-repeat: no-repeat;
-  background-position: top right;
+.source-coordinates .visual-illustration {
+  #xy-start,  #xy-stop {
+    float: left;
+    width: 120px;
+    height: 100px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: top right;
+  }
 }
 
 .source-type .visual-illustration #vertical{
@@ -97,4 +108,16 @@ form.field-mappings .field label {
 
 .source-coordinates .visual-illustration #xy-stop{
   background-image: asset-url("xy_stop.png");
+}
+
+.field-mappings .file-path, .edit_metadata_builder .file-path{
+  color: #000000;
+  background-color: #e0e0e0;
+  font-family: monospace;
+  font-size: 120%;
+}
+
+textarea#repo_review_status {
+  width: 300px;
+  height: 100px;
 }

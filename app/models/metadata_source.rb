@@ -109,8 +109,9 @@ class MetadataSource < ActiveRecord::Base
     if self.root_element.present?
       @xml_content_final_copy = "<#{root_element}>#{@xml_content}</#{root_element}>"
     else
-      @xml_content_final_copy = @xml_content
+      @xml_content_final_copy = "#{@xml_content}"
     end
+    @xml_content_final_copy
     _build_preservation_xml(xml_fname, @xml_content_final_copy)
     self.metadata_builder.save!
     self.metadata_builder.repo.version_control_agent.commit("Generated preservation XML for #{fname}")
@@ -120,7 +121,7 @@ class MetadataSource < ActiveRecord::Base
   def generate_parent_child_xml
     self.children.each do |child|
       metadata_path = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
-      child_path = MetadataSource.where(:id => 2).pluck(:path).first
+      child_path = MetadataSource.where(:id => child).pluck(:path).first
       key_xml_path = "#{self.path}.xml"
       child_xml_path = "#{child_path}.xml"
       self.metadata_builder.repo.version_control_agent.get(:get_location => key_xml_path)
@@ -138,6 +139,14 @@ class MetadataSource < ActiveRecord::Base
       self.metadata_builder.repo.version_control_agent.push
       self.metadata_builder.save!
     end
+  end
+
+  def generate_review_status_xml
+    review_status_xml = ""
+    self.metadata_builder.repo.review_status.each do |review_status|
+      review_status_xml << "<review_status>#{review_status}</review_status>"
+    end
+    return review_status_xml
   end
 
   def parse_error_messages(error_messages)
@@ -237,7 +246,7 @@ class MetadataSource < ActiveRecord::Base
       _offset = 1
       headers.each_with_index do |header,h_index|
         field_val = workbook[0][y_start+index+_offset][x_start+h_index].present? ? workbook[0][y_start+index+_offset][x_start+h_index].value : ""
-        row_value << "<#{header}>#{field_val}</#{header}>"
+        row_value << "<#{self.user_defined_mappings[header]["mapped_value"]}>#{field_val}</#{self.user_defined_mappings[header]["mapped_value"]}>" if self.user_defined_mappings[header].present?
       end
       return row_value
     end
@@ -253,13 +262,17 @@ class MetadataSource < ActiveRecord::Base
       _offset = 1
       headers.each_with_index do |header,h_index|
         field_val = workbook[0][y_start+h_index][index+_offset].present? ? workbook[0][y_start+h_index][index+_offset].value : ""
-        column_value << "<#{header}>#{field_val}</#{header}>"
+        column_value << "<#{self.user_defined_mappings[header]["mapped_value"]}>#{field_val}</#{self.user_defined_mappings[header]["mapped_value"]}>"
       end
       return column_value
     end
 
     def _build_preservation_xml(filename, content)
       tmp_filename = "#{filename}.tmp"
+      if File.basename(filename) == self.metadata_builder.repo.preservation_filename
+        xml_review_status = generate_review_status_xml
+        content << xml_review_status
+      end
       File.open(tmp_filename, "w+") do |f|
         f << $xml_header << content << $xml_footer
       end

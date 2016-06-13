@@ -9,7 +9,7 @@
     <%= field_set_tag 'Map source metadata to XML' do %>
       Fill out the fields below to field values from metadata source files to XML.
     <% end %>
-    <h3>Mappings for <%= prettify(source.path) %></h3>
+    <h3>Mappings for <span class="file-path"><%= prettify(source.path)%></span></h3>
     <%= content_tag :div, :class => "field" do -%>
       <%= s.label :root_element, "Root element:" %>
       <%= s.text_field :root_element %>
