@@ -4,16 +4,36 @@
 *
 */
 
-.blacklight-catalog-show .review-status,
-.blacklight-catalog-show .review-status .panel-heading,
-.blacklight-catalog-show .review-status .panel-body {
+.blacklight-catalog-show .review-status {
   border-color: #4a819c;
-}
+  clear: both;
+  h1, h2, h3, h4, h5 {
+    color: #1f3946;
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+  h2 {
+    font-size: 18px;
+  }
+  h3{
+    font-size: 14px;
+    background: #e5e5e5;
+    border-top: #7d7d7d solid 1px;
+    border-bottom: #7d7d7d solid 1px;
+    margin-left: -15px;
+    margin-right: -15px;
+    padding-left: 10px;
+  }
+  .panel-heading {
+    background-color: #a3c5d5;
+    border-color: #4a819c;
+  }
+  .panel-body {
+    background-color: #e2f0f6;
+  }
 
-.blacklight-catalog-show .review-status .panel-heading {
-  background-color: #a3c5d5;
-}
-
-.blacklight-catalog-show .review-status .panel-body {
-  background-color: #e2f0f6;
+  li {
+    font-size: 12px;
+    padding: 10px 0px;
+  }
 }

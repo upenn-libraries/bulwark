@@ -12,7 +12,6 @@ class ReposController < ApplicationController
   end
 
   def review_status
-    binding.pry()
     @message = @repo.update(repo_params)
     redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/ingest", :flash => { :success => "Review status note added." }
   end

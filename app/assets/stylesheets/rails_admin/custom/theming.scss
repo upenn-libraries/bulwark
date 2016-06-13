@@ -4,12 +4,11 @@
   background-color: #e4e4e4;
 }
 
-.metadata-sources-table table,
-.metadata-sources-table th,
-.metadata-sources-table tr,
-.metadata-sources-table td {
-  border: 1px solid #000000;
-  padding: 0.5em;
+.metadata-sources-table {
+  table, th, tr, td {
+    border: 1px solid #000000;
+    padding: 0.5em;
+  }
 }
 
 form.field-mappings .field {
@@ -68,13 +67,15 @@ form.field-mappings .field label {
   float:left;
 }
 
-.source-type .visual-illustration #vertical, .source-type .visual-illustration #horizontal {
-  float: left;
-  width: 120px;
-  height: 100px;
-  background-size: 100%;
-  background-repeat: no-repeat;
-  background-position: top right;
+.source-type .visual-illustration {
+  #vertical,  #horizontal {
+    float: left;
+    width: 120px;
+    height: 100px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: top right;
+  }
 }
 
 .source-coordinates .visual-illustration {
