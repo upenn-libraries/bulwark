@@ -1,6 +1,16 @@
 /*
- *= require base/mixins
- */
+  Customize RailsAdmin theme here.
+
+  Look at the markup in RailsAdmin and go there to get inspiration from:
+
+  http://getbootstrap.com
+
+  Test me: (actual color should be the one defined in variables.scss if you did)
+
+  body { background-color: $link-color; }
+*/
+
+@import 'rails_admin/themes/colenda/variables';
 
 @import "font-awesome";
 
@@ -150,7 +160,7 @@ form.field-mappings .field label {
 
 .review-status {
   .review-status-list {
-    //@include rounded-corners;
+    @include rounded-corners;
     background: #e3e3e3;
   }
 }

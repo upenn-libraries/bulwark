@@ -22,6 +22,7 @@ gem 'hydra-pcdm'
 gem 'qa'
 gem "blacklight_range_limit"
 
+gem 'rails_admin_colenda', :path => 'rails_admin_colenda'
 gem "rails_admin"
 gem "colorize"
 gem "git"

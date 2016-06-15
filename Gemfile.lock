@@ -20,6 +20,12 @@ GIT
       rsolr (~> 1.0.10)
       solrizer (~> 3.3.0)
 
+PATH
+  remote: rails_admin_colenda
+  specs:
+    rails_admin_colenda (0.0.1)
+      rails (~> 4.2.5)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -547,6 +553,7 @@ DEPENDENCIES
   qa
   rails (= 4.2.5)
   rails_admin
+  rails_admin_colenda!
   roo
   rsolr (~> 1.0.6)
   rspec-rails
