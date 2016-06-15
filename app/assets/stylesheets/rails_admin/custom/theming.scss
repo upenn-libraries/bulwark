@@ -121,3 +121,22 @@ textarea#repo_review_status {
   width: 300px;
   height: 100px;
 }
+
+
+/*
+*
+* Waiting container
+*
+*/
+
+
+.wait{
+  background: url('/assets/gears.gif') no-repeat scroll center bottom transparent;
+  margin-left: auto;
+  margin-right: auto;
+  width: 200px;
+  height: 300px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
