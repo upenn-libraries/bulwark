@@ -1,0 +1,8 @@
+// ---------------------------------------------------------------------
+// Rounded corners
+
+@mixin rounded-corners {
+  border-radius: 7px;
+  -webkit-border-radius: 7px;
+  -moz-border-radius: 7px;
+}

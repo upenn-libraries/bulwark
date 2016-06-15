@@ -1,3 +1,7 @@
+/*
+ *= require base/mixins
+ */
+
 @import "font-awesome";
 
 .git-directions pre {
@@ -117,11 +121,6 @@ form.field-mappings .field label {
   font-size: 120%;
 }
 
-textarea#repo_review_status {
-  width: 300px;
-  height: 100px;
-}
-
 
 /*
 *
@@ -139,4 +138,24 @@ textarea#repo_review_status {
   font-size: 16px;
   font-weight: bold;
   text-align: center;
+}
+
+
+
+/*
+*
+* Ingest review
+*
+*/
+
+.review-status {
+  .review-status-list {
+    //@include rounded-corners;
+    background: #e3e3e3;
+  }
+}
+
+textarea#repo_review_status {
+  width: 300px;
+  height: 100px;
 }
