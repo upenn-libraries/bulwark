@@ -1,10 +1,19 @@
 $(document).ready(function(){
+
   $(function() {
     $('.wait').addClass('hide');
     $(".xml-preview").removeClass("hide");
+    $(".ingest-dashboard").removeClass("hide");
   });
-	$("#edit_metadata_builder_1").submit(function(){
+
+	$(".xml-preview-form").submit(function(){
       $(".wait").removeClass("hide");
       $(".xml-preview").addClass("hide");
 	});
+
+	$(".ingest-select-form").submit(function(){
+      $(".wait").removeClass("hide");
+      $(".ingest-dashboard").addClass("hide");
+	});
+
 });
