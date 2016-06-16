@@ -123,10 +123,13 @@ form.field-mappings .field label {
   background-image: asset-url("xy_stop.png");
 }
 
-.field-mappings .file-path, .edit_metadata_builder .file-path{
-  color: #000000;
-  background-color: #e0e0e0;
+span.inline-pre, .field-mappings .file-path, .edit_metadata_builder .file-path {
+  color: $text-black;
+  background-color: $light-grey;
   font-family: monospace;
+}
+
+.field-mappings .file-path, .edit_metadata_builder .file-path{
   font-size: 120%;
 }
 
@@ -157,10 +160,11 @@ form.field-mappings .field label {
 .review-status {
   .review-status-list {
     @include rounded-corners;
-    background: #b0d9ff;
-    border-bottom: #5889b6 1px solid;
-    border-right: #5889b6 1px solid;
+    background: $light-blue;
+    border-bottom: $dark-blue 1px solid;
+    border-right: $dark-blue 1px solid;
     margin: 10px;
+    padding: 10px 5px;
   }
 }
 

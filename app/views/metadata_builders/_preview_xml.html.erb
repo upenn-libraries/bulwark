@@ -1,5 +1,6 @@
 <div class="wait hide">
-  Generating XML...
+  Generating XML...<br />
+  Please do not close this window until this process completes.
 </div>
 <div class="xml-preview">
 <%= form_for @object.metadata_builder, :validate => true, :method => :post, :html => { :class => "xml-preview-form" }, :url => "/metadata_builders/#{@object.metadata_builder.id}/generate_preview_xml" do |f| %>
