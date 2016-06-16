@@ -1,3 +1,3 @@
 $(document).ready(function(){
-  alert("colenda")
+  alert("rails_admin_colenda")
 });
