@@ -6,12 +6,12 @@ $(document).ready(function(){
     $(".ingest-dashboard").removeClass("hide");
   });
 
-	$(".xml-preview-form").submit(function(){
+	$("#xml_preview_submit").click(function(){
     $(".wait").removeClass("hide");
     $(".xml-preview").addClass("hide");
 	});
 
-	$(".ingest-select-form").submit(function(){
+	$("#ingest_select_submit").click(function(){
     $(".wait").removeClass("hide");
     $(".ingest-dashboard").addClass("hide");
 	});
