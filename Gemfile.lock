@@ -1,4 +1,23 @@
 GIT
+  remote: git://github.com/kelynch/rails_admin.git
+  revision: 5d6a29413338053662fbb61568548914ce6110f2
+  branch: js_loading_in_custom_theme
+  specs:
+    rails_admin (0.8.1)
+      builder (~> 3.1)
+      coffee-rails (~> 4.0)
+      font-awesome-rails (>= 3.0, < 5)
+      haml (~> 4.0)
+      jquery-rails (>= 3.0, < 5)
+      jquery-ui-rails (~> 5.0)
+      kaminari (~> 0.14)
+      nested_form (~> 0.3)
+      rack-pjax (~> 0.7)
+      rails (>= 4.0, < 6)
+      remotipart (~> 1.0)
+      sass-rails (>= 4.0, < 6)
+
+GIT
   remote: git://github.com/projecthydra/hydra.git
   revision: 645c21080cb80e16d8aa24b6c52c4bca703ea5dd
   branch: pcdm
@@ -19,23 +38,6 @@ GIT
       rails (~> 4.1)
       rsolr (~> 1.0.10)
       solrizer (~> 3.3.0)
-
-PATH
-  remote: /Users/katherly/Documents/Rails/rails_admin
-  specs:
-    rails_admin (0.8.1)
-      builder (~> 3.1)
-      coffee-rails (~> 4.0)
-      font-awesome-rails (>= 3.0, < 5)
-      haml (~> 4.0)
-      jquery-rails (>= 3.0, < 5)
-      jquery-ui-rails (~> 5.0)
-      kaminari (~> 0.14)
-      nested_form (~> 0.3)
-      rack-pjax (~> 0.7)
-      rails (>= 4.0, < 6)
-      remotipart (~> 1.0)
-      sass-rails (>= 4.0, < 6)
 
 PATH
   remote: rails_admin_colenda

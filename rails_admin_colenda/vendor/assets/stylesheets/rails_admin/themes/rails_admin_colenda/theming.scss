@@ -10,7 +10,6 @@
   body { background-color: $link-color; }
 */
 
-@import 'rails_admin/themes/colenda/variables';
 
 @import "font-awesome";
 
@@ -137,8 +136,6 @@ form.field-mappings .field label {
 * Waiting container
 *
 */
-
-
 .wait{
   background: url('/assets/gears.gif') no-repeat scroll center bottom transparent;
   margin-left: auto;
@@ -157,11 +154,13 @@ form.field-mappings .field label {
 * Ingest review
 *
 */
-
 .review-status {
   .review-status-list {
     @include rounded-corners;
-    background: #e3e3e3;
+    background: #b0d9ff;
+    border-bottom: #5889b6 1px solid;
+    border-right: #5889b6 1px solid;
+    margin: 10px;
   }
 }
 
