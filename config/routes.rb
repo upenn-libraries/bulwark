@@ -1,11 +1,14 @@
 Rails.application.routes.draw do
+
   resources :repos do
     member do
       post :checksum_log
       post :ingest
+      post :review_status
       post :detect_metadata
     end
   end
+
   resources :metadata_builders do
     member do
       post :update

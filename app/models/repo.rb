@@ -1,3 +1,5 @@
+require 'sanitize'
+
 class Repo < ActiveRecord::Base
 
   has_one :metadata_builder, dependent: :destroy, :validate => false
@@ -17,9 +19,10 @@ class Repo < ActiveRecord::Base
   validates :title, multiple: false
   validates :directory, multiple: false
 
-  serialize :metadata_sources
-  serialize :metadata_builder_id
-  serialize :ingested
+  serialize :metadata_sources, Array
+  serialize :metadata_builder_id, Array
+  serialize :ingested, Array
+  serialize :review_status, Array
 
   include Filesystem
   include FileExtensions
@@ -81,8 +84,20 @@ class Repo < ActiveRecord::Base
     read_attribute(:file_extensions) || ''
   end
 
+  def ingested
+    read_attribute(:ingested) || ''
+  end
+
   def metadata_source_extensions
     read_attribute(:metadata_source_extensions) || ''
+  end
+
+  def review_status
+    read_attribute(:review_status) || ''
+  end
+
+  def review_status=(review_status)
+    self[:review_status].push(Sanitize.fragment(review_status, Sanitize::Config::RESTRICTED)) if review_status.present?
   end
 
   def create_remote
@@ -125,6 +140,14 @@ class Repo < ActiveRecord::Base
 
   def load_metadata_source_extensions
     return metadata_source_file_extensions
+  end
+
+  def preserve_exists?
+    return _check_if_preserve_exists
+  end
+
+  def update_object_review_status
+    _update_object_review_status
   end
 
 private
@@ -182,6 +205,16 @@ private
       self.version_control_agent.clone(:destination => display_path)
       _refresh_assets
     end
+  end
+
+  def _check_if_preserve_exists
+    self.version_control_agent.clone
+    self.metadata_builder.preserve.each {|f| @fname = f if File.basename(f) == self.preservation_filename}
+    self.version_control_agent.get(:get_location => @fname)
+    exist_status = File.exists?(@fname)
+    self.version_control_agent.drop
+    self.version_control_agent.delete_clone
+    return exist_status
   end
 
   # TODO: Determine if this is really the best place to put this because we're dealing with Git bare repo best practices

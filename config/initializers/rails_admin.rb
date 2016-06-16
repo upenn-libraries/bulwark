@@ -9,7 +9,12 @@ require Rails.root.join('lib', 'rails_admin', 'preview_xml.rb')
 require Rails.root.join('lib', 'rails_admin', 'preserve.rb')
 
 RailsAdmin.config do |config|
-  config.main_app_name = ["Intermediary", "Admin Interface"]
+  config.main_app_name = ["Review", "Admin Dashboard"]
+
+  config.authenticate_with do
+    warden.authenticate! scope: :user
+  end
+  config.current_user_method(&:current_user)
 
   config.included_models = ["Repo"]
 

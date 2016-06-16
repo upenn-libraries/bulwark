@@ -44,9 +44,9 @@ class CatalogController < ApplicationController
     # facet bar
     config.add_facet_field solr_name('creator', :facetable), :label => 'Creator'
     config.add_facet_field solr_name('date', :facetable), :label => 'Date', :range => true
-
     config.add_facet_field solr_name('language', :facetable), :label => 'Language'
 
+    config.add_facet_field solr_name('review_status', :facetable), :label => 'Review Status'
 
     # Have BL send all facet field names to Solr, which has been the default
     # previously. Simply remove these lines if you'd rather use Solr request
@@ -72,6 +72,8 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('language', :stored_searchable, type: :string), :label => 'Language', :link_to_search => solr_name('language', :facetable)
     config.add_show_field solr_name('coverage', :stored_searchable, type: :string), :label => 'Coverage', :link_to_search => solr_name('coverage', :facetable)
     config.add_show_field solr_name('file_location', :stored_searchable, type: :string), :label => 'File Location'
+    config.add_show_field solr_name('review_status', :stored_searchable, type: :string), :label => 'Review Status'
+
 
     # "fielded" search configuration. Used by pulldown among other places.
     # For supported keys in hash, see rdoc for Blacklight::SearchFields

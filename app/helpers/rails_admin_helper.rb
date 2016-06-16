@@ -2,6 +2,7 @@ require "rexml/document"
 
 module RailsAdminHelper
 
+  include CatalogHelper
   include MetadataBuilderHelper
   include MetadataSourceHelper
   include RepoHelper
@@ -18,6 +19,11 @@ module RailsAdminHelper
 
   def render_ingest_links
     render_ingested_list
+  end
+
+  def render_review_box
+    repo = Repo.where("ingested = ?", [@document.id].to_yaml).first!
+    render_review_status(repo)
   end
 
   def _metadata_builder(repo)

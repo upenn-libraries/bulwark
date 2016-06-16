@@ -12,22 +12,11 @@
  *
  *= require_tree .
  *= require_self
+ *= require review
+ *= require reader
 
  *
  * Used by blacklight_range_limit
  *= require  'blacklight_range_limit'
  *
 */
-
-.reader {
-  width: 120%;
-}
-
-.reader .left {
-  float: left;
-}
-
-.reader .right {
-  float:right;
-  clear:none;
-}

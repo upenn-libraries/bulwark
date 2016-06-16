@@ -1,18 +1,10 @@
 module MetadataBuilderHelper
 
   def render_preview_xml
-    if MetadataSource.where(:metadata_builder_id => @object.metadata_builder.id).pluck(:user_defined_mappings).present?
+    unless MetadataSource.where(:metadata_builder_id => @object.metadata_builder.id).pluck(:user_defined_mappings).all?{ |h| h.empty? }
       render :partial => "metadata_builders/preview_xml"
     else
       render :partial => "metadata_builders/no_mappings"
-    end
-  end
-
-  def render_ingest_or_message
-    if @object.metadata_builder.preserve.present?
-      render :partial => "metadata_builders/ingest_select"
-    else
-      render :partial => "metadata_builders/no_xml"
     end
   end
 

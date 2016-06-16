@@ -71,6 +71,7 @@ ActiveRecord::Schema.define(version: 20160523141604) do
     t.string   "metadata_source_extensions"
     t.string   "ingested"
     t.string   "preservation_filename"
+    t.string   "review_status"
     t.integer  "metadata_builder_id"
     t.integer  "version_control_agent_id"
   end
