@@ -1,4 +1,5 @@
 <div class="review-status">
+  <% if @object.review_status.present? %>
   <h3>Review Status</h3>
   <div class="review-status-list content-block">
     <ul>
@@ -7,6 +8,7 @@
       <% end -%>
     </ul>
   </div>
+  <% end %>
   <% @object.ingested.each do |ingest| -%>
     <% @document = ActiveFedora::Base.find(ingest) %>
       <%= form_for @object, :validate => true, :html => {:class => "ingest-review"}, :method => :post, :url => "/repos/#{@object.id}/review_status" do |f| %>
