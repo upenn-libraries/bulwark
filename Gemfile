@@ -22,7 +22,8 @@ gem 'hydra-pcdm'
 gem 'qa'
 gem "blacklight_range_limit"
 
-gem "rails_admin"
+gem 'rails_admin_colenda', :path => 'rails_admin_colenda'
+gem "rails_admin", github: 'kelynch/rails_admin', branch: 'js_loading_in_custom_theme'
 gem "colorize"
 gem "git"
 gem "rubyXL"

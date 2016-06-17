@@ -1,4 +1,12 @@
 <div class="git-directions">
   <p>Your git remote has been initialized at <%= "#{full_path}" %>.  To begin using this remote, run the following command from the terminal:
   <pre>git clone <%= "#{full_path}\ncd #{(@object.directory).gsub(".git","")}/#{Utils.config.object_data_path}" %></pre></p>
+  <p>To add content to your remote, use the following syntax:</p>
+  <pre>git annex sync --content
+git annex add RELATIVE_PATH_TO_CONTENT
+git commit -a -m "COMMIT_MESSAGE"
+git push origin master git-annex
+git annex sync --content</pre>
+<p>Replace <span class="inline-pre">RELATIVE_PATH_TO_CONTENT</span> with the meaningful relative path within your git repository's <span class="inline-pre">data/</span> directory to the new/updated content you intend to add.</p>
+<p>Replace <span class="inline-pre">COMMIT_MESSAGE</span> with a short message describing the changes you're committing.</p>
 </div>
