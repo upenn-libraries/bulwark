@@ -9,10 +9,12 @@
 
   </div>
 </div>
-<% image_array = fetch_files(@document) %>
+<% image_hash = fetch_files(@document) %>
 
 <div class="reader">
-  <%= render(:partial => "pages/page_image", :collection => @image_array) %>
+  <% @image_hash.keys.each do |key| %>
+    <%= render(:partial => "pages/page_image", :locals => {:key => key }) %>
+  <% end -%>
 </div>
 
 <% if @document.respond_to?(:export_as_openurl_ctx_kev) %>
