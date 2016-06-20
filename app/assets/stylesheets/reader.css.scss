@@ -6,13 +6,14 @@
 
 .reader {
   width: 120%;
-}
-
-.reader .left {
-  float: left;
-}
-
-.reader .right {
-  float:right;
-  clear:none;
+ .left {
+    float: left;
+  }
+  .right {
+    float:right;
+    clear:none;
+  }
+  .details {
+    font-size: 11px;
+  }
 }

@@ -1,0 +1,38 @@
+@import 'base/colors.css.scss';
+@import 'base/mixins.css.scss';
+
+/*************
+*
+* UPenn styles
+*
+**************/
+
+.site-name {
+  width:500px;
+  float: right;
+  padding-top: 10px;
+   a {
+    font-size: 30px;
+    color: $text-white;
+    font-weight: bold;
+  }
+}
+
+
+/*************
+*
+* Overriding Blacklight styles
+*
+**************/
+
+#header-navbar {
+  .navbar-brand {
+    background-image: asset-url('logo.png');
+    margin-top: 10px;
+  }
+}
+
+.btn-primary {
+  background-color: $upenn-red;
+  border-color: $upenn-blue;
+}

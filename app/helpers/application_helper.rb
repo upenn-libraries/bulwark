@@ -4,7 +4,7 @@ module ApplicationHelper
     if model == "Manuscript"
       @image_array = Array.new
       manuscript = model.constantize.find(doc.id)
-      pages = Page.where(parent_manuscript: manuscript.id).to_a
+      pages = Page.where(parent_manuscript: manuscript.id).to_a.sort_by! {|p| p.page_number}
       pages.each do |page|
         file_print = page.pageImage.uri
         @image_array.push(file_print.to_s.html_safe)
