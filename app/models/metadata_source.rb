@@ -199,7 +199,7 @@ class MetadataSource < ActiveRecord::Base
           iterator += 1
         end
       when "vertical"
-        while((y_stop >= (y_start+iterator)) && (workbook[0][y_start+iterator].present?))
+        while((y_stop >= (y_start+iterator)) && (workbook[0][y_start+iterator].present?) && (workbook[0][y_start+iterator][x_start].present?))
           header = workbook[0][y_start+iterator][x_start].value
           headers << header
           vals = []
