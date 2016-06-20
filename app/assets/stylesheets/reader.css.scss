@@ -1,3 +1,5 @@
+@import 'base/colors.css.scss';
+
 /*
 *
 * Reader CSS for image reader display
@@ -13,7 +15,27 @@
     float:right;
     clear:none;
   }
+
+  .page {
+    background-color: $reader-background;
+    color: $text-white;
+    width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    h2 {
+      font-size: 14px;
+    }
+  }
   .details {
-    font-size: 11px;
+    font-size: 12px;
+    padding: 10px;
+    li {
+      padding: 2px 0px;
+    }
+    .details-label {
+      font-style: italic;
+      padding-right: 10px;
+    }
   }
 }
