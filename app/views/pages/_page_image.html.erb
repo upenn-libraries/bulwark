@@ -1,3 +1,12 @@
-<div class="<%= cycle('left', 'right') -%>">
-  <%= image_tag(page_image) %>
+<div class="<%= cycle('left', 'right') -%> page">
+  <%= image_tag(key) %>
+  <div class="details">
+    <h2>Page Details</h2>
+    <ul>
+      <% @image_hash[key].each do |a| %>
+        <% a_string = a.last.try(:to_sentence) || a.last %>
+        <li><span class="details-label"><%= "#{a.first.capitalize}:" %></span> <%= "#{a_string.present? ? a_string : "N/A" }" %></li>
+      <% end -%>
+    </ul>
+  </div>
 </div>
