@@ -100,7 +100,7 @@ class VersionControlAgent < ActiveRecord::Base
   end
 
   def _initialize_worker
-    @@worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo) unless (defined?(@@worker) && @@worker.repo == repo)
+    @@worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo) unless (defined?(@@worker) && @@worker.repo.attributes == self.repo.attributes)
   end
 
 end
