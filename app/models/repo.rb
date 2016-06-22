@@ -195,7 +195,8 @@ private
   end
 
   def _set_metadata_builder
-    self.metadata_builder = MetadataBuilder.new(:parent_repo => self.id)
+    self.metadata_builder = MetadataBuilder.new
+    self.metadata_builder.repo = self
     self.metadata_builder.save!
     self.save!
   end

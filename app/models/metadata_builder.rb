@@ -10,8 +10,6 @@ class MetadataBuilder < ActiveRecord::Base
 
   include Utils
 
-  validates :parent_repo, presence: true
-
   serialize :preserve, Set
 
   @@xml_tags = Array.new
@@ -23,18 +21,8 @@ class MetadataBuilder < ActiveRecord::Base
     yield
   end
 
-  def parent_repo=(parent_repo)
-    self[:parent_repo] = parent_repo
-    @repo = Repo.find(parent_repo)
-    self.repo = @repo
-  end
-
   def preserve
     read_attribute(:preserve) || ''
-  end
-
-  def parent_repo
-    read_attribute(:parent_repo) || ''
   end
 
   def available_metadata_files
@@ -87,7 +75,9 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def build_xml_files
+    binding.pry()
     if self.metadata_source.pluck(:user_defined_mappings).all? { |h| h.present? }
+      binding.pry()
       self.metadata_source.each do |source|
         source.build_xml
       end
