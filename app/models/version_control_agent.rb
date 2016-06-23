@@ -99,8 +99,10 @@ class VersionControlAgent < ActiveRecord::Base
     @@worker.remove_working_directory
   end
 
+  private
+
   def _initialize_worker
-    @@worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo) unless (defined?(@@worker) && @@worker.repo == repo)
+    @@worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo) unless (defined?(@@worker) && @@worker.repo.attributes == self.repo.attributes)
   end
 
 end
