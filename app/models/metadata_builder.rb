@@ -75,9 +75,7 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def build_xml_files
-    binding.pry()
     if self.metadata_source.pluck(:user_defined_mappings).all? { |h| h.present? }
-      binding.pry()
       self.metadata_source.each do |source|
         source.build_xml
       end
