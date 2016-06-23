@@ -25,7 +25,7 @@
     <% source.original_mappings.each do |p| %>
       <%= content_tag :div, :class => "field" do -%>
         <%= s.label "user_defined_mappings[#{p.first}][mapped_value]", "\"#{p.first}\" should map to:" %>
-        <%= select_tag "metadata_builder[metadata_source_attributes][#{counter}][user_defined_mappings][#{p.first}][mapped_value]", options_for_select(schema_terms) %>
+        <%= select_tag "metadata_builder[metadata_source_attributes][#{counter}][user_defined_mappings][#{p.first}][mapped_value]", options_for_select(schema_terms, s.object.user_defined_mappings[p.first].values.first) %>
         <%= content_tag(:div, "Example values from source: #{p.last.to_s}", :class => "field-tip") %>
       <% end -%>
     <% end -%>
