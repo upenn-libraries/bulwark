@@ -19,24 +19,17 @@ RSpec.describe Repo, type: :model do
   it "is invalid without an assets subdirectory" do
     expect(FactoryGirl.build(:repo, :assets_subdirectory => nil)).not_to be_valid
   end
-  it "is invalid without a metadata filename" do
-    expect(FactoryGirl.build(:repo, :metadata_filename => nil)).not_to be_valid
-  end
-  it "is invalid without file extensions" do
-    expect(FactoryGirl.build(:repo, :file_extensions => nil)).not_to be_valid
+
+  it "is invalid without a preservation filename" do
+    expect(FactoryGirl.build(:repo, :preservation_filename => nil)).not_to be_valid
   end
 
   describe "public instance methods" do
-    context "responds to" do
-      it "create_remote" do
-        expect(repo_instance).to respond_to(:create_remote)
-      end
-    end
 
-    context "executes model methods correctly" do
+    context "executes model methods correctly on creation" do
       context "create_remote" do
         it "can create a remote directory" do
-          expect(repo_instance.create_remote).to eq({ :success => "Remote successfully created" })
+          expect(repo_instance.create_remote).to be_in([{ :success => "Remote successfully created" }, { :error => "Remote already exists" }])
         end
       end
     end

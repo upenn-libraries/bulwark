@@ -11,8 +11,8 @@ module Utils
 
       def initialize(repo)
         @repo = repo
-        @remote_repo_path = "#{Utils.config.assets_path}/#{@repo.directory}"
-        @working_repo_path = "#{Utils.config.working_dir}/#{@remote_repo_path.gsub("/","_")}".gsub("__", "_")
+        @remote_repo_path = @repo.version_control_agent.remote_path
+        @working_repo_path = @repo.version_control_agent.working_path
       end
 
       def repo
