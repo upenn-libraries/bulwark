@@ -12,20 +12,19 @@
     <h3>Mappings for <span class="file-path"><%= prettify(source.path)%></span></h3>
     <%= content_tag :div, :class => "field" do -%>
       <%= s.label :root_element, "Root element:" %>
-      <%= s.text_field :root_element %>
+      <%= s.select :root_element, root_element_options, :include_blank => :true %>
       <%= content_tag(:div, "Root element of the XML schema generated -- defaults to \"root\" if left blank.", :class => "field-tip") %>
     <% end -%>
     <%= content_tag :div, :class => "field" do -%>
       <%= s.label :parent_element, "Child element of root, applied per row (optional):" %>
-      <%= s.text_field :parent_element %>
+      <%= s.select :parent_element, parent_element_options, :include_blank => :true %>
       <%= content_tag(:div, "Optional -- Parent of each row of values in metadata source spreadsheet; Child of the root element.", :class => "field-tip") %>
     <% end -%>
 
     <% source.original_mappings.each do |p| %>
-      <% val = source.user_defined_mappings.present? ? source.user_defined_mappings["#{p.first}"]["mapped_value"] : p.first %>
       <%= content_tag :div, :class => "field" do -%>
         <%= s.label "user_defined_mappings[#{p.first}][mapped_value]", "\"#{p.first}\" should map to:" %>
-        <%= s.text_field "user_defined_mappings[#{p.first}][mapped_value]", :value => "#{val}" %>
+        <%= s.select "user_defined_mappings[#{p.first}][mapped_value]", schema_terms, :include_blank => :true %>
         <%= content_tag(:div, "Example values from source: #{p.last.to_s}", :class => "field-tip") %>
       <% end -%>
     <% end -%>

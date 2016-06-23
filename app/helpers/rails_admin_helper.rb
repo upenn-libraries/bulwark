@@ -8,6 +8,7 @@ module RailsAdminHelper
   include RepoHelper
   include Filesystem
   include Utils
+  include MetadataSchema
 
   def render_git_remote_options
     render_git_directions_or_actions
@@ -24,6 +25,18 @@ module RailsAdminHelper
   def render_review_box
     repo = Repo.where("ingested = ?", [@document.id].to_yaml).first!
     render_review_status(repo)
+  end
+
+  def root_element_options
+    return MetadataSchema.config.root_element_options
+  end
+
+  def parent_element_options
+    return MetadataSchema.config.parent_element_options
+  end
+
+  def schema_terms
+    return MetadataSchema.config.schema_terms
   end
 
 end

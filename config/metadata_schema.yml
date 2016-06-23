@@ -1,0 +1,42 @@
+development:
+  root_element_options:
+    - records
+    - record
+    - pages
+    - page
+  parent_element_options:
+    - record
+    - page
+    - image
+  schema_terms:
+    - identifier
+    - abstract
+    - coverage
+    - description
+    - language
+    - date
+    - title
+    - file_name
+    - page_number
+    - ocr_text
+    - parent_manuscript
+test:
+  root_element_options:
+    - record
+    - page
+  parent_element_options:
+    - pages
+    - records
+  schema_terms:
+    - title
+    - author
+production:
+  root_element_options:
+    - record
+    - page
+  parent_element_options:
+    - pages
+    - records
+  schema_terms:
+    - title
+    - author
