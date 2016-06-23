@@ -3,6 +3,7 @@
 <% end %>
 
 <%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
+<% counter = 0 %>
   <% @object.metadata_builder.metadata_source.each do |source| %>
     <%= f.fields_for :metadata_source, source do |s| %>
 
@@ -24,7 +25,7 @@
     <% source.original_mappings.each do |p| %>
       <%= content_tag :div, :class => "field" do -%>
         <%= s.label "user_defined_mappings[#{p.first}][mapped_value]", "\"#{p.first}\" should map to:" %>
-        <%= s.select "user_defined_mappings[#{p.first}][mapped_value]", schema_terms, :include_blank => :true %>
+        <%= select_tag "metadata_builder[metadata_source_attributes][#{counter}][user_defined_mappings][#{p.first}][mapped_value]", options_for_select(schema_terms) %>
         <%= content_tag(:div, "Example values from source: #{p.last.to_s}", :class => "field-tip") %>
       <% end -%>
     <% end -%>
@@ -38,6 +39,7 @@
         <%= s.select :children, nested_relationships_values(source.path), {}, { :multiple => true } %>
       <% end -%>
     <% end -%>
+    <% counter += 1 %>
   <% end -%>
   <% end -%>
   <%= content_tag(:div, (f.submit "Save metadata mappings"), :class => "form-bottom") %>

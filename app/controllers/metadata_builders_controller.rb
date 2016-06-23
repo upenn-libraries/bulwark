@@ -74,7 +74,6 @@ class MetadataBuildersController < ApplicationController
 
   def _update_metadata_sources
     params[:metadata_builder][:metadata_source_attributes].each do |a|
-      binding.pry()
       hash_params_strings = Hash[*Hash[*a.flatten(1)].values.flatten(0)]
       hash_params = Hash[hash_params_strings.map{|k,v| [k.to_sym, v]}]
       metadata_source = MetadataSource.find(hash_params[:id])

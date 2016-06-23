@@ -1,6 +1,7 @@
 class MetadataSource < ActiveRecord::Base
 
   attr_accessor :xml_header, :xml_footer
+  attr_accessor :user_defined_mappings
 
   belongs_to :metadata_builder, :foreign_key => "metadata_builder_id"
 
@@ -65,6 +66,10 @@ class MetadataSource < ActiveRecord::Base
 
   def user_defined_mappings
     read_attribute(:user_defined_mappings) || ''
+  end
+
+  def user_defined_mappings=(user_defined_mappings)
+    self[:user_defined_mappings] = user_defined_mappings
   end
 
   def set_metadata_mappings
