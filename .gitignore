@@ -20,7 +20,10 @@
 .DS_Store
 
 # Ignore config yml files
-config/*.yml
+config/filesystem.yml
+config/file_extensions.yml
+config/metadata_schema.yml
+config/fedora.yml
 
 # Ignore bash script
 repo.sh
