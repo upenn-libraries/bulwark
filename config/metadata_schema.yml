@@ -20,6 +20,8 @@ development:
     - page_number
     - ocr_text
     - parent_manuscript
+  canonical_identifier_path:
+    - /root/record/identifier
 test:
   root_element_options:
     - record
@@ -30,6 +32,8 @@ test:
   schema_terms:
     - title
     - author
+  canonical_identifier_path:
+    - /root/record/identifier
 production:
   root_element_options:
     - record
@@ -40,3 +44,5 @@ production:
   schema_terms:
     - title
     - author
+  canonical_identifier_path:
+    - /root/record/identifier

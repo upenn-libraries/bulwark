@@ -1,5 +1,5 @@
 <%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :method => :post, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}/refresh_metadata" do |f| %>
-  <%= f.submit "Refresh metadata" %>
+  <%= f.submit "Fetch most recent metadata" %>
 <% end %>
 
 <%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
@@ -23,7 +23,7 @@
     <% end -%>
 
     <% source.original_mappings.each do |p| %>
-      <% value = s.object.user_defined_mappings.present? ? s.object.user_defined_mappings[p.first].values.first : "" %>
+      <% value = (s.object.user_defined_mappings.present? && s.object.user_defined_mappings[p.first].present?) ? s.object.user_defined_mappings[p.first].values.first : schema_term_default(p.first) %>
       <%= content_tag :div, :class => "field" do -%>
         <%= s.label "user_defined_mappings[#{p.first}][mapped_value]", "\"#{p.first}\" should map to:" %>
         <%= select_tag "metadata_builder[metadata_source_attributes][#{counter}][user_defined_mappings][#{p.first}][mapped_value]", options_for_select(schema_terms, value) %>

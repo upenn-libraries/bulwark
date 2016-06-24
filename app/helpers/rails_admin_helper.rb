@@ -39,4 +39,16 @@ module RailsAdminHelper
     return MetadataSchema.config.schema_terms
   end
 
+  def schema_term_default(source_value)
+    schema_terms = MetadataSchema.config.schema_terms.map(&:downcase)
+    if schema_terms.index(source_value).present?
+      best_guess = schema_terms[schema_terms.index(source_value)]
+    elsif schema_terms.index { |s| s.starts_with?(source_value.first.downcase) }.present?
+      best_guess = schema_terms[schema_terms.index { |s| s.starts_with?(source_value.first.downcase) }]
+    else
+      best_guess = schema_terms.first
+    end
+    return best_guess
+  end
+
 end
