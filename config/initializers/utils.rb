@@ -22,11 +22,9 @@ Utils.configure do |config|
     config.federated_fs_path = options.fetch(:federated_fs_path)
     config.metadata_path_label = options.fetch(:metadata_path_label)
     config.file_path_label = options.fetch(:file_path_label)
-    config.imports_local_staging = options.fetch(:imports_local_staging)
     config.working_dir = options.fetch(:working_dir)
     config.transformed_dir = options.fetch(:transformed_dir)
     config.repository_prefix = options.fetch(:repository_prefix)
-    config.split_on = options.fetch(:split_on)
   end
 
 end
