@@ -4,16 +4,20 @@ RSpec.describe MetadataBuilder, type: :model do
   it "has a valid factory" do
     expect(FactoryGirl.create(:metadata_builder)).to be_valid
   end
-
-
-  let(:metadata_builder_spec) { FactoryGirl.create(:metadata_builder) }
-
-  describe "public instance methods" do
-    it "build_xml_files" do
-      metadata_builder_spec.refresh_metadata_from_source
-      expect(metadata_builder_spec.build_xml_files).to eq({:success => "Preservation XML generated successfully.  See preview below."})
+  context "parent_repo" do
+    it "is invalid without a parent repo" do
+      expect(FactoryGirl.build(:metadata_builder, :parent_repo => nil)).not_to be_valid
     end
-  end
+    it "belongs to an existing parent repo" do
 
+    end
+    it "is deleted when its parent repo is deleted"
+  end
+  context "source" do
+    it "is invalid without at least one source file" do
+      expects(FactoryGirl.build(:metadata_builder, :source => nil)).not_to be_valid
+    end
+    it "has a valid source"
+  end
 
 end
