@@ -26,4 +26,9 @@ module RailsAdminHelper
     render_review_status(repo)
   end
 
+  def _metadata_builder(repo)
+    mb = MetadataBuilder.where(:parent_repo => repo.id).blank? ? MetadataBuilder.create(:parent_repo => repo.id) : MetadataBuilder.find_by(:parent_repo => repo.id)
+    return mb
+  end
+
 end

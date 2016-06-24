@@ -11,12 +11,13 @@ class Repo < ActiveRecord::Base
 
   validates :title, presence: true
   validates :directory, presence: true
+  validates :metadata_subdirectory, presence: true
+  validates :assets_subdirectory, presence: true
+  validates :file_extensions, presence: true
   validates :preservation_filename, presence: true
 
   validates :title, multiple: false
   validates :directory, multiple: false
-
-  validate :subdirectories
 
   serialize :metadata_sources, Array
   serialize :metadata_builder_id, Array
@@ -56,11 +57,7 @@ class Repo < ActiveRecord::Base
   end
 
   def preservation_filename=(preservation_filename)
-    self[:preservation_filename] = preservation_filename.present? ? (preservation_filename.concat(".xml") unless preservation_filename.ends_with?(".xml")) : nil
-  end
-
-  def review_status=(review_status)
-    self[:review_status].push(Sanitize.fragment(review_status, Sanitize::Config::RESTRICTED)) if review_status.present?
+    self[:preservation_filename] = preservation_filename.concat(".xml") unless preservation_filename.ends_with?(".xml")
   end
 
   def title
@@ -99,6 +96,9 @@ class Repo < ActiveRecord::Base
     read_attribute(:review_status) || ''
   end
 
+  def review_status=(review_status)
+    self[:review_status].push(Sanitize.fragment(review_status, Sanitize::Config::RESTRICTED)) if review_status.present?
+  end
 
   def create_remote
     unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
@@ -150,10 +150,6 @@ class Repo < ActiveRecord::Base
     _update_object_review_status
   end
 
-  def subdirectories
-    _subdirectories
-  end
-
 private
 
   def _build_and_populate_directories(working_copy_path)
@@ -195,8 +191,7 @@ private
   end
 
   def _set_metadata_builder
-    self.metadata_builder = MetadataBuilder.new
-    self.metadata_builder.repo = self
+    self.metadata_builder = MetadataBuilder.new(:parent_repo => self.id)
     self.metadata_builder.save!
     self.save!
   end
@@ -220,11 +215,6 @@ private
     self.version_control_agent.drop
     self.version_control_agent.delete_clone
     return exist_status
-  end
-
-  def _subdirectories
-    errors.add(:metadata_subdirectory, "Metadata subdirectory cannot be blank") if self.metadata_subdirectory == "data/"
-    errors.add(:assets_subdirectory, "Assets subdirectory cannot be blank") if self.assets_subdirectory == "data/"
   end
 
   # TODO: Determine if this is really the best place to put this because we're dealing with Git bare repo best practices

@@ -31,7 +31,6 @@ config/fedora.yml
 # Ignore bash script
 repo.sh
 just_jetty.sh
-binstubs.sh
 
 # Ignore rdf
 *.rdf
