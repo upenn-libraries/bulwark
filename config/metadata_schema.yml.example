@@ -1,0 +1,33 @@
+development:
+  root_element_options:
+    - record
+    - page
+  parent_element_options:
+    - pages
+    - records
+  schema_terms:
+    - title
+    - author
+  canonical_identifier_path: identifier
+test:
+  root_element_options:
+    - record
+    - page
+  parent_element_options:
+    - pages
+    - records
+  schema_terms:
+    - title
+    - author
+  canonical_identifier_path: identifier
+production:
+  root_element_options:
+    - record
+    - page
+  parent_element_options:
+    - pages
+    - records
+  schema_terms:
+    - title
+    - author
+  canonical_identifier_path: identifier
