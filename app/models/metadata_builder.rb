@@ -9,6 +9,7 @@ class MetadataBuilder < ActiveRecord::Base
   around_create :set_preserve
 
   include Utils
+  include MetadataSchema
 
   validates :parent_repo, presence: true
 
@@ -99,20 +100,34 @@ class MetadataBuilder < ActiveRecord::Base
 
   def transform_and_ingest(array)
     @vca = self.repo.version_control_agent
+    @vca.clone
+    transformed_repo_path = "#{Utils.config.transformed_dir}/#{@vca.remote_path.gsub("/","_")}"
     array.each do |p|
       key, val = p
-      @vca.clone
       @vca.get(:get_location => val)
       @vca.unlock(val)
-      transformed_repo_path = "#{Utils.config.transformed_dir}/#{@vca.remote_path.gsub("/","_")}"
+      unless _canonical_identifier_check(val)
+        @status = { :error => "No canonical identifier found for /#{self.repo.metadata_subdirectory}/#{File.basename(val)}.  Skipping ingest of this file."}
+        next
+      end
       Dir.mkdir(transformed_repo_path) && Dir.chdir(transformed_repo_path)
       `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
       @status = self.repo.ingest(transformed_repo_path)
-      @vca.reset_hard
-      @vca.delete_clone
-      FileUtils.rm_rf(transformed_repo_path, :secure => true) if File.directory?(transformed_repo_path)
     end
+    @vca.reset_hard
+    @vca.delete_clone
+    FileUtils.rm_rf(transformed_repo_path, :secure => true) if File.directory?(transformed_repo_path)
     return @status
   end
+
+  private
+
+    def _canonical_identifier_check(xml_file)
+      doc = File.open(xml_file) { |f| Nokogiri::XML(f) }
+      MetadataSchema.config.canonical_identifier_path.each do |canon|
+        @presence = doc.at("#{canon}").present?
+      end
+      return @presence
+    end
 
 end
