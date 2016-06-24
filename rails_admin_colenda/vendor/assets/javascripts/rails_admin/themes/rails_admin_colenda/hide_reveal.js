@@ -1,19 +1,9 @@
-$(document).ready(function(){
+$(document).on("click","#xml_preview_submit", function() {
+  $(".wait").removeClass("hide");
+  $(".xml-preview").addClass("hide");
+});
 
-  $(function() {
-    $('.wait').addClass('hide');
-    $(".xml-preview").removeClass("hide");
-    $(".ingest-dashboard").removeClass("hide");
-  });
-
-	$("#xml_preview_submit").on("click", function(){
-    $(".wait").removeClass("hide");
-    $(".xml-preview").addClass("hide");
-	});
-
-	$("#ingest_select_submit").on("click", function(){
-    $(".wait").removeClass("hide");
-    $(".ingest-dashboard").addClass("hide");
-	});
-
+$(document).on("click","#ingest_select_submit", function() {
+  $(".wait").removeClass("hide");
+  $(".ingest-dashboard").addClass("hide");
 });

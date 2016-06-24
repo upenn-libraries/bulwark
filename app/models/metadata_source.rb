@@ -190,7 +190,7 @@ class MetadataSource < ActiveRecord::Base
       workbook = RubyXL::Parser.parse(self.path)
       case self.view_type
       when "horizontal"
-        while((x_stop >= (x_start+iterator)) && (workbook[0][y_start][x_start+iterator].present?))
+        while((x_stop >= (x_start+iterator)) && (workbook[0][y_start].present?) && (workbook[0][y_start][x_start+iterator].present?))
           header = workbook[0][y_start][x_start+iterator].value
           headers << header
           vals = []
@@ -204,7 +204,7 @@ class MetadataSource < ActiveRecord::Base
           iterator += 1
         end
       when "vertical"
-        while((y_stop >= (y_start+iterator)) && (workbook[0][y_start+iterator].present?))
+        while((y_stop >= (y_start+iterator)) && (workbook[0][y_start+iterator].present?) && (workbook[0][y_start+iterator][x_start].present?))
           header = workbook[0][y_start+iterator][x_start].value
           headers << header
           vals = []
