@@ -47,10 +47,12 @@ gem 'spring',        group: :development
 gem "rsolr", "~> 1.0.6"
 gem "devise"
 gem "devise-guests", "~> 0.3"
-
 group :development, :test do
   gem "pry-rails", "~> 0.3.4"
   gem "jettywrapper"
+end
+
+group :test do
   gem 'rspec-rails'
   gem 'factory_girl_rails'
   gem 'faker'

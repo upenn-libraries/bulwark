@@ -68,7 +68,7 @@ class MetadataBuildersController < ApplicationController
   end
 
   def metadata_builder_params
-    params.require(:metadata_builder).permit(
+    params.require(:metadata_builder).permit(:parent_repo,
       :metadata_source_attributes => [:id, :view_type, :num_objects, :x_start, :y_start, :x_stop, :y_stop, :original_mappings, :root_element, :parent_element, :user_defined_mappings, :children => []])
   end
 
