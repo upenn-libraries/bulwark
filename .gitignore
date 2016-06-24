@@ -19,14 +19,8 @@
 /imports
 .DS_Store
 
-# Ignore filesystem.yml
-filesystem.yml
-
-# Ignore file_extensions.yml
-file_extensions.yml
-
-# Ignore fedora.yml
-config/fedora.yml
+# Ignore config yml files
+config/*.yml
 
 # Ignore bash script
 repo.sh
