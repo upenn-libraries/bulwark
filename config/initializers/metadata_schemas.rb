@@ -15,6 +15,7 @@ MetadataSchema.configure do |config|
     config.parent_element_options = options.fetch(:parent_element_options)
     config.schema_terms = options.fetch(:schema_terms)
     config.canonical_identifier_path = options.fetch(:canonical_identifier_path)
+    config.voyager_root = options.fetch(:voyager_root)
   end
 
 end

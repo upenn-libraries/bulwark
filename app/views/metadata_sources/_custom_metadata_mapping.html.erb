@@ -1,16 +1,17 @@
-<%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :method => :post, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}/refresh_metadata" do |f| %>
-  <%= f.submit "Fetch most recent metadata" %>
+<%= field_set_tag "Custom Metadata Source" do %>
+  <%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :method => :post, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}/refresh_metadata" do |f| %>
+    <%= f.submit "Fetch most recent metadata" %>
+  <% end %>
 <% end %>
 
 <%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
 <% counter = 0 %>
-  <% @object.metadata_builder.metadata_source.each do |source| %>
-    <%= f.fields_for :metadata_source, source do |s| %>
+    <%= f.fields_for :metadata_source, @source do |s| %>
 
     <%= field_set_tag 'Map source metadata to XML' do %>
       Fill out the fields below to field values from metadata source files to XML.
     <% end %>
-    <h3>Mappings for <span class="file-path"><%= prettify(source.path)%></span></h3>
+    <h3>Mappings for <span class="file-path"><%= prettify(@source.path)%></span></h3>
     <%= content_tag :div, :class => "field" do -%>
       <%= s.label :root_element, "Root element:" %>
       <%= s.select :root_element, root_element_options, :include_blank => :true %>
@@ -22,7 +23,7 @@
       <%= content_tag(:div, "Optional -- Parent of each row of values in metadata source spreadsheet; Child of the root element.", :class => "field-tip") %>
     <% end -%>
 
-    <% source.original_mappings.each do |p| %>
+    <% @source.original_mappings.each do |p| %>
       <% value = (s.object.user_defined_mappings.present? && s.object.user_defined_mappings[p.first].present?) ? s.object.user_defined_mappings[p.first].values.first : schema_term_default(p.first) %>
       <%= content_tag :div, :class => "field" do -%>
         <%= s.label "user_defined_mappings[#{p.first}][mapped_value]", "\"#{p.first}\" should map to:" %>
@@ -31,17 +32,15 @@
       <% end -%>
     <% end -%>
 
-
     <% if @object.metadata_builder.metadata_source.size > 1 %>
       <h2>Define relationships</h2>
       <p>Structure relationships between multiple metadata source files</p>
       <%= content_tag :div, :class => "field" do -%>
-        <%= s.label :children, "Child/children of #{prettify(source.path)}:" %>
-        <%= s.select :children, nested_relationships_values(source.path), {}, { :multiple => true } %>
+        <%= s.label :children, "Child/children of #{prettify(@source.path)}:" %>
+        <%= s.select :children, nested_relationships_values(@source.path), {}, { :multiple => true } %>
       <% end -%>
     <% end -%>
     <% counter += 1 %>
-  <% end -%>
   <% end -%>
   <%= content_tag(:div, (f.submit "Save metadata mappings"), :class => "form-bottom") %>
   <% end -%>

@@ -1,6 +1,6 @@
 class MetadataBuildersController < ApplicationController
 
-  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files, :refresh_metadata, :generate_metadata, :generate_preview_xml]
+  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files, :refresh_metadata, :fetch_voyager, :generate_metadata, :generate_preview_xml]
 
   def show
   end
@@ -30,6 +30,11 @@ class MetadataBuildersController < ApplicationController
   def refresh_metadata
     @metadata_builder.refresh_metadata_from_source
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata refreshed.  See output below."}
+  end
+
+  def fetch_voyager
+    @metadata_builder.fetch_voyager_from_bibid
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Voyager data fetched.  See output below."}
   end
 
   def generate_metadata

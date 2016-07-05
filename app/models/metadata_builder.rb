@@ -81,21 +81,24 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def refresh_metadata_from_source
-    self.metadata_source.each do |source |
+    self.metadata_source.where(:source_type => "custom").each do |source|
+      source.set_metadata_mappings
+      source.save!
+    end
+  end
+
+  def fetch_voyager_from_bibid
+    self.metadata_source.where(:source_type => "voyager").each do |source|
       source.set_metadata_mappings
       source.save!
     end
   end
 
   def build_xml_files
-    if self.metadata_source.pluck(:user_defined_mappings).all? { |h| h.present? }
-      self.metadata_source.each do |source|
-        source.build_xml
-      end
-      return {:success => "Preservation XML generated successfully.  See preview below."}
-    else
-      return {:error => "Metadata mappings have not been generated.  No preservation XML could be generated."}
+    self.metadata_source.each do |source|
+      source.build_xml if source.user_defined_mappings.present?
     end
+    return {:success => "Preservation XML generated successfully.  See preview below."}
   end
 
   def transform_and_ingest(array)

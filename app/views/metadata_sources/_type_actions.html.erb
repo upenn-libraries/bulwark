@@ -1,9 +1,7 @@
-<div class="mapping-dashboard">
+<div class="type-dashboard">
   <% if @object.metadata_builder.metadata_source.present? %>
     <% @object.metadata_builder.metadata_source.each do |source| %>
-      <%= render_metadata_form(source) %>
+      <%= render_source_type(source)%>
     <% end %>
-  <% else %>
-    <%= render :partial => "metadata_sources/no_source" %>
   <% end %>
 </div>

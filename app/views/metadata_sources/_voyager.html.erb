@@ -1,0 +1,7 @@
+<%= field_set_tag "Voyager Source Data for #{prettify(@source.path)}" do  %>
+  <%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :method => :post, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}/fetch_voyager" do |f| %>
+    <%= f.submit "Fetch metadata from Voyager" %>
+  <% end %>
+<% end %>
+
+<%= @source.user_defined_mappings %>
