@@ -18,12 +18,12 @@ class MetadataBuildersController < ApplicationController
       _update_metadata_sources if params[:metadata_builder][:metadata_source_attributes].present?
       if @metadata_builder.errors.present?
         errors_rendered = Array[*@metadata_builder.errors.messages.values.flatten(1)].join(";  ").html_safe
-        redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :error => errors_rendered }
+        redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/#{_return_location}", :flash => { :error => errors_rendered }
       else
-        redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata Builder updated successfully."}
+        redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/#{_return_location}", :flash => { :success => "Metadata Builder updated successfully."}
       end
     else
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :error => "Metadata Builder was not updated successfully."}
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/#{_return_location}", :flash => { :error => "Metadata Builder was not updated successfully."}
     end
   end
 
@@ -88,6 +88,10 @@ class MetadataBuildersController < ApplicationController
         @metadata_builder.errors[:base] << message
       end
     end
+  end
+
+  def _return_location
+    return_location = params[:metadata_builder][:metadata_source_attributes][:user_defined_mappings].present? ? "generate_metadata" : "preserve"
   end
 
 end

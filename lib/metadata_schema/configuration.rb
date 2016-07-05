@@ -6,5 +6,6 @@ module MetadataSchema
     attr_accessor :canonical_identifier_path
     attr_accessor :voyager_root_element
     attr_accessor :voyager_http_lookup
+    attr_accessor :voyager_multivalue_fields
   end
 end

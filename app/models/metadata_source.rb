@@ -125,7 +125,10 @@ class MetadataSource < ActiveRecord::Base
     @xml_content = ""
     self.user_defined_mappings.each do |mapping|
       tag = mapping.first
-      @xml_content << "<#{tag}>#{mapping.last}</#{tag}>"
+      mapped_values_array = mapping.last.try(:each) || Array[*mapping.last.lstrip]
+      mapped_values_array.each do |mapped_val|
+        @xml_content << "<#{tag}>#{mapped_val}</#{tag}>"
+      end
     end
     @xml_content_transformed = "<#{self.root_element}>#{@xml_content}</#{self.root_element}>"
     @xml_content_transformed
@@ -201,14 +204,19 @@ class MetadataSource < ActiveRecord::Base
       data = Nokogiri::XML(voyager_source)
       data.children.children.children.children.children.each do |child|
         if child.name == "datafield"
-          binding.pry()
-          header = CustomEncodings::Marc21::Constants::TAG.include?(child.attributes["tag"].value) ?  CustomEncodings::Marc21::Constants::TAG[child.attributes["tag"].value] : nil
-          # Make child_value an array/hash if we need to separate the tag values from Voyager
-          child_value = ""
-          child.children.each do |c|
-            child_value << c.text
-          end
+          header = _fetch_header_from_voyager(child)
           if header.present?
+            if MetadataSchema.config.voyager_multivalue_fields.include?(header)
+              child_value = spreadsheet_values["#{header}"].present? ? spreadsheet_values["#{header}"] : []
+              child.children.each do |c|
+                child_value << c.text
+              end
+            else
+              child_value = ""
+              child.children.each do |c|
+                child_value << " #{c.text}"
+              end
+            end
             spreadsheet_values["#{header}"] = child_value
           end
         end
@@ -221,6 +229,18 @@ class MetadataSource < ActiveRecord::Base
       self.metadata_builder.repo.version_control_agent.get(:get_location => "#{self.path}")
       worksheet = RubyXL::Parser.parse(self.path)
       self.original_mappings = {"bibid" => worksheet[0][1][0].value}
+    end
+
+    def _fetch_header_from_voyager(voyager_field)
+      if CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes["tag"].value].present?
+        if CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes["tag"].value]["*"].present?
+          header = CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes["tag"].value]["*"]
+        else
+          if CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes["tag"].value][voyager_field.children.first.attributes["code"].value].present?
+            header = CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes["tag"].value][voyager_field.children.first.attributes["code"].value]
+          end
+        end
+      end
     end
 
     def _convert_metadata

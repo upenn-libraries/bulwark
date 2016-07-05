@@ -42,6 +42,7 @@ class CatalogController < ApplicationController
     #
     # :show may be set to false if you don't want the facet to be drawn in the
     # facet bar
+    config.add_facet_field solr_name('subject', :facetable), :label => 'Subject'
     config.add_facet_field solr_name('creator', :facetable), :label => 'Creator'
     config.add_facet_field solr_name('date', :facetable), :label => 'Date', :range => true
     config.add_facet_field solr_name('language', :facetable), :label => 'Language'
@@ -69,11 +70,11 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('date', :stored_searchable, type: :string), :label => 'Date', :link_to_search => solr_name('date', :facetable)
     config.add_show_field solr_name('abstract', :stored_searchable, type: :string), :label => 'Abstract'
     config.add_show_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
+    config.add_show_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject', :link_to_search => solr_name('subject', :facetable)
     config.add_show_field solr_name('language', :stored_searchable, type: :string), :label => 'Language', :link_to_search => solr_name('language', :facetable)
     config.add_show_field solr_name('coverage', :stored_searchable, type: :string), :label => 'Coverage', :link_to_search => solr_name('coverage', :facetable)
     config.add_show_field solr_name('file_location', :stored_searchable, type: :string), :label => 'File Location'
     config.add_show_field solr_name('review_status', :stored_searchable, type: :string), :label => 'Review Status'
-
 
     # "fielded" search configuration. Used by pulldown among other places.
     # For supported keys in hash, see rdoc for Blacklight::SearchFields

@@ -26,6 +26,10 @@ development:
   voyager:
     root_element: record
     http_lookup: http://dla.library.upenn.edu/dla/franklin/lookup
+    multivalue_fields:
+      - coverage
+      - language
+      - subject
 test:
   root_element_options:
     - record
@@ -41,6 +45,9 @@ test:
   voyager:
     root_element: root
     http_lookup: http://url/to/http/no/trailing/slash
+    multivalue_fields:
+      - language
+      - subject
 production:
   root_element_options:
     - record
@@ -56,3 +63,6 @@ production:
   voyager:
     root_element: root
     http_lookup: http://url/to/http/no/trailing/slash
+    multivalue_fields:
+      - language
+      - subject
