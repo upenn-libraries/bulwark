@@ -86,6 +86,7 @@ class MetadataSource < ActiveRecord::Base
       when "custom"
         self.original_mappings = _convert_metadata
       when "voyager"
+        self.root_element = MetadataSchema.config.try(:voyager_root_element) || "voyager_object"
         self.user_defined_mappings = _set_voyager_data
       end
     end
@@ -122,14 +123,11 @@ class MetadataSource < ActiveRecord::Base
 
   def xml_from_voyager
     @xml_content = ""
-    root_element = MetadataSchema.config.try(:voyager_root_element) || "voyager_object"
     self.user_defined_mappings.each do |mapping|
       tag = mapping.first
-      mapping.last.each do |m|
-        @xml_content << "<#{tag}>#{m}</#{tag}>"
-      end
+      @xml_content << "<#{tag}>#{mapping.last}</#{tag}>"
     end
-    @xml_content_transformed = "<#{root_element}>#{@xml_content}</#{root_element}>"
+    @xml_content_transformed = "<#{self.root_element}>#{@xml_content}</#{self.root_element}>"
     @xml_content_transformed
   end
 
@@ -204,7 +202,6 @@ class MetadataSource < ActiveRecord::Base
       data.children.children.children.children.children.each do |child|
         if child.name == "datafield"
           header = CustomEncodings::Marc21::Constants::TAG.include?(child.attributes["tag"].value) ?  CustomEncodings::Marc21::Constants::TAG[child.attributes["tag"].value] : nil
-
           # Make child_value an array/hash if we need to separate the tag values from Voyager
           child_value = ""
           child.children.each do |c|
@@ -215,6 +212,7 @@ class MetadataSource < ActiveRecord::Base
           end
         end
       end
+      spreadsheet_values["identifier"] = "#{Utils.config.repository_prefix}_#{self.original_mappings["bibid"]}" unless spreadsheet_values.keys.include?("identifier")
       return spreadsheet_values
     end
 
