@@ -24,6 +24,7 @@ development:
   canonical_identifier_path:
     - /root/record/identifier
   voyager:
+    root_element: record
     http_lookup: http://dla.library.upenn.edu/dla/franklin/lookup
 test:
   root_element_options:
@@ -38,6 +39,7 @@ test:
   canonical_identifier_path:
     - /root/record/identifier
   voyager:
+    root_element: root
     http_lookup: http://url/to/http/no/trailing/slash
 production:
   root_element_options:
@@ -52,4 +54,5 @@ production:
   canonical_identifier_path:
     - /root/record/identifier
   voyager:
+    root_element: root
     http_lookup: http://url/to/http/no/trailing/slash

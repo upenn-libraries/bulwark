@@ -122,13 +122,15 @@ class MetadataSource < ActiveRecord::Base
 
   def xml_from_voyager
     @xml_content = ""
+    root_element = MetadataSchema.config.try(:voyager_root_element) || "voyager_object"
     self.user_defined_mappings.each do |mapping|
       tag = mapping.first
       mapping.last.each do |m|
         @xml_content << "<#{tag}>#{m}</#{tag}>"
       end
     end
-    @xml_content
+    @xml_content_transformed = "<#{root_element}>#{@xml_content}</#{root_element}>"
+    @xml_content_transformed
   end
 
   def xml_from_custom(fname)
