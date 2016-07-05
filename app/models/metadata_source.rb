@@ -197,7 +197,7 @@ class MetadataSource < ActiveRecord::Base
     def _set_voyager_data
       _refresh_bibid
       spreadsheet_values = {}
-      voyager_source = open("http://dla.library.upenn.edu/dla/franklin/lookup/#{self.original_mappings["bibid"]}.xml")
+      voyager_source = open("#{MetadataSchema.config.voyager_http_lookup}/#{self.original_mappings["bibid"]}.xml")
       data = Nokogiri::XML(voyager_source)
       data.children.children.children.children.children.each do |child|
         if child.name == "datafield"
@@ -213,24 +213,6 @@ class MetadataSource < ActiveRecord::Base
       end
       return spreadsheet_values
     end
-
-    # def _build_spreadsheet_derivative(spreadsheet_values, options = {})
-    #   spreadsheet_derivative_path = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{Utils.config.object_derivatives_path}/#{self.original_mappings["bibid"]}.xlsx"
-    #   self.metadata_builder.metadata_source << MetadataSource.create(path: spreadsheet_derivative_path, source_type: "voyager_derivative", view_type: options[:view_type], x_start: options[:x_start], y_start: options[:y_start], x_stop: options[:x_stop], y_stop: options[:y_stop]) unless self.metadata_builder.metadata_source.where(metadata_builder_id: self.metadata_builder.id).pluck(:path) == spreadsheet_derivative_path
-    #   self.metadata_builder.save!
-    #   workbook = RubyXL::Workbook.new
-    #   worksheet = workbook[0]
-    #   spreadsheet_values.keys.each_with_index do |key, k_index|
-    #     worksheet.add_cell(0, k_index, key)
-    #     spreadsheet_values[key].each_with_index do |val, v_index|
-    #       worksheet.add_cell(v_index+1,k_index,val)
-    #     end
-    #   end
-    #   workbook.write(spreadsheet_derivative_path)
-    #   self.metadata_builder.repo.version_control_agent.commit("Created derivative spreadsheet of Voyager metadata")
-    #   self.metadata_builder.repo.version_control_agent.push
-    #   generate_and_build_xml("#{self.metadata_builder.repo.version_control_agent.working_path}/#{Utils.config.object_derivatives_path}/#{self.original_mappings["bibid"]}.xlsx")
-    # end
 
     def _refresh_bibid
       self.metadata_builder.repo.version_control_agent.get(:get_location => "#{self.path}")
@@ -376,5 +358,24 @@ class MetadataSource < ActiveRecord::Base
     def self.source_types
       source_types = [["Voyager BibID Lookup", "voyager"], ["Custom", "custom"]]
     end
+
+
+    # def _build_spreadsheet_derivative(spreadsheet_values, options = {})
+    #   spreadsheet_derivative_path = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{Utils.config.object_derivatives_path}/#{self.original_mappings["bibid"]}.xlsx"
+    #   self.metadata_builder.metadata_source << MetadataSource.create(path: spreadsheet_derivative_path, source_type: "voyager_derivative", view_type: options[:view_type], x_start: options[:x_start], y_start: options[:y_start], x_stop: options[:x_stop], y_stop: options[:y_stop]) unless self.metadata_builder.metadata_source.where(metadata_builder_id: self.metadata_builder.id).pluck(:path) == spreadsheet_derivative_path
+    #   self.metadata_builder.save!
+    #   workbook = RubyXL::Workbook.new
+    #   worksheet = workbook[0]
+    #   spreadsheet_values.keys.each_with_index do |key, k_index|
+    #     worksheet.add_cell(0, k_index, key)
+    #     spreadsheet_values[key].each_with_index do |val, v_index|
+    #       worksheet.add_cell(v_index+1,k_index,val)
+    #     end
+    #   end
+    #   workbook.write(spreadsheet_derivative_path)
+    #   self.metadata_builder.repo.version_control_agent.commit("Created derivative spreadsheet of Voyager metadata")
+    #   self.metadata_builder.repo.version_control_agent.push
+    #   generate_and_build_xml("#{self.metadata_builder.repo.version_control_agent.working_path}/#{Utils.config.object_derivatives_path}/#{self.original_mappings["bibid"]}.xlsx")
+    # end
 
 end

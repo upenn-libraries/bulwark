@@ -23,8 +23,8 @@ development:
     - parent_manuscript
   canonical_identifier_path:
     - /root/record/identifier
-  voyager_root:
-    - record
+  voyager:
+    http_lookup: http://dla.library.upenn.edu/dla/franklin/lookup
 test:
   root_element_options:
     - record
@@ -37,8 +37,8 @@ test:
     - author
   canonical_identifier_path:
     - /root/record/identifier
-  voyager_root:
-    - root
+  voyager:
+    http_lookup: http://url/to/http/no/trailing/slash
 production:
   root_element_options:
     - record
@@ -51,5 +51,5 @@ production:
     - author
   canonical_identifier_path:
     - /root/record/identifier
-  voyager_root:
-    - root
+  voyager:
+    http_lookup: http://url/to/http/no/trailing/slash
