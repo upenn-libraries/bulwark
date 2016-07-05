@@ -201,6 +201,7 @@ class MetadataSource < ActiveRecord::Base
       data = Nokogiri::XML(voyager_source)
       data.children.children.children.children.children.each do |child|
         if child.name == "datafield"
+          binding.pry()
           header = CustomEncodings::Marc21::Constants::TAG.include?(child.attributes["tag"].value) ?  CustomEncodings::Marc21::Constants::TAG[child.attributes["tag"].value] : nil
           # Make child_value an array/hash if we need to separate the tag values from Voyager
           child_value = ""
