@@ -204,7 +204,9 @@ class MetadataSource < ActiveRecord::Base
       data.children.children.children.children.children.each do |child|
         if child.name == "datafield"
           header = CustomEncodings::Marc21::Constants::TAG.include?(child.attributes["tag"].value) ?  CustomEncodings::Marc21::Constants::TAG[child.attributes["tag"].value] : nil
-          child_value = []
+
+          # Make child_value an array/hash if we need to separate the tag values from Voyager
+          child_value = ""
           child.children.each do |c|
             child_value << c.text
           end

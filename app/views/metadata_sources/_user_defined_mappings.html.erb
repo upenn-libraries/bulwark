@@ -1,0 +1,8 @@
+<ul>
+  <% @source.user_defined_mappings.each do |mapping| -%>
+    <li>
+      <strong><%= mapping.first %>:</strong><br />
+      <%= mapping.last %>
+   </li>
+   <% end %>
+</ul>
