@@ -103,7 +103,7 @@ class MetadataSource < ActiveRecord::Base
       source.set_metadata_mappings
       source.generate_and_build_xml
     end
-    self.generate_parent_child_xml
+    self.generate_parent_child_xml unless self.children.empty?
     self.metadata_builder.repo.version_control_agent.delete_clone
   end
 
@@ -116,6 +116,7 @@ class MetadataSource < ActiveRecord::Base
       @xml_content_final_copy = xml_from_voyager
     end
     _build_preservation_xml(xml_fname, @xml_content_final_copy)
+    _build_preservation_xml("#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}", @xml_content_final_copy) if self.children.empty?
     self.metadata_builder.save!
     self.metadata_builder.repo.version_control_agent.commit("Generated preservation XML for #{fname}")
     self.metadata_builder.repo.version_control_agent.push
@@ -158,9 +159,9 @@ class MetadataSource < ActiveRecord::Base
   def generate_parent_child_xml
     self.children.each do |child|
       metadata_path = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
-      child_path = MetadataSource.where(:id => child).pluck(:path).first
+      @child_path = MetadataSource.where(:id => child).pluck(:path).first
       key_xml_path = "#{self.path}.xml"
-      child_xml_path = "#{child_path}.xml"
+      child_xml_path = "#{@child_path}.xml"
       self.metadata_builder.repo.version_control_agent.get(:get_location => key_xml_path)
       self.metadata_builder.repo.version_control_agent.get(:get_location => child_xml_path)
       xml_content = File.open(key_xml_path, "r"){|io| io.read}
@@ -171,8 +172,8 @@ class MetadataSource < ActiveRecord::Base
       xml_content.insert(insert_index, child_xml_content)
       xml_unified_filename = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"
       self.metadata_builder.repo.version_control_agent.unlock(xml_unified_filename) if File.exists?(xml_unified_filename)
-      _build_preservation_xml(xml_unified_filename,xml_content)
-      self.metadata_builder.repo.version_control_agent.commit("Generated unified XML for #{self.path} and #{child_path} at #{xml_unified_filename}")
+      _build_preservation_xml(xml_unified_filename, xml_content)
+      self.metadata_builder.repo.version_control_agent.commit("Generated unified XML for #{self.path} and #{@child_path} at #{xml_unified_filename}")
       self.metadata_builder.repo.version_control_agent.push
       self.metadata_builder.save!
     end
@@ -203,25 +204,32 @@ class MetadataSource < ActiveRecord::Base
       voyager_source = open("#{MetadataSchema.config.voyager_http_lookup}/#{self.original_mappings["bibid"]}.xml")
       data = Nokogiri::XML(voyager_source)
       data.children.children.children.children.children.each do |child|
-        if child.name == "datafield"
-          header = _fetch_header_from_voyager(child)
-          if header.present?
-            if MetadataSchema.config.voyager_multivalue_fields.include?(header)
-              child_value = spreadsheet_values["#{header}"].present? ? spreadsheet_values["#{header}"] : []
-              child.children.each do |c|
-                child_value << c.text
-              end
-            else
-              child_value = ""
-              child.children.each do |c|
-                child_value << " #{c.text}"
-              end
+        if child.name == "datafield" && CustomEncodings::Marc21::Constants::TAGS[child.attributes["tag"].value].present?
+          if CustomEncodings::Marc21::Constants::TAGS[child.attributes["tag"].value]["*"].present?
+            header = _fetch_header_from_voyager(child)
+            spreadsheet_values["#{header}"] = [] unless spreadsheet_values["#{header}"].present?
+            child.children.each do |c|
+              spreadsheet_values["#{header}"] << c.text
             end
-            spreadsheet_values["#{header}"] = child_value
+          else
+            child.children.each do |c|
+              header = _fetch_header_from_subfield_voyager(child.attributes["tag"].value, c)
+
+              if header.present?
+                spreadsheet_values["#{header}"] = [] unless spreadsheet_values["#{header}"].present?
+                c.children.each do |s|
+                  spreadsheet_values["#{header}"] << s.text
+                end
+              end
+
+            end
           end
         end
       end
-      spreadsheet_values["identifier"] = "#{Utils.config.repository_prefix}_#{self.original_mappings["bibid"]}" unless spreadsheet_values.keys.include?("identifier")
+      spreadsheet_values["identifier"] = ["#{Utils.config.repository_prefix}_#{self.original_mappings["bibid"]}"] unless spreadsheet_values.keys.include?("identifier")
+      spreadsheet_values.each do |entry|
+        spreadsheet_values[entry.first] = entry.last.join(" ") unless MetadataSchema.config.voyager_multivalue_fields.include?(entry.first)
+      end
       return spreadsheet_values
     end
 
@@ -232,15 +240,11 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def _fetch_header_from_voyager(voyager_field)
-      if CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes["tag"].value].present?
-        if CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes["tag"].value]["*"].present?
-          header = CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes["tag"].value]["*"]
-        else
-          if CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes["tag"].value][voyager_field.children.first.attributes["code"].value].present?
-            header = CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes["tag"].value][voyager_field.children.first.attributes["code"].value]
-          end
-        end
-      end
+      return CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes["tag"].value]["*"]
+    end
+
+    def _fetch_header_from_subfield_voyager(tag_value, voyager_child_field)
+      return CustomEncodings::Marc21::Constants::TAGS[tag_value][voyager_child_field.attributes["code"].value]
     end
 
     def _convert_metadata

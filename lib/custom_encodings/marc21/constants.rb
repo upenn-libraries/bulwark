@@ -7,8 +7,10 @@ module CustomEncodings
       TAGS["300"] = { "*" => "description" }
       TAGS["520"] = { "*" => "abstract" }
       TAGS["546"] = { "*" => "language" }
-      TAGS["600"] = { "a" => "subject" }
-      TAGS["650"] = { "*" => "subject" }
+      TAGS["600"] = { "*" => "subject" }
+      TAGS["650"] = { "a" => "subject",
+        "z" => "coverage"
+      }
       TAGS["651"] = { "a" => "coverage",
         "x" => "subject",
         "y" => "date",
