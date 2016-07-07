@@ -97,17 +97,17 @@ class MetadataSource < ActiveRecord::Base
   def build_xml
     self.set_metadata_mappings
     self.metadata_builder.repo.version_control_agent.clone
-    self.generate_and_build_xml
+    self.generate_and_build_individual_xml
     self.children.each do |child|
       source = MetadataSource.find(child)
       source.set_metadata_mappings
-      source.generate_and_build_xml
+      source.generate_and_build_individual_xml
     end
-    self.generate_parent_child_xml
+    self.generate_preservation_xml
     self.metadata_builder.repo.version_control_agent.delete_clone
   end
 
-  def generate_and_build_xml(fname = self.path)
+  def generate_and_build_individual_xml(fname = self.path)
     xml_fname = "#{fname}.xml"
     case self.source_type
     when "custom"
@@ -115,10 +115,17 @@ class MetadataSource < ActiveRecord::Base
     when "voyager"
       @xml_content_final_copy = xml_from_voyager
     end
-    _build_preservation_xml(xml_fname, @xml_content_final_copy)
-    self.metadata_builder.save!
-    self.metadata_builder.repo.version_control_agent.commit("Generated preservation XML for #{fname}")
-    self.metadata_builder.repo.version_control_agent.push
+    _fetch_write_save_preservation_xml(xml_fname, @xml_content_final_copy)
+  end
+
+  def generate_preservation_xml
+    if self.children.present?
+      self.generate_parent_child_xml
+    else
+      file = File.new("#{self.path}.xml")
+      xml_content = file.readline
+       _fetch_write_save_preservation_xml(file, xml_content) if self.metadata_builder.canonical_identifier_check("#{self.path}.xml")
+    end
   end
 
   def xml_from_voyager
@@ -169,12 +176,7 @@ class MetadataSource < ActiveRecord::Base
       end_tag = "</#{self.root_element}>"
       insert_index = xml_content.index(end_tag)
       xml_content.insert(insert_index, child_xml_content)
-      xml_unified_filename = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"
-      self.metadata_builder.repo.version_control_agent.unlock(xml_unified_filename) if File.exists?(xml_unified_filename)
-      _build_preservation_xml(xml_unified_filename,xml_content)
-      self.metadata_builder.repo.version_control_agent.commit("Generated unified XML for #{self.path} and #{child_path} at #{xml_unified_filename}")
-      self.metadata_builder.repo.version_control_agent.push
-      self.metadata_builder.save!
+      _fetch_write_save_preservation_xml(xml_content)
     end
   end
 
@@ -213,14 +215,12 @@ class MetadataSource < ActiveRecord::Base
           else
             child.children.each do |c|
               header = _fetch_header_from_subfield_voyager(child.attributes["tag"].value, c)
-
               if header.present?
                 spreadsheet_values["#{header}"] = [] unless spreadsheet_values["#{header}"].present?
                 c.children.each do |s|
                   spreadsheet_values["#{header}"] << s.text
                 end
               end
-
             end
           end
         end
@@ -360,9 +360,19 @@ class MetadataSource < ActiveRecord::Base
         content << xml_review_status
       end
       File.open(tmp_filename, "w+") do |f|
-        f << $xml_header << content << $xml_footer
+        f << $xml_header unless content.start_with?($xml_header)
+        f << content
+        f << $xml_footer unless content.end_with?($xml_footer)
       end
       File.rename(tmp_filename, filename)
+    end
+
+    def _fetch_write_save_preservation_xml(file_path = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}", xml_content)
+      self.metadata_builder.repo.version_control_agent.unlock(file_path) if File.exists?(file_path)
+      _build_preservation_xml(file_path,xml_content)
+      self.metadata_builder.repo.version_control_agent.commit("Generated unified XML for #{self.path} at #{file_path}")
+      self.metadata_builder.repo.version_control_agent.push
+      self.metadata_builder.save!
     end
 
     def _offset
@@ -401,7 +411,7 @@ class MetadataSource < ActiveRecord::Base
     #   workbook.write(spreadsheet_derivative_path)
     #   self.metadata_builder.repo.version_control_agent.commit("Created derivative spreadsheet of Voyager metadata")
     #   self.metadata_builder.repo.version_control_agent.push
-    #   generate_and_build_xml("#{self.metadata_builder.repo.version_control_agent.working_path}/#{Utils.config.object_derivatives_path}/#{self.original_mappings["bibid"]}.xlsx")
+    #   generate_and_build_individual_xml("#{self.metadata_builder.repo.version_control_agent.working_path}/#{Utils.config.object_derivatives_path}/#{self.original_mappings["bibid"]}.xlsx")
     # end
 
 end

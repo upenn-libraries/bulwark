@@ -109,7 +109,7 @@ class MetadataBuilder < ActiveRecord::Base
       key, val = p
       @vca.get(:get_location => val)
       @vca.unlock(val)
-      unless _canonical_identifier_check(val)
+      unless canonical_identifier_check(val)
         @status = { :error => "No canonical identifier found for /#{self.repo.metadata_subdirectory}/#{File.basename(val)}.  Skipping ingest of this file."}
         next
       end
@@ -123,14 +123,13 @@ class MetadataBuilder < ActiveRecord::Base
     return @status
   end
 
-  private
-
-    def _canonical_identifier_check(xml_file)
-      doc = File.open(xml_file) { |f| Nokogiri::XML(f) }
-      MetadataSchema.config.canonical_identifier_path.each do |canon|
-        @presence = doc.at("#{canon}").present?
-      end
-      return @presence
+  def canonical_identifier_check(xml_file)
+    doc = File.open(xml_file) { |f| Nokogiri::XML(f) }
+    MetadataSchema.config.canonical_identifier_path.each do |canon|
+      @presence = doc.at("#{canon}").present?
     end
+    return @presence
+  end
+
 
 end
