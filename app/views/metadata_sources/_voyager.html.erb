@@ -6,7 +6,7 @@
     <p>Structure relationships between multiple metadata source files</p>
     <%= content_tag :div, :class => "field" do -%>
       <%= s.label :children, "Child/children of #{prettify(@source.path)}:" %>
-      <%= s.select :children, nested_relationships_values(@source.path), {}, { :multiple => true } %>
+      <%= s.select :children, nested_relationships_values(@source.path), { :include_blank => "Select one..." }, { :multiple => true } %>
     <% end -%>
   <% end -%>
   <% end -%>

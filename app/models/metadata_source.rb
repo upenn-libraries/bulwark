@@ -124,7 +124,7 @@ class MetadataSource < ActiveRecord::Base
     else
       file = File.new("#{self.path}.xml")
       xml_content = file.readline
-       _fetch_write_save_preservation_xml(file, xml_content) if self.metadata_builder.canonical_identifier_check("#{self.path}.xml")
+       _fetch_write_save_preservation_xml(xml_content) if self.metadata_builder.canonical_identifier_check("#{self.path}.xml")
     end
   end
 
