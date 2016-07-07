@@ -103,7 +103,7 @@ class MetadataSource < ActiveRecord::Base
       source.set_metadata_mappings
       source.generate_and_build_xml
     end
-    self.generate_parent_child_xml unless self.children.empty?
+    self.generate_parent_child_xml
     self.metadata_builder.repo.version_control_agent.delete_clone
   end
 
@@ -116,7 +116,6 @@ class MetadataSource < ActiveRecord::Base
       @xml_content_final_copy = xml_from_voyager
     end
     _build_preservation_xml(xml_fname, @xml_content_final_copy)
-    _build_preservation_xml("#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}", @xml_content_final_copy) if self.children.empty?
     self.metadata_builder.save!
     self.metadata_builder.repo.version_control_agent.commit("Generated preservation XML for #{fname}")
     self.metadata_builder.repo.version_control_agent.push
@@ -159,9 +158,9 @@ class MetadataSource < ActiveRecord::Base
   def generate_parent_child_xml
     self.children.each do |child|
       metadata_path = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
-      @child_path = MetadataSource.where(:id => child).pluck(:path).first
+      child_path = MetadataSource.where(:id => child).pluck(:path).first
       key_xml_path = "#{self.path}.xml"
-      child_xml_path = "#{@child_path}.xml"
+      child_xml_path = "#{child_path}.xml"
       self.metadata_builder.repo.version_control_agent.get(:get_location => key_xml_path)
       self.metadata_builder.repo.version_control_agent.get(:get_location => child_xml_path)
       xml_content = File.open(key_xml_path, "r"){|io| io.read}
@@ -172,8 +171,8 @@ class MetadataSource < ActiveRecord::Base
       xml_content.insert(insert_index, child_xml_content)
       xml_unified_filename = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"
       self.metadata_builder.repo.version_control_agent.unlock(xml_unified_filename) if File.exists?(xml_unified_filename)
-      _build_preservation_xml(xml_unified_filename, xml_content)
-      self.metadata_builder.repo.version_control_agent.commit("Generated unified XML for #{self.path} and #{@child_path} at #{xml_unified_filename}")
+      _build_preservation_xml(xml_unified_filename,xml_content)
+      self.metadata_builder.repo.version_control_agent.commit("Generated unified XML for #{self.path} and #{child_path} at #{xml_unified_filename}")
       self.metadata_builder.repo.version_control_agent.push
       self.metadata_builder.save!
     end
