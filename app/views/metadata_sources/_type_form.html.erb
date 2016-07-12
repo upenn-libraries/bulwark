@@ -2,8 +2,10 @@
   <% @object.metadata_builder.metadata_source.each do |source| %>
     <h3>Source data for <%= prettify(source.path) %></h3>
     <%= f.fields_for :metadata_source, source do |s| %>
-      <%= s.label :source_type, "Source Type" %>
-      <%= s.select :source_type, MetadataSource.source_types %>
+      <div class="input-fields">
+        <%= s.label :source_type, "Source Type" %>
+        <%= s.select :source_type, MetadataSource.source_types %>
+      </div>
     <% end %>
   <% end %>
   <%= f.submit "Update source types" %>

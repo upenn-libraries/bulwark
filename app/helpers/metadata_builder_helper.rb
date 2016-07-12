@@ -1,7 +1,7 @@
 module MetadataBuilderHelper
 
   def render_preview_xml
-    unless MetadataSource.where(:metadata_builder_id => @object.metadata_builder.id).pluck(:user_defined_mappings).all?{ |h| h.empty? }
+    if mappings_present?(:user_defined_mappings)
       render :partial => "metadata_builders/preview_xml"
     else
       render :partial => "metadata_builders/no_mappings"
@@ -56,6 +56,10 @@ module MetadataBuilderHelper
       else
         raise "Invalid argument #{file_path_input}. prettify can only accept strings and arrays of strings."
       end
+  end
+
+  def mappings_present?(query_field)
+     MetadataSource.where(:metadata_builder_id => @object.metadata_builder.id).pluck(query_field).all?{ |h| h.empty? } ? false : true
   end
 
   private

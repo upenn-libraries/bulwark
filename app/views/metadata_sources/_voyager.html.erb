@@ -1,17 +1,3 @@
-<%= field_set_tag "Voyager Source Data for #{prettify(@source.path)}" do  %>
-  <%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :method => :post, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}/fetch_voyager" do |f| %>
-  <%= f.fields_for :metadata_source, @source do |s| %>
-  <% if @object.metadata_builder.metadata_source.size > 1 %>
-    <h2>Define relationships</h2>
-    <p>Structure relationships between multiple metadata source files</p>
-    <%= content_tag :div, :class => "field" do -%>
-      <%= s.label :children, "Child/children of #{prettify(@source.path)}:" %>
-      <%= s.select :children, nested_relationships_values(@source.path), { :include_blank => "Select one..." }, { :multiple => true } %>
-    <% end -%>
-  <% end -%>
-  <% end -%>
-    <%= f.submit "Save relationships and fetch metadata from Voyager" %>
-  <% end %>
-<% end %>
+<%= render :partial => "metadata_sources/fetch_metadata_from_voyager" %>
 
-<%= render :partial => "metadata_sources/user_defined_mappings"%>
+<%= render :partial => "metadata_sources/voyager_metadata_mapping" if mappings_present?(:original_mappings) %>

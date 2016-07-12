@@ -17,7 +17,7 @@ module MetadataSourceHelper
     @source = source
       case source.source_type
         when "custom"
-          render :partial => "metadata_sources/custom_metadata_mapping", :source => @source
+          render :partial => "metadata_sources/generate_custom_metadata", :source => @source
         else "voyager"
           render :partial => "metadata_sources/voyager", :source => @source
       end

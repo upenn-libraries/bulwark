@@ -1,0 +1,5 @@
+<%= field_set_tag "Custom Metadata Source" do %>
+  <%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :method => :post, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}/refresh_metadata" do |f| %>
+    <%= f.submit "Fetch most recent metadata" %>
+  <% end %>
+<% end %>
