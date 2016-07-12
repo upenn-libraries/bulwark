@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160523141604) do
+ActiveRecord::Schema.define(version: 20160629182006) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
@@ -54,6 +54,7 @@ ActiveRecord::Schema.define(version: 20160523141604) do
     t.datetime "created_at",                                   null: false
     t.datetime "updated_at",                                   null: false
     t.integer  "metadata_builder_id"
+    t.string   "source_type"
   end
 
   add_index "metadata_sources", ["metadata_builder_id"], name: "index_metadata_sources_on_metadata_builder_id"

@@ -67,6 +67,9 @@
           <sv:property sv:name="ns002:language" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="language" />
           </sv:property>
+          <sv:property sv:name="ns002:subject" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="subject" />
+          </sv:property>
           <sv:property sv:name="ns002:description" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="description" />
           </sv:property>
@@ -97,6 +100,10 @@
     </xsl:template>
 
     <xsl:template match="language">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="subject">
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
 

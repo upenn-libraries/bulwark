@@ -54,6 +54,13 @@ class MetadataBuilder < ActiveRecord::Base
     return unidentified
   end
 
+  def refresh_metadata
+    self.metadata_source.each do |source|
+      source.set_metadata_mappings
+      source.save!
+    end
+  end
+
   def set_source(source_files)
     #TODO: Consider removing from MetadataBuilder
     self.source = source_files
@@ -80,22 +87,11 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.delete_clone
   end
 
-  def refresh_metadata_from_source
-    self.metadata_source.each do |source |
-      source.set_metadata_mappings
-      source.save!
-    end
-  end
-
   def build_xml_files
-    if self.metadata_source.pluck(:user_defined_mappings).all? { |h| h.present? }
-      self.metadata_source.each do |source|
-        source.build_xml
-      end
-      return {:success => "Preservation XML generated successfully.  See preview below."}
-    else
-      return {:error => "Metadata mappings have not been generated.  No preservation XML could be generated."}
+    self.metadata_source.each do |source|
+      source.build_xml if source.user_defined_mappings.present?
     end
+    return {:success => "Preservation XML generated successfully.  See preview below."}
   end
 
   def transform_and_ingest(array)
@@ -106,7 +102,7 @@ class MetadataBuilder < ActiveRecord::Base
       key, val = p
       @vca.get(:get_location => val)
       @vca.unlock(val)
-      unless _canonical_identifier_check(val)
+      unless canonical_identifier_check(val)
         @status = { :error => "No canonical identifier found for /#{self.repo.metadata_subdirectory}/#{File.basename(val)}.  Skipping ingest of this file."}
         next
       end
@@ -120,14 +116,13 @@ class MetadataBuilder < ActiveRecord::Base
     return @status
   end
 
-  private
-
-    def _canonical_identifier_check(xml_file)
-      doc = File.open(xml_file) { |f| Nokogiri::XML(f) }
-      MetadataSchema.config.canonical_identifier_path.each do |canon|
-        @presence = doc.at("#{canon}").present?
-      end
-      return @presence
+  def canonical_identifier_check(xml_file)
+    doc = File.open(xml_file) { |f| Nokogiri::XML(f) }
+    MetadataSchema.config.canonical_identifier_path.each do |canon|
+      @presence = doc.at("#{canon}").present?
     end
+    return @presence
+  end
+
 
 end

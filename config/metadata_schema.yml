@@ -16,12 +16,20 @@ development:
     - language
     - date
     - title
+    - author
     - file_name
     - page_number
     - ocr_text
     - parent_manuscript
   canonical_identifier_path:
     - /root/record/identifier
+  voyager:
+    root_element: record
+    http_lookup: http://dla.library.upenn.edu/dla/franklin/lookup
+    multivalue_fields:
+      - coverage
+      - language
+      - subject
 test:
   root_element_options:
     - record
@@ -34,6 +42,12 @@ test:
     - author
   canonical_identifier_path:
     - /root/record/identifier
+  voyager:
+    root_element: root
+    http_lookup: http://url/to/http/no/trailing/slash
+    multivalue_fields:
+      - language
+      - subject
 production:
   root_element_options:
     - record
@@ -46,3 +60,9 @@ production:
     - author
   canonical_identifier_path:
     - /root/record/identifier
+  voyager:
+    root_element: root
+    http_lookup: http://url/to/http/no/trailing/slash
+    multivalue_fields:
+      - language
+      - subject

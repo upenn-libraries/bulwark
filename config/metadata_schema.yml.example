@@ -8,7 +8,14 @@ development:
   schema_terms:
     - title
     - author
-  canonical_identifier_path: identifier
+  canonical_identifier_path:
+    - identifier
+  voyager:
+    root_element: root
+    http_lookup: http://url/to/http/no/trailing/slash
+    multivalue_fields:
+      - language
+      - subject
 test:
   root_element_options:
     - record
@@ -19,7 +26,14 @@ test:
   schema_terms:
     - title
     - author
-  canonical_identifier_path: identifier
+  canonical_identifier_path:
+    - identifier
+  voyager:
+    root_element: root
+    http_lookup: http://url/to/http/no/trailing/slash
+    multivalue_fields:
+      - language
+      - subject
 production:
   root_element_options:
     - record
@@ -30,4 +44,11 @@ production:
   schema_terms:
     - title
     - author
-  canonical_identifier_path: identifier
+  canonical_identifier_path:
+    - identifier
+  voyager:
+    root_element: root
+    http_lookup: http://url/to/http/no/trailing/slash
+    multivalue_fields:
+      - language
+      - subject

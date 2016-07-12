@@ -1,0 +1,7 @@
+<div class="type-dashboard">
+  <% if @object.metadata_builder.metadata_source.present? %>
+    <% @object.metadata_builder.metadata_source.each do |source| %>
+      <%= render_source_type(source)%>
+    <% end %>
+  <% end %>
+</div>

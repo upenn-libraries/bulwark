@@ -1,3 +1,7 @@
 <%= render_source_select_form %>
 
-<%= render_source_specs_form %>
+<%= render_source_type_form %>
+
+<% @object.metadata_builder.metadata_source.each do |source| %>
+  <%= render_source_specs_form(source) if source.source_type == "custom" %>
+<% end %>

@@ -1,7 +1,7 @@
 module MetadataBuilderHelper
 
   def render_preview_xml
-    unless MetadataSource.where(:metadata_builder_id => @object.metadata_builder.id).pluck(:user_defined_mappings).all?{ |h| h.empty? }
+    if mappings_present?(:user_defined_mappings)
       render :partial => "metadata_builders/preview_xml"
     else
       render :partial => "metadata_builders/no_mappings"
@@ -17,11 +17,12 @@ module MetadataBuilderHelper
   end
 
   def render_sample_xml
+    get_location = "#{@object.version_control_agent.working_path}/#{@object.metadata_subdirectory}"
     @object.version_control_agent.clone
-    @object.version_control_agent.get(:get_location => "#{@object.version_control_agent.working_path}/#{@object.metadata_subdirectory}")
+    @object.version_control_agent.get(:get_location => get_location)
     @sample_xml_docs = ""
     @file_links = Array.new
-    @object.metadata_builder.preserve.each do |file|
+    Dir.glob("#{get_location}/*.xml") do |file|
       if File.exist?(file)
         @file_links << link_to(prettify(file), "##{file}")
         anchor_tag = content_tag(:a, "", :name=> file)
@@ -55,6 +56,10 @@ module MetadataBuilderHelper
       else
         raise "Invalid argument #{file_path_input}. prettify can only accept strings and arrays of strings."
       end
+  end
+
+  def mappings_present?(query_field)
+     MetadataSource.where(:metadata_builder_id => @object.metadata_builder.id).pluck(query_field).all?{ |h| h.empty? } ? false : true
   end
 
   private

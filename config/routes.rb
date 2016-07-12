@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       post :set_source
       post :clear_files
       post :refresh_metadata
+      post :fetch_voyager
       post :generate_preview_xml
     end
   end

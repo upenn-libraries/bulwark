@@ -1,17 +1,26 @@
 module MetadataSourceHelper
 
-  def render_source_specs_form
+  def render_source_specs_form(source)
+    @source = source
     if @object.metadata_builder.metadata_source.present?
-      render :partial => "metadata_sources/form"
+      render :partial => "metadata_sources/form", source: @source
     end
   end
 
-  def render_metadata_generation_form
+  def render_source_type_form
     if @object.metadata_builder.metadata_source.present?
-      render :partial => "metadata_sources/generate_metadata"
-    else
-      render :partial => "metadata_sources/no_source"
+      render :partial => "metadata_sources/type_form"
     end
+  end
+
+  def render_metadata_form(source)
+    @source = source
+      case source.source_type
+        when "custom"
+          render :partial => "metadata_sources/generate_custom_metadata", :source => @source
+        else "voyager"
+          render :partial => "metadata_sources/voyager", :source => @source
+      end
   end
 
   def nested_relationships_values(parent_file)

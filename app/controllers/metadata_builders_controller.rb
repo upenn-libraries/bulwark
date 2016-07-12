@@ -1,6 +1,6 @@
 class MetadataBuildersController < ApplicationController
 
-  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files, :refresh_metadata, :generate_metadata, :generate_preview_xml]
+  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files, :refresh_metadata, :fetch_voyager, :generate_metadata, :generate_preview_xml]
 
   def show
   end
@@ -18,17 +18,17 @@ class MetadataBuildersController < ApplicationController
       _update_metadata_sources if params[:metadata_builder][:metadata_source_attributes].present?
       if @metadata_builder.errors.present?
         errors_rendered = Array[*@metadata_builder.errors.messages.values.flatten(1)].join(";  ").html_safe
-        redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :error => errors_rendered }
+        redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/#{_return_location}", :flash => { :error => errors_rendered }
       else
-        redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata Builder updated successfully."}
+        redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/#{_return_location}", :flash => { :success => "Metadata Builder updated successfully."}
       end
     else
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :error => "Metadata Builder was not updated successfully."}
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/#{_return_location}", :flash => { :error => "Metadata Builder was not updated successfully."}
     end
   end
 
   def refresh_metadata
-    @metadata_builder.refresh_metadata_from_source
+    @metadata_builder.refresh_metadata
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata refreshed.  See output below."}
   end
 
@@ -82,6 +82,10 @@ class MetadataBuildersController < ApplicationController
         @metadata_builder.errors[:base] << message
       end
     end
+  end
+
+  def _return_location
+    return_location = params[:metadata_builder][:metadata_source_attributes].any?{ |h| h.last.keys.any? { |i| ["user_defined_mappings", "root_element"].index i } } ? "generate_metadata" : "preserve"
   end
 
 end
