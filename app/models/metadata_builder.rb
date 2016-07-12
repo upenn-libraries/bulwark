@@ -54,6 +54,13 @@ class MetadataBuilder < ActiveRecord::Base
     return unidentified
   end
 
+  def refresh_metadata
+    self.metadata_source.each do |source|
+      source.set_metadata_mappings
+      source.save!
+    end
+  end
+
   def set_source(source_files)
     #TODO: Consider removing from MetadataBuilder
     self.source = source_files
@@ -78,20 +85,6 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.commit("Removed files not identified as metadata source and/or for long-term preservation: #{unidentified_files}")
     self.repo.version_control_agent.push
     self.repo.version_control_agent.delete_clone
-  end
-
-  def refresh_metadata_from_source
-    self.metadata_source.where(:source_type => "custom").each do |source|
-      source.set_metadata_mappings
-      source.save!
-    end
-  end
-
-  def fetch_voyager_from_bibid
-    self.metadata_source.where(:source_type => "voyager").each do |source|
-      source.set_metadata_mappings
-      source.save!
-    end
   end
 
   def build_xml_files

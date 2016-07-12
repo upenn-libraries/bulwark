@@ -28,14 +28,8 @@ class MetadataBuildersController < ApplicationController
   end
 
   def refresh_metadata
-    @metadata_builder.refresh_metadata_from_source
+    @metadata_builder.refresh_metadata
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata refreshed.  See output below."}
-  end
-
-  def fetch_voyager
-    _update_metadata_sources if params[:metadata_builder].present? && params[:metadata_builder][:metadata_source_attributes].present?
-    @metadata_builder.fetch_voyager_from_bibid
-    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Voyager data fetched.  See output below."}
   end
 
   def generate_metadata
