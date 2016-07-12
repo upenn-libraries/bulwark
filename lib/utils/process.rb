@@ -15,7 +15,7 @@ module Utils
         object_and_descendants_action(@oid, "update_index")
         @@status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo.\n"
         @@status_type = :success
-        ActiveFedora::Base.find(@oid).attach_files(repo)
+        ActiveFedora::Base.find(@oid).try(:attach_files, repo)
         repo.version_control_agent.push
       end
       if(@@status_message == "Item already exists") then
