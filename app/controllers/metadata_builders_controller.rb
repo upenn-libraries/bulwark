@@ -85,7 +85,7 @@ class MetadataBuildersController < ApplicationController
   end
 
   def _return_location
-    return_location = params[:metadata_builder][:metadata_source_attributes].all?{ |h| h.last.keys.include?("user_defined_mappings") } ? "generate_metadata" : "preserve"
+    return_location = params[:metadata_builder][:metadata_source_attributes].any?{ |h| h.last.keys.any? { |i| ["user_defined_mappings", "root_element"].index i } } ? "generate_metadata" : "preserve"
   end
 
 end
