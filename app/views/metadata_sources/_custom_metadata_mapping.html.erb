@@ -18,6 +18,15 @@
       <%= content_tag(:div, "Optional -- Parent of each row of values in metadata source spreadsheet; Child of the root element.", :class => "field-tip") %>
     <% end -%>
 
+    <% if source.source_type == "voyager" -%>
+      <h4>Descriptive metadata fetched from Voyager</h4>
+      <ul>
+        <% source.user_defined_mappings.each do |m| -%>
+          <li><strong><%= "#{m.first}" %>:</strong> <%= "#{m.last}"%></li>
+        <% end -%>
+      </ul>
+    <% end -%>
+
     <% if source.source_type == "custom" -%>
       <% source.original_mappings.each do |p| %>
         <% value = (s.object.user_defined_mappings.present? && s.object.user_defined_mappings[p.first].present?) ? s.object.user_defined_mappings[p.first].values.first : schema_term_default(p.first) %>
