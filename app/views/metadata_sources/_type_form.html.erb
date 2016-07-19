@@ -2,7 +2,7 @@
   <%= form_for @object.metadata_builder, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
   <%= field_set_tag "Describe metadata source types:" do %>
       <% @object.metadata_builder.metadata_source.each do |source| %>
-        <h3>What type of metadata source is <%= prettify(source.path) %>?</h3>
+        <h3>What type of metadata source is <span class="file-path"><%= prettify(source.path) %></span>?</h3>
         <%= f.fields_for :metadata_source, source do |s| %>
           <div class="input-fields">
             <%= s.label :source_type, "Source Type" %>

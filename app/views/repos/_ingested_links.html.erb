@@ -1,6 +1,8 @@
-<h3>Full preview of ingested items</h3>
-<ul>
-  <% @object.ingested.each do |identifier| -%>
-    <li>(Opens in a new tab) - <%= generate_ingest_link(identifier) %></li>
-  <% end -%>
-</ul>
+<div class="ingested-links">
+  <h2>Click below to review of ingested item:</h2>
+  <ul>
+    <% @object.ingested.each do |identifier| -%>
+      <li>(Opens in a new tab) - <%= generate_ingest_link(identifier) %></li>
+    <% end -%>
+  </ul>
+</div>

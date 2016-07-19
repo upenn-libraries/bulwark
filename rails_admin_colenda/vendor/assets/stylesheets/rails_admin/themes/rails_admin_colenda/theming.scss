@@ -14,22 +14,16 @@
 @import "font-awesome";
 
 
-.content-block {
-  @include rounded-corners;
-  background: $light-blue;
-  border-bottom: $dark-blue 1px solid;
-  border-right: $dark-blue 1px solid;
-  margin: 20px;
-  padding: 5px 15px;
+form input[type="submit"] {
+  padding: 5px;
+  margin: 10px 0px;
+  font-size: 20px;
 }
 
-.content-block ul {
-  padding-top: 10px;
-}
-
-.content-block li {
-  margin-left: -5px;
-  padding-bottom: 10px;
+/* Resetting inherited margin spacing */
+h2, h3 {
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
 .git-directions pre {
@@ -37,7 +31,12 @@
 }
 
 form.field-mappings .field {
-  margin-top: 2em;
+  margin: 10px 0px;
+}
+.metadata-source-types {
+  h3 {
+    padding: 10px 0px;
+  }
 }
 
 form.field-mappings .field label {
@@ -54,13 +53,14 @@ form.field-mappings .field label {
 }
 
 .mapping-dashboard .field-mappings .form-bottom{
-  clear: both;
+  padding-bottom: 20px;
 }
 
 span.inline-pre, .field-mappings .file-path, .edit_metadata_builder .file-path {
   color: $text-black;
   background-color: $light-grey;
   font-family: monospace;
+  font-weight: bold;
 }
 
 .field-mappings .file-path, .edit_metadata_builder .file-path{
@@ -90,17 +90,24 @@ span.inline-pre, .field-mappings .file-path, .edit_metadata_builder .file-path {
 * Metadata Source form
 *
 */
-.metadata-source-select, .metadata-source-description {
-  margin: 40px 0px;
+.metadata-source-select, .metadata-source-description, .metadata-source-mapping, .select-for-ingest, .review-status {
+  margin: 20px 0px;
   padding: 10px;
   @include rounded-corners;
   border: $medium-blue 1px solid;
   width: 75%;
 }
 
-.metadata-source-select label, .metadata-source-types h3, .source-coordinates legend {
+.metadata-source-select label, .metadata-source-types h3, .metadata-source-mapping h2, .source-coordinates legend, .select-for-ingest h2, .ingested-links h2, .review-status h2, .metadata-only-preview h2 {
   font-size: 16px;
   font-weight: bold;
+  padding: 10px 0px;
+}
+
+.select-for-ingest {
+  input[type="checkbox"], label {
+    margin-left: 10px;
+  }
 }
 
 .source-select label{
@@ -166,6 +173,16 @@ span.inline-pre, .field-mappings .file-path, .edit_metadata_builder .file-path {
 
 .source-coordinates .visual-illustration #xy-stop{
   background-image: asset-url("xy_stop.png");
+}
+
+.voyager-descriptive-preview, .doc pre, .content-block {
+  background: $light-grey;
+  margin: 10px -10px;
+  padding: 5px;
+}
+
+.metadata-only-preview{
+  margin-top: 20px;
 }
 
 /*

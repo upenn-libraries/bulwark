@@ -1,54 +1,58 @@
-<%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
-<% counter = 0 %>
-  <% @object.metadata_builder.metadata_source.each do |source| %>
-    <%= f.fields_for :metadata_source, source do |s| %>
+  <%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
+  <% counter = 0 %>
+    <% @object.metadata_builder.metadata_source.each do |source| %>
+    <div class="metadata-source-mapping">
+      <%= f.fields_for :metadata_source, source do |s| %>
 
-    <%= field_set_tag 'Map source metadata to XML' do %>
-      Fill out the fields below to field values from metadata source files to XML.
-    <% end %>
-    <h3>Mappings for <span class="file-path"><%= prettify(source.path)%></span></h3>
-    <%= content_tag :div, :class => "field" do -%>
-      <%= s.label :root_element, "Root element:" %>
-      <%= s.select :root_element, root_element_options, :include_blank => :true %>
-      <%= content_tag(:div, "Root element of the XML schema generated -- defaults to \"root\" if left blank.", :class => "field-tip") %>
-    <% end -%>
-    <%= content_tag :div, :class => "field" do -%>
-      <%= s.label :parent_element, "Child element of root, for multi-item spreadsheets (optional):" %>
-      <%= s.select :parent_element, parent_element_options, :include_blank => :true %>
-      <%= content_tag(:div, "For single spreadsheets that describe more than one item -- Parent of each row of values in metadata source spreadsheet; Child of the root element.", :class => "field-tip") %>
-    <% end -%>
-
-    <% if source.source_type == "voyager" -%>
-      <h4>Descriptive metadata fetched from Voyager</h4>
-      <ul>
-        <% source.user_defined_mappings.each do |m| -%>
-          <li><strong><%= "#{m.first}" %>:</strong> <%= "#{m.last}"%></li>
-        <% end -%>
-      </ul>
-    <% end -%>
-
-    <% if source.source_type == "custom" -%>
-      <% source.original_mappings.each do |p| %>
-        <% value = (s.object.user_defined_mappings.present? && s.object.user_defined_mappings[p.first].present?) ? s.object.user_defined_mappings[p.first].values.first : schema_term_default(p.first) %>
-        <%= content_tag :div, :class => "field" do -%>
-          <%= s.label "user_defined_mappings[#{p.first}][mapped_value]", "\"#{p.first}\" should map to:" %>
-          <%= select_tag "metadata_builder[metadata_source_attributes][#{counter}][user_defined_mappings][#{p.first}][mapped_value]", options_for_select(schema_terms, value) %>
-          <%= content_tag(:div, "Example values from source: #{p.last.to_s}", :class => "field-tip") %>
-        <% end -%>
-      <% end -%>
-    <% end -%>
-
-
-    <% if @object.metadata_builder.metadata_source.size > 1 %>
-      <h2>Define relationships</h2>
-      <p>Structure relationships between multiple metadata source files</p>
+      <%= field_set_tag 'Map source metadata to XML' do %>
+        Fill out the fields below to field values from metadata source files to XML.
+      <% end %>
+      <h2>Mappings for <span class="file-path"><%= prettify(source.path)%></span></h2>
       <%= content_tag :div, :class => "field" do -%>
-        <%= s.label :children, "Child/children of #{prettify(source.path)}:" %>
-        <%= s.select :children, nested_relationships_values(source.path), {}, { :multiple => true } %>
+        <%= s.label :root_element, "Root element:" %>
+        <%= s.select :root_element, root_element_options, :include_blank => :true %>
+        <%= content_tag(:div, "Root element of the XML schema generated -- defaults to \"root\" if left blank.", :class => "field-tip") %>
       <% end -%>
+      <%= content_tag :div, :class => "field" do -%>
+        <%= s.label :parent_element, "Child element of root, for multi-item spreadsheets (optional):" %>
+        <%= s.select :parent_element, parent_element_options, :include_blank => :true %>
+        <%= content_tag(:div, "For single spreadsheets that describe more than one item -- Parent of each row of values in metadata source spreadsheet; Child of the root element.", :class => "field-tip") %>
+      <% end -%>
+
+      <% if source.source_type == "voyager" -%>
+        <div class="voyager-descriptive-preview">
+          <h2>Descriptive metadata fetched from Voyager</h2>
+          <ul>
+            <% source.user_defined_mappings.each do |m| -%>
+              <li><strong><%= "#{m.first}" %>:</strong> <%= "#{m.last}"%></li>
+            <% end -%>
+          </ul>
+        </div>
+      <% end -%>
+
+      <% if source.source_type == "custom" -%>
+        <% source.original_mappings.each do |p| %>
+          <% value = (s.object.user_defined_mappings.present? && s.object.user_defined_mappings[p.first].present?) ? s.object.user_defined_mappings[p.first].values.first : schema_term_default(p.first) %>
+          <%= content_tag :div, :class => "field" do -%>
+            <%= s.label "user_defined_mappings[#{p.first}][mapped_value]", "\"#{p.first}\" should map to:" %>
+            <%= select_tag "metadata_builder[metadata_source_attributes][#{counter}][user_defined_mappings][#{p.first}][mapped_value]", options_for_select(schema_terms, value) %>
+            <%= content_tag(:div, "Example values from source: #{p.last.to_s}", :class => "field-tip") %>
+          <% end -%>
+        <% end -%>
+      <% end -%>
+
+
+      <% if @object.metadata_builder.metadata_source.size > 1 %>
+        <h2>Define relationships</h2>
+        <p>Structure relationships between multiple metadata source files</p>
+        <%= content_tag :div, :class => "field" do -%>
+          <%= s.label :children, "Child/children of #{prettify(source.path)}:" %>
+          <%= s.select :children, nested_relationships_values(source.path), {}, { :multiple => true } %>
+        <% end -%>
+      <% end -%>
+      <% counter += 1 %>
     <% end -%>
-    <% counter += 1 %>
-  <% end -%>
-  <% end -%>
-  <%= content_tag(:div, (f.submit "Save metadata mappings"), :class => "form-bottom") %>
-  <% end -%>
+  </div>
+    <% end -%>
+    <%= content_tag(:div, (f.submit "Save metadata mappings"), :class => "form-bottom") %>
+    <% end -%>

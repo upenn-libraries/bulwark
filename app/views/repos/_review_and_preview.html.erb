@@ -1,6 +1,6 @@
 <div class="review-status">
   <% if @object.review_status.present? %>
-  <h3>Review Status</h3>
+  <h2>Review Status</h2>
   <div class="review-status-list content-block">
     <ul>
       <% @object.review_status.each do |review| %>
@@ -12,14 +12,14 @@
   <% @object.ingested.each do |ingest| -%>
     <% @document = ActiveFedora::Base.find(ingest) %>
       <%= form_for @object, :validate => true, :html => {:class => "ingest-review"}, :method => :post, :url => "/repos/#{@object.id}/review_status" do |f| %>
-      <%= f.label :review_status, "Update Review Status" %>
+      <%= f.label :review_status, "Add a Review Status note for #{@document.identifier.first}" %>
       <%= f.text_area :review_status, :value => nil %>
-      <%= f.submit "Update Review Status for #{@document.identifier.first}" %>
+      <%= f.submit "Add note" %>
     <% end -%>
 </div>
 
 <div class="metadata-only-preview content-block">
-  <h3>Alphabetized metadata-only preview of <%= ingest %></h3>
+  <h2>Alphabetized metadata-only preview of <%= ingest %></h2>
   <% @document.attribute_names.sort.each do |a_name| -%>
     <% if @document.try(a_name).present? %>
     <strong><%= a_name.capitalize %></strong>

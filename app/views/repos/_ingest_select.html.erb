@@ -1,9 +1,12 @@
-<%= form_for @object.metadata_builder, :validate => true, :method => :post, :html => { :class => "ingest-select-form" }, :url => "/metadata_builders/#{@object.metadata_builder.id}/ingest" do |f| %>
-  <% @object.metadata_builder.preserve.each do |preserve| %>
-  <div class="checkbox">
-    <%= check_box_tag "to_ingest[#{prettify(preserve)}]", preserve %>
-    <%= label "to_ingest[#{prettify(preserve)}]", prettify(preserve) %>
-  </div>
-  <% end %>
-  <%= f.submit "Mark files for ingest", :id => "ingest_select_submit" %>
-<% end -%>
+<div class="select-for-ingest">
+  <h2>Select file for ingest into the repository</h2>
+  <%= form_for @object.metadata_builder, :validate => true, :method => :post, :html => { :class => "ingest-select-form" }, :url => "/metadata_builders/#{@object.metadata_builder.id}/ingest" do |f| %>
+    <% @object.metadata_builder.preserve.each do |preserve| %>
+    <div class="checkbox">
+      <%= check_box_tag "to_ingest[#{prettify(preserve)}]", preserve %>
+      <%= label "to_ingest[#{prettify(preserve)}]", prettify(preserve) %>
+    </div>
+    <% end %>
+    <%= f.submit "Ingest now", :id => "ingest_select_submit" %>
+  <% end -%>
+</div>
