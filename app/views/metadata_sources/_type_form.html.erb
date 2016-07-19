@@ -1,12 +1,16 @@
-<%= form_for @object.metadata_builder, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
-  <% @object.metadata_builder.metadata_source.each do |source| %>
-    <h3>What type of metadata source is <%= prettify(source.path) %>?</h3>
-    <%= f.fields_for :metadata_source, source do |s| %>
-      <div class="input-fields">
-        <%= s.label :source_type, "Source Type" %>
-        <%= s.select :source_type, MetadataSource.source_types %>
-      </div>
+<div class="metadata-source-types">
+  <%= form_for @object.metadata_builder, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
+  <%= field_set_tag "Describe metadata source types:" do %>
+      <% @object.metadata_builder.metadata_source.each do |source| %>
+        <h3>What type of metadata source is <%= prettify(source.path) %>?</h3>
+        <%= f.fields_for :metadata_source, source do |s| %>
+          <div class="input-fields">
+            <%= s.label :source_type, "Source Type" %>
+            <%= s.select :source_type, MetadataSource.source_types %>
+          </div>
+        <% end %>
+      <% end %>
+      <%= f.submit "Save source types" %>
+      <% end %>
     <% end %>
-  <% end %>
-  <%= f.submit "Update source types" %>
-<% end %>
+</div>

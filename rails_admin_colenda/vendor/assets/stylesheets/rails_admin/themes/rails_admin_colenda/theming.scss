@@ -24,7 +24,7 @@
 }
 
 .content-block ul {
-  padding-top: 10px;  
+  padding-top: 10px;
 }
 
 .content-block li {
@@ -57,7 +57,53 @@ form.field-mappings .field label {
   clear: both;
 }
 
-.md-source-select label{
+span.inline-pre, .field-mappings .file-path, .edit_metadata_builder .file-path {
+  color: $text-black;
+  background-color: $light-grey;
+  font-family: monospace;
+}
+
+.field-mappings .file-path, .edit_metadata_builder .file-path{
+  font-size: 120%;
+}
+
+
+/*
+*
+* Waiting container
+*
+*/
+.wait{
+  background: url('/assets/gears.gif') no-repeat scroll center bottom transparent;
+  margin-left: auto;
+  margin-right: auto;
+  width: 200px;
+  height: 300px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+
+/*
+*
+* Metadata Source form
+*
+*/
+.metadata-source-select, .metadata-source-description {
+  margin: 40px 0px;
+  padding: 10px;
+  @include rounded-corners;
+  border: $medium-blue 1px solid;
+  width: 75%;
+}
+
+.metadata-source-select label, .metadata-source-types h3, .source-coordinates legend {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.source-select label{
   display: block;
 }
 .ingest-review {
@@ -120,33 +166,6 @@ form.field-mappings .field label {
 
 .source-coordinates .visual-illustration #xy-stop{
   background-image: asset-url("xy_stop.png");
-}
-
-span.inline-pre, .field-mappings .file-path, .edit_metadata_builder .file-path {
-  color: $text-black;
-  background-color: $light-grey;
-  font-family: monospace;
-}
-
-.field-mappings .file-path, .edit_metadata_builder .file-path{
-  font-size: 120%;
-}
-
-
-/*
-*
-* Waiting container
-*
-*/
-.wait{
-  background: url('/assets/gears.gif') no-repeat scroll center bottom transparent;
-  margin-left: auto;
-  margin-right: auto;
-  width: 200px;
-  height: 300px;
-  font-size: 16px;
-  font-weight: bold;
-  text-align: center;
 }
 
 /*
