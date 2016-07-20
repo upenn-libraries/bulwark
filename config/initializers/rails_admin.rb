@@ -46,6 +46,13 @@ RailsAdmin.config do |config|
     field :title do
       required(true)
     end
+    field :directory_link do
+      visible true
+      label "Directory"
+      pretty_value do
+        %{#{value}}.html_safe
+      end
+    end
     field :directory do
       required(true)
       help "Required - directory on the remote filesystem that will serve as the location for the git repository"
@@ -85,6 +92,12 @@ RailsAdmin.config do |config|
       required(true)
       help "Required - Filename for long-term preservation XML file"
     end
+    list do
+      field :directory do
+        visible false
+      end
+    end
+
   end
 
 end

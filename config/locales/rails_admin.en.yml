@@ -2,9 +2,9 @@ en:
   admin:
     actions:
       git_actions:
-        title: "Git Actions"
-        menu: "Git Actions"
-        breadcrumb: "Git Actions"
+        title: "Repo Information"
+        menu: "Repo Information"
+        breadcrumb: "Repo Information"
       create_remote:
         title: "Create Remote Repository"
         menu: "Create Remote Repository"

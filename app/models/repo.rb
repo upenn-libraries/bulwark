@@ -150,6 +150,11 @@ class Repo < ActiveRecord::Base
     _update_object_review_status
   end
 
+  def directory_link
+    url = "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{self.id}/git_actions"
+    "<a href=\"#{url}\">#{self.directory}</a>"
+  end
+
 private
 
   def _build_and_populate_directories(working_copy_path)

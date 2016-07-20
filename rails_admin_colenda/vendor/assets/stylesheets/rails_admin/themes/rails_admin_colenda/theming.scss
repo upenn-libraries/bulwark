@@ -17,13 +17,20 @@
 form input[type="submit"] {
   padding: 5px;
   margin: 10px 0px;
-  font-size: 20px;
+  font-size: 15px;
+  color: white;
+  background-color: #428bca;
+  border-color: #357ebd;
 }
 
 /* Resetting inherited margin spacing */
 h2, h3 {
   margin-top: 0px;
   margin-bottom: 0px;
+}
+
+.about-repo li {
+  padding: 5px 0px;
 }
 
 .git-directions pre {
@@ -56,14 +63,17 @@ form.field-mappings .field label {
   padding-bottom: 20px;
 }
 
-span.inline-pre, .field-mappings .file-path, .edit_metadata_builder .file-path {
+span.inline-pre,
+.field-mappings .file-path,
+.edit_metadata_builder .file-path {
   color: $text-black;
   background-color: $light-grey;
   font-family: monospace;
   font-weight: bold;
 }
 
-.field-mappings .file-path, .edit_metadata_builder .file-path{
+.field-mappings .file-path,
+.edit_metadata_builder .file-path{
   font-size: 120%;
 }
 
@@ -86,11 +96,14 @@ span.inline-pre, .field-mappings .file-path, .edit_metadata_builder .file-path {
 
 
 /*
-*
-* Metadata Source form
-*
+* Bordered
 */
-.metadata-source-select, .metadata-source-description, .metadata-source-mapping, .select-for-ingest, .review-status {
+.git-directions,
+.metadata-source-select,
+.metadata-source-description,
+.metadata-source-mapping,
+.select-for-ingest,
+.review-status {
   margin: 20px 0px;
   padding: 10px;
   @include rounded-corners;
@@ -98,7 +111,20 @@ span.inline-pre, .field-mappings .file-path, .edit_metadata_builder .file-path {
   width: 75%;
 }
 
-.metadata-source-select label, .metadata-source-types h3, .metadata-source-mapping h2, .source-coordinates legend, .select-for-ingest h2, .ingested-links h2, .review-status h2, .metadata-only-preview h2 {
+/*
+* Section titles
+*/
+.about-repo h2,
+.git-directions h2,
+.metadata-source-select label,
+.metadata-source-types h3,
+.metadata-source-mapping h2,
+.source-coordinates legend,
+.xml-preview h2, 
+.select-for-ingest h2,
+.ingested-links h2,
+.review-status h2,
+.metadata-only-preview h2 {
   font-size: 16px;
   font-weight: bold;
   padding: 10px 0px;
@@ -175,7 +201,9 @@ span.inline-pre, .field-mappings .file-path, .edit_metadata_builder .file-path {
   background-image: asset-url("xy_stop.png");
 }
 
-.voyager-descriptive-preview, .doc pre, .content-block {
+.voyager-descriptive-preview,
+.doc pre,
+.content-block {
   background: $light-grey;
   margin: 10px -10px;
   padding: 5px;
