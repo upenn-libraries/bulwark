@@ -152,7 +152,7 @@ class Repo < ActiveRecord::Base
 
   def directory_link
     url = "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{self.id}/git_actions"
-    "<a href=\"#{url}\">#{self.directory}</a>"
+    return "<a href=\"#{url}\">#{self.directory}</a>"
   end
 
 private

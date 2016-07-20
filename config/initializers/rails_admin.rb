@@ -47,7 +47,7 @@ RailsAdmin.config do |config|
       required(true)
     end
     field :directory_link do
-      visible true
+      visible false
       label "Directory"
       pretty_value do
         %{#{value}}.html_safe
@@ -95,6 +95,9 @@ RailsAdmin.config do |config|
     list do
       field :directory do
         visible false
+      end
+      field :directory_link do
+        visible true
       end
     end
 

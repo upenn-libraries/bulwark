@@ -120,7 +120,7 @@ span.inline-pre,
 .metadata-source-types h3,
 .metadata-source-mapping h2,
 .source-coordinates legend,
-.xml-preview h2, 
+.xml-preview h2,
 .select-for-ingest h2,
 .ingested-links h2,
 .review-status h2,
@@ -213,11 +213,13 @@ span.inline-pre,
   margin-top: 20px;
 }
 
-/*
-*
-* Ingest review
-*
-*/
+td.links li, .nav li i {
+  font-size: 24px;
+}
+
+.nav li span {
+  vertical-align: text-bottom;
+}
 
 textarea#repo_review_status {
   width: 300px;
