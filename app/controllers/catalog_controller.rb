@@ -9,7 +9,7 @@ class CatalogController < ApplicationController
   #before_filter :enforce_show_permissions, :only=>:show
   # This applies appropriate access controls to all solr queries
 
-  add_nav_action "admin_repo/admin_menu" #if :current_user?
+  add_nav_action "admin_repo/admin_menu", if: :current_user?
 
 
   CatalogController.search_params_logic += [:exclude_unwanted_models]#, :exclude_unwanted_terms]

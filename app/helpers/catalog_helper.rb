@@ -6,4 +6,8 @@ module CatalogHelper
     render :partial => "catalog/show_main_content_preview"
   end
 
+  def current_user?
+    current_user != nil
+  end
+
 end
