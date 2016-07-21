@@ -211,7 +211,16 @@ span.inline-pre,
 }
 
 td.links li, .nav li i {
-  font-size: 24px;
+  font-size: 20px;
+  text-align: center;
+}
+
+td.links li .wording {
+  font-size: 12px;
+  display: block;
+  width: 60px;
+  height: 60px;
+  white-space: normal;
 }
 
 .nav li span {

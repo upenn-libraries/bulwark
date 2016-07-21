@@ -22,8 +22,6 @@ RailsAdmin.config do |config|
     dashboard                     # mandatory
     index                         # mandatory
     new
-    export
-    bulk_delete
     edit
     delete
     git_actions do
@@ -31,6 +29,7 @@ RailsAdmin.config do |config|
     end
     preserve do
       only ["Repo"]
+
     end
     generate_metadata
     preview_xml
