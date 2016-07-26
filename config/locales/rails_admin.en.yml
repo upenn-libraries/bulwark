@@ -2,9 +2,9 @@ en:
   admin:
     actions:
       git_actions:
-        title: "Git Actions"
-        menu: "Git Actions"
-        breadcrumb: "Git Actions"
+        title: "Repo Information"
+        menu: "Repo Information"
+        breadcrumb: "Repo Information"
       create_remote:
         title: "Create Remote Repository"
         menu: "Create Remote Repository"
@@ -34,6 +34,6 @@ en:
         menu: "Preview XML"
         breadcrumb: "Preview XML"
       preserve:
-        title: "Designate Source Metadata Files"
-        menu: "Designate Source Metadata Files"
-        breadcrumb: "Designate Source Metadata Files"
+        title: "Select Metadata Sources"
+        menu: "Select Metadata Sources"
+        breadcrumb: "Select Metadata Sources"

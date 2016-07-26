@@ -21,7 +21,7 @@ module RailsAdmin
         end
 
         register_instance_option :link_icon do
-         'fa fa-git'
+         'fa fa-info-circle'
         end
 
         register_instance_option :http_methods do

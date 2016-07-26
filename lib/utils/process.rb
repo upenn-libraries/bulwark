@@ -54,6 +54,7 @@ module Utils
 
     def validate_file(file)
       begin
+        binding.pry()
         MiniMagick::Image.open(file)
         return true
       rescue MiniMagick::Invalid

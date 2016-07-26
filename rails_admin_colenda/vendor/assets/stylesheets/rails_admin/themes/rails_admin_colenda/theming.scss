@@ -14,22 +14,27 @@
 @import "font-awesome";
 
 
-.content-block {
-  @include rounded-corners;
-  background: $light-blue;
-  border-bottom: $dark-blue 1px solid;
-  border-right: $dark-blue 1px solid;
-  margin: 20px;
-  padding: 5px 15px;
+form input[type="submit"] {
+  padding: 5px;
+  margin: 10px 0px;
+  font-size: 15px;
+  color: white;
+  background-color: #428bca;
+  border-color: #357ebd;
 }
 
-.content-block ul {
-  padding-top: 10px;  
+/* Resetting inherited margin spacing */
+h2, h3 {
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
-.content-block li {
-  margin-left: -5px;
-  padding-bottom: 10px;
+.table-striped tr.repo_row td {
+  vertical-align: inherit;
+}
+
+.about-repo li {
+  padding: 5px 0px;
 }
 
 .git-directions pre {
@@ -37,7 +42,12 @@
 }
 
 form.field-mappings .field {
-  margin-top: 2em;
+  margin: 10px 0px;
+}
+.metadata-source-types {
+  h3 {
+    padding: 10px 0px;
+  }
 }
 
 form.field-mappings .field label {
@@ -54,10 +64,83 @@ form.field-mappings .field label {
 }
 
 .mapping-dashboard .field-mappings .form-bottom{
-  clear: both;
+  padding-bottom: 20px;
 }
 
-.md-source-select label{
+span.inline-pre,
+.field-mappings .file-path,
+.edit_metadata_builder .file-path {
+  color: $text-black;
+  background-color: $light-grey;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.field-mappings .file-path,
+.edit_metadata_builder .file-path{
+  font-size: 120%;
+}
+
+
+/*
+*
+* Waiting container
+*
+*/
+.wait{
+  background: url('/assets/gears.gif') no-repeat scroll center bottom transparent;
+  margin-left: auto;
+  margin-right: auto;
+  width: 200px;
+  height: 300px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+
+/*
+* Bordered
+*/
+.git-directions,
+.metadata-source-select,
+.metadata-source-description,
+.metadata-source-mapping,
+.select-for-ingest,
+.review-status {
+  margin: 20px 0px;
+  padding: 10px;
+  @include rounded-corners;
+  border: $medium-blue 1px solid;
+  width: 75%;
+}
+
+/*
+* Section titles
+*/
+.about-repo h2,
+.git-directions h2,
+.metadata-source-select label,
+.metadata-source-types h3,
+.metadata-source-mapping h2,
+.source-coordinates legend,
+.xml-preview h2,
+.select-for-ingest h2,
+.ingested-links h2,
+.review-status h2,
+.metadata-only-preview h2 {
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 0px;
+}
+
+.select-for-ingest {
+  input[type="checkbox"], label {
+    margin-left: 10px;
+  }
+}
+
+.source-select label{
   display: block;
 }
 .ingest-review {
@@ -74,12 +157,9 @@ form.field-mappings .field label {
   margin-bottom: 150px;
 }
 
-.source-type .visual-illustration{
+.source-type .visual-illustration {
   width: 200px;
   float:left;
-}
-
-.source-type .visual-illustration {
   #vertical,  #horizontal {
     float: left;
     width: 120px;
@@ -122,40 +202,44 @@ form.field-mappings .field label {
   background-image: asset-url("xy_stop.png");
 }
 
-span.inline-pre, .field-mappings .file-path, .edit_metadata_builder .file-path {
-  color: $text-black;
-  background-color: $light-grey;
-  font-family: monospace;
+.voyager-descriptive-preview,
+.doc pre,
+.content-block {
+  background: $light-grey;
+  margin: 10px -10px;
+  padding: 5px;
 }
 
-.field-mappings .file-path, .edit_metadata_builder .file-path{
-  font-size: 120%;
+.metadata-only-preview{
+  margin-top: 20px;
 }
 
-
-/*
-*
-* Waiting container
-*
-*/
-.wait{
-  background: url('/assets/gears.gif') no-repeat scroll center bottom transparent;
-  margin-left: auto;
-  margin-right: auto;
-  width: 200px;
-  height: 300px;
-  font-size: 16px;
-  font-weight: bold;
+td.links li, .nav li {
   text-align: center;
 }
 
-/*
-*
-* Ingest review
-*
-*/
+td.links li, .nav li i {
+  font-size: 20px;
+  vertical-align: bottom;
+}
+
+td.links li .wording {
+  font-size: 12px;
+  display: block;
+  width: 60px;
+  height: 60px;
+  white-space: normal;
+}
+
+.nav li span {
+  vertical-align: text-bottom;
+}
 
 textarea#repo_review_status {
   width: 300px;
   height: 100px;
+}
+
+form#new_repo .input-group[class*="col-"] {
+  width: 10px;
 }

@@ -1,46 +1,48 @@
-<%= form_for @object.metadata_builder, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
-    <%= f.fields_for :metadata_source, @source do |s| %>
-    <%= field_set_tag "Define the orientation of the field mappings for <span class=\"file-path\">#{prettify(@source.path)}</span>".html_safe do %>
-    <div class="source-type">
-      <% MetadataSource.sheet_types.each do |mb| %>
-      <div class="visual-illustration">
-        <div id="<%= mb.last %>"></div>
-        <div class="input-fields">
-          <%= s.label :view_type, mb.first %>
-          <%= s.radio_button :view_type, mb.last  %>
+<div class="metadata-source-description">
+  <%= form_for @object.metadata_builder, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
+      <%= f.fields_for :metadata_source, @source do |s| %>
+      <%= field_set_tag "Define the orientation of the field mappings for <span class=\"file-path\">#{prettify(@source.path)}</span>".html_safe do %>
+      <div class="source-type">
+        <% MetadataSource.sheet_types.each do |mb| %>
+        <div class="visual-illustration">
+          <div id="<%= mb.last %>"></div>
+          <div class="input-fields">
+            <%= s.label :view_type, mb.first %>
+            <%= s.radio_button :view_type, mb.last  %>
+          </div>
+        </div>
+        <% end -%>
+      </div>
+      <% end -%>
+      <div class="source-coordinates">
+        <div class="visual-illustration">
+          <div id="xy-start"></div>
+          <%= field_set_tag "Define the X & Y coordinates of the cell at which field mappings begin:" do %>
+          <%= s.label :x_start %>
+          <%= s.number_field :x_start %>
+          <%= s.label :y_start %>
+            <%= s.number_field :y_start%>
+          <% end -%>
         </div>
       </div>
-      <% end -%>
-    </div>
-    <% end -%>
-    <div class="source-coordinates">
-      <div class="visual-illustration">
-        <div id="xy-start"></div>
-        <%= field_set_tag "Define the X & Y coordinates of the cell at which field mappings begin:" do %>
-        <%= s.label :x_start %>
-        <%= s.number_field :x_start %>
-        <%= s.label :y_start %>
-          <%= s.number_field :y_start%>
+      <div class="source-coordinates">
+        <div class="visual-illustration">
+          <div id="xy-stop"></div>
+          <%= field_set_tag "Define the X & Y coordinates of the cell at which field mappings end:" do %>
+          <%= s.label :x_stop %>
+          <%= s.number_field :x_stop %>
+          <%= s.label :y_stop %>
+          <%= s.number_field :y_stop %>
+          <% end -%>
+        </div>
+      </div>
+      <div class="source-num-objects">
+        <%= field_set_tag "Other specifications:" do %>
+        <%= s.label :num_objects, "How many items are described in this source?" %>
+        <%= s.number_field :num_objects %>
         <% end -%>
       </div>
-    </div>
-    <div class="source-coordinates">
-      <div class="visual-illustration">
-        <div id="xy-stop"></div>
-        <%= field_set_tag "Define the X & Y coordinates of the cell at which field mappings end:" do %>
-        <%= s.label :x_stop %>
-        <%= s.number_field :x_stop %>
-        <%= s.label :y_stop %>
-        <%= s.number_field :y_stop %>
-        <% end -%>
-      </div>
-    </div>
-    <div class="source-num-objects">
-      <%= field_set_tag "Other specifications:" do %>
-      <%= s.label :num_objects, "How many objects are described in this source?" %>
-      <%= s.number_field :num_objects %>
-      <% end -%>
-    </div>
+    <% end %>
+      <%= f.submit "Save changes" %>
   <% end %>
-    <%= f.submit "Update this Source" %>
-<% end %>
+</div>

@@ -30,7 +30,7 @@ module MetadataBuilderHelper
         sample_xml_doc = REXML::Document.new sample_xml_content
         sample_xml = ""
         sample_xml_doc.write(sample_xml, 1)
-        header = content_tag(:h3, "XML Sample for #{prettify(file)}")
+        header = content_tag(:h2, "XML Sample for #{prettify(file)}")
         xml_code = content_tag(:pre, "#{sample_xml}")
         @sample_xml_docs << content_tag(:div, anchor_tag << header << xml_code, :class => "doc")
       end

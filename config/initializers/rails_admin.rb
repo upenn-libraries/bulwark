@@ -16,16 +16,16 @@ RailsAdmin.config do |config|
   end
   config.current_user_method(&:current_user)
 
+  config.navigation_static_links = {
+    "Front End" => "/"
+  }
+
   config.included_models = ["Repo"]
 
   config.actions do
     dashboard                     # mandatory
     index                         # mandatory
     new
-    export
-    bulk_delete
-    edit
-    delete
     git_actions do
       only ["Repo"]
     end
@@ -40,11 +40,20 @@ RailsAdmin.config do |config|
     ingest do
       only ["Repo"]
     end
+    edit
+    delete
   end
 
   config.model Repo do
     field :title do
       required(true)
+    end
+    field :directory_link do
+      visible false
+      label "Directory"
+      pretty_value do
+        %{#{value}}.html_safe
+      end
     end
     field :directory do
       required(true)
@@ -85,6 +94,39 @@ RailsAdmin.config do |config|
       required(true)
       help "Required - Filename for long-term preservation XML file"
     end
+    list do
+      field :directory do
+        visible false
+      end
+      field :metadata_subdirectory do
+        visible false
+      end
+      field :assets_subdirectory do
+        visible false
+      end
+      field :file_extensions do
+        visible false
+      end
+      field :metadata_source_extensions do
+        visible false
+      end
+      field :preservation_filename do
+        visible false
+      end
+      field :owner do
+        visible false
+      end
+      field :title do
+        visible true
+      end
+      field :directory_link do
+        visible true
+      end
+      field :description do
+        visible true
+      end
+    end
+
   end
 
 end

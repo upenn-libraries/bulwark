@@ -84,6 +84,8 @@ class MetadataSource < ActiveRecord::Base
     if self.source_type.present?
       case self.source_type
       when "custom"
+        self.root_element = "pages"
+        self.parent_element = "page"
         self.original_mappings = _convert_metadata
       when "voyager"
         self.root_element = MetadataSchema.config.try(:voyager_root_element) || "voyager_object"
@@ -392,7 +394,7 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def self.source_types
-      source_types = [["Voyager BibID Lookup", "voyager"], ["Custom", "custom"]]
+      source_types = [["Voyager BibID Lookup", "voyager"], ["Custom Structural Metadata", "custom"]]
     end
 
 
