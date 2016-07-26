@@ -1,6 +1,11 @@
 class ReposController < ApplicationController
   before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log, :ingest, :review_status, :detect_metadata, :preview_xml_preview]
 
+  def create
+    @repo = Repo.new
+    @repo.current_user = current_user
+  end
+
   def show
     @message = @repo.create_remote
     redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_actions", :flash => { @message.keys.first => @message.values.first }

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160629182006) do
+ActiveRecord::Schema.define(version: 20160721141231) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
@@ -75,6 +75,7 @@ ActiveRecord::Schema.define(version: 20160629182006) do
     t.string   "review_status"
     t.integer  "metadata_builder_id"
     t.integer  "version_control_agent_id"
+    t.string   "owner"
   end
 
   add_index "repos", ["metadata_builder_id"], name: "index_repos_on_metadata_builder_id"

@@ -29,6 +29,10 @@ h2, h3 {
   margin-bottom: 0px;
 }
 
+.table-striped tr.repo_row td {
+  vertical-align: inherit;
+}
+
 .about-repo li {
   padding: 5px 0px;
 }
@@ -210,9 +214,13 @@ span.inline-pre,
   margin-top: 20px;
 }
 
+td.links li, .nav li {
+  text-align: center;
+}
+
 td.links li, .nav li i {
   font-size: 20px;
-  text-align: center;
+  vertical-align: bottom;
 }
 
 td.links li .wording {
@@ -230,4 +238,8 @@ td.links li .wording {
 textarea#repo_review_status {
   width: 300px;
   height: 100px;
+}
+
+form#new_repo .input-group[class*="col-"] {
+  width: 10px;
 }
