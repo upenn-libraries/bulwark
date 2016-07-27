@@ -103,6 +103,7 @@ span.inline-pre,
 * Bordered
 */
 .git-directions,
+.additional-repo-actions,
 .metadata-source-select,
 .metadata-source-description,
 .metadata-source-mapping,
@@ -119,6 +120,7 @@ span.inline-pre,
 * Section titles
 */
 .about-repo h2,
+.additional-repo-actions h2,
 .git-directions h2,
 .metadata-source-select label,
 .metadata-source-types h3,
@@ -240,6 +242,7 @@ textarea#repo_review_status {
   height: 100px;
 }
 
-form#new_repo .input-group[class*="col-"] {
+form#new_repo .input-group[class*="col-"],
+form#edit_repo .input-group[class*="col-"] {
   width: 10px;
 }

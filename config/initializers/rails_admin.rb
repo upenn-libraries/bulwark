@@ -25,7 +25,9 @@ RailsAdmin.config do |config|
   config.actions do
     dashboard                     # mandatory
     index                         # mandatory
-    new
+    new do
+      only ["Repo"]
+    end
     git_actions do
       only ["Repo"]
     end
@@ -114,7 +116,7 @@ RailsAdmin.config do |config|
         visible false
       end
       field :owner do
-        visible false
+        visible true
       end
       field :title do
         visible true

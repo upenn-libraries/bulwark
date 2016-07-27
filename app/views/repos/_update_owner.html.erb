@@ -1,0 +1,8 @@
+<div class="additional-repo-actions">
+  <h2>Additional Repo Actions</h2>
+  <%= form_for @object, :validate => true, :html => {:class => "update-owner"}, :method => :post, :url => "/repos/#{@object.id}" do |f| %>
+    <%= f.label :owner, "Repo Owner:" %>
+    <%= f.select :owner, Repo.repo_owners %>
+    <%= f.submit "Reassign Owner"%>
+  <% end %>
+</div>

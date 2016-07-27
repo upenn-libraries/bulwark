@@ -1,17 +1,3 @@
-<div class="about-repo">
-  <h2>About this Repo</h2>
-  <ul>
-    <li><strong>Name:</strong> <%= @object.title %></li>
-    <li><strong>Directory:</strong> <%= @object.directory %></li>
-    <li><strong>Description:</strong> <%= @object.description %></li>
-    <li><strong>Metadata Subdirectory:</strong> <%= @object.metadata_subdirectory %></li>
-    <li><strong>Assets Subdirectory:</strong> <%= @object.assets_subdirectory %></li>
-    <li><strong>Accepted File Extension(s) for Metadata:</strong> <%= @object.metadata_source_file_extensions.join(", ") %></li>
-    <li><strong>Accepted File Extension(s) for Assets:</strong> <%= @object.file_extensions %></li>
-    <li><strong>Preservation XML Filename:</strong> <%= @object.preservation_filename %></li>
-  </ul>
-</div>
-
 <div class="git-directions">
   <h2>Using this Repo</h2>
   <p>Your git remote has been initialized at <%= "#{full_path}" %>.  To begin using this remote, run the following command from the terminal:
@@ -25,3 +11,20 @@ git annex sync --content</pre>
 <p>Replace <span class="inline-pre">RELATIVE_PATH_TO_CONTENT</span> with the meaningful relative path within your git repository's <span class="inline-pre">data/</span> directory to the new/updated content you intend to add.</p>
 <p>Replace <span class="inline-pre">COMMIT_MESSAGE</span> with a short message describing the changes you're committing.</p>
 </div>
+
+<div class="about-repo">
+  <h2>About this Repo</h2>
+  <ul>
+    <li><strong>Name:</strong> <%= @object.title %></li>
+    <li><strong>Owner Email:</strong> <%= @object.owner %></li>
+    <li><strong>Directory:</strong> <%= @object.directory %></li>
+    <li><strong>Description:</strong> <%= @object.description %></li>
+    <li><strong>Metadata Subdirectory:</strong> <%= @object.metadata_subdirectory %></li>
+    <li><strong>Assets Subdirectory:</strong> <%= @object.assets_subdirectory %></li>
+    <li><strong>Accepted File Extension(s) for Metadata:</strong> <%= @object.metadata_source_file_extensions.join(", ") %></li>
+    <li><strong>Accepted File Extension(s) for Assets:</strong> <%= @object.file_extensions %></li>
+    <li><strong>Preservation XML Filename:</strong> <%= @object.preservation_filename %></li>
+  </ul>
+</div>
+
+<%= render :partial => "repos/update_owner" %>
