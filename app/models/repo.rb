@@ -157,7 +157,7 @@ class Repo < ActiveRecord::Base
   end
 
   def self.repo_owners
-    return User.where(guest: false).pluck(:email, :id)
+    return User.where(guest: false).pluck(:email, :email)
   end
 
 private

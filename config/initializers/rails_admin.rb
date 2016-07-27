@@ -114,7 +114,7 @@ RailsAdmin.config do |config|
         visible false
       end
       field :owner do
-        visible false
+        visible true
       end
       field :title do
         visible true
