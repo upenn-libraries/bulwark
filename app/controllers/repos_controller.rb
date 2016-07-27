@@ -11,6 +11,14 @@ class ReposController < ApplicationController
     redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_actions", :flash => { @message.keys.first => @message.values.first }
   end
 
+  def update
+    if @repo.update(repo_params)
+      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_actions", :flash => { :success => "Repo updated successfully."}
+    else
+      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_actions", :flash => { :error => "Repo was not updated successfully."}
+    end
+  end
+
   def checksum_log
     @message = Utils.generate_checksum_log("#{Utils.config.assets_path}/#{@repo.directory}")
     redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/ingest", :flash => { @message.keys.first => @message.values.first }
@@ -39,7 +47,7 @@ class ReposController < ApplicationController
 
     def repo_params
       params[:repo][:review_status] = format_review_status(params[:repo][:review_status]) if params[:repo][:review_status].present?
-      params.require(:repo).permit(:title, :directory, :identifier, :description, :metadata_subdirectory, :assets_subdirectory, :metadata_filename, :file_extensions, :version_control_agent, :preservation_filename, :review_status)
+      params.require(:repo).permit(:title, :directory, :identifier, :description, :metadata_subdirectory, :assets_subdirectory, :metadata_filename, :file_extensions, :version_control_agent, :preservation_filename, :review_status, :owner)
     end
 
     def format_review_status(message)

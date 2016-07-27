@@ -2,6 +2,7 @@
   <h2>About this Repo</h2>
   <ul>
     <li><strong>Name:</strong> <%= @object.title %></li>
+    <li><strong>Owner Email:</strong> <%= @object.owner %></li>
     <li><strong>Directory:</strong> <%= @object.directory %></li>
     <li><strong>Description:</strong> <%= @object.description %></li>
     <li><strong>Metadata Subdirectory:</strong> <%= @object.metadata_subdirectory %></li>
@@ -11,6 +12,8 @@
     <li><strong>Preservation XML Filename:</strong> <%= @object.preservation_filename %></li>
   </ul>
 </div>
+
+<%= render :partial => "repos/update_owner" %>
 
 <div class="git-directions">
   <h2>Using this Repo</h2>

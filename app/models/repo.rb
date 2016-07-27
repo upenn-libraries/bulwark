@@ -36,6 +36,7 @@ class Repo < ActiveRecord::Base
   end
 
   def set_defaults
+    self[:owner] = User.current
     self[:derivatives_subdirectory] = "#{Utils.config.object_derivatives_path}"
   end
 
@@ -153,6 +154,10 @@ class Repo < ActiveRecord::Base
   def directory_link
     url = "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{self.id}/git_actions"
     return "<a href=\"#{url}\">#{self.directory}</a>"
+  end
+
+  def self.repo_owners
+    return User.where(guest: false).pluck(:email, :id)
   end
 
 private
