@@ -3,7 +3,6 @@ class ReposController < ApplicationController
 
   def create
     @repo = Repo.new
-    @repo.current_user = current_user
   end
 
   def show

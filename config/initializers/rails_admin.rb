@@ -25,7 +25,9 @@ RailsAdmin.config do |config|
   config.actions do
     dashboard                     # mandatory
     index                         # mandatory
-    new
+    new do
+      only ["Repo"]
+    end
     git_actions do
       only ["Repo"]
     end
