@@ -7,7 +7,7 @@
         <%= f.label :source, "Select metadata sources:" %>
         <%= f.select :source, prettify(@preserve).zip(@preserve), {}, { :multiple => true }  %>
       </div>
-      <%= f.submit "Save selections" %>
+      <%= f.submit form_label("source_select", @object.steps) %>
     <% end -%>
   <% end -%>
 </div>

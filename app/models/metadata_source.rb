@@ -108,6 +108,7 @@ class MetadataSource < ActiveRecord::Base
       end
     end
     self.metadata_builder.repo.version_control_agent.delete_clone if fresh_clone
+    self.metadata_builder.repo.update_steps(:metadata_extracted)
     self.save!
   end
 

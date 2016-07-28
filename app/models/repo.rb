@@ -211,6 +211,7 @@ private
       :metadata_sources_selected => false,
       :metadata_source_type_specified => false,
       :metadata_source_additional_info_set => false,
+      :metadata_extracted => false,
       :metadata_mappings_generated => false,
       :preservation_xml_generated => false,
       :published_preview => false

@@ -7,6 +7,6 @@
       <%= label "to_ingest[#{prettify(preserve)}]", prettify(preserve) %>
     </div>
     <% end %>
-    <%= f.submit "Ingest now", :id => "ingest_select_submit" %>
+    <%= f.submit form_label("publish_preview", @object.steps), :id => "ingest_select_submit" %>
   <% end -%>
 </div>
