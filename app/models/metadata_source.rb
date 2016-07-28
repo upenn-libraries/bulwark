@@ -18,6 +18,7 @@ class MetadataSource < ActiveRecord::Base
 
   $xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root>"
   $xml_footer = "</root>"
+  $jettison_files = Set.new
 
   def path
     read_attribute(:path) || ''
@@ -123,6 +124,7 @@ class MetadataSource < ActiveRecord::Base
     end
     self.generate_preservation_xml
     self.metadata_builder.repo.version_control_agent.delete_clone
+    self.metadata_builder.jettison_unwanted_files($jettison_files)
   end
 
   def generate_and_build_individual_xml(fname = self.path)
@@ -133,6 +135,7 @@ class MetadataSource < ActiveRecord::Base
     when "voyager"
       @xml_content_final_copy = xml_from_voyager
     end
+    $jettison_files.add(xml_fname)
     _fetch_write_save_preservation_xml(xml_fname, @xml_content_final_copy)
   end
 

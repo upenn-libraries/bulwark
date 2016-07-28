@@ -67,23 +67,10 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.update_steps(:metadata_sources_selected)
   end
 
-  def clear_unidentified_files
-    unidentified_files = self.unidentified_files
-    self.repo.version_control_agent.clone
-    unidentified_files.each do |f|
-      self.repo.version_control_agent.unlock(f)
-      self.repo.version_control_agent.drop(:drop_location => f) && `rm -rf #{f}`
-    end
-    self.repo.version_control_agent.commit("Removed files not identified as metadata source and/or for long-term preservation: #{unidentified_files}")
-    self.repo.version_control_agent.push
-    self.repo.version_control_agent.delete_clone
-  end
-
   def build_xml_files
     self.metadata_source.each do |source|
       source.build_xml if source.user_defined_mappings.present?
     end
-    clear_unidentified_files
     return {:success => "Preservation XML generated successfully.  See preview below."}
   end
 
@@ -115,6 +102,17 @@ class MetadataBuilder < ActiveRecord::Base
       @presence = doc.at("#{canon}").present?
     end
     return @presence
+  end
+
+  def jettison_unwanted_files(files_to_jettison)
+    self.repo.version_control_agent.clone
+    files_to_jettison.each do |f|
+      self.repo.version_control_agent.unlock(f)
+      self.repo.version_control_agent.drop(:drop_location => f) && `rm -rf #{f}`
+    end
+    self.repo.version_control_agent.commit("Removed files not identified as metadata source and/or for long-term preservation.")
+    self.repo.version_control_agent.push
+    self.repo.version_control_agent.delete_clone
   end
 
   def qualified_metadata_files
