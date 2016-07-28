@@ -246,3 +246,9 @@ form#new_repo .input-group[class*="col-"],
 form#edit_repo .input-group[class*="col-"] {
   width: 10px;
 }
+
+/* Hiding breadcrumbs */
+
+.breadcrumb {
+  display: none;
+}
