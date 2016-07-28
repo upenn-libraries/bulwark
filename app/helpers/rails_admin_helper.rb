@@ -51,4 +51,14 @@ module RailsAdminHelper
     return best_guess
   end
 
+  def form_label(form_type, repo_steps)
+    case form_type
+    when "generate_xml"
+      #binding.pry()
+      "Generate XML"
+    else
+      "Submit"
+    end
+  end
+
 end

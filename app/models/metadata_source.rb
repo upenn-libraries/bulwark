@@ -67,12 +67,27 @@ class MetadataSource < ActiveRecord::Base
     read_attribute(:source_type) || ''
   end
 
+  def view_type
+    read_attribute(:view_type) || ''
+  end
+
   def children=(children)
     self[:children] = children.reject(&:empty?)
   end
 
+  def source_type=(source_type)
+    self[:source_type] = source_type
+    self.metadata_builder.repo.update_steps(:metadata_source_type_specified)
+  end
+
+  def view_type=(view_type)
+    self[:view_type] = view_type
+    self.metadata_builder.repo.update_steps(:metadata_source_additional_info_set)
+  end
+
   def user_defined_mappings=(user_defined_mappings)
     self[:user_defined_mappings] = user_defined_mappings
+    self.metadata_builder.repo.update_steps(:metadata_mappings_generated)
   end
 
   def set_metadata_mappings
@@ -128,6 +143,7 @@ class MetadataSource < ActiveRecord::Base
       xml_content = file.readline
        _fetch_write_save_preservation_xml(xml_content) if self.metadata_builder.canonical_identifier_check("#{self.path}.xml")
     end
+    self.metadata_builder.repo.update_steps(:preservation_xml_generated)
   end
 
   def xml_from_voyager
@@ -394,7 +410,7 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def self.source_types
-      source_types = [["Voyager BibID Lookup", "voyager"], ["Custom Structural Metadata", "custom"]]
+      source_types = [["Voyager BibID Lookup Spreadsheet (XLSX)", "voyager"], ["Custom Structural Metadata Spreadsheet (XLSX)", "custom"]]
     end
 
 

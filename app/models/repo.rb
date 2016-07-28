@@ -23,6 +23,7 @@ class Repo < ActiveRecord::Base
   serialize :metadata_builder_id, Array
   serialize :ingested, Array
   serialize :review_status, Array
+  serialize :steps, Hash
 
   include Filesystem
   include FileExtensions
@@ -38,6 +39,7 @@ class Repo < ActiveRecord::Base
   def set_defaults
     self[:owner] = User.current
     self[:derivatives_subdirectory] = "#{Utils.config.object_derivatives_path}"
+    _initialize_steps
   end
 
   def metadata_subdirectory=(metadata_subdirectory)
@@ -59,6 +61,10 @@ class Repo < ActiveRecord::Base
 
   def preservation_filename=(preservation_filename)
     self[:preservation_filename] = preservation_filename.concat(".xml") unless preservation_filename.ends_with?(".xml")
+  end
+
+  def review_status=(review_status)
+    self[:review_status].push(Sanitize.fragment(review_status, Sanitize::Config::RESTRICTED)) if review_status.present?
   end
 
   def title
@@ -97,11 +103,13 @@ class Repo < ActiveRecord::Base
     read_attribute(:review_status) || ''
   end
 
-  def review_status=(review_status)
-    self[:review_status].push(Sanitize.fragment(review_status, Sanitize::Config::RESTRICTED)) if review_status.present?
+  def steps
+    read_attribute(:steps) || ''
   end
 
   def create_remote
+    # Function weirdness forcing this to the top
+    self.update_steps(:git_remote_initialized)
     unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
       self.version_control_agent.init_bare
       self.version_control_agent.clone
@@ -125,14 +133,11 @@ class Repo < ActiveRecord::Base
       self.ingested = ingest_array
       _refresh_assets
       self.save!
+      self.update_steps(:published_preview)
       return @status
     rescue
       raise $!, "Ingest and index failed due to the following error(s): #{$!}", $!.backtrace
     end
-  end
-
-  def reindex
-    ActiveFedora::Base.reindex_everything
   end
 
   def load_file_extensions
@@ -154,6 +159,11 @@ class Repo < ActiveRecord::Base
   def directory_link
     url = "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{self.id}/git_actions"
     return "<a href=\"#{url}\">#{self.directory}</a>"
+  end
+
+  def update_steps(task)
+    self.steps[task] = true
+    self.save!
   end
 
   def self.repo_owners
@@ -193,6 +203,18 @@ private
     aft = ft.join(',')
     aft = "*{#{aft}}"
     return aft
+  end
+
+  def _initialize_steps
+    self.steps = {
+      :git_remote_initialized => false,
+      :metadata_sources_selected => false,
+      :metadata_source_type_specified => false,
+      :metadata_source_additional_info_set => false,
+      :metadata_mappings_generated => false,
+      :preservation_xml_generated => false,
+      :published_preview => false
+    }
   end
 
   def _set_version_control_agent

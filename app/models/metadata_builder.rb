@@ -73,6 +73,7 @@ class MetadataBuilder < ActiveRecord::Base
       self.metadata_source << MetadataSource.create(:path => source) unless MetadataSource.where(:path => source).pluck(:path).present?
     end
     self.save!
+    self.repo.update_steps(:metadata_sources_selected)
   end
 
   def clear_unidentified_files
