@@ -39,7 +39,7 @@ class Repo < ActiveRecord::Base
   def set_defaults
     self[:owner] = User.current
     self[:derivatives_subdirectory] = "#{Utils.config.object_derivatives_path}"
-    _initialize_steps
+    self[:admin_subdirectory] = "#{Utils.config.object_admin_path}"
   end
 
   def metadata_subdirectory=(metadata_subdirectory)
@@ -133,6 +133,7 @@ class Repo < ActiveRecord::Base
       self.ingested = ingest_array
       _refresh_assets
       self.save!
+      self.package_metadata_info
       self.update_steps(:published_preview)
       return @status
     rescue
@@ -159,6 +160,16 @@ class Repo < ActiveRecord::Base
   def directory_link
     url = "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{self.id}/git_actions"
     return "<a href=\"#{url}\">#{self.directory}</a>"
+  end
+
+  def package_metadata_info
+    File.open("#{self.version_control_agent.working_path}/#{self.admin_subdirectory}/#{self.directory.gsub(/\.git$/, '')}", "w+") do |f|
+      self.metadata_builder.metadata_source.each do |source|
+        f.puts "Source information for #{source.path}\npath: #{source.path}\nid (use to correlate children): #{source.id}\nsource_type: #{source.source_type}\nview_type: #{source.view_type}\nnum_objects: #{source.num_objects}\nx_start: #{source.x_start}\nx_stop: #{source.x_stop}\ny_start: #{source.y_start}\ny_stop: #{source.y_stop}\nchildren: #{source.children}\n\n"
+      end
+    end
+    self.version_control_agent.commit("Added packaging info about metadata sources to admin directory")
+    self.version_control_agent.push
   end
 
   def update_steps(task)

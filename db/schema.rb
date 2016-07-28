@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160728141732) do
+ActiveRecord::Schema.define(version: 20160728201313) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
@@ -59,28 +59,8 @@ ActiveRecord::Schema.define(version: 20160728141732) do
 
   add_index "metadata_sources", ["metadata_builder_id"], name: "index_metadata_sources_on_metadata_builder_id"
 
-  create_table "repos", force: :cascade do |t|
-    t.string   "title"
-    t.string   "directory"
-    t.string   "description"
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
-    t.string   "metadata_subdirectory"
-    t.string   "assets_subdirectory"
-    t.string   "derivatives_subdirectory"
-    t.string   "file_extensions"
-    t.string   "metadata_source_extensions"
-    t.string   "ingested"
-    t.string   "preservation_filename"
-    t.string   "review_status"
-    t.integer  "metadata_builder_id"
-    t.integer  "version_control_agent_id"
-    t.string   "owner"
-    t.string   "steps"
-  end
-
-  add_index "repos", ["metadata_builder_id"], name: "index_repos_on_metadata_builder_id"
-  add_index "repos", ["version_control_agent_id"], name: "index_repos_on_version_control_agent_id"
+# Could not dump table "repos" because of following NoMethodError
+#   undefined method `[]' for nil:NilClass
 
   create_table "roles", force: :cascade do |t|
     t.string "name"
