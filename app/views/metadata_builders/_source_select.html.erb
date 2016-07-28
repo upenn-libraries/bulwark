@@ -2,7 +2,7 @@
   <%= form_for @object.metadata_builder, :validate => true, :method => :post, :url => "/metadata_builders/#{@object.metadata_builder.id}/set_source" do |f| %>
     <%= field_set_tag "Select metadata source files from the following:" do %>
       <p>Hold down the Shift key to select multiple files.</p>
-      <% @preserve = @object.metadata_builder.available_metadata_files %>
+      <% @preserve = @object.metadata_builder.qualified_metadata_files %>
       <div class="source-select">
         <%= f.label :source, "Select metadata sources:" %>
         <%= f.select :source, prettify(@preserve).zip(@preserve), {}, { :multiple => true }  %>

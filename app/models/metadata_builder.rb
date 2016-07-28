@@ -38,19 +38,10 @@ class MetadataBuilder < ActiveRecord::Base
     read_attribute(:parent_repo) || ''
   end
 
-  def available_metadata_files
-    available_metadata_files = Array.new
-    self.repo.version_control_agent.clone
-    Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*.#{self.repo.metadata_source_extensions}") do |file|
-      available_metadata_files << file
-    end
-    self.repo.version_control_agent.delete_clone
-    return available_metadata_files
-  end
-
   def unidentified_files
-    identified = (self.source + self.preserve).uniq!
-    unidentified = self.available_metadata_files - identified
+    identified = (eval(self.source) + self.preserve.to_a)
+    identified.uniq!
+    unidentified = self.all_metadata_files - identified
     return unidentified
   end
 
@@ -92,6 +83,7 @@ class MetadataBuilder < ActiveRecord::Base
     self.metadata_source.each do |source|
       source.build_xml if source.user_defined_mappings.present?
     end
+    clear_unidentified_files
     return {:success => "Preservation XML generated successfully.  See preview below."}
   end
 
@@ -125,5 +117,26 @@ class MetadataBuilder < ActiveRecord::Base
     return @presence
   end
 
+  def qualified_metadata_files
+    qualified_metadata_files = _available_files("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*.#{self.repo.metadata_source_extensions}")
+    return qualified_metadata_files
+  end
+
+  def all_metadata_files
+    all_metadata_files = _available_files("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*")
+    return all_metadata_files
+  end
+
+  private
+
+  def _available_files(query)
+    available_files = Array.new
+    self.repo.version_control_agent.clone
+    Dir.glob("#{query}") do |file|
+      available_files << file
+    end
+    self.repo.version_control_agent.delete_clone
+    return available_files
+  end
 
 end

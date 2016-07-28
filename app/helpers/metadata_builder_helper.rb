@@ -9,10 +9,10 @@ module MetadataBuilderHelper
   end
 
   def render_source_select_form
-    if @object.metadata_builder.available_metadata_files.present?
+    if @object.metadata_builder.qualified_metadata_files.present?
       render :partial => "metadata_builders/source_select"
     else
-      render :partial => "metadata_builders/no_available_metadata_files"
+      render :partial => "metadata_builders/no_qualified_metadata_files"
     end
   end
 
