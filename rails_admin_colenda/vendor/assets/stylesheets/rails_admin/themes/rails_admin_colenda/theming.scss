@@ -151,58 +151,76 @@ span.inline-pre,
   }
 }
 
-.source-type .input-fields {
-  clear: both;
-}
 
 .source-type {
   margin-bottom: 150px;
-}
-
-.source-type .visual-illustration {
-  width: 200px;
-  float:left;
-  #vertical,  #horizontal {
-    float: left;
-    width: 120px;
-    height: 100px;
-    background-size: 100%;
-    background-repeat: no-repeat;
-    background-position: top right;
+  .input-fields {
+    clear: both;
   }
-}
-
-.source-coordinates .visual-illustration {
-  #xy-start,  #xy-stop {
-    float: left;
-    width: 120px;
-    height: 100px;
-    background-size: 100%;
-    background-repeat: no-repeat;
-    background-position: top right;
+  .visual-illustration {
+    width: 200px;
+    float:left;
+    #vertical,  #horizontal {
+      float: left;
+      width: 120px;
+      height: 100px;
+      background-size: 100%;
+      background-repeat: no-repeat;
+      background-position: top right;
+    }
+    #vertical{
+      background-image: asset-url("vertical.png");
+    }
+    #horizontal{
+      background-image: asset-url("horizontal.png");
+    }
   }
-}
-
-.source-type .visual-illustration #vertical{
-  background-image: asset-url("vertical.png");
-}
-
-.source-type .visual-illustration #horizontal{
-  background-image: asset-url("horizontal.png");
 }
 
 .source-coordinates {
   clear:both;
   margin-bottom: 50px;
+  .visual-illustration {
+    #xy-start,  #xy-stop {
+      float: left;
+      width: 120px;
+      height: 100px;
+      background-size: 100%;
+      background-repeat: no-repeat;
+      background-position: top right;
+    }
+    #xy-start{
+      background-image: asset-url("xy_start.png");
+    }
+    #xy-stop{
+      background-image: asset-url("xy_stop.png");
+    }
+  }
 }
 
-.source-coordinates .visual-illustration #xy-start{
-  background-image: asset-url("xy_start.png");
+.source-num-objects  {
+  clear:both;
+  margin-bottom: 20px;
+  .visual-illustration {
+    #numbered-horiz, #numbered-vert {
+      float: left;
+      width: 120px;
+      height: 90px;
+      background-size: 100%;
+      background-repeat: no-repeat;
+      background-position: top right;
+    }
+    #numbered-horiz {
+      background-image: asset-url("numbered_horiz.png")
+    }
+    #numbered-vert {
+      background-image: asset-url("numbered_vert.png")
+    }
+  }
 }
 
-.source-coordinates .visual-illustration #xy-stop{
-  background-image: asset-url("xy_stop.png");
-}
+
+
 
 .voyager-descriptive-preview,
 .doc pre,
