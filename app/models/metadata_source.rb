@@ -78,6 +78,9 @@ class MetadataSource < ActiveRecord::Base
 
   def source_type=(source_type)
     self[:source_type] = source_type
+    self[:user_defined_mappings] = nil
+    self[:original_mappings] = nil
+    self.update_last_used_settings
     self.metadata_builder.repo.update_steps(:metadata_source_type_specified)
   end
 
@@ -88,7 +91,7 @@ class MetadataSource < ActiveRecord::Base
 
   def user_defined_mappings=(user_defined_mappings)
     self[:user_defined_mappings] = user_defined_mappings
-    self.metadata_builder.repo.update_steps(:metadata_mappings_generated)
+    self.metadata_builder.repo.update_steps(:metadata_mappings_generated) if user_defined_mappings.present?
   end
 
   def set_metadata_mappings
@@ -217,6 +220,11 @@ class MetadataSource < ActiveRecord::Base
     end
     parsed << "</ul>"
     return parsed
+  end
+
+  def update_last_used_settings
+    self.last_settings_updated = DateTime.now()
+    self.save!
   end
 
   private
@@ -415,6 +423,10 @@ class MetadataSource < ActiveRecord::Base
 
     def self.source_types
       source_types = [["Voyager BibID Lookup Spreadsheet (XLSX)", "voyager"], ["Custom Structural Metadata Spreadsheet (XLSX)", "custom"]]
+    end
+
+    def self.settings_fields
+      settings_fields = [:view_type, :num_objects, :x_start, :y_start, :x_stop, :y_stop]
     end
 
 

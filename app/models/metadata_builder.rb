@@ -48,6 +48,7 @@ class MetadataBuilder < ActiveRecord::Base
   def refresh_metadata
     self.metadata_source.each do |source|
       source.set_metadata_mappings
+      source.last_extraction = DateTime.now
       source.save!
     end
   end

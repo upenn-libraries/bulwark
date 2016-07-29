@@ -78,6 +78,7 @@ class MetadataBuildersController < ApplicationController
       hash_params = Hash[hash_params_strings.map{|k,v| [k.to_sym, v]}]
       metadata_source = MetadataSource.find(hash_params[:id])
       metadata_source.update(hash_params)
+      metadata_source.update_last_used_settings if (hash_params.keys & MetadataSource.settings_fields).present?
       metadata_source.errors.messages.each do |key, message|
         @metadata_builder.errors[:base] << message
       end
