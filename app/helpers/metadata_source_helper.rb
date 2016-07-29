@@ -1,9 +1,8 @@
 module MetadataSourceHelper
 
-  def render_source_specs_form(source)
-    @source = source
+  def render_source_specs_form
     if @object.metadata_builder.metadata_source.present?
-      render :partial => "metadata_sources/form", source: @source
+      render :partial => "metadata_sources/form"
     end
   end
 

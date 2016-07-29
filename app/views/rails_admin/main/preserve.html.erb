@@ -2,6 +2,4 @@
 
 <%= render_source_type_form %>
 
-<% @object.metadata_builder.metadata_source.each do |source| %>
-  <%= render_source_specs_form(source) if source.source_type == "custom" %>
-<% end %>
+<%= render_source_specs_form if @object.metadata_builder.metadata_source.any?{ |ms| ms.source_type == "custom" } %>
