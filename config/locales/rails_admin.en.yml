@@ -6,6 +6,7 @@ en:
         menu: "Add a New Repo"
         breadcrumb: "Add a New Repo"
         done: "created"
+        warning_reason: "Metadata subdirectory and assets subdirectory are the same."
       git_actions:
         title: "Repo Information"
         menu: "1. Repo Information"
@@ -26,3 +27,5 @@ en:
         title: "Select Metadata Sources"
         menu: "2. Select Metadata Sources"
         breadcrumb: "Select Metadata Sources"
+    flash:
+      warning: "%{name} %{action} with the following warning(s): %{reason}"

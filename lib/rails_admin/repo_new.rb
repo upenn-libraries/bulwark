@@ -45,8 +45,8 @@ module RailsAdmin
                 @auditing_adapter && @auditing_adapter.create_object(@object, @abstract_model, _current_user)
                 params[:return_to]
                 if @abstract_model.model_name == "Repo"
-                  notice = I18n.t('admin.flash.successful', name: @model_config.label, action: I18n.t("admin.actions.#{@action.key}.done"))
-                  redirect_to "#{main_app.root_path}admin_repo/#{@abstract_model.model_name.downcase}/#{@object.id}/git_actions",  flash: {success: notice}
+                  memo = @object.metadata_subdirectory == @object.assets_subdirectory ? { :warning => I18n.t('admin.flash.warning', name: @model_config.label, action: I18n.t("admin.actions.#{@action.key}.done"), reason: I18n.t("admin.actions.#{@action.key}.warning_reason")) } : { :success => I18n.t('admin.flash.successful', name: @model_config.label, action: I18n.t("admin.actions.#{@action.key}.done"))}
+                  redirect_to "#{main_app.root_path}admin_repo/#{@abstract_model.model_name.downcase}/#{@object.id}/git_actions",  flash: memo
                 else
                   respond_to do |format|
                     format.html { redirect_to_on_success }

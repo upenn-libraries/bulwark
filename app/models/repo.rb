@@ -108,7 +108,7 @@ class Repo < ActiveRecord::Base
   end
 
   def create_remote
-    # Function weirdness forcing this to the top
+    # Function weirdness forcing update_steps to the top
     self.update_steps(:git_remote_initialized)
     unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
       self.version_control_agent.init_bare
@@ -117,9 +117,6 @@ class Repo < ActiveRecord::Base
       self.version_control_agent.commit_bare("Added subdirectories according to the configuration specified in the repo configuration")
       self.version_control_agent.push_bare
       self.version_control_agent.delete_clone
-      return { :success => "Remote successfully created" }
-    else
-      return { :error => "Remote already exists" }
     end
   end
 
@@ -193,7 +190,7 @@ private
     Dir.mkdir("#{admin_directory}")
     Dir.mkdir("#{data_directory}")
     Dir.mkdir("#{metadata_subdirectory}") && FileUtils.touch("#{metadata_subdirectory}/.keep")
-    Dir.mkdir("#{assets_subdirectory}") && FileUtils.touch("#{assets_subdirectory}/.keep")
+    Dir.mkdir("#{assets_subdirectory}") && FileUtils.touch("#{assets_subdirectory}/.keep") unless File.exists?(assets_subdirectory)
     Dir.mkdir("#{derivatives_subdirectory}") && FileUtils.touch("#{derivatives_subdirectory}/.keep")
     _populate_admin_manifest("#{admin_directory}")
   end
