@@ -5,6 +5,7 @@ en:
         title: "Add a New Repo"
         menu: "Add a New Repo"
         breadcrumb: "Add a New Repo"
+        done: "created"
       git_actions:
         title: "Repo Information"
         menu: "1. Repo Information"
