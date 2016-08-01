@@ -1,9 +1,8 @@
 module MetadataSourceHelper
 
-  def render_source_specs_form(source)
-    @source = source
+  def render_source_specs_form
     if @object.metadata_builder.metadata_source.present?
-      render :partial => "metadata_sources/form", source: @source
+      render :partial => "metadata_sources/form"
     end
   end
 
@@ -21,6 +20,10 @@ module MetadataSourceHelper
         else "voyager"
           render :partial => "metadata_sources/voyager", :source => @source
       end
+  end
+
+  def render_warning_if_out_of_sync
+    flash[:warning] =  "Metadata Source settings have been updated since the last extraction of metadata.  Please press the button below to extract metadata based on these new settings." if @object.metadata_builder.metadata_source.any?{ |ms| ms.last_settings_updated > ms.last_extraction if ms.last_extraction.present? }
   end
 
   def nested_relationships_values(parent_file)

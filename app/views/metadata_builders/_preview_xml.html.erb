@@ -5,7 +5,7 @@
 
 <div class="xml-preview">
 <%= form_for @object.metadata_builder, :validate => true, :method => :post, :html => { :class => "xml-preview-form" }, :url => "/metadata_builders/#{@object.metadata_builder.id}/generate_preview_xml" do |f| %>
-  <%= f.submit "Generate XML preview", :id => "xml_preview_submit" %>
+  <%= f.submit form_label("generate_xml", @object.steps), :id => "xml_preview_submit" %>
 <% end %>
   <%= render_sample_xml %>
 </div>

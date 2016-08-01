@@ -51,4 +51,25 @@ module RailsAdminHelper
     return best_guess
   end
 
+  def form_label(form_type, repo_steps)
+    case form_type
+    when "generate_xml"
+      repo_steps[:preservation_xml_generated] ? "Regenerate XML" : "Generate XML"
+    when "source_select"
+      repo_steps[:metadata_sources_selected] ? "Update metadata source selections" : "Select metadata sources"
+    when "metadata_mappings"
+      repo_steps[:metadata_mappings_generated] ? "Update metadata mappings" : "Save metadata mappings"
+    when "extract_metadata"
+      repo_steps[:metadata_extracted] ? "Refresh extracted metadata from sources" : "Extract metadata from sources"
+    when "metadata_source_additional_info"
+      repo_steps[:metadata_source_additional_info_set] ? "Update additional information" : "Save additional information"
+    when "set_source_types"
+      repo_steps[:metadata_source_type_specified] ? "Update source types" : "Save source types"
+    when "publish_preview"
+      repo_steps[:published_preview] ? "Republish preview" : "Publish preview"
+    else
+      "Submit"
+    end
+  end
+
 end

@@ -38,25 +38,17 @@ class MetadataBuilder < ActiveRecord::Base
     read_attribute(:parent_repo) || ''
   end
 
-  def available_metadata_files
-    available_metadata_files = Array.new
-    self.repo.version_control_agent.clone
-    Dir.glob("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*.#{self.repo.metadata_source_extensions}") do |file|
-      available_metadata_files << file
-    end
-    self.repo.version_control_agent.delete_clone
-    return available_metadata_files
-  end
-
   def unidentified_files
-    identified = (self.source + self.preserve).uniq!
-    unidentified = self.available_metadata_files - identified
+    identified = (eval(self.source) + self.preserve.to_a)
+    identified.uniq!
+    unidentified = self.all_metadata_files - identified
     return unidentified
   end
 
   def refresh_metadata
     self.metadata_source.each do |source|
       source.set_metadata_mappings
+      source.last_extraction = DateTime.now
       source.save!
     end
   end
@@ -73,18 +65,7 @@ class MetadataBuilder < ActiveRecord::Base
       self.metadata_source << MetadataSource.create(:path => source) unless MetadataSource.where(:path => source).pluck(:path).present?
     end
     self.save!
-  end
-
-  def clear_unidentified_files
-    unidentified_files = self.unidentified_files
-    self.repo.version_control_agent.clone
-    unidentified_files.each do |f|
-      self.repo.version_control_agent.unlock(f)
-      self.repo.version_control_agent.drop(:drop_location => f) && `rm -rf #{f}`
-    end
-    self.repo.version_control_agent.commit("Removed files not identified as metadata source and/or for long-term preservation: #{unidentified_files}")
-    self.repo.version_control_agent.push
-    self.repo.version_control_agent.delete_clone
+    self.repo.update_steps(:metadata_sources_selected)
   end
 
   def build_xml_files
@@ -124,5 +105,37 @@ class MetadataBuilder < ActiveRecord::Base
     return @presence
   end
 
+  def jettison_unwanted_files(files_to_jettison)
+    self.repo.version_control_agent.clone
+    files_to_jettison.each do |f|
+      self.repo.version_control_agent.unlock(f)
+      self.repo.version_control_agent.drop(:drop_location => f) && `rm -rf #{f}`
+    end
+    self.repo.version_control_agent.commit("Removed files not identified as metadata source and/or for long-term preservation.")
+    self.repo.version_control_agent.push
+    self.repo.version_control_agent.delete_clone
+  end
+
+  def qualified_metadata_files
+    qualified_metadata_files = _available_files("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*.#{self.repo.metadata_source_extensions}")
+    return qualified_metadata_files
+  end
+
+  def all_metadata_files
+    all_metadata_files = _available_files("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*")
+    return all_metadata_files
+  end
+
+  private
+
+  def _available_files(query)
+    available_files = Array.new
+    self.repo.version_control_agent.clone
+    Dir.glob("#{query}") do |file|
+      available_files << file
+    end
+    self.repo.version_control_agent.delete_clone
+    return available_files
+  end
 
 end

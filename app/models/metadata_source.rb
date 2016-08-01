@@ -18,6 +18,7 @@ class MetadataSource < ActiveRecord::Base
 
   $xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root>"
   $xml_footer = "</root>"
+  $jettison_files = Set.new
 
   def path
     read_attribute(:path) || ''
@@ -67,12 +68,30 @@ class MetadataSource < ActiveRecord::Base
     read_attribute(:source_type) || ''
   end
 
+  def view_type
+    read_attribute(:view_type) || ''
+  end
+
   def children=(children)
     self[:children] = children.reject(&:empty?)
   end
 
+  def source_type=(source_type)
+    self[:source_type] = source_type
+    self[:user_defined_mappings] = nil
+    self[:original_mappings] = nil
+    self.update_last_used_settings
+    self.metadata_builder.repo.update_steps(:metadata_source_type_specified)
+  end
+
+  def view_type=(view_type)
+    self[:view_type] = view_type
+    self.metadata_builder.repo.update_steps(:metadata_source_additional_info_set)
+  end
+
   def user_defined_mappings=(user_defined_mappings)
     self[:user_defined_mappings] = user_defined_mappings
+    self.metadata_builder.repo.update_steps(:metadata_mappings_generated) if user_defined_mappings.present?
   end
 
   def set_metadata_mappings
@@ -93,6 +112,7 @@ class MetadataSource < ActiveRecord::Base
       end
     end
     self.metadata_builder.repo.version_control_agent.delete_clone if fresh_clone
+    self.metadata_builder.repo.update_steps(:metadata_extracted)
     self.save!
   end
 
@@ -107,6 +127,7 @@ class MetadataSource < ActiveRecord::Base
     end
     self.generate_preservation_xml
     self.metadata_builder.repo.version_control_agent.delete_clone
+    self.metadata_builder.jettison_unwanted_files($jettison_files)
   end
 
   def generate_and_build_individual_xml(fname = self.path)
@@ -117,6 +138,7 @@ class MetadataSource < ActiveRecord::Base
     when "voyager"
       @xml_content_final_copy = xml_from_voyager
     end
+    $jettison_files.add(xml_fname)
     _fetch_write_save_preservation_xml(xml_fname, @xml_content_final_copy)
   end
 
@@ -128,6 +150,7 @@ class MetadataSource < ActiveRecord::Base
       xml_content = file.readline
        _fetch_write_save_preservation_xml(xml_content) if self.metadata_builder.canonical_identifier_check("#{self.path}.xml")
     end
+    self.metadata_builder.repo.update_steps(:preservation_xml_generated)
   end
 
   def xml_from_voyager
@@ -197,6 +220,11 @@ class MetadataSource < ActiveRecord::Base
     end
     parsed << "</ul>"
     return parsed
+  end
+
+  def update_last_used_settings
+    self.last_settings_updated = DateTime.now()
+    self.save!
   end
 
   private
@@ -394,7 +422,11 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def self.source_types
-      source_types = [["Voyager BibID Lookup", "voyager"], ["Custom Structural Metadata", "custom"]]
+      source_types = [["Voyager BibID Lookup Spreadsheet (XLSX)", "voyager"], ["Custom Structural Metadata Spreadsheet (XLSX)", "custom"]]
+    end
+
+    def self.settings_fields
+      settings_fields = [:view_type, :num_objects, :x_start, :y_start, :x_stop, :y_stop]
     end
 
 

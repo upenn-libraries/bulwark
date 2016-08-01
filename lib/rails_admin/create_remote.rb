@@ -16,13 +16,6 @@ module RailsAdmin
           [:post]
         end
 
-        register_instance_option :controller do
-          Proc.new do
-            @object.create_remote
-            redirect_to main_app.show_path(@object)
-          end
-        end
-
       end
     end
   end

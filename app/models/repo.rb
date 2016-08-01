@@ -23,6 +23,7 @@ class Repo < ActiveRecord::Base
   serialize :metadata_builder_id, Array
   serialize :ingested, Array
   serialize :review_status, Array
+  serialize :steps, Hash
 
   include Filesystem
   include FileExtensions
@@ -38,6 +39,7 @@ class Repo < ActiveRecord::Base
   def set_defaults
     self[:owner] = User.current
     self[:derivatives_subdirectory] = "#{Utils.config.object_derivatives_path}"
+    self[:admin_subdirectory] = "#{Utils.config.object_admin_path}"
   end
 
   def metadata_subdirectory=(metadata_subdirectory)
@@ -59,6 +61,10 @@ class Repo < ActiveRecord::Base
 
   def preservation_filename=(preservation_filename)
     self[:preservation_filename] = preservation_filename.concat(".xml") unless preservation_filename.ends_with?(".xml")
+  end
+
+  def review_status=(review_status)
+    self[:review_status].push(Sanitize.fragment(review_status, Sanitize::Config::RESTRICTED)) if review_status.present?
   end
 
   def title
@@ -97,11 +103,13 @@ class Repo < ActiveRecord::Base
     read_attribute(:review_status) || ''
   end
 
-  def review_status=(review_status)
-    self[:review_status].push(Sanitize.fragment(review_status, Sanitize::Config::RESTRICTED)) if review_status.present?
+  def steps
+    read_attribute(:steps) || ''
   end
 
   def create_remote
+    # Function weirdness forcing update_steps to the top
+    self.update_steps(:git_remote_initialized)
     unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
       self.version_control_agent.init_bare
       self.version_control_agent.clone
@@ -109,9 +117,6 @@ class Repo < ActiveRecord::Base
       self.version_control_agent.commit_bare("Added subdirectories according to the configuration specified in the repo configuration")
       self.version_control_agent.push_bare
       self.version_control_agent.delete_clone
-      return { :success => "Remote successfully created" }
-    else
-      return { :error => "Remote already exists" }
     end
   end
 
@@ -125,14 +130,12 @@ class Repo < ActiveRecord::Base
       self.ingested = ingest_array
       _refresh_assets
       self.save!
+      self.package_metadata_info
+      self.update_steps(:published_preview)
       return @status
     rescue
       raise $!, "Ingest and index failed due to the following error(s): #{$!}", $!.backtrace
     end
-  end
-
-  def reindex
-    ActiveFedora::Base.reindex_everything
   end
 
   def load_file_extensions
@@ -156,6 +159,21 @@ class Repo < ActiveRecord::Base
     return "<a href=\"#{url}\">#{self.directory}</a>"
   end
 
+  def package_metadata_info
+    File.open("#{self.version_control_agent.working_path}/#{self.admin_subdirectory}/#{self.directory.gsub(/\.git$/, '')}", "w+") do |f|
+      self.metadata_builder.metadata_source.each do |source|
+        f.puts "Source information for #{source.path}\npath: #{source.path}\nid (use to correlate children): #{source.id}\nsource_type: #{source.source_type}\nview_type: #{source.view_type}\nnum_objects: #{source.num_objects}\nx_start: #{source.x_start}\nx_stop: #{source.x_stop}\ny_start: #{source.y_start}\ny_stop: #{source.y_stop}\nchildren: #{source.children}\n\n"
+      end
+    end
+    self.version_control_agent.commit("Added packaging info about metadata sources to admin directory")
+    self.version_control_agent.push
+  end
+
+  def update_steps(task)
+    self.steps[task] = true
+    self.save!
+  end
+
   def self.repo_owners
     return User.where(guest: false).pluck(:email, :email)
   end
@@ -172,7 +190,7 @@ private
     Dir.mkdir("#{admin_directory}")
     Dir.mkdir("#{data_directory}")
     Dir.mkdir("#{metadata_subdirectory}") && FileUtils.touch("#{metadata_subdirectory}/.keep")
-    Dir.mkdir("#{assets_subdirectory}") && FileUtils.touch("#{assets_subdirectory}/.keep")
+    Dir.mkdir("#{assets_subdirectory}") && FileUtils.touch("#{assets_subdirectory}/.keep") unless File.exists?(assets_subdirectory)
     Dir.mkdir("#{derivatives_subdirectory}") && FileUtils.touch("#{derivatives_subdirectory}/.keep")
     _populate_admin_manifest("#{admin_directory}")
   end
@@ -193,6 +211,19 @@ private
     aft = ft.join(',')
     aft = "*{#{aft}}"
     return aft
+  end
+
+  def _initialize_steps
+    self.steps = {
+      :git_remote_initialized => false,
+      :metadata_sources_selected => false,
+      :metadata_source_type_specified => false,
+      :metadata_source_additional_info_set => false,
+      :metadata_extracted => false,
+      :metadata_mappings_generated => false,
+      :preservation_xml_generated => false,
+      :published_preview => false
+    }
   end
 
   def _set_version_control_agent

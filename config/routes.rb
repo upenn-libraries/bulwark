@@ -2,6 +2,7 @@ Rails.application.routes.draw do
 
   resources :repos do
     member do
+      post :repo_new
       post :update
       post :checksum_log
       post :ingest
