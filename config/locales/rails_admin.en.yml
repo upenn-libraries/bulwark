@@ -1,6 +1,10 @@
 en:
   admin:
     actions:
+      repo_new:
+        title: "Add a New Repo"
+        menu: "Add a New Repo"
+        breadcrumb: "Add a New Repo"
       git_actions:
         title: "Repo Information"
         menu: "1. Repo Information"

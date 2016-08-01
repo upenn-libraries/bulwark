@@ -7,6 +7,7 @@ require Rails.root.join('lib', 'rails_admin', 'ingest.rb')
 require Rails.root.join('lib', 'rails_admin', 'generate_metadata.rb')
 require Rails.root.join('lib', 'rails_admin', 'preview_xml.rb')
 require Rails.root.join('lib', 'rails_admin', 'preserve.rb')
+require Rails.root.join('lib', 'rails_admin', 'repo_new.rb')
 
 RailsAdmin.config do |config|
   config.main_app_name = ["Review", "Admin Dashboard"]
@@ -24,8 +25,8 @@ RailsAdmin.config do |config|
 
   config.actions do
     dashboard                     # mandatory
-    index                         # mandatory
-    new do
+    index
+    repo_new do
       only ["Repo"]
     end
     git_actions do
