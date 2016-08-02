@@ -262,11 +262,13 @@ private
 
   def _mint_and_format_ezid
     #TODO: Replace with test EZID minting when in place:
-    minted_id = "#{Utils.config.repository_prefix}_#{self.human_readable_name}_#{SecureRandom.hex(10)}"
-    while Repo.where(directory: "#{minted_id}.git").pluck(:directory).present?
-      minted_id = "#{Utils.config.repository_prefix}_#{self.human_readable_name}_#{SecureRandom.hex(10)}"
+    minted_id = SecureRandom.hex(10)
+    while Repo.where(directory: "#{Utils.config.repository_prefix}_#{self.human_readable_name}_#{minted_id}.git").pluck(:directory).present?
+      minted_id = SecureRandom.hex(10)
     end
-    self[:directory] = minted_id
+    
+    self[:unique_identifier] = "#{Utils.config.repository_prefix}_#{minted_id}"
+    self[:directory] = "#{Utils.config.repository_prefix}_#{self.human_readable_name}_#{minted_id}"
     _concatenate_git
   end
 

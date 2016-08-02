@@ -8,7 +8,7 @@ module Utils
 
     def import(file, repo)
       @command = build_command("import", :file => file)
-      @oid = File.basename(file,".xml")
+      @oid = File.basename(repo.unique_identifier)
       @@status_type = :error
       @@status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
       unless @@status_message.present?
@@ -101,6 +101,7 @@ module Utils
 
     def object_and_descendants_action(parent_id, action)
       uri = ActiveFedora::Base.id_to_uri(parent_id)
+      binding.pry()
       refresh_ldp_contains(uri)
       descs = ActiveFedora::Base.descendant_uris(uri)
       descs.rotate!

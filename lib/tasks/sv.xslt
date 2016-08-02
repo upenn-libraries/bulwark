@@ -7,14 +7,14 @@
   xmlns:image="http://www.modeshape.org/images/1.0"
   xmlns:space="preserve"
   extension-element-prefixes="exsl ex">
-  <xsl:variable name="identifier">
-    <xsl:value-of select="/root/record/identifier" />
+  <xsl:variable name="uuid">
+    <xsl:value-of select="/root/record/uuid" />
   </xsl:variable>
   <xsl:output method="xml" indent="yes"/>
   <xsl:preserve-space elements="sv:node sv:property sv:value"/>
     <xsl:template match="/root/record">
       <xsl:copy>
-        <exsl:document method="xml" href="{identifier}.xml">
+        <exsl:document method="xml" href="{uuid}.xml">
           <sv:node xmlns:premis="http://www.loc.gov/premis/rdf/v1#"
             xmlns:image="http://www.modeshape.org/images/1.0"
             xmlns:sv="http://www.jcp.org/jcr/sv/1.0"
@@ -38,7 +38,7 @@
             xmlns:mix="http://www.jcp.org/jcr/mix/1.0"
             xmlns:foaf="http://xmlns.com/foaf/0.1/"
             xmlns:dc="http://purl.org/dc/elements/1.1/">
-            <xsl:attribute name="sv:name"><xsl:value-of select="identifier" /></xsl:attribute>
+            <xsl:attribute name="sv:name"><xsl:value-of select="uuid" /></xsl:attribute>
           <sv:property sv:name="jcr:primaryType" sv:type="Name">
             <sv:value>nt:folder</sv:value>
           </sv:property>
@@ -143,7 +143,7 @@
         <sv:value>bypassAdmin</sv:value>
       </sv:property>
       <sv:property sv:name="ns004:parentManuscript" sv:type="String" sv:multiple="false">
-        <sv:value><xsl:value-of select="$identifier" /></sv:value>
+        <sv:value><xsl:value-of select="$uuid" /></sv:value>
       </sv:property>
       <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="identifier" /></sv:value>

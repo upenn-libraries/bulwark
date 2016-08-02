@@ -384,6 +384,7 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def _build_preservation_xml(filename, content)
+      _manage_canonical_identifier(content) if filename == "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"
       tmp_filename = "#{filename}.tmp"
       if File.basename(filename) == self.metadata_builder.repo.preservation_filename
         xml_review_status = generate_review_status_xml
@@ -395,6 +396,12 @@ class MetadataSource < ActiveRecord::Base
         f << $xml_footer unless content.end_with?($xml_footer)
       end
       File.rename(tmp_filename, filename)
+    end
+
+    def _manage_canonical_identifier(xml_content)
+      minted_identifier = "<uuid>#{self.metadata_builder.repo.unique_identifier}</uuid>"
+      root_element_check = "<#{self.root_element}>"
+      xml_content.insert((xml_content.index(root_element_check)+root_element_check.length), minted_identifier)
     end
 
     def _fetch_write_save_preservation_xml(file_path = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}", xml_content)
