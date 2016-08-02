@@ -5,18 +5,15 @@ class Repo < ActiveRecord::Base
   has_one :metadata_builder, dependent: :destroy, :validate => false
   has_one :version_control_agent, dependent: :destroy, :validate => false
 
-  before_validation :_concatenate_git
-
   around_create :set_version_control_agent_and_repo
 
-  validates :title, presence: true
-  validates :directory, presence: true
+  validates :human_readable_name, presence: true
   validates :metadata_subdirectory, presence: true
   validates :assets_subdirectory, presence: true
   validates :file_extensions, presence: true
   validates :preservation_filename, presence: true
 
-  validates :title, multiple: false
+  validates :human_readable_name, multiple: false
   validates :directory, multiple: false
 
   serialize :metadata_sources, Array
@@ -38,6 +35,7 @@ class Repo < ActiveRecord::Base
 
   def set_defaults
     self[:owner] = User.current
+    mint_ezid
     self[:derivatives_subdirectory] = "#{Utils.config.object_derivatives_path}"
     self[:admin_subdirectory] = "#{Utils.config.object_admin_path}"
   end
@@ -67,8 +65,8 @@ class Repo < ActiveRecord::Base
     self[:review_status].push(Sanitize.fragment(review_status, Sanitize::Config::RESTRICTED)) if review_status.present?
   end
 
-  def title
-    read_attribute(:title) || ''
+  def human_readable_name
+    read_attribute(:human_readable_name) || ''
   end
 
   def directory
@@ -174,6 +172,10 @@ class Repo < ActiveRecord::Base
     self.save!
   end
 
+  def mint_ezid
+    _mint_and_format_ezid
+  end
+
   def self.repo_owners
     return User.where(guest: false).pluck(:email, :email)
   end
@@ -256,6 +258,16 @@ private
     self.version_control_agent.drop
     self.version_control_agent.delete_clone
     return exist_status
+  end
+
+  def _mint_and_format_ezid
+    #TODO: Replace with test EZID minting when in place:
+    minted_id = "#{Utils.config.repository_prefix}_#{self.human_readable_name}_#{SecureRandom.hex(10)}"
+    while Repo.where(directory: "#{minted_id}.git").pluck(:directory).present?
+      minted_id = "#{Utils.config.repository_prefix}_#{self.human_readable_name}_#{SecureRandom.hex(10)}"
+    end
+    self[:directory] = minted_id
+    _concatenate_git
   end
 
   # TODO: Determine if this is really the best place to put this because we're dealing with Git bare repo best practices
