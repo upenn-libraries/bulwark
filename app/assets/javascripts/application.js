@@ -12,6 +12,15 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require bookreader/BookReader/jquery-ui-1.12.0.min
+//= require bookreader/BookReader/jquery.browser.min
+//= require bookreader/BookReader/dragscrollable
+//= require bookreader/BookReader/jquery.colorbox-min
+//= require bookreader/BookReader/jquery.ui.ipad
+//= require bookreader/BookReader/jquery.bt.min
+//= require bookreader/BookReader/BookReader
+//= require BookReaderJSSimple
+
 
 // Required by Blacklight
 //= require blacklight/blacklight

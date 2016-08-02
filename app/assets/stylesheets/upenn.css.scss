@@ -36,3 +36,22 @@
   background-color: $upenn-red;
   border-color: $upenn-blue;
 }
+
+
+/*************
+*
+* Overriding BookReader styles
+*
+**************/
+
+body {
+  font-size: 100%;
+}
+
+#BRcontainer,#BRtoolbar {
+  width: 600px;
+}
+
+#BRcontainer {
+  height: 800px;
+}
