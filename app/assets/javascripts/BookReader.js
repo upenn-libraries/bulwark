@@ -76,10 +76,10 @@ br.getPageNum = function(index) {
     return index+1;
 }
 
-// Total number of leafs
 // Book title and the URL used for the book title link
 br.bookTitle= 'Page Turning View';
-// Override the path used to find UI images
+br.bookUrl  = '';
+
 br.imagesBaseURL = 'vendor/assets/javascripts/bookreader/BookReader/images/';
 
 br.getEmbedCode = function(frameWidth, frameHeight, viewParams) {

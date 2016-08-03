@@ -1,4 +1,6 @@
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+
+
 <%= javascript_include_tag "BookReader" %>
 <%= render 'previous_next_doc' %>
 
@@ -11,11 +13,8 @@
 
   </div>
 </div>
-<% image_hash = fetch_files(@document) %>
-
 
 <%= render_image_list %>
-
 
 <div id="BookReader">
   Internet Archive BookReader Demo    <br/>

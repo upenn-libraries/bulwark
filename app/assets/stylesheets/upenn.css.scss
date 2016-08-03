@@ -48,6 +48,13 @@ body {
   font-size: 100%;
 }
 
+#BookReader {
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  width: 600px;
+}
+
 #BRcontainer,#BRtoolbar {
   width: 600px;
 }
@@ -61,4 +68,13 @@ body {
 div#BRnav {
   position: relative;
   width: 600px;
+}
+
+div#BRpage {
+  width: 350px;
+}
+
+/* Hide everything we don't need */
+#BRreturn, #BRtoolbarbuttons, #BRnavCntlBtm {
+  display: none;
 }
