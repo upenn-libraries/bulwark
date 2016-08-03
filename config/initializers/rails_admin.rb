@@ -48,7 +48,8 @@ RailsAdmin.config do |config|
   end
 
   config.model Repo do
-    field :title do
+    field :human_readable_name do
+      label "Name"
       required(true)
     end
     field :directory_link do
@@ -57,10 +58,6 @@ RailsAdmin.config do |config|
       pretty_value do
         %{#{value}}.html_safe
       end
-    end
-    field :directory do
-      required(true)
-      help "Required - directory on the remote filesystem that will serve as the location for the git repository"
     end
     field :description do
       required(false)
@@ -119,7 +116,7 @@ RailsAdmin.config do |config|
       field :owner do
         visible true
       end
-      field :title do
+      field :human_readable_name do
         visible true
       end
       field :directory_link do
