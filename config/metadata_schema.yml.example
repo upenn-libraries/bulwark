@@ -10,8 +10,7 @@ development:
     - author
   canonical_identifier_path:
     - identifier
-  unique_identifier_field:
-    - identifier
+  unique_identifier_field: identifier
   voyager:
     root_element: root
     http_lookup: http://url/to/http/no/trailing/slash
@@ -30,8 +29,7 @@ test:
     - author
   canonical_identifier_path:
     - identifier
-  unique_identifier_field:
-    - identifier
+  unique_identifier_field: identifier
   voyager:
     root_element: root
     http_lookup: http://url/to/http/no/trailing/slash
@@ -50,8 +48,7 @@ production:
     - author
   canonical_identifier_path:
     - identifier
-  unique_identifier_field:
-    - identifier
+  unique_identifier_field: identifier
   voyager:
     root_element: root
     http_lookup: http://url/to/http/no/trailing/slash
