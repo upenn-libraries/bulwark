@@ -13,9 +13,9 @@
  *= require bookreader/BookReader/BookReader
  *= require review
  *= require reader
+ *= require_tree .
  *= require upenn
  *= require_self
- *= require_tree .
 
  *
  * Used by blacklight_range_limit
