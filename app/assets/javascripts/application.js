@@ -19,7 +19,6 @@
 //= require bookreader/BookReader/jquery.ui.ipad
 //= require bookreader/BookReader/jquery.bt.min
 //= require bookreader/BookReader/BookReader
-//= require BookReaderJSSimple
 
 
 // Required by Blacklight

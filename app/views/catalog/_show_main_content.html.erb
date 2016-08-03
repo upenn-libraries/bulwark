@@ -1,3 +1,5 @@
+<%= javascript_include_tag "BookReader" %>
+
 <%= render 'previous_next_doc' %>
 
 <% @page_title = t('blacklight.search.show.title', :document_title => document_show_html_title, :application_name => application_name).html_safe %>
@@ -12,6 +14,7 @@
 <% image_hash = fetch_files(@document) %>
 
 
+<%= render_image_list %>
 
 
 <div id="BookReader">
@@ -24,18 +27,8 @@
   </noscript>
 </div>
 
-<script type="text/javascript" src="http://localhost:3000/assets/BookReaderJSSimple.js"></script>
+<script type="text/javascript">br.renderViewer()</script>
 
-
-
-
-
-
-<div class="reader">
-  <% @image_hash.keys.each do |key| %>
-    <%= render(:partial => "pages/page_image", :locals => {:key => key }) %>
-  <% end -%>
-</div>
 
 <% if @document.respond_to?(:export_as_openurl_ctx_kev) %>
   <span class="Z3988" title="<%= @document.export_as_openurl_ctx_kev(document_partial_name(@document)) %>"></span>

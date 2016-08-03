@@ -23,9 +23,9 @@ br.getPageURI = function(index, reduce, rotate) {
     // could e.g. look at reduce and load images from a different directory
     // or pass the information to an image server
     var leafStr = '000';
-    var imgStr = (index+1).toString();
+    var imgStr = (br.pageList[index]).toString();
     var re = new RegExp("0{"+imgStr.length+"}$");
-    var url = 'http://localhost:8985/fedora/rest/files/finn_MEDREN_3030.git/.derivs/a.jpeg';
+    var url = imgStr//'/Users/katherly/Documents/Rails/trial_images/' + leafStr.replace(re, imgStr) + '.jpeg';
     return url;
 }
 
@@ -78,21 +78,20 @@ br.getPageNum = function(index) {
 
 // Total number of leafs
 br.numLeafs = 3;
-
 // Book title and the URL used for the book title link
 br.bookTitle= 'Page Turning View';
-
 // Override the path used to find UI images
 br.imagesBaseURL = 'vendor/assets/javascripts/bookreader/BookReader/images/';
 
 br.getEmbedCode = function(frameWidth, frameHeight, viewParams) {
-    return "Embed code not supported in bookreader demo.";
+    return "Embed code not supported in bookreader.";
 }
 
-// Let's go!
-br.init();
+br.renderViewer = function() {
+  br.pageList = jQuery.parseJSON($("#pages").attr("data"));
+  br.init();
+  $('#BRtoolbar').find('.read').hide();
+  $('#textSrch').hide();
+  $('#btnSrch').hide();
 
-// read-aloud and search need backend compenents and are not supported in the demo
-$('#BRtoolbar').find('.read').hide();
-$('#textSrch').hide();
-$('#btnSrch').hide();
+}

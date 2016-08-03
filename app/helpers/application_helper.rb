@@ -16,6 +16,10 @@ module ApplicationHelper
     return @image_hash
   end
 
+  def render_image_list
+    content_tag(:div, "", id: "pages", data: @image_hash.keys.to_json )
+  end
+
   def flash_class(level)
     case level
       when :notice then "alert alert-info"
