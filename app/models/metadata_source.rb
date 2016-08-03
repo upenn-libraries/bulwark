@@ -399,7 +399,7 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def _manage_canonical_identifier(xml_content)
-      minted_identifier = "<uuid>#{self.metadata_builder.repo.unique_identifier}</uuid>"
+      minted_identifier = "<#{MetadataSchema.config.unique_identifier_field}>#{self.metadata_builder.repo.unique_identifier}</#{MetadataSchema.config.unique_identifier_field}>"
       root_element_check = "<#{self.root_element}>"
       xml_content.insert((xml_content.index(root_element_check)+root_element_check.length), minted_identifier)
     end

@@ -101,7 +101,6 @@ module Utils
 
     def object_and_descendants_action(parent_id, action)
       uri = ActiveFedora::Base.id_to_uri(parent_id)
-      binding.pry()
       refresh_ldp_contains(uri)
       descs = ActiveFedora::Base.descendant_uris(uri)
       descs.rotate!

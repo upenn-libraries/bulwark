@@ -23,6 +23,8 @@ development:
     - parent_manuscript
   canonical_identifier_path:
     - /root/record/uuid
+  unique_identifier_field:
+    - uuid
   voyager:
     root_element: record
     http_lookup: http://dla.library.upenn.edu/dla/franklin/lookup
