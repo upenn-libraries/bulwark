@@ -54,4 +54,11 @@ body {
 
 #BRcontainer {
   height: 800px;
+  z-index: 0;
+  position: relative;
+}
+
+div#BRnav {
+  position: relative;
+  width: 600px;
 }
