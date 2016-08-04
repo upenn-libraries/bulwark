@@ -10,6 +10,7 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
+//= require_tree .
 //= require jquery
 //= require jquery_ujs
 //= require bookreader/BookReader/jquery-ui-1.12.0.min
@@ -24,7 +25,6 @@
 // Required by Blacklight
 //= require blacklight/blacklight
 
-//= require_tree .
 
 
 

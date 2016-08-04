@@ -76,12 +76,10 @@ br.getPageNum = function(index) {
     return index+1;
 }
 
-// Total number of leafs
-br.numLeafs = 3;
 // Book title and the URL used for the book title link
 br.bookTitle= 'Page Turning View';
 // Override the path used to find UI images
-br.imagesBaseURL = 'vendor/assets/javascripts/bookreader/BookReader/images/';
+br.imagesBaseURL = '/vendor/assets/javascripts/bookreader/BookReader/images/';
 
 br.getEmbedCode = function(frameWidth, frameHeight, viewParams) {
     return "Embed code not supported in bookreader.";
@@ -89,6 +87,7 @@ br.getEmbedCode = function(frameWidth, frameHeight, viewParams) {
 
 br.renderViewer = function() {
   br.pageList = jQuery.parseJSON($("#pages").attr("data"));
+  br.numLeafs = br.pageList.length;
   br.init();
   $('#BRtoolbar').find('.read').hide();
   $('#textSrch').hide();
