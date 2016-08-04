@@ -97,7 +97,6 @@ br.renderViewer = function() {
   $('#BRtoolbar').find('.read').hide();
   $('#textSrch').hide();
   $('#btnSrch').hide();
-  
   /* Undo the aggressive title changing from BookReader */
   document.title = $('#content h1').text();
 }
