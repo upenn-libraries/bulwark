@@ -10,16 +10,17 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require jquery
-//= require jquery_ujs
-
-// Required by Blacklight
-//= require blacklight/blacklight
 
 //= require_tree .
-
-
-
-// For blacklight_range_limit built-in JS, if you don't want it you don't need
-// this:
+//= require jquery
+//= require jquery_ujs
+//= require blacklight/blacklight
 //= require 'blacklight_range_limit'
+//= require bookreader/BookReader/jquery-ui-1.12.0.min
+//= require bookreader/BookReader/jquery.browser.min
+//= require bookreader/BookReader/dragscrollable
+//= require bookreader/BookReader/jquery.colorbox-min
+//= require bookreader/BookReader/jquery.ui.ipad
+//= require bookreader/BookReader/jquery.bt.min
+//= require bookreader/BookReader/BookReader
+//= require BookReaderColenda

@@ -1,0 +1,3 @@
+[submodule "vendor/assets/javascripts/bookreader"]
+	path = vendor/assets/javascripts/bookreader
+	url = https://github.com/internetarchive/bookreader.git
