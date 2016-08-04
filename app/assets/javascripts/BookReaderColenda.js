@@ -24,7 +24,7 @@ br.getPageURI = function(index, reduce, rotate) {
     // could e.g. look at reduce and load images from a different directory
     // or pass the information to an image server
     var leafStr = '000';
-    var imgStr = (br.pageList[index]).toString();
+    var imgStr = (br.pages[index]).toString();
     var re = new RegExp("0{"+imgStr.length+"}$");
     var url = imgStr;
     return url;
@@ -84,14 +84,15 @@ br.getPageNum = function(index) {
 br.bookTitle= 'Page Turning View';
 // Override the path used to find UI images
 br.imagesBaseURL = '/vendor/assets/javascripts/bookreader/BookReader/images/';
+br.bookUrl  = '';
 
 br.getEmbedCode = function(frameWidth, frameHeight, viewParams) {
     return "Embed code not supported in bookreader.";
 }
 
 br.renderViewer = function() {
-  br.pageList = jQuery.parseJSON($("#pages").attr("data"));
-  br.numLeafs = br.pageList.length;
+  br.pages = jQuery.parseJSON($("#pages").attr("data"));
+  br.numLeafs = br.pages.length;
   br.init();
   $('#BRtoolbar').find('.read').hide();
   $('#textSrch').hide();
