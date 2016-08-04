@@ -1,3 +1,6 @@
+<%= javascript_include_tag "BookReaderColenda" %>
+
+<%= javascript_include_tag "BookReader" %>
 <%= render 'previous_next_doc' %>
 
 <% @page_title = t('blacklight.search.show.title', :document_title => document_show_html_title, :application_name => application_name).html_safe %>
@@ -9,13 +12,18 @@
 
   </div>
 </div>
-<% image_hash = fetch_files(@document) %>
 
-<div class="reader">
-  <% @image_hash.keys.each do |key| %>
-    <%= render(:partial => "pages/page_image", :locals => {:key => key }) %>
-  <% end -%>
+<% image_hash = fetch_files(@document) %>
+<%= render_image_list %>
+
+<div id="BookReader">
+  <noscript>
+    <p>
+      The BookReader requires JavaScript to be enabled. Please check that your browser supports JavaScript and that it is enabled in the browser settings.</a>.
+    </p>
+  </noscript>
 </div>
+<script type="text/javascript">br.renderViewer();</script>
 
 <% if @document.respond_to?(:export_as_openurl_ctx_kev) %>
   <span class="Z3988" title="<%= @document.export_as_openurl_ctx_kev(document_partial_name(@document)) %>"></span>
