@@ -6,6 +6,7 @@
 // Create the BookReader object
 br = new BookReader();
 
+
 // Return the width of a given page.  Here we assume all images are 800 pixels wide
 br.getPageWidth = function(index) {
     return 800;
@@ -25,7 +26,7 @@ br.getPageURI = function(index, reduce, rotate) {
     var leafStr = '000';
     var imgStr = (br.pageList[index]).toString();
     var re = new RegExp("0{"+imgStr.length+"}$");
-    var url = imgStr//'/Users/katherly/Documents/Rails/trial_images/' + leafStr.replace(re, imgStr) + '.jpeg';
+    var url = imgStr;
     return url;
 }
 
@@ -37,6 +38,9 @@ br.getPageSide = function(index) {
         return 'L';
     }
 }
+
+br.canRotatePage = function() { }
+br.getPageNum = function() { }
 
 // This function returns the left and right indices for the user-visible
 // spread that contains the given index.  The return values may be
