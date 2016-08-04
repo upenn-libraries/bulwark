@@ -10,11 +10,10 @@
  * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
  * file per style scope.
  *
- *= require bookreader/BookReader/BookReader
+ *= require_tree .
+ *= require_self
  *= require review
  *= require reader
- *= require_self
- *= require_tree .
  *= require upenn
 
  *
