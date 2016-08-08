@@ -1,7 +1,5 @@
 class Manuscript < ActiveFedora::Base
-
-  validates :title, presence: true
-  validates :identifier, presence: true
+  include Hydra::Works::WorkBehavior
 
   has_many :pages
 
@@ -94,11 +92,11 @@ class Manuscript < ActiveFedora::Base
 #
 ##########
   def attach_files(repo)
-    Page.find(:parent_manuscript => self.id).each do |page|
-      page.manuscript = self
-      page.save!
+    Page.where(:parent_manuscript => self.id).each do |page|
       Utils::Process.attach_file(repo, page, page.file_name, "pageImage")
+      self.members << page
     end
+    self.save
   end
 
 

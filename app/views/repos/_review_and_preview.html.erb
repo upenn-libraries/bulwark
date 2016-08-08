@@ -35,5 +35,10 @@
 
 
 <div class="structural-metadata-preview">
-  <% binding.pry() %>
+  <% ActiveFedora::Base.where(:id => "#{@document.id}/members").each do |a| %>
+    <% a.contained.each do |p| %>
+      <% binding.pry %>
+      <%= p %>
+    <% end -%>
+  <% end -%>
 </div>

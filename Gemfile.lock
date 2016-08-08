@@ -548,6 +548,7 @@ DEPENDENCIES
   guard-rspec
   hydra!
   hydra-pcdm
+  hydra-works
   jbuilder (~> 2.0)
   jettywrapper
   jquery-rails
