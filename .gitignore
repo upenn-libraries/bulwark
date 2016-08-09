@@ -24,6 +24,7 @@ config/filesystem.yml
 config/file_extensions.yml
 config/metadata_schema.yml
 config/fedora.yml
+config/jetty.yml
 
 # Ignore bash script
 repo.sh
