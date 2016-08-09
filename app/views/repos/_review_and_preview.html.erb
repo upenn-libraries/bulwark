@@ -35,10 +35,22 @@
 
 
 <div class="structural-metadata-preview">
-  <% ActiveFedora::Base.where(:id => "#{@document.id}/members").each do |a| %>
-    <% a.contained.each do |p| %>
-      <% binding.pry %>
-      <%= p %>
+  <% ActiveFedora::Base.where(:id => "#{@document.id}/members").each do |member| %>
+    <% member.contained.each do |container| %>
+      <% obj = ActiveFedora::Base.find(id: ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(container.id)).target_id).first %>
+
+      <% obj.attribute_names.sort.each do |a_name| -%>
+        <% if obj.try(a_name).present? %>
+        <strong><%= a_name.capitalize %></strong>
+        <ul>
+          <% Array[obj.try(a_name)].flatten(1).each do |value| %>
+            <li><%= value %></li>
+          <% end -%>
+        </ul>
+        <% end %>
+      <% end -%>
+
+
     <% end -%>
   <% end -%>
 </div>
