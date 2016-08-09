@@ -1,5 +1,5 @@
 <div class="metadata-source-lookup">
   <%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :method => :post, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}/refresh_metadata" do |f| %>
-    <%= f.submit form_label("extract_metadata", @object.steps) %>
+    <%= f.submit form_label("extract_metadata", @object.steps), :id => "metadata_extract_submit" %>
   <% end %>
 </div>
