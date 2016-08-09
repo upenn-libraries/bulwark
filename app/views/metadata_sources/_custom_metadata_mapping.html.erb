@@ -1,3 +1,4 @@
+<div class="metadata-dashboard">
   <%= form_for @object.metadata_builder, :html => {:class => "field-mappings"}, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
   <% counter = 0 %>
     <% @object.metadata_builder.metadata_source.each do |source| %>
@@ -56,3 +57,4 @@
     <% end -%>
     <%= content_tag(:div, (f.submit form_label("metadata_mappings", @object.steps)), :class => "form-bottom") %>
     <% end -%>
+</div>
