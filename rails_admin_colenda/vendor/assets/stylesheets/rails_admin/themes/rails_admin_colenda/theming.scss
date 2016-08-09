@@ -130,7 +130,8 @@ span.inline-pre,
 .select-for-ingest h2,
 .ingested-links h2,
 .review-status h2,
-.metadata-only-preview h2 {
+.metadata-only-preview h2,
+.structural-metadata-preview h2 {
   font-size: 16px;
   font-weight: bold;
   padding: 10px 0px;
@@ -232,6 +233,22 @@ span.inline-pre,
 
 .metadata-only-preview{
   margin-top: 20px;
+}
+
+.structural-metadata-preview {
+  h2, h3 {
+    padding: 10px 0px;
+  }
+  h3 {
+    font-size: 14px;
+    font-weight: bold;
+  }
+  .fragment {
+    border: $dark-grey 1px solid;
+    @include rounded-corners;
+    margin: 5px;
+    padding: 10px;
+  }
 }
 
 td.links li, .nav li {

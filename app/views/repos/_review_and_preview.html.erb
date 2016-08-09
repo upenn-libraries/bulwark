@@ -20,37 +20,19 @@
 
 <div class="metadata-only-preview content-block">
   <h2>Alphabetized metadata-only preview of <%= ingest %></h2>
-  <% @document.attribute_names.sort.each do |a_name| -%>
-    <% if @document.try(a_name).present? %>
-    <strong><%= a_name.capitalize %></strong>
-    <ul>
-      <% Array[@document.try(a_name)].flatten(1).each do |value| %>
-        <li><%= value %></li>
-      <% end -%>
-    </ul>
-    <% end %>
-  <% end -%>
-<% end -%>
+  <%= attributes_display(@document).html_safe %>
 </div>
-
+<% end -%>
 
 <div class="structural-metadata-preview">
+  <h2>Page-level metadata preview</h2>
   <% ActiveFedora::Base.where(:id => "#{@document.id}/members").each do |member| %>
     <% member.contained.each do |container| %>
-      <% obj = ActiveFedora::Base.find(id: ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(container.id)).target_id).first %>
-
-      <% obj.attribute_names.sort.each do |a_name| -%>
-        <% if obj.try(a_name).present? %>
-        <strong><%= a_name.capitalize %></strong>
-        <ul>
-          <% Array[obj.try(a_name)].flatten(1).each do |value| %>
-            <li><%= value %></li>
-          <% end -%>
-        </ul>
-        <% end %>
-      <% end -%>
-
-
+      <div class="fragment">
+        <% obj = ActiveFedora::Base.find(id: ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(container.id)).target_id).first %>
+        <h3><%= obj.id %></h3>
+        <%= attributes_display(obj).html_safe %>
+      </div>
     <% end -%>
   <% end -%>
 </div>
