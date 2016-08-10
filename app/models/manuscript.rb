@@ -3,6 +3,8 @@ class Manuscript < ActiveFedora::Base
 
   has_many :pages
 
+  contains "thumbnail"
+
   property :abstract, predicate: ::RDF::Vocab::DC.abstract, multiple: false do |index|
     index.as :stored_searchable
   end
@@ -97,6 +99,10 @@ class Manuscript < ActiveFedora::Base
       self.members << page
     end
     self.save
+  end
+
+  def thumbnail_link
+    self.thumbnail.ldp_source.subject
   end
 
 

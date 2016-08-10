@@ -39,7 +39,8 @@ module Utils
         thumbnail_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(file_link, derivatives_destination)}"
         @command = build_command("file_attach", :file => derivative_link, :fid => parent.id, :child_container => child_container)
         execute_curl
-        binding.pry()
+        @command = build_command("file_attach", :file => thumbnail_link, :fid => repo.unique_identifier, :child_container => "thumbnail")
+        execute_curl
         repo.version_control_agent.add(:add_location => "#{derivatives_destination}")
         repo.version_control_agent.commit("Generated derivative for #{parent.file_name}")
       else
