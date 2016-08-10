@@ -74,7 +74,7 @@ module RailsAdminHelper
   def wrap_values(values)
     formatted = ""
     values.each do |value|
-      formatted << content_tag(:li, value)
+      formatted << content_tag(:li, value.blank? ? "N/A" : value)
     end
     return formatted.html_safe
   end
