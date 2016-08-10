@@ -4,18 +4,22 @@ module Utils
     @@status_message
     @@status_type
 
+    @@derivatives_working_destination
+
     extend self
 
     def import(file, repo)
       @command = build_command("import", :file => file)
       @oid = File.basename(repo.unique_identifier)
+      @@derivatives_working_destination = "#{repo.version_control_agent.working_path}/#{repo.derivatives_subdirectory}"
       @@status_type = :error
       @@status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
       unless @@status_message.present?
         object_and_descendants_action(@oid, "update_index")
         @@status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo.\n"
         @@status_type = :success
-        ActiveFedora::Base.find(@oid).try(:attach_files, repo)
+        ActiveFedora::Base.where(:id => @oid).first.try(:attach_files, repo)
+        set_thumbnail(repo)
         repo.version_control_agent.push
       end
       if(@@status_message == "Item already exists") then
@@ -34,14 +38,10 @@ module Utils
       repo.version_control_agent.unlock(file_link)
       validated = validate_file(file_link) if File.exist?(file_link)
       if(File.exist?(file_link) && validated)
-        derivatives_destination = "#{repo.version_control_agent.working_path}/#{repo.derivatives_subdirectory}"
-        derivative_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, derivatives_destination)}"
-        thumbnail_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(file_link, derivatives_destination)}"
+        derivative_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
         @command = build_command("file_attach", :file => derivative_link, :fid => parent.id, :child_container => child_container)
         execute_curl
-        @command = build_command("file_attach", :file => thumbnail_link, :fid => repo.unique_identifier, :child_container => "thumbnail")
-        execute_curl
-        repo.version_control_agent.add(:add_location => "#{derivatives_destination}")
+        repo.version_control_agent.add(:add_location => "#{@@derivatives_working_destination}")
         repo.version_control_agent.commit("Generated derivative for #{parent.file_name}")
       else
         @@status_type = :warning
@@ -53,6 +53,13 @@ module Utils
       end
     end
 
+    def set_thumbnail(repo)
+      unencrypted_thumbnail_path = "#{repo.version_control_agent.working_path}/#{repo.assets_subdirectory}/#{ActiveFedora::Base.where(:id => repo.unique_identifier).first.cover.file_name}"
+      thumbnail_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}"
+      @command = build_command("file_attach", :file => thumbnail_link, :fid => repo.unique_identifier, :child_container => "thumbnail")
+      execute_curl
+    end
+
     protected
 
     def validate_file(file)
@@ -62,10 +69,6 @@ module Utils
       rescue MiniMagick::Invalid
         return false
       end
-    end
-
-    def generate_additional_derivatives(file, destination)
-      Utils::Derivatives.generate_additional_derivatives(file, destination)
     end
 
     private

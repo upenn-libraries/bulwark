@@ -105,5 +105,9 @@ class Manuscript < ActiveFedora::Base
     self.thumbnail.ldp_source.subject
   end
 
+  def cover
+    Page.where(:parent_manuscript => self.id).sort_by {|obj| obj.page_number}.first
+  end
+
 
 end
