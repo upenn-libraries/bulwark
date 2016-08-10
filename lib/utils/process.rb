@@ -35,9 +35,11 @@ module Utils
       validated = validate_file(file_link) if File.exist?(file_link)
       if(File.exist?(file_link) && validated)
         derivatives_destination = "#{repo.version_control_agent.working_path}/#{repo.derivatives_subdirectory}"
-        derivative_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives.generate_access_copy(file_link, derivatives_destination, :width => "380",:height => "500")}"
+        derivative_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, derivatives_destination)}"
+        thumbnail_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(file_link, derivatives_destination)}"
         @command = build_command("file_attach", :file => derivative_link, :fid => parent.id, :child_container => child_container)
         execute_curl
+        binding.pry()
         repo.version_control_agent.add(:add_location => "#{derivatives_destination}")
         repo.version_control_agent.commit("Generated derivative for #{parent.file_name}")
       else
@@ -59,6 +61,10 @@ module Utils
       rescue MiniMagick::Invalid
         return false
       end
+    end
+
+    def generate_additional_derivatives(file, destination)
+      Utils::Derivatives.generate_additional_derivatives(file, destination)
     end
 
     private

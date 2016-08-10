@@ -1,9 +1,9 @@
 module Utils
   module Derivatives
-    module Thumbnail
+    module Access
       extend self
       def generate_copy(file, destination)
-        file_path = Utils::Derivatives.generate_copy(file, destination, :type => "thumbnail")
+        file_path = Utils::Derivatives.generate_copy(file, destination, :type => "access")
         return file_path
       end
     end

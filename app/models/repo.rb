@@ -266,7 +266,7 @@ private
     while Repo.where(directory: "#{Utils.config.repository_prefix}_#{self.human_readable_name}_#{minted_id}.git").pluck(:directory).present?
       minted_id = SecureRandom.hex(10)
     end
-    
+
     self[:unique_identifier] = "#{Utils.config.repository_prefix}_#{minted_id}"
     self[:directory] = "#{Utils.config.repository_prefix}_#{self.human_readable_name}_#{minted_id}"
     _concatenate_git

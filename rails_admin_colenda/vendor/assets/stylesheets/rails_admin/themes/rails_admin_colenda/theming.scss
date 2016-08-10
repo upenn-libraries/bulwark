@@ -248,6 +248,9 @@ span.inline-pre,
     @include rounded-corners;
     margin: 5px;
     padding: 10px;
+    .thumbnail {
+      float: right;
+    }
   }
 }
 
