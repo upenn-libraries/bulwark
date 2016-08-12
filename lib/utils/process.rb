@@ -13,15 +13,15 @@ module Utils
       @@derivatives_working_destination = "#{repo.version_control_agent.working_path}/#{repo.derivatives_subdirectory}"
       @@status_type = :error
       delete_duplicate(@oid)
-      @command = build_command("import", :file => file)
-      @@status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
+      @command = _build_command("import", :file => file)
+      @@status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : _execute_curl
       if check_persisted(@oid)
         object_and_descendants_action(@oid, "update_index")
       end
       ActiveFedora::Base.where(:id => @oid).first.try(:attach_files, repo)
       thumbnail = generate_thumbnail(repo)
-      @command = build_command("file_attach", :file => thumbnail, :fid => repo.unique_identifier, :child_container => "thumbnail")
-      execute_curl
+      @command = _build_command("file_attach", :file => thumbnail, :fid => repo.unique_identifier, :child_container => "thumbnail")
+      _execute_curl
       repo.version_control_agent.add(:add_location => "#{@@derivatives_working_destination}")
       repo.version_control_agent.commit("Generated thumbnail for #{@oid}")
       repo.version_control_agent.push
@@ -34,8 +34,8 @@ module Utils
       obj = ActiveFedora::Base.where(:id => object_id).first
       if obj.present?
         object_and_descendants_action(object_id, "delete")
-        @command = build_command("delete_tombstone", :object_uri => obj.translate_id_to_uri.call(obj.id))
-        execute_curl
+        @command = _build_command("delete_tombstone", :object_uri => obj.translate_id_to_uri.call(obj.id))
+        _execute_curl
       end
     end
 
@@ -46,8 +46,8 @@ module Utils
       validated = validate_file(file_link) if File.exist?(file_link)
       if(File.exist?(file_link) && validated)
         derivative_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
-        @command = build_command("file_attach", :file => derivative_link, :fid => parent.id, :child_container => child_container)
-        execute_curl
+        @command = _build_command("file_attach", :file => derivative_link, :fid => parent.id, :child_container => child_container)
+        _execute_curl
         repo.version_control_agent.add(:add_location => "#{@@derivatives_working_destination}")
         repo.version_control_agent.commit("Generated derivative for #{parent.file_name}")
       else
@@ -88,39 +88,6 @@ module Utils
       end
     end
 
-    private
-
-    @fedora_yml = "#{Rails.root}/config/fedora.yml"
-    fedora_config = YAML.load_file(File.expand_path(@fedora_yml, __FILE__))
-    @fedora_user = fedora_config['development']['user']
-    @fedora_password = fedora_config['development']['password']
-    @fedora_link = "#{fedora_config['development']['url']}#{fedora_config['development']['base_path']}"
-
-    def build_command(type, options = {})
-      child_container = options[:child_container]
-      file = options[:file]
-      fid = options[:fid]
-      object_uri = options[:object_uri]
-      case type
-      when "import"
-        command = "curl -u #{@fedora_user}:#{@fedora_password} -X POST --data-binary \"@#{file}\" \"#{@fedora_link}/fcr:import?format=jcr/xml\""
-      when "file_attach"
-        fedora_full_path = "#{@fedora_link}/#{fid}/#{child_container}"
-        command = "curl -u #{@fedora_user}:#{@fedora_password}  -X PUT -H \"Content-Type: message/external-body; access-type=URL; URL=\\\"#{file}\\\"\" \"#{fedora_full_path}\""
-      when "delete"
-        command = "curl -u #{@fedora_user}:#{@fedora_password} -X DELETE \"#{object_uri}\""
-      when "delete_tombstone"
-        command = "curl -u #{@fedora_user}:#{@fedora_password} -X DELETE \"#{object_uri}/fcr:tombstone\""
-      else
-        raise "Invalid command type specified.  Command not built."
-      end
-      return command
-    end
-
-    def execute_curl
-      `#{@command}`
-    end
-
     def contains_blanks(file)
       status = File.read(file) =~ /<sv:node sv:name="">/
       return status.nil? ? false : true
@@ -148,6 +115,39 @@ module Utils
       orm = Ldp::Orm.new(resource)
       orm.graph.delete
       orm.save
+    end
+
+    private
+
+    @fedora_yml = "#{Rails.root}/config/fedora.yml"
+    fedora_config = YAML.load_file(File.expand_path(@fedora_yml, __FILE__))
+    @fedora_user = fedora_config['development']['user']
+    @fedora_password = fedora_config['development']['password']
+    @fedora_link = "#{fedora_config['development']['url']}#{fedora_config['development']['base_path']}"
+
+    def _build_command(type, options = {})
+      child_container = options[:child_container]
+      file = options[:file]
+      fid = options[:fid]
+      object_uri = options[:object_uri]
+      case type
+      when "import"
+        command = "curl -u #{@fedora_user}:#{@fedora_password} -X POST --data-binary \"@#{file}\" \"#{@fedora_link}/fcr:import?format=jcr/xml\""
+      when "file_attach"
+        fedora_full_path = "#{@fedora_link}/#{fid}/#{child_container}"
+        command = "curl -u #{@fedora_user}:#{@fedora_password}  -X PUT -H \"Content-Type: message/external-body; access-type=URL; URL=\\\"#{file}\\\"\" \"#{fedora_full_path}\""
+      when "delete"
+        command = "curl -u #{@fedora_user}:#{@fedora_password} -X DELETE \"#{object_uri}\""
+      when "delete_tombstone"
+        command = "curl -u #{@fedora_user}:#{@fedora_password} -X DELETE \"#{object_uri}/fcr:tombstone\""
+      else
+        raise "Invalid command type specified.  Command not built."
+      end
+      return command
+    end
+
+    def _execute_curl
+      `#{@command}`
     end
 
   end
