@@ -126,7 +126,7 @@ class Repo < ActiveRecord::Base
         ingest_array << File.basename(file, File.extname(file))
       end
       self.ingested = ingest_array
-      _refresh_assets
+      Utils::Process.refresh_assets(self)
       self.save!
       self.package_metadata_info
       self.update_steps(:published_preview)
@@ -237,17 +237,6 @@ private
     self.metadata_builder = MetadataBuilder.new(:parent_repo => self.id)
     self.metadata_builder.save!
     self.save!
-  end
-
-  def _refresh_assets
-    display_path = "#{Utils.config.assets_display_path}/#{self.directory}"
-    if File.directory?("#{Utils.config.assets_display_path}/#{self.directory}")
-      Dir.chdir(display_path)
-      self.version_control_agent.sync_content
-    else
-      self.version_control_agent.clone(:destination => display_path)
-      _refresh_assets
-    end
   end
 
   def _check_if_preserve_exists

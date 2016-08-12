@@ -9,27 +9,34 @@ module Utils
     extend self
 
     def import(file, repo)
-      @command = build_command("import", :file => file)
       @oid = File.basename(repo.unique_identifier)
       @@derivatives_working_destination = "#{repo.version_control_agent.working_path}/#{repo.derivatives_subdirectory}"
       @@status_type = :error
+      delete_duplicate(@oid)
+      @command = build_command("import", :file => file)
       @@status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : execute_curl
-      unless @@status_message.present?
+      if check_persisted(@oid)
         object_and_descendants_action(@oid, "update_index")
-        @@status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo.\n"
-        @@status_type = :success
-        ActiveFedora::Base.where(:id => @oid).first.try(:attach_files, repo)
-        set_thumbnail(repo)
-        repo.version_control_agent.push
       end
-      if(@@status_message == "Item already exists") then
-        obj = ActiveFedora::Base.find(@oid)
-        object_and_descendants_action(@oid, "delete")
+      ActiveFedora::Base.where(:id => @oid).first.try(:attach_files, repo)
+      thumbnail = generate_thumbnail(repo)
+      @command = build_command("file_attach", :file => thumbnail, :fid => repo.unique_identifier, :child_container => "thumbnail")
+      execute_curl
+      repo.version_control_agent.add(:add_location => "#{@@derivatives_working_destination}")
+      repo.version_control_agent.commit("Generated thumbnail for #{@oid}")
+      repo.version_control_agent.push
+      @@status_type = :success
+      @@status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo.\n"
+      return {@@status_type => @@status_message}
+    end
+
+    def delete_duplicate(object_id)
+      obj = ActiveFedora::Base.where(:id => object_id).first
+      if obj.present?
+        object_and_descendants_action(object_id, "delete")
         @command = build_command("delete_tombstone", :object_uri => obj.translate_id_to_uri.call(obj.id))
         execute_curl
-        import(file, repo)
       end
-      return {@@status_type => @@status_message}
     end
 
     def attach_file(repo, parent, file_name, child_container = "child")
@@ -53,11 +60,21 @@ module Utils
       end
     end
 
-    def set_thumbnail(repo)
+    def generate_thumbnail(repo)
       unencrypted_thumbnail_path = "#{repo.version_control_agent.working_path}/#{repo.assets_subdirectory}/#{ActiveFedora::Base.where(:id => repo.unique_identifier).first.cover.file_name}"
       thumbnail_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}"
-      @command = build_command("file_attach", :file => thumbnail_link, :fid => repo.unique_identifier, :child_container => "thumbnail")
-      execute_curl
+      return thumbnail_link
+    end
+
+    def refresh_assets(repo)
+      display_path = "#{Utils.config.assets_display_path}/#{repo.directory}"
+      if File.directory?("#{Utils.config.assets_display_path}/#{repo.directory}")
+        Dir.chdir(display_path)
+        repo.version_control_agent.sync_content
+      else
+        repo.version_control_agent.clone(:destination => display_path)
+        refresh_assets(repo)
+      end
     end
 
     protected
@@ -113,10 +130,17 @@ module Utils
       uri = ActiveFedora::Base.id_to_uri(parent_id)
       refresh_ldp_contains(uri)
       descs = ActiveFedora::Base.descendant_uris(uri)
-      descs.rotate!
       descs.each do |desc|
-        ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(desc)).send(action)
+        begin
+          ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(desc)).send(action)
+        rescue
+          next
+        end
       end
+    end
+
+    def check_persisted(object_id)
+      Ldp::Orm.new(Ldp::Resource::RdfSource.new(ActiveFedora.fedora.connection, ActiveFedora::Base.id_to_uri(object_id))).persisted?
     end
 
     def refresh_ldp_contains(container_uri)
@@ -125,7 +149,6 @@ module Utils
       orm.graph.delete
       orm.save
     end
-
 
   end
 end
