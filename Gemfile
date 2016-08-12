@@ -18,6 +18,7 @@ gem "therubyracer",  platforms: :ruby
 
 gem "hydra", github: "projecthydra/hydra", branch: "pcdm"
 
+gem "hydra-works"
 gem "hydra-pcdm"
 gem "qa"
 gem "blacklight_range_limit"

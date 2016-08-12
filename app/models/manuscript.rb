@@ -1,9 +1,9 @@
 class Manuscript < ActiveFedora::Base
-
-  validates :title, presence: true
-  validates :identifier, presence: true
+  include Hydra::Works::WorkBehavior
 
   has_many :pages
+
+  contains "thumbnail"
 
   property :abstract, predicate: ::RDF::Vocab::DC.abstract, multiple: false do |index|
     index.as :stored_searchable
@@ -94,11 +94,19 @@ class Manuscript < ActiveFedora::Base
 #
 ##########
   def attach_files(repo)
-    Page.find(:parent_manuscript => self.id).each do |page|
-      page.manuscript = self
-      page.save!
+    Page.where(:parent_manuscript => self.id).each do |page|
       Utils::Process.attach_file(repo, page, page.file_name, "pageImage")
+      self.members << page
     end
+    self.save
+  end
+
+  def thumbnail_link
+    self.thumbnail.ldp_source.subject
+  end
+
+  def cover
+    Page.where(:parent_manuscript => self.id).sort_by {|obj| obj.page_number}.first
   end
 
 

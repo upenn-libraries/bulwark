@@ -11,7 +11,7 @@ class ReposController < ApplicationController
 
   def show
     @message = @repo.create_remote
-    redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_actions", :flash => { @message.keys.first => @message.values.first }
+    redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_actions"
   end
 
   def update

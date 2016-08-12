@@ -1,8 +1,7 @@
 class Page < ActiveFedora::Base
-  contains "pageImage"
+  include Hydra::Works::FileSetBehavior
 
-  validates :page_id, presence: true
-  validates :parent_manuscript, presence: true
+  contains "pageImage"
 
   property :page_id, predicate: ::RDF::Vocab::DC.identifier, multiple: true do |index|
     index.as :stored_searchable

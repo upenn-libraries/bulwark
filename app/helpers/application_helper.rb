@@ -7,6 +7,11 @@ module ApplicationHelper
     if model == "Manuscript"
       image_hash = Hash.new
       manuscript = model.constantize.find(doc.id)
+      ######
+      ######
+      # TODO: Make pages properly associate with manuscript without relying on parent_manuscript
+      ######
+      ######
       pages = Page.where(parent_manuscript: manuscript.id).to_a.sort_by! {|p| p.page_number}
       pages.each do |page|
         file_print = page.pageImage.uri

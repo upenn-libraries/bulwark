@@ -103,8 +103,10 @@ class MetadataSource < ActiveRecord::Base
     if self.source_type.present?
       case self.source_type
       when "custom"
-        self.root_element = "pages"
-        self.parent_element = "page"
+        unless self.root_element.present?
+          self.root_element = "pages"
+          self.parent_element = "page"
+        end
         self.original_mappings = _convert_metadata
       when "voyager"
         self.root_element = MetadataSchema.config.try(:voyager_root_element) || "voyager_object"

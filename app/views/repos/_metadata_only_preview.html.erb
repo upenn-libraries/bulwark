@@ -1,0 +1,14 @@
+<div class="metadata-only-preview content-block">
+  <h2>Alphabetized metadata-only preview of <%= ingest %></h2>
+  <% @document.attribute_names.sort.each do |a_name| -%>
+    <% if @document.try(a_name).present? %>
+    <strong><%= a_name.capitalize %></strong>
+    <ul>
+      <% Array[@document.try(a_name)].flatten(1).each do |value| %>
+        <li><%= value %></li>
+      <% end -%>
+    </ul>
+    <% end %>
+  <% end -%>
+<% end -%>
+</div>

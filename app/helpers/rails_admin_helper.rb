@@ -51,6 +51,34 @@ module RailsAdminHelper
     return best_guess
   end
 
+  def attributes_display(object)
+    display_hash = {}
+    object.attribute_names.sort.each do |a_name|
+      if object.try(a_name).present?
+        items_for_display = []
+        Array[object.try(a_name)].flatten(1).each do |value|
+          items_for_display << value
+        end
+        display_hash[a_name.capitalize.to_sym] = items_for_display
+      end
+    end
+    attributes_display = ""
+    display_hash.each do |key, values|
+      items = wrap_values(values)
+      attributes_display << content_tag(:strong, key)
+      attributes_display << content_tag(:ul, items)
+    end
+    return attributes_display
+  end
+
+  def wrap_values(values)
+    formatted = ""
+    values.each do |value|
+      formatted << content_tag(:li, value.blank? ? "N/A" : value)
+    end
+    return formatted.html_safe
+  end
+
   def form_label(form_type, repo_steps)
     case form_type
     when "generate_xml"
