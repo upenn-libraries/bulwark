@@ -20,10 +20,16 @@ module Utils
       end
       ActiveFedora::Base.where(:id => @oid).first.try(:attach_files, repo)
       thumbnail = generate_thumbnail(repo)
-      @command = _build_command("file_attach", :file => thumbnail, :fid => repo.unique_identifier, :child_container => "thumbnail")
-      _execute_curl
+      if thumbnail.present?
+        repo.has_thumbnail = true
+        @command = _build_command("file_attach", :file => thumbnail, :fid => repo.unique_identifier, :child_container => "thumbnail")
+        _execute_curl
+      else
+        repo.has_thumbnail = false
+      end
+      repo.save!
       repo.version_control_agent.add(:add_location => "#{@@derivatives_working_destination}")
-      repo.version_control_agent.commit("Generated thumbnail for #{@oid}")
+      repo.version_control_agent.commit("Generated derivatives for #{@oid}")
       repo.version_control_agent.push
       @@status_type = :success
       @@status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo.\n"
@@ -62,7 +68,7 @@ module Utils
 
     def generate_thumbnail(repo)
       unencrypted_thumbnail_path = "#{repo.version_control_agent.working_path}/#{repo.assets_subdirectory}/#{ActiveFedora::Base.where(:id => repo.unique_identifier).first.cover.file_name}"
-      thumbnail_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}"
+      thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ""
       return thumbnail_link
     end
 
