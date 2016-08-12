@@ -126,7 +126,7 @@ class Repo < ActiveRecord::Base
         ingest_array << File.basename(file, File.extname(file))
       end
       self.ingested = ingest_array
-      _refresh_assets
+      Utils::Process.refresh_assets(self)
       self.save!
       self.package_metadata_info
       self.update_steps(:published_preview)
@@ -239,17 +239,6 @@ private
     self.save!
   end
 
-  def _refresh_assets
-    display_path = "#{Utils.config.assets_display_path}/#{self.directory}"
-    if File.directory?("#{Utils.config.assets_display_path}/#{self.directory}")
-      Dir.chdir(display_path)
-      self.version_control_agent.sync_content
-    else
-      self.version_control_agent.clone(:destination => display_path)
-      _refresh_assets
-    end
-  end
-
   def _check_if_preserve_exists
     self.version_control_agent.clone
     self.metadata_builder.preserve.each {|f| @fname = f if File.basename(f) == self.preservation_filename}
@@ -266,7 +255,7 @@ private
     while Repo.where(directory: "#{Utils.config.repository_prefix}_#{self.human_readable_name}_#{minted_id}.git").pluck(:directory).present?
       minted_id = SecureRandom.hex(10)
     end
-    
+
     self[:unique_identifier] = "#{Utils.config.repository_prefix}_#{minted_id}"
     self[:directory] = "#{Utils.config.repository_prefix}_#{self.human_readable_name}_#{minted_id}"
     _concatenate_git
