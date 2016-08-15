@@ -105,6 +105,12 @@ class Repo < ActiveRecord::Base
     read_attribute(:steps) || ''
   end
 
+  def has_thumbnail
+    read_attribute(:has_thumbnail) || false
+  end
+
+  alias_method :has_thumbnail?, :has_thumbnail
+
   def create_remote
     # Function weirdness forcing update_steps to the top
     self.update_steps(:git_remote_initialized)

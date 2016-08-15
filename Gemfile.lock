@@ -310,6 +310,7 @@ GEM
     nenv (0.3.0)
     nested_form (0.3.2)
     net-http-persistent (2.9.4)
+    net-ping (2.0.1)
     netrc (0.11.0)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
@@ -554,6 +555,7 @@ DEPENDENCIES
   jquery-rails
   launchy
   mini_magick
+  net-ping
   pry-rails (~> 0.3.4)
   qa
   rails (= 4.2.5)

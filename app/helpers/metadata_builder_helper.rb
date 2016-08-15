@@ -43,6 +43,12 @@ module MetadataBuilderHelper
     return content_tag(:ul, @file_links_html.html_safe) << @sample_xml_docs.html_safe
   end
 
+  def render_xml_warning_if_out_of_sync
+    if @object.metadata_builder.last_xml_generated.present?
+      flash[:warning] =  "Metadata has been updated since the last time this XML was generated.  Please press the button below to generate XML with the most current metadata." if @object.metadata_builder.metadata_source.any?{ |ms| @object.metadata_builder.last_xml_generated < ms.last_extraction if ms.last_extraction.present? }
+    end 
+  end
+
   def prettify(file_path_input)
       if file_path_input.is_a? Array
         file_path_array = Array.new
