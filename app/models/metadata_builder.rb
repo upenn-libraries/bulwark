@@ -72,6 +72,8 @@ class MetadataBuilder < ActiveRecord::Base
     self.metadata_source.each do |source|
       source.build_xml if source.user_defined_mappings.present?
     end
+    self.last_xml_generated = DateTime.now()
+    self.save!
     return {:success => "Preservation XML generated successfully.  See preview below."}
   end
 
