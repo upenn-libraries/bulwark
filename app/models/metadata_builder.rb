@@ -105,17 +105,6 @@ class MetadataBuilder < ActiveRecord::Base
     return @presence
   end
 
-  def jettison_unwanted_files(files_to_jettison)
-    self.repo.version_control_agent.clone
-    files_to_jettison.each do |f|
-      self.repo.version_control_agent.unlock(f)
-      self.repo.version_control_agent.drop(:drop_location => f) && `rm -rf #{f}`
-    end
-    self.repo.version_control_agent.commit("Removed files not identified as metadata source and/or for long-term preservation.")
-    self.repo.version_control_agent.push
-    self.repo.version_control_agent.delete_clone
-  end
-
   def qualified_metadata_files
     qualified_metadata_files = _available_files("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*.#{self.repo.metadata_source_extensions}")
     return qualified_metadata_files

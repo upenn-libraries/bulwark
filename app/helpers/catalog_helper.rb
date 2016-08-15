@@ -8,7 +8,7 @@ module CatalogHelper
 
   def thumbnail(document, options)
     default = content_tag(:div, "", :class => "glyphicon glyphicon-book", "aria-hidden" => "true").html_safe
-    Repo.where(:unique_identifier => document.id).pluck(:has_thumbnail) ? image_tag("#{ActiveFedora::Base.where(:id => document.id).first.thumbnail_link}", :width => 100, :height => 150) : default
+    Repo.where(:unique_identifier => document.id).pluck(:has_thumbnail).first ? image_tag("#{ActiveFedora::Base.where(:id => document.id).first.thumbnail_link}", :width => 100, :height => 150) : default
   end
 
   def current_user?
