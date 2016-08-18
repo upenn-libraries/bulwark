@@ -22,6 +22,9 @@
 # Ignore config yml files
 config/*.yml
 
+# Ignore repository.json
+config/repository.json
+
 # Ignore bash script
 repo.sh
 just_jetty.sh
