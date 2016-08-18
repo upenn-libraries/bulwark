@@ -31,7 +31,7 @@ gem "git"
 gem "rubyXL"
 gem "mini_magick"
 gem "sanitize"
-gem "net-ping"
+gem "bunny"
 
 gem "roo"
 

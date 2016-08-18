@@ -107,6 +107,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
     addressable (2.4.0)
+    amq-protocol (2.0.1)
     arel (6.0.3)
     autoprefixer-rails (6.3.4)
       execjs
@@ -128,6 +129,8 @@ GEM
       autoprefixer-rails (>= 5.0.0.1)
       sass (>= 3.2.19)
     builder (3.2.2)
+    bunny (2.2.2)
+      amq-protocol (>= 2.0.1)
     cancancan (1.13.1)
     capybara (2.6.2)
       addressable
@@ -310,7 +313,6 @@ GEM
     nenv (0.3.0)
     nested_form (0.3.2)
     net-http-persistent (2.9.4)
-    net-ping (2.0.1)
     netrc (0.11.0)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
@@ -538,6 +540,7 @@ PLATFORMS
 DEPENDENCIES
   blacklight_range_limit
   bootstrap-sass (= 3.3.4.1)
+  bunny
   capybara
   coffee-rails (~> 4.0.0)
   colorize
@@ -555,7 +558,6 @@ DEPENDENCIES
   jquery-rails
   launchy
   mini_magick
-  net-ping
   pry-rails (~> 0.3.4)
   qa
   rails (= 4.2.5)
