@@ -8,9 +8,6 @@ class MetadataBuilder < ActiveRecord::Base
 
   around_create :set_preserve
 
-  include Utils
-  include MetadataSchema
-
   validates :parent_repo, presence: true
 
   serialize :preserve, Set
@@ -80,7 +77,7 @@ class MetadataBuilder < ActiveRecord::Base
   def transform_and_ingest(array)
     @vca = self.repo.version_control_agent
     @vca.clone
-    transformed_repo_path = "#{Utils.config.transformed_dir}/#{@vca.remote_path.gsub("/","_")}"
+    transformed_repo_path = "#{Utils.config[:transformed_dir]}/#{@vca.remote_path.gsub("/","_")}"
     array.each do |p|
       key, val = p
       @vca.get(:get_location => val)
@@ -101,7 +98,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   def canonical_identifier_check(xml_file)
     doc = File.open(xml_file) { |f| Nokogiri::XML(f) }
-    MetadataSchema.config.canonical_identifier_path.each do |canon|
+    MetadataSchema.config[:canonical_identifier_path].each do |canon|
       @presence = doc.at("#{canon}").present?
     end
     return @presence

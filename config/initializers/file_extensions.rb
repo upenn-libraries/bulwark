@@ -1,4 +1,4 @@
-module Utils
+module FileExtensions
   def config
     @config ||= config_yaml.with_indifferent_access
   end
@@ -6,7 +6,7 @@ module Utils
   private
 
     def config_yaml
-      config_file = Rails.root.join("config", 'filesystem.yml')
+      config_file = Rails.root.join("config", 'file_extensions.yml')
       fail "Missing configuration file at: #{config_file}." unless File.exist?(config_file)
       YAML.load(ERB.new(File.read(config_file)).result)[Rails.env]
     end

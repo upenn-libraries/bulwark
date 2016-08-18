@@ -9,9 +9,7 @@ module FileExtensions
   end
 
   def load_extensions(exts_type)
-    extensions_yml = "#{Rails.root}/config/file_extensions.yml"
-    extensions_config = YAML.load_file(File.expand_path(extensions_yml, __FILE__))
-    file_extensions = extensions_config["#{Rails.env}"]["allowed_extensions"]["#{exts_type}"].split(",")
+    file_extensions = FileExtensions.config[:allowed_extensions]["#{exts_type.to_sym}"].split(",")
     return file_extensions
   end
 

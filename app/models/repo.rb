@@ -22,9 +22,6 @@ class Repo < ActiveRecord::Base
   serialize :review_status, Array
   serialize :steps, Hash
 
-  include Filesystem
-  include FileExtensions
-
   def set_version_control_agent_and_repo
     yield
     set_defaults
@@ -36,16 +33,16 @@ class Repo < ActiveRecord::Base
   def set_defaults
     self[:owner] = User.current
     mint_ezid
-    self[:derivatives_subdirectory] = "#{Utils.config.object_derivatives_path}"
-    self[:admin_subdirectory] = "#{Utils.config.object_admin_path}"
+    self[:derivatives_subdirectory] = "#{Utils.config[:object_derivatives_path]}"
+    self[:admin_subdirectory] = "#{Utils.config[:object_admin_path]}"
   end
 
   def metadata_subdirectory=(metadata_subdirectory)
-    self[:metadata_subdirectory] = "#{Utils.config.object_data_path}/#{metadata_subdirectory}"
+    self[:metadata_subdirectory] = "#{Utils.config[:object_data_path]}/#{metadata_subdirectory}"
   end
 
   def assets_subdirectory=(assets_subdirectory)
-    self[:assets_subdirectory] = "#{Utils.config.object_data_path}/#{assets_subdirectory}"
+    self[:assets_subdirectory] = "#{Utils.config[:object_data_path]}/#{assets_subdirectory}"
   end
 
   def file_extensions=(file_extensions)
@@ -114,7 +111,7 @@ class Repo < ActiveRecord::Base
   def create_remote
     # Function weirdness forcing update_steps to the top
     self.update_steps(:git_remote_initialized)
-    unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
+    unless Dir.exists?("#{Utils.config[:assets_path]}/#{self.directory}")
       self.version_control_agent.init_bare
       self.version_control_agent.clone
       _build_and_populate_directories(self.version_control_agent.working_path)
@@ -189,8 +186,8 @@ class Repo < ActiveRecord::Base
 private
 
   def _build_and_populate_directories(working_copy_path)
-    admin_directory = "#{Utils.config.object_admin_path}"
-    data_directory = "#{Utils.config.object_data_path}"
+    admin_directory = "#{Utils.config[:object_admin_path]}"
+    data_directory = "#{Utils.config[:object_data_path]}"
     metadata_subdirectory = "#{self.metadata_subdirectory}"
     assets_subdirectory = "#{self.assets_subdirectory}"
     derivatives_subdirectory = "#{self.derivatives_subdirectory}"
@@ -204,10 +201,10 @@ private
   end
 
   def _populate_admin_manifest(admin_path)
-    filesystem_semantics_path = "#{admin_path}/#{Utils.config.object_semantics_location}"
+    filesystem_semantics_path = "#{admin_path}/#{Utils.config[:object_semantics_location]}"
     file_types = _define_file_types
-    metadata_line = "#{Utils.config.metadata_path_label}: #{self.metadata_subdirectory}/#{self.metadata_source_extensions}"
-    assets_line = "#{Utils.config.file_path_label}: #{self.assets_subdirectory}/#{file_types}"
+    metadata_line = "#{Utils.config[:metadata_path_label]}: #{self.metadata_subdirectory}/#{self.metadata_source_extensions}"
+    assets_line = "#{Utils.config[:file_path_label]}: #{self.assets_subdirectory}/#{file_types}"
     File.open(filesystem_semantics_path, "w+") do |file|
       file.puts("#{metadata_line}\n#{assets_line}")
     end
@@ -258,12 +255,12 @@ private
   def _mint_and_format_ezid
     #TODO: Replace with test EZID minting when in place:
     minted_id = SecureRandom.hex(10)
-    while Repo.where(directory: "#{Utils.config.repository_prefix}_#{self.human_readable_name}_#{minted_id}.git").pluck(:directory).present?
+    while Repo.where(directory: "#{Utils.config[:repository_prefix]}_#{self.human_readable_name}_#{minted_id}.git").pluck(:directory).present?
       minted_id = SecureRandom.hex(10)
     end
 
-    self[:unique_identifier] = "#{Utils.config.repository_prefix}_#{minted_id}"
-    self[:directory] = "#{Utils.config.repository_prefix}_#{self.human_readable_name}_#{minted_id}"
+    self[:unique_identifier] = "#{Utils.config[:repository_prefix]}_#{minted_id}"
+    self[:directory] = "#{Utils.config[:repository_prefix]}_#{self.human_readable_name}_#{minted_id}"
     _concatenate_git
   end
 

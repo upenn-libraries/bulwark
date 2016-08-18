@@ -7,7 +7,6 @@ class MetadataSource < ActiveRecord::Base
 
   belongs_to :metadata_builder, :foreign_key => "metadata_builder_id"
 
-  include Utils
   include CustomEncodings
 
   validates :user_defined_mappings, :xml_tags => true
@@ -109,7 +108,7 @@ class MetadataSource < ActiveRecord::Base
         end
         self.original_mappings = _convert_metadata
       when "voyager"
-        self.root_element = MetadataSchema.config.try(:voyager_root_element) || "voyager_object"
+        self.root_element = MetadataSchema.config[:voyager_root_element] || "voyager_object"
         self.user_defined_mappings = _set_voyager_data
       end
     end
@@ -244,7 +243,7 @@ class MetadataSource < ActiveRecord::Base
     def _set_voyager_data
       _refresh_bibid
       spreadsheet_values = {}
-      voyager_source = open("#{MetadataSchema.config.voyager_http_lookup}/#{self.original_mappings["bibid"]}.xml")
+      voyager_source = open("#{MetadataSchema.config[:voyager_http_lookup]}/#{self.original_mappings["bibid"]}.xml")
       data = Nokogiri::XML(voyager_source)
       data.children.children.children.children.children.each do |child|
         if child.name == "datafield" && CustomEncodings::Marc21::Constants::TAGS[child.attributes["tag"].value].present?
@@ -267,9 +266,9 @@ class MetadataSource < ActiveRecord::Base
           end
         end
       end
-      spreadsheet_values["identifier"] = ["#{Utils.config.repository_prefix}_#{self.original_mappings["bibid"]}"] unless spreadsheet_values.keys.include?("identifier")
+      spreadsheet_values["identifier"] = ["#{Utils.config[:repository_prefix]}_#{self.original_mappings["bibid"]}"] unless spreadsheet_values.keys.include?("identifier")
       spreadsheet_values.each do |entry|
-        spreadsheet_values[entry.first] = entry.last.join(" ") unless MetadataSchema.config.voyager_multivalue_fields.include?(entry.first)
+        spreadsheet_values[entry.first] = entry.last.join(" ") unless MetadataSchema.config[:voyager_multivalue_fields].include?(entry.first)
       end
       return spreadsheet_values
     end
@@ -411,7 +410,7 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def _manage_canonical_identifier(xml_content)
-      minted_identifier = "<#{MetadataSchema.config.unique_identifier_field}>#{self.metadata_builder.repo.unique_identifier}</#{MetadataSchema.config.unique_identifier_field}>"
+      minted_identifier = "<#{MetadataSchema.config[:unique_identifier_field]}>#{self.metadata_builder.repo.unique_identifier}</#{MetadataSchema.config[:unique_identifier_field]}>"
       root_element_check = "<#{self.root_element}>"
       xml_content.insert((xml_content.index(root_element_check)+root_element_check.length), minted_identifier)
     end
@@ -450,7 +449,7 @@ class MetadataSource < ActiveRecord::Base
 
 
     # def _build_spreadsheet_derivative(spreadsheet_values, options = {})
-    #   spreadsheet_derivative_path = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{Utils.config.object_derivatives_path}/#{self.original_mappings["bibid"]}.xlsx"
+    #   spreadsheet_derivative_path = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{Utils.config[:object_derivatives_path]}/#{self.original_mappings["bibid"]}.xlsx"
     #   self.metadata_builder.metadata_source << MetadataSource.create(path: spreadsheet_derivative_path, source_type: "voyager_derivative", view_type: options[:view_type], x_start: options[:x_start], y_start: options[:y_start], x_stop: options[:x_stop], y_stop: options[:y_stop]) unless self.metadata_builder.metadata_source.where(metadata_builder_id: self.metadata_builder.id).pluck(:path) == spreadsheet_derivative_path
     #   self.metadata_builder.save!
     #   workbook = RubyXL::Workbook.new
@@ -464,7 +463,7 @@ class MetadataSource < ActiveRecord::Base
     #   workbook.write(spreadsheet_derivative_path)
     #   self.metadata_builder.repo.version_control_agent.commit("Created derivative spreadsheet of Voyager metadata")
     #   self.metadata_builder.repo.version_control_agent.push
-    #   generate_and_build_individual_xml("#{self.metadata_builder.repo.version_control_agent.working_path}/#{Utils.config.object_derivatives_path}/#{self.original_mappings["bibid"]}.xlsx")
+    #   generate_and_build_individual_xml("#{self.metadata_builder.repo.version_control_agent.working_path}/#{Utils.config[:object_derivatives_path]}/#{self.original_mappings["bibid"]}.xlsx")
     # end
 
 end
