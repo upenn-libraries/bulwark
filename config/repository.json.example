@@ -18,7 +18,7 @@
     "externalSources" : {
       "fileSystem" : {
         "classname" : "org.fcrepo.connector.file.FedoraFileSystemConnector",
-        "directoryPath" : "/fs/pub/display",
+        "directoryPath" : "/custom/path/to/filesystem",
         "readonly" : true,
         "extraPropertiesStorage": "json",
         "cacheTtlSeconds" : 5,
