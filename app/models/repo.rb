@@ -16,6 +16,8 @@ class Repo < ActiveRecord::Base
   validates :human_readable_name, multiple: false
   validates :directory, multiple: false
 
+  serialize :file_extensions, Array
+  serialize :metadata_source_extensions, Array
   serialize :metadata_sources, Array
   serialize :metadata_builder_id, Array
   serialize :ingested, Array
@@ -46,12 +48,15 @@ class Repo < ActiveRecord::Base
   end
 
   def file_extensions=(file_extensions)
-    self[:file_extensions] = file_extensions.reject(&:empty?).join(",")
+    self[:file_extensions] = Array.wrap(file_extensions).reject(&:empty?)
+  end
+
+  def metadata_source_extensions=(metadata_source_extensions)
+    self[:metadata_source_extensions] = Array.wrap(metadata_source_extensions).reject(&:empty?)
   end
 
   def nested_relationships=(nested_relationships)
-    nested_relationships.reject!(&:empty?)
-    self[:nested_relationships] = nested_relationships
+    self[:nested_relationships] = nested_relationships.reject(&:empty?)
   end
 
   def preservation_filename=(preservation_filename)
@@ -140,11 +145,11 @@ class Repo < ActiveRecord::Base
   end
 
   def load_file_extensions
-    return asset_file_extensions
+    return FileExtensions.asset_file_extensions
   end
 
   def load_metadata_source_extensions
-    return metadata_source_file_extensions
+    return FileExtensions.metadata_source_file_extensions
   end
 
   def preserve_exists?
@@ -202,20 +207,35 @@ private
 
   def _populate_admin_manifest(admin_path)
     filesystem_semantics_path = "#{admin_path}/#{Utils.config[:object_semantics_location]}"
-    file_types = _define_file_types
-    metadata_line = "#{Utils.config[:metadata_path_label]}: #{self.metadata_subdirectory}/#{self.metadata_source_extensions}"
+    file_types = _format_types(self.file_extensions)
+    metadata_source_types = _format_types(self.metadata_source_extensions)
+    metadata_line = "#{Utils.config[:metadata_path_label]}: #{self.metadata_subdirectory}/#{metadata_source_types}"
     assets_line = "#{Utils.config[:file_path_label]}: #{self.assets_subdirectory}/#{file_types}"
     File.open(filesystem_semantics_path, "w+") do |file|
       file.puts("#{metadata_line}\n#{assets_line}")
     end
   end
 
-  def _define_file_types
-    ft = self.file_extensions.split(",")
-    ft.map! { |f| ".#{f}"}
-    aft = ft.join(',')
-    aft = "*{#{aft}}"
-    return aft
+  def _format_types(extensions_array)
+    formatted_types = ""
+    if extensions_array.length > 1
+      formatted_types = _format_multiple(extensions_array)
+    else
+      formatted_types = _format_singular(extensions_array)
+    end
+    return formatted_types
+  end
+
+  def _format_singular(extension)
+    formatted_ft = "*.#{extension.first}"
+    return formatted_ft
+  end
+
+  def _format_multiple(extensions)
+    ft = extensions.map { |f| ".#{f}"}
+    formatted_ft = ft.join(',')
+    formatted_ft = "*{#{formatted_ft}}"
+    return formatted_ft
   end
 
   def _initialize_steps

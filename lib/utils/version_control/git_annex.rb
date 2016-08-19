@@ -5,8 +5,6 @@ module Utils
   module VersionControl
     class GitAnnex
 
-      include Filesystem
-
       attr_accessor :remote_repo_path, :working_repo_path
 
       def initialize(repo)
@@ -16,7 +14,7 @@ module Utils
       end
 
       def repo
-        @repo || ''
+        @repo ||= ''
       end
 
       def initialize_bare_remote

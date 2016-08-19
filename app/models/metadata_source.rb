@@ -108,7 +108,7 @@ class MetadataSource < ActiveRecord::Base
         end
         self.original_mappings = _convert_metadata
       when "voyager"
-        self.root_element = MetadataSchema.config[:voyager_root_element] || "voyager_object"
+        self.root_element = MetadataSchema.config[:voyager][:root_element] || "voyager_object"
         self.user_defined_mappings = _set_voyager_data
       end
     end
@@ -243,7 +243,7 @@ class MetadataSource < ActiveRecord::Base
     def _set_voyager_data
       _refresh_bibid
       spreadsheet_values = {}
-      voyager_source = open("#{MetadataSchema.config[:voyager_http_lookup]}/#{self.original_mappings["bibid"]}.xml")
+      voyager_source = open("#{MetadataSchema.config[:voyager][:http_lookup]}/#{self.original_mappings["bibid"]}.xml")
       data = Nokogiri::XML(voyager_source)
       data.children.children.children.children.children.each do |child|
         if child.name == "datafield" && CustomEncodings::Marc21::Constants::TAGS[child.attributes["tag"].value].present?
@@ -268,7 +268,7 @@ class MetadataSource < ActiveRecord::Base
       end
       spreadsheet_values["identifier"] = ["#{Utils.config[:repository_prefix]}_#{self.original_mappings["bibid"]}"] unless spreadsheet_values.keys.include?("identifier")
       spreadsheet_values.each do |entry|
-        spreadsheet_values[entry.first] = entry.last.join(" ") unless MetadataSchema.config[:voyager_multivalue_fields].include?(entry.first)
+        spreadsheet_values[entry.first] = entry.last.join(" ") unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
       end
       return spreadsheet_values
     end

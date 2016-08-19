@@ -21,8 +21,5 @@ module Utils
       end
     end
 
-    def index
-      ActiveFedora::Base.reindex_everything
-    end
   end
 end

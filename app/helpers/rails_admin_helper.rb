@@ -6,9 +6,6 @@ module RailsAdminHelper
   include MetadataBuilderHelper
   include MetadataSourceHelper
   include RepoHelper
-  include Filesystem
-  include Utils
-  include MetadataSchema
 
   def render_git_remote_options
     render_git_directions_or_actions

@@ -105,21 +105,20 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def qualified_metadata_files
-    qualified_metadata_files = _available_files("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*.#{self.repo.metadata_source_extensions}")
+    qualified_metadata_files = _available_files
     return qualified_metadata_files
-  end
-
-  def all_metadata_files
-    all_metadata_files = _available_files("#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/*")
-    return all_metadata_files
   end
 
   private
 
-  def _available_files(query)
+  def _available_files
     available_files = Array.new
     self.repo.version_control_agent.clone
-    Dir.glob("#{query}") do |file|
+    file = File.open("#{self.repo.version_control_agent.working_path}/#{self.repo.admin_subdirectory}/#{Utils.config[:object_semantics_location]}")
+    mapped_lines = file.each_line.map
+    query_line = mapped_lines.each { |line| line if line.start_with?(Utils.config[:metadata_path_label]) }
+    metadata_path = query_line.first.split(":").last.strip!
+    Dir.glob("#{self.repo.version_control_agent.working_path}/#{metadata_path}") do |file|
       available_files << file
     end
     self.repo.version_control_agent.delete_clone
