@@ -17,9 +17,9 @@ gem "coffee-rails", "~> 4.0.0"
 gem "therubyracer",  platforms: :ruby
 
 gem "hydra", github: "projecthydra/hydra", branch: "pcdm"
-
 gem "hydra-works"
 gem "hydra-pcdm"
+
 gem "qa"
 gem "blacklight_range_limit"
 
@@ -32,6 +32,8 @@ gem "rubyXL"
 gem "mini_magick"
 gem "sanitize"
 gem "bunny"
+gem "sidekiq"
+gem "sinatra", :require => false
 
 gem "roo"
 
