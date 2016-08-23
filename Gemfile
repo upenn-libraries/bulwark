@@ -31,6 +31,7 @@ gem "git"
 gem "rubyXL"
 gem "mini_magick"
 gem "sanitize"
+
 gem "bunny"
 gem "sidekiq"
 gem "sinatra", :require => false
