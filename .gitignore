@@ -28,3 +28,6 @@ just_jetty.sh
 
 # Ignore rdf
 *.rdf
+
+
+dump.rdb
