@@ -30,4 +30,4 @@ just_jetty.sh
 *.rdf
 
 
-dump.rdb
+*.rdb
