@@ -10,7 +10,7 @@ module Utils
       def initialize(repo)
         @repo = repo
         @remote_repo_path = "#{Utils.config[:assets_path]}/#{@repo.directory}"
-        @working_repo_path = "#{Dir.mktmpdir}"
+        @working_repo_path = "#{Dir.mktmpdir}/#{@repo.directory}"
       end
 
       def repo

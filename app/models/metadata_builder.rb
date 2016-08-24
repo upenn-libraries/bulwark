@@ -11,7 +11,6 @@ class MetadataBuilder < ActiveRecord::Base
   @@xml_tags = Array.new
   @@error_message = nil
 
-
   def parent_repo=(parent_repo)
     self[:parent_repo] = parent_repo
     @repo = Repo.find(parent_repo)
@@ -30,11 +29,13 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def refresh_metadata
+    @working_path = self.repo.version_control_agent.clone
     self.metadata_source.each do |source|
-      source.set_metadata_mappings
+      source.set_metadata_mappings(@working_path)
       source.last_extraction = DateTime.now
       source.save!
     end
+    self.repo.version_control_agent.delete_clone
   end
 
   def set_source(source_files)
@@ -101,12 +102,8 @@ class MetadataBuilder < ActiveRecord::Base
   def _available_files
     available_files = Array.new
     working_path = self.repo.version_control_agent.clone
-    file = File.open("#{working_path}/#{self.repo.admin_subdirectory}/#{Utils.config[:object_semantics_location]}")
-    mapped_lines = file.each_line.map
-    query_line = mapped_lines.each { |line| line if line.start_with?(Utils.config[:metadata_path_label]) }
-    metadata_path = query_line.first.split(":").last.strip!
-    Dir.glob("#{working_path}/#{metadata_path}") do |file|
-      available_files << file
+    Dir.glob("#{working_path}/#{self.repo.metadata_subdirectory}/#{self.repo.format_types(self.repo.metadata_source_extensions)}") do |file|
+      available_files << file.gsub(working_path,"")
     end
     self.repo.version_control_agent.delete_clone
     return available_files

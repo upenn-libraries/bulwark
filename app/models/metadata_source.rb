@@ -93,8 +93,7 @@ class MetadataSource < ActiveRecord::Base
     self.metadata_builder.repo.update_steps(:metadata_mappings_generated) if user_defined_mappings.present?
   end
 
-  def set_metadata_mappings
-      self.metadata_builder.repo.version_control_agent.clone
+  def set_metadata_mappings(working_path)
     if self.source_type.present?
       case self.source_type
       when "custom"
@@ -102,24 +101,23 @@ class MetadataSource < ActiveRecord::Base
           self.root_element = "pages"
           self.parent_element = "page"
         end
-        self.original_mappings = _convert_metadata
+        self.original_mappings = _convert_metadata(working_path)
       when "voyager"
         self.root_element = MetadataSchema.config[:voyager][:root_element] || "voyager_object"
-        self.user_defined_mappings = _set_voyager_data
+        self.user_defined_mappings = _set_voyager_data(working_path)
       end
     end
-    #self.metadata_builder.repo.version_control_agent.delete_clone
     self.metadata_builder.repo.update_steps(:metadata_extracted)
     self.save!
   end
 
   def build_xml
-    self.set_metadata_mappings
+    #self.set_metadata_mappings
     self.metadata_builder.repo.version_control_agent.clone
     self.generate_and_build_individual_xml
     self.children.each do |child|
       source = MetadataSource.find(child)
-      source.set_metadata_mappings
+      #source.set_metadata_mappings
       source.generate_and_build_individual_xml
     end
     self.generate_preservation_xml
@@ -236,8 +234,8 @@ class MetadataSource < ActiveRecord::Base
 
   private
 
-    def _set_voyager_data
-      _refresh_bibid
+    def _set_voyager_data(working_path)
+      _refresh_bibid(working_path)
       spreadsheet_values = {}
       voyager_source = open("#{MetadataSchema.config[:voyager][:http_lookup]}/#{self.original_mappings["bibid"]}.xml")
       data = Nokogiri::XML(voyager_source)
@@ -269,9 +267,10 @@ class MetadataSource < ActiveRecord::Base
       return spreadsheet_values
     end
 
-    def _refresh_bibid
-      self.metadata_builder.repo.version_control_agent.get(:get_location => "#{self.path}")
-      worksheet = RubyXL::Parser.parse(self.path)
+    def _refresh_bibid(working_path)
+      full_path = "#{working_path}/#{self.path}"
+      self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
+      worksheet = RubyXL::Parser.parse(full_path)
       self.original_mappings = {"bibid" => worksheet[0][1][0].value}
     end
 
@@ -283,14 +282,15 @@ class MetadataSource < ActiveRecord::Base
       return CustomEncodings::Marc21::Constants::TAGS[tag_value][voyager_child_field.attributes["code"].value]
     end
 
-    def _convert_metadata
+    def _convert_metadata(working_path)
       begin
         pathname = Pathname.new(self.path)
         ext = pathname.extname.to_s[1..-1]
         case ext
         when "xlsx"
-          self.metadata_builder.repo.version_control_agent.get(:get_location => "#{self.path}")
-          @mappings = _generate_mapping_options_xlsx
+          full_path = "#{working_path}/#{self.path}"
+          self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
+          @mappings = _generate_mapping_options_xlsx(full_path)
         else
           raise "Illegal metadata source unit type"
         end
@@ -300,12 +300,12 @@ class MetadataSource < ActiveRecord::Base
       end
     end
 
-    def _generate_mapping_options_xlsx
+    def _generate_mapping_options_xlsx(full_path)
       mappings = {}
       headers = []
       iterator = 0
       x_start, y_start, x_stop, y_stop = _offset
-      workbook = RubyXL::Parser.parse(self.path)
+      workbook = RubyXL::Parser.parse(full_path)
       case self.view_type
       when "horizontal"
         while((x_stop >= (x_start+iterator)) && (workbook[0][y_start].present?) && (workbook[0][y_start][x_start+iterator].present?))

@@ -188,6 +188,16 @@ class Repo < ActiveRecord::Base
     return User.where(guest: false).pluck(:email, :email)
   end
 
+  def format_types(extensions_array)
+    formatted_types = ""
+    if extensions_array.length > 1
+      formatted_types = _format_multiple(extensions_array)
+    else
+      formatted_types = _format_singular(extensions_array)
+    end
+    return formatted_types
+  end
+
 private
 
   def _build_and_populate_directories(working_path)
@@ -207,23 +217,13 @@ private
 
   def _populate_admin_manifest(admin_path)
     filesystem_semantics_path = "#{admin_path}/#{Utils.config[:object_semantics_location]}"
-    file_types = _format_types(self.file_extensions)
-    metadata_source_types = _format_types(self.metadata_source_extensions)
+    file_types = format_types(self.file_extensions)
+    metadata_source_types = format_types(self.metadata_source_extensions)
     metadata_line = "#{Utils.config[:metadata_path_label]}: #{self.metadata_subdirectory}/#{metadata_source_types}"
     assets_line = "#{Utils.config[:file_path_label]}: #{self.assets_subdirectory}/#{file_types}"
     File.open(filesystem_semantics_path, "w+") do |file|
       file.puts("#{metadata_line}\n#{assets_line}")
     end
-  end
-
-  def _format_types(extensions_array)
-    formatted_types = ""
-    if extensions_array.length > 1
-      formatted_types = _format_multiple(extensions_array)
-    else
-      formatted_types = _format_singular(extensions_array)
-    end
-    return formatted_types
   end
 
   def _format_singular(extension)
