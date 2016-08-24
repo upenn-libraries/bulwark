@@ -6,20 +6,11 @@ class MetadataBuilder < ActiveRecord::Base
   accepts_nested_attributes_for :metadata_source, allow_destroy: true
   validates_associated :metadata_source
 
-  around_create :set_preserve
-
   validates :parent_repo, presence: true
-
-  serialize :preserve, Set
 
   @@xml_tags = Array.new
   @@error_message = nil
 
-  def set_preserve
-    preserve_full_path = "#{self.repo.version_control_agent.working_path}/#{self.repo.metadata_subdirectory}/#{self.repo.preservation_filename}"
-    self.preserve.add(preserve_full_path)
-    yield
-  end
 
   def parent_repo=(parent_repo)
     self[:parent_repo] = parent_repo
@@ -27,16 +18,12 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo = @repo
   end
 
-  def preserve
-    read_attribute(:preserve) || ''
-  end
-
   def parent_repo
     read_attribute(:parent_repo) || ''
   end
 
   def unidentified_files
-    identified = (eval(self.source) + self.preserve.to_a)
+    identified = (eval(self.source) + self.repo.preservation_filename)
     identified.uniq!
     unidentified = self.all_metadata_files - identified
     return unidentified
@@ -76,7 +63,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   def transform_and_ingest(array)
     @vca = self.repo.version_control_agent
-    @vca.clone
+    working_path = @vca.clone
     transformed_repo_path = "#{Utils.config[:transformed_dir]}/#{@vca.remote_path.gsub("/","_")}"
     array.each do |p|
       key, val = p
@@ -88,7 +75,7 @@ class MetadataBuilder < ActiveRecord::Base
       end
       Dir.mkdir(transformed_repo_path) && Dir.chdir(transformed_repo_path)
       `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
-      @status = self.repo.ingest(transformed_repo_path)
+      @status = self.repo.ingest(transformed_repo_path, working_path)
     end
     @vca.reset_hard
     @vca.delete_clone
@@ -113,12 +100,12 @@ class MetadataBuilder < ActiveRecord::Base
 
   def _available_files
     available_files = Array.new
-    self.repo.version_control_agent.clone
-    file = File.open("#{self.repo.version_control_agent.working_path}/#{self.repo.admin_subdirectory}/#{Utils.config[:object_semantics_location]}")
+    working_path = self.repo.version_control_agent.clone
+    file = File.open("#{working_path}/#{self.repo.admin_subdirectory}/#{Utils.config[:object_semantics_location]}")
     mapped_lines = file.each_line.map
     query_line = mapped_lines.each { |line| line if line.start_with?(Utils.config[:metadata_path_label]) }
     metadata_path = query_line.first.split(":").last.strip!
-    Dir.glob("#{self.repo.version_control_agent.working_path}/#{metadata_path}") do |file|
+    Dir.glob("#{working_path}/#{metadata_path}") do |file|
       available_files << file
     end
     self.repo.version_control_agent.delete_clone

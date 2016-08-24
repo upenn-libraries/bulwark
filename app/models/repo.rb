@@ -118,19 +118,19 @@ class Repo < ActiveRecord::Base
     self.update_steps(:git_remote_initialized)
     unless Dir.exists?("#{Utils.config[:assets_path]}/#{self.directory}")
       self.version_control_agent.init_bare
-      self.version_control_agent.clone
-      _build_and_populate_directories(self.version_control_agent.working_path)
+      working_path = self.version_control_agent.clone
+      _build_and_populate_directories(working_path)
       self.version_control_agent.commit_bare("Added subdirectories according to the configuration specified in the repo configuration")
       self.version_control_agent.push_bare
       self.version_control_agent.delete_clone
     end
   end
 
-  def ingest(directory)
+  def ingest(transformed_directory, working_path)
     begin
       ingest_array = Array.new
-      Dir.glob("#{directory}/*").each do |file|
-        @status = Utils::Process.import(file, self)
+      Dir.glob("#{transformed_directory}/*").each do |file|
+        @status = Utils::Process.import(file, self, working_path)
         ingest_array << File.basename(file, File.extname(file))
       end
       self.ingested = ingest_array
@@ -190,13 +190,13 @@ class Repo < ActiveRecord::Base
 
 private
 
-  def _build_and_populate_directories(working_copy_path)
+  def _build_and_populate_directories(working_path)
     admin_directory = "#{Utils.config[:object_admin_path]}"
     data_directory = "#{Utils.config[:object_data_path]}"
     metadata_subdirectory = "#{self.metadata_subdirectory}"
     assets_subdirectory = "#{self.assets_subdirectory}"
     derivatives_subdirectory = "#{self.derivatives_subdirectory}"
-    Dir.chdir("#{working_copy_path}")
+    Dir.chdir("#{working_path}")
     Dir.mkdir("#{admin_directory}")
     Dir.mkdir("#{data_directory}")
     Dir.mkdir("#{metadata_subdirectory}") && FileUtils.touch("#{metadata_subdirectory}/.keep")
@@ -263,10 +263,10 @@ private
   end
 
   def _check_if_preserve_exists
-    self.version_control_agent.clone
-    self.metadata_builder.preserve.each {|f| @fname = f if File.basename(f) == self.preservation_filename}
-    self.version_control_agent.get(:get_location => @fname)
-    exist_status = File.exists?(@fname)
+    working_path = self.version_control_agent.clone
+    fname = "#{working_path}/#{self.preservation_filename}"
+    self.version_control_agent.get(:get_location => fname)
+    exist_status = File.exists?(fname)
     self.version_control_agent.drop
     self.version_control_agent.delete_clone
     return exist_status

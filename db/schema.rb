@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160815151355) do
+ActiveRecord::Schema.define(version: 20160824184059) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
@@ -109,10 +109,9 @@ ActiveRecord::Schema.define(version: 20160815151355) do
   create_table "version_control_agents", force: :cascade do |t|
     t.string   "vc_type"
     t.string   "remote_path"
-    t.string   "working_path"
     t.integer  "repo_id"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
   end
 
   add_index "version_control_agents", ["repo_id"], name: "index_version_control_agents_on_repo_id"

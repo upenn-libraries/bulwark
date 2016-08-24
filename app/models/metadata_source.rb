@@ -94,11 +94,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def set_metadata_mappings
-    fresh_clone = false
-    unless File.exist?(self.metadata_builder.repo.version_control_agent.working_path)
       self.metadata_builder.repo.version_control_agent.clone
-      fresh_clone = true
-    end
     if self.source_type.present?
       case self.source_type
       when "custom"
@@ -112,7 +108,7 @@ class MetadataSource < ActiveRecord::Base
         self.user_defined_mappings = _set_voyager_data
       end
     end
-    self.metadata_builder.repo.version_control_agent.delete_clone if fresh_clone
+    #self.metadata_builder.repo.version_control_agent.delete_clone
     self.metadata_builder.repo.update_steps(:metadata_extracted)
     self.save!
   end

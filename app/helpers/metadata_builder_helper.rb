@@ -17,8 +17,7 @@ module MetadataBuilderHelper
   end
 
   def render_sample_xml
-    get_location = "#{@object.version_control_agent.working_path}/#{@object.metadata_subdirectory}"
-    @object.version_control_agent.clone
+    get_location = @object.version_control_agent.clone
     @object.version_control_agent.get(:get_location => get_location)
     @sample_xml_docs = ""
     @file_links = Array.new
@@ -46,7 +45,7 @@ module MetadataBuilderHelper
   def render_xml_warning_if_out_of_sync
     if @object.metadata_builder.last_xml_generated.present?
       flash[:warning] =  "Metadata has been updated since the last time this XML was generated.  Please press the button below to generate XML with the most current metadata." if @object.metadata_builder.metadata_source.any?{ |ms| @object.metadata_builder.last_xml_generated < ms.last_extraction if ms.last_extraction.present? }
-    end 
+    end
   end
 
   def prettify(file_path_input)
@@ -71,7 +70,8 @@ module MetadataBuilderHelper
   private
 
   def _prettified_working_file(file_path)
-    return file_path.gsub(@object.version_control_agent.working_path, "")
+    file_array = file_path.split("/").reverse
+    return "#{Utils.config[:object_data_path]}/#{file_array.second}/#{file_array.first}"
   end
 
 end
