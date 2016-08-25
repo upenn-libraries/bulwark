@@ -2,7 +2,7 @@ class GenerateXmlJob < ActiveJob::Base
 
   queue_as :xml
 
-  after_perform :update_dashboard
+  after_perform :relay_message
 
   def perform(metadata_builder)
     metadata_builder.build_xml_files
@@ -10,12 +10,8 @@ class GenerateXmlJob < ActiveJob::Base
 
   private
 
-  def notify_user
-    NotificationMailer.process_completed_email("Generation of Preservation XML", user)
-  end
-
-  def update_dashboard
-
+  def relay_message
+    MessengerClient.client.publish("XML generated")
   end
 
 end

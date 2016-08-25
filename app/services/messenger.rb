@@ -1,5 +1,5 @@
 class Messenger
-  
+
   attr_reader :amqp_host
 
   def initialize(amqp_host = Bunny.config[:host])

@@ -2,7 +2,7 @@ class MetadataExtractionJob < ActiveJob::Base
 
   queue_as :metadata_extraction
 
-  after_perform :update_dashboard
+  after_perform :relay_message
 
   def perform(metadata_builder)
     metadata_builder.refresh_metadata
@@ -10,12 +10,8 @@ class MetadataExtractionJob < ActiveJob::Base
 
   private
 
-  def notify_user
-    NotificationMailer.process_completed_email("Metadata Extraction", user)
-  end
-
-  def update_dashboard
-
+  def relay_message
+    MessengerClient.client.publish("Metadata extracted")
   end
 
 end
