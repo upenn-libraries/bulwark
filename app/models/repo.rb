@@ -126,17 +126,15 @@ class Repo < ActiveRecord::Base
     end
   end
 
-  def ingest(transformed_directory, working_path)
+  def ingest(file, working_path)
     begin
       ingest_array = Array.new
-      Dir.glob("#{transformed_directory}/*").each do |file|
-        @status = Utils::Process.import(file, self, working_path)
-        ingest_array << File.basename(file, File.extname(file))
-      end
+      @status = Utils::Process.import(file, self, working_path)
+      ingest_array << File.basename(file, File.extname(file))
       self.ingested = ingest_array
       Utils::Process.refresh_assets(self)
       self.save!
-      self.package_metadata_info
+      self.package_metadata_info(working_path)
       self.update_steps(:published_preview)
       return @status
     rescue
@@ -165,8 +163,8 @@ class Repo < ActiveRecord::Base
     return "<a href=\"#{url}\">#{self.directory}</a>"
   end
 
-  def package_metadata_info
-    File.open("#{self.version_control_agent.working_path}/#{self.admin_subdirectory}/#{self.directory.gsub(/\.git$/, '')}", "w+") do |f|
+  def package_metadata_info(working_path)
+    File.open("#{working_path}/#{self.admin_subdirectory}/#{self.directory.gsub(/\.git$/, '')}", "w+") do |f|
       self.metadata_builder.metadata_source.each do |source|
         f.puts "Source information for #{source.path}\npath: #{source.path}\nid (use to correlate children): #{source.id}\nsource_type: #{source.source_type}\nview_type: #{source.view_type}\nnum_objects: #{source.num_objects}\nx_start: #{source.x_start}\nx_stop: #{source.x_stop}\ny_start: #{source.y_start}\ny_stop: #{source.y_stop}\nchildren: #{source.children}\n\n"
       end

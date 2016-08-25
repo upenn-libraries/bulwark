@@ -8,6 +8,8 @@ class MetadataBuilder < ActiveRecord::Base
 
   validates :parent_repo, presence: true
 
+  serialize :preserve, Array
+
   @@xml_tags = Array.new
   @@error_message = nil
 
@@ -66,22 +68,24 @@ class MetadataBuilder < ActiveRecord::Base
   def transform_and_ingest(array)
     @vca = self.repo.version_control_agent
     working_path = @vca.clone
-    transformed_repo_path = "#{Utils.config[:transformed_dir]}/#{@vca.remote_path.gsub("/","_")}"
     array.each do |p|
       key, val = p
+      val = "#{working_path}#{val}"
       @vca.get(:get_location => val)
       @vca.unlock(val)
       unless canonical_identifier_check(val)
         @status = { :error => "No canonical identifier found for /#{self.repo.metadata_subdirectory}/#{File.basename(val)}.  Skipping ingest of this file."}
         next
       end
-      Dir.mkdir(transformed_repo_path) && Dir.chdir(transformed_repo_path)
+      Dir.chdir(File.dirname(val))
       `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
-      @status = self.repo.ingest(transformed_repo_path, working_path)
+      transformed_file_path = "#{working_path}/#{self.repo.unique_identifier}.xml"
+      @vca.get(:get_location => transformed_file_path)
+      @vca.unlock(transformed_file_path)
+      @status = self.repo.ingest(transformed_file_path, working_path)
     end
     @vca.reset_hard
     @vca.delete_clone
-    FileUtils.rm_rf(transformed_repo_path, :secure => true) if File.directory?(transformed_repo_path)
     return @status
   end
 
@@ -107,6 +111,7 @@ class MetadataBuilder < ActiveRecord::Base
     Dir.glob("#{get_location}/*.xml") do |file|
       if File.exist?(file)
         pretty_file = file.gsub(working_path,"")
+        self.preserve << pretty_file if File.basename(file) == self.repo.preservation_filename
         @file_links << link_to(pretty_file, "##{file}")
         anchor_tag = content_tag(:a, "", :name=> file)
         sample_xml_content = File.open(file, "r"){|io| io.read}
