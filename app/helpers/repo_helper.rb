@@ -11,7 +11,7 @@ module RepoHelper
   end
 
   def render_ingest_or_message
-    if @object.preserve_exists?
+    if @object.metadata_builder.xml_preview.present?
       render :partial => "repos/ingest_select"
     else
       render :partial => "repos/no_xml"

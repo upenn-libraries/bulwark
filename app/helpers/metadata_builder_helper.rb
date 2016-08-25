@@ -17,7 +17,7 @@ module MetadataBuilderHelper
   end
 
   def render_sample_xml
-    @object.metadata_builder.xml_preview.html_safe
+    @object.metadata_builder.xml_preview.html_safe if @object.metadata_builder.xml_preview.present?
   end
 
   def render_xml_warning_if_out_of_sync

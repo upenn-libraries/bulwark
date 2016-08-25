@@ -38,8 +38,7 @@ class MetadataBuildersController < ApplicationController
   end
 
   def generate_preview_xml
-    @metadata_builder.build_xml_files
-    #GenerateXmlJob.perform_later(@metadata_builder)
+    GenerateXmlJob.perform_later(@metadata_builder)
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :success => "Preservation XML being generated.  You will receive notification when it is complete."}
   end
 
