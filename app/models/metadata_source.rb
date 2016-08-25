@@ -17,7 +17,10 @@ class MetadataSource < ActiveRecord::Base
 
   $xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root>"
   $xml_footer = "</root>"
+
   @@jettison_files = Set.new
+
+  @@working_path
 
   def path
     read_attribute(:path) || ''
@@ -93,7 +96,7 @@ class MetadataSource < ActiveRecord::Base
     self.metadata_builder.repo.update_steps(:metadata_mappings_generated) if user_defined_mappings.present?
   end
 
-  def set_metadata_mappings(working_path)
+  def set_metadata_mappings(working_path = @@working_path)
     if self.source_type.present?
       case self.source_type
       when "custom"
@@ -113,7 +116,7 @@ class MetadataSource < ActiveRecord::Base
 
   def build_xml
     #self.set_metadata_mappings
-    self.metadata_builder.repo.version_control_agent.clone
+    @@working_path = self.metadata_builder.repo.version_control_agent.clone
     self.generate_and_build_individual_xml
     self.children.each do |child|
       source = MetadataSource.find(child)
@@ -127,6 +130,7 @@ class MetadataSource < ActiveRecord::Base
 
   def jettison_unwanted_files(files_to_jettison)
     files_to_jettison.each do |f|
+      f = _working_path_check(@@working_path, f)
       self.metadata_builder.repo.version_control_agent.unlock(f)
       self.metadata_builder.repo.version_control_agent.drop(:drop_location => f) && `rm -rf #{f}`
     end
@@ -151,9 +155,9 @@ class MetadataSource < ActiveRecord::Base
     if self.children.present?
       self.generate_parent_child_xml
     else
-      file = File.new("#{self.path}.xml")
+      file = File.new(_working_path_check(@@working_path, "#{self.path}.xml"))
       xml_content = file.readline
-       _fetch_write_save_preservation_xml(xml_content) if self.metadata_builder.canonical_identifier_check("#{self.path}.xml")
+       _fetch_write_save_preservation_xml(xml_content) if self.metadata_builder.canonical_identifier_check(_working_path_check(@@working_path, "#{self.path}.xml"))
     end
     self.metadata_builder.repo.update_steps(:preservation_xml_generated)
   end
@@ -181,8 +185,8 @@ class MetadataSource < ActiveRecord::Base
         end
       end
     else
-      self.metadata_builder.repo.version_control_agent.get(:get_location => fname)
-      @xml_content << _child_values(fname)
+      self.metadata_builder.repo.version_control_agent.get(:get_location => "#{@@working_path}/#{fname}")
+      @xml_content << _child_values("#{@@working_path}/#{fname}")
     end
     if self.root_element.present?
       @xml_content_transformed = "<#{root_element}>#{@xml_content}</#{root_element}>"
@@ -194,10 +198,10 @@ class MetadataSource < ActiveRecord::Base
 
   def generate_parent_child_xml
     self.children.each do |child|
-      metadata_path = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
+      metadata_path = "#{@@working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
       child_path = MetadataSource.where(:id => child).pluck(:path).first
-      key_xml_path = "#{self.path}.xml"
-      child_xml_path = "#{child_path}.xml"
+      key_xml_path = _working_path_check(@@working_path, "#{self.path}.xml")
+      child_xml_path = _working_path_check(@@working_path, "#{child_path}.xml")
       self.metadata_builder.repo.version_control_agent.get(:get_location => key_xml_path)
       self.metadata_builder.repo.version_control_agent.get(:get_location => child_xml_path)
       xml_content = File.open(key_xml_path, "r"){|io| io.read}
@@ -234,7 +238,7 @@ class MetadataSource < ActiveRecord::Base
 
   private
 
-    def _set_voyager_data(working_path)
+    def _set_voyager_data(working_path = @@working_path)
       _refresh_bibid(working_path)
       spreadsheet_values = {}
       voyager_source = open("#{MetadataSchema.config[:voyager][:http_lookup]}/#{self.original_mappings["bibid"]}.xml")
@@ -267,8 +271,8 @@ class MetadataSource < ActiveRecord::Base
       return spreadsheet_values
     end
 
-    def _refresh_bibid(working_path)
-      full_path = "#{working_path}/#{self.path}"
+    def _refresh_bibid(working_path = @@working_path)
+      full_path = _working_path_check(working_path, "#{self.path}")
       self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
       worksheet = RubyXL::Parser.parse(full_path)
       self.original_mappings = {"bibid" => worksheet[0][1][0].value}
@@ -282,13 +286,13 @@ class MetadataSource < ActiveRecord::Base
       return CustomEncodings::Marc21::Constants::TAGS[tag_value][voyager_child_field.attributes["code"].value]
     end
 
-    def _convert_metadata(working_path)
+    def _convert_metadata(working_path = @@working_path)
       begin
         pathname = Pathname.new(self.path)
         ext = pathname.extname.to_s[1..-1]
         case ext
         when "xlsx"
-          full_path = "#{working_path}/#{self.path}"
+          full_path = _working_path_check(working_path,"#{self.path}")
           self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
           @mappings = _generate_mapping_options_xlsx(full_path)
         else
@@ -390,10 +394,12 @@ class MetadataSource < ActiveRecord::Base
       return column_value
     end
 
-    def _build_preservation_xml(filename, content)
-      _manage_canonical_identifier(content) if filename == "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"
-      tmp_filename = "#{filename}.tmp"
-      if File.basename(filename) == self.metadata_builder.repo.preservation_filename
+    def _build_preservation_xml(metadata_path_and_filename, content)
+      full_filename = _working_path_check(@@working_path,"#{metadata_path_and_filename}")
+      full_preservation_filename = _working_path_check(@@working_path, "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}")
+      _manage_canonical_identifier(content) if full_filename == full_preservation_filename
+      tmp_filename = "#{full_filename}.tmp"
+      if File.basename(metadata_path_and_filename) == self.metadata_builder.repo.preservation_filename
         xml_review_status = generate_review_status_xml
         content << xml_review_status
       end
@@ -402,7 +408,7 @@ class MetadataSource < ActiveRecord::Base
         f << content
         f << $xml_footer unless content.end_with?($xml_footer)
       end
-      File.rename(tmp_filename, filename)
+      File.rename(tmp_filename, full_filename)
     end
 
     def _manage_canonical_identifier(xml_content)
@@ -411,7 +417,8 @@ class MetadataSource < ActiveRecord::Base
       xml_content.insert((xml_content.index(root_element_check)+root_element_check.length), minted_identifier)
     end
 
-    def _fetch_write_save_preservation_xml(file_path = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}", xml_content)
+    def _fetch_write_save_preservation_xml(file_path = "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}", xml_content)
+      file_path = _working_path_check(@@working_path, file_path)
       self.metadata_builder.repo.version_control_agent.unlock(file_path) if File.exists?(file_path)
       _build_preservation_xml(file_path,xml_content)
       self.metadata_builder.repo.version_control_agent.commit("Generated unified XML for #{self.path} at #{file_path}")
@@ -443,9 +450,13 @@ class MetadataSource < ActiveRecord::Base
       settings_fields = [:view_type, :num_objects, :x_start, :y_start, :x_stop, :y_stop]
     end
 
+    def _working_path_check(working_path, file_path)
+      file_path.start_with?(working_path) ? file_path : "#{working_path}/#{file_path}".gsub("//","/")
+    end
+
 
     # def _build_spreadsheet_derivative(spreadsheet_values, options = {})
-    #   spreadsheet_derivative_path = "#{self.metadata_builder.repo.version_control_agent.working_path}/#{Utils.config[:object_derivatives_path]}/#{self.original_mappings["bibid"]}.xlsx"
+    #   spreadsheet_derivative_path = "#{@@working_path}/#{Utils.config[:object_derivatives_path]}/#{self.original_mappings["bibid"]}.xlsx"
     #   self.metadata_builder.metadata_source << MetadataSource.create(path: spreadsheet_derivative_path, source_type: "voyager_derivative", view_type: options[:view_type], x_start: options[:x_start], y_start: options[:y_start], x_stop: options[:x_stop], y_stop: options[:y_stop]) unless self.metadata_builder.metadata_source.where(metadata_builder_id: self.metadata_builder.id).pluck(:path) == spreadsheet_derivative_path
     #   self.metadata_builder.save!
     #   workbook = RubyXL::Workbook.new
@@ -459,7 +470,7 @@ class MetadataSource < ActiveRecord::Base
     #   workbook.write(spreadsheet_derivative_path)
     #   self.metadata_builder.repo.version_control_agent.commit("Created derivative spreadsheet of Voyager metadata")
     #   self.metadata_builder.repo.version_control_agent.push
-    #   generate_and_build_individual_xml("#{self.metadata_builder.repo.version_control_agent.working_path}/#{Utils.config[:object_derivatives_path]}/#{self.original_mappings["bibid"]}.xlsx")
+    #   generate_and_build_individual_xml("#{@@working_path}/#{Utils.config[:object_derivatives_path]}/#{self.original_mappings["bibid"]}.xlsx")
     # end
 
 end

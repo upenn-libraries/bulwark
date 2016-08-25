@@ -57,6 +57,7 @@ class MetadataBuilder < ActiveRecord::Base
     self.metadata_source.each do |source|
       source.build_xml if source.user_defined_mappings.present?
     end
+    self.store_xml_preview
     self.last_xml_generated = DateTime.now()
     self.save!
     return {:success => "Preservation XML generated successfully.  See preview below."}
@@ -95,6 +96,35 @@ class MetadataBuilder < ActiveRecord::Base
   def qualified_metadata_files
     qualified_metadata_files = _available_files
     return qualified_metadata_files
+  end
+
+  def store_xml_preview
+    working_path = self.repo.version_control_agent.clone
+    get_location = "#{working_path}/#{self.repo.metadata_subdirectory}"
+    self.repo.version_control_agent.get(:get_location => get_location)
+    @sample_xml_docs = ""
+    @file_links = Array.new
+    Dir.glob("#{get_location}/*.xml") do |file|
+      if File.exist?(file)
+        pretty_file = file.gsub(working_path,"")
+        @file_links << link_to(pretty_file, "##{file}")
+        anchor_tag = content_tag(:a, "", :name=> file)
+        sample_xml_content = File.open(file, "r"){|io| io.read}
+        sample_xml_doc = REXML::Document.new sample_xml_content
+        sample_xml = ""
+        sample_xml_doc.write(sample_xml, 1)
+        header = content_tag(:h2, "XML Sample for #{pretty_file}")
+        xml_code = content_tag(:pre, "#{sample_xml}")
+        @sample_xml_docs << content_tag(:div, anchor_tag << header << xml_code, :class => "doc")
+      end
+    end
+    self.repo.version_control_agent.delete_clone
+    @file_links_html = ""
+    @file_links.each do |file_link|
+      @file_links_html << content_tag(:li, file_link.html_safe)
+    end
+    self.xml_preview = content_tag(:ul, @file_links_html.html_safe) << @sample_xml_docs.html_safe
+    self.save!
   end
 
   private
