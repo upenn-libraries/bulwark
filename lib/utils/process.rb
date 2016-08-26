@@ -3,14 +3,15 @@ module Utils
 
     @@status_message
     @@status_type
-
     @@derivatives_working_destination
+    @@working_path
 
     extend self
 
-    def import(file, repo)
+    def import(file, repo, working_path)
+      @@working_path = working_path
       @oid = File.basename(repo.unique_identifier)
-      @@derivatives_working_destination = "#{repo.version_control_agent.working_path}/#{repo.derivatives_subdirectory}"
+      @@derivatives_working_destination = "#{@@working_path}/#{repo.derivatives_subdirectory}"
       @@status_type = :error
       delete_duplicate(@oid)
       @command = _build_command("import", :file => file)
@@ -46,12 +47,12 @@ module Utils
     end
 
     def attach_file(repo, parent, file_name, child_container = "child")
-      file_link = "#{repo.version_control_agent.working_path}/#{repo.assets_subdirectory}/#{file_name}"
+      file_link = "#{@@working_path}/#{repo.assets_subdirectory}/#{file_name}"
       repo.version_control_agent.get(:get_location => file_link)
       repo.version_control_agent.unlock(file_link)
       validated = validate_file(file_link) if File.exist?(file_link)
       if(File.exist?(file_link) && validated)
-        derivative_link = "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
+        derivative_link = "#{Utils.config[:federated_fs_path]}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
         @command = _build_command("file_attach", :file => derivative_link, :fid => parent.id, :child_container => child_container)
         _execute_curl
         repo.version_control_agent.add(:add_location => "#{@@derivatives_working_destination}")
@@ -67,14 +68,14 @@ module Utils
     end
 
     def generate_thumbnail(repo)
-      unencrypted_thumbnail_path = "#{repo.version_control_agent.working_path}/#{repo.assets_subdirectory}/#{ActiveFedora::Base.where(:id => repo.unique_identifier).first.cover.file_name}"
-      thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config.federated_fs_path}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ""
+      unencrypted_thumbnail_path = "#{@@working_path}/#{repo.assets_subdirectory}/#{ActiveFedora::Base.where(:id => repo.unique_identifier).first.cover.file_name}"
+      thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ""
       return thumbnail_link
     end
 
     def refresh_assets(repo)
-      display_path = "#{Utils.config.assets_display_path}/#{repo.directory}"
-      if File.directory?("#{Utils.config.assets_display_path}/#{repo.directory}")
+      display_path = "#{Utils.config[:assets_display_path]}/#{repo.directory}"
+      if File.directory?("#{Utils.config[:assets_display_path]}/#{repo.directory}")
         Dir.chdir(display_path)
         repo.version_control_agent.sync_content
       else

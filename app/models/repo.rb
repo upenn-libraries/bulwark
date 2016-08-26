@@ -16,14 +16,13 @@ class Repo < ActiveRecord::Base
   validates :human_readable_name, multiple: false
   validates :directory, multiple: false
 
+  serialize :file_extensions, Array
+  serialize :metadata_source_extensions, Array
   serialize :metadata_sources, Array
   serialize :metadata_builder_id, Array
   serialize :ingested, Array
   serialize :review_status, Array
   serialize :steps, Hash
-
-  include Filesystem
-  include FileExtensions
 
   def set_version_control_agent_and_repo
     yield
@@ -36,25 +35,28 @@ class Repo < ActiveRecord::Base
   def set_defaults
     self[:owner] = User.current
     mint_ezid
-    self[:derivatives_subdirectory] = "#{Utils.config.object_derivatives_path}"
-    self[:admin_subdirectory] = "#{Utils.config.object_admin_path}"
+    self[:derivatives_subdirectory] = "#{Utils.config[:object_derivatives_path]}"
+    self[:admin_subdirectory] = "#{Utils.config[:object_admin_path]}"
   end
 
   def metadata_subdirectory=(metadata_subdirectory)
-    self[:metadata_subdirectory] = "#{Utils.config.object_data_path}/#{metadata_subdirectory}"
+    self[:metadata_subdirectory] = "#{Utils.config[:object_data_path]}/#{metadata_subdirectory}"
   end
 
   def assets_subdirectory=(assets_subdirectory)
-    self[:assets_subdirectory] = "#{Utils.config.object_data_path}/#{assets_subdirectory}"
+    self[:assets_subdirectory] = "#{Utils.config[:object_data_path]}/#{assets_subdirectory}"
   end
 
   def file_extensions=(file_extensions)
-    self[:file_extensions] = file_extensions.reject(&:empty?).join(",")
+    self[:file_extensions] = Array.wrap(file_extensions).reject(&:empty?)
+  end
+
+  def metadata_source_extensions=(metadata_source_extensions)
+    self[:metadata_source_extensions] = Array.wrap(metadata_source_extensions).reject(&:empty?)
   end
 
   def nested_relationships=(nested_relationships)
-    nested_relationships.reject!(&:empty?)
-    self[:nested_relationships] = nested_relationships
+    self[:nested_relationships] = nested_relationships.reject(&:empty?)
   end
 
   def preservation_filename=(preservation_filename)
@@ -114,27 +116,25 @@ class Repo < ActiveRecord::Base
   def create_remote
     # Function weirdness forcing update_steps to the top
     self.update_steps(:git_remote_initialized)
-    unless Dir.exists?("#{assets_path_prefix}/#{self.directory}")
+    unless Dir.exists?("#{Utils.config[:assets_path]}/#{self.directory}")
       self.version_control_agent.init_bare
-      self.version_control_agent.clone
-      _build_and_populate_directories(self.version_control_agent.working_path)
+      working_path = self.version_control_agent.clone
+      _build_and_populate_directories(working_path)
       self.version_control_agent.commit_bare("Added subdirectories according to the configuration specified in the repo configuration")
       self.version_control_agent.push_bare
       self.version_control_agent.delete_clone
     end
   end
 
-  def ingest(directory)
+  def ingest(file, working_path)
     begin
       ingest_array = Array.new
-      Dir.glob("#{directory}/*").each do |file|
-        @status = Utils::Process.import(file, self)
-        ingest_array << File.basename(file, File.extname(file))
-      end
+      @status = Utils::Process.import(file, self, working_path)
+      ingest_array << File.basename(file, File.extname(file))
       self.ingested = ingest_array
       Utils::Process.refresh_assets(self)
       self.save!
-      self.package_metadata_info
+      self.package_metadata_info(working_path)
       self.update_steps(:published_preview)
       return @status
     rescue
@@ -143,11 +143,11 @@ class Repo < ActiveRecord::Base
   end
 
   def load_file_extensions
-    return asset_file_extensions
+    return FileExtensions.asset_file_extensions
   end
 
   def load_metadata_source_extensions
-    return metadata_source_file_extensions
+    return FileExtensions.metadata_source_file_extensions
   end
 
   def preserve_exists?
@@ -163,8 +163,8 @@ class Repo < ActiveRecord::Base
     return "<a href=\"#{url}\">#{self.directory}</a>"
   end
 
-  def package_metadata_info
-    File.open("#{self.version_control_agent.working_path}/#{self.admin_subdirectory}/#{self.directory.gsub(/\.git$/, '')}", "w+") do |f|
+  def package_metadata_info(working_path)
+    File.open("#{working_path}/#{self.admin_subdirectory}/#{self.directory.gsub(/\.git$/, '')}", "w+") do |f|
       self.metadata_builder.metadata_source.each do |source|
         f.puts "Source information for #{source.path}\npath: #{source.path}\nid (use to correlate children): #{source.id}\nsource_type: #{source.source_type}\nview_type: #{source.view_type}\nnum_objects: #{source.num_objects}\nx_start: #{source.x_start}\nx_stop: #{source.x_stop}\ny_start: #{source.y_start}\ny_stop: #{source.y_stop}\nchildren: #{source.children}\n\n"
       end
@@ -186,15 +186,25 @@ class Repo < ActiveRecord::Base
     return User.where(guest: false).pluck(:email, :email)
   end
 
+  def format_types(extensions_array)
+    formatted_types = ""
+    if extensions_array.length > 1
+      formatted_types = _format_multiple(extensions_array)
+    else
+      formatted_types = _format_singular(extensions_array)
+    end
+    return formatted_types
+  end
+
 private
 
-  def _build_and_populate_directories(working_copy_path)
-    admin_directory = "#{Utils.config.object_admin_path}"
-    data_directory = "#{Utils.config.object_data_path}"
+  def _build_and_populate_directories(working_path)
+    admin_directory = "#{Utils.config[:object_admin_path]}"
+    data_directory = "#{Utils.config[:object_data_path]}"
     metadata_subdirectory = "#{self.metadata_subdirectory}"
     assets_subdirectory = "#{self.assets_subdirectory}"
     derivatives_subdirectory = "#{self.derivatives_subdirectory}"
-    Dir.chdir("#{working_copy_path}")
+    Dir.chdir("#{working_path}")
     Dir.mkdir("#{admin_directory}")
     Dir.mkdir("#{data_directory}")
     Dir.mkdir("#{metadata_subdirectory}") && FileUtils.touch("#{metadata_subdirectory}/.keep")
@@ -204,21 +214,26 @@ private
   end
 
   def _populate_admin_manifest(admin_path)
-    filesystem_semantics_path = "#{admin_path}/#{Utils.config.object_semantics_location}"
-    file_types = _define_file_types
-    metadata_line = "#{Utils.config.metadata_path_label}: #{self.metadata_subdirectory}/#{self.metadata_source_extensions}"
-    assets_line = "#{Utils.config.file_path_label}: #{self.assets_subdirectory}/#{file_types}"
+    filesystem_semantics_path = "#{admin_path}/#{Utils.config[:object_semantics_location]}"
+    file_types = format_types(self.file_extensions)
+    metadata_source_types = format_types(self.metadata_source_extensions)
+    metadata_line = "#{Utils.config[:metadata_path_label]}: #{self.metadata_subdirectory}/#{metadata_source_types}"
+    assets_line = "#{Utils.config[:file_path_label]}: #{self.assets_subdirectory}/#{file_types}"
     File.open(filesystem_semantics_path, "w+") do |file|
       file.puts("#{metadata_line}\n#{assets_line}")
     end
   end
 
-  def _define_file_types
-    ft = self.file_extensions.split(",")
-    ft.map! { |f| ".#{f}"}
-    aft = ft.join(',')
-    aft = "*{#{aft}}"
-    return aft
+  def _format_singular(extension)
+    formatted_ft = "*.#{extension.first}"
+    return formatted_ft
+  end
+
+  def _format_multiple(extensions)
+    ft = extensions.map { |f| ".#{f}"}
+    formatted_ft = ft.join(',')
+    formatted_ft = "*{#{formatted_ft}}"
+    return formatted_ft
   end
 
   def _initialize_steps
@@ -246,10 +261,10 @@ private
   end
 
   def _check_if_preserve_exists
-    self.version_control_agent.clone
-    self.metadata_builder.preserve.each {|f| @fname = f if File.basename(f) == self.preservation_filename}
-    self.version_control_agent.get(:get_location => @fname)
-    exist_status = File.exists?(@fname)
+    working_path = self.version_control_agent.clone
+    fname = "#{working_path}/#{self.preservation_filename}"
+    self.version_control_agent.get(:get_location => fname)
+    exist_status = File.exists?(fname)
     self.version_control_agent.drop
     self.version_control_agent.delete_clone
     return exist_status
@@ -258,12 +273,12 @@ private
   def _mint_and_format_ezid
     #TODO: Replace with test EZID minting when in place:
     minted_id = SecureRandom.hex(10)
-    while Repo.where(directory: "#{Utils.config.repository_prefix}_#{self.human_readable_name}_#{minted_id}.git").pluck(:directory).present?
+    while Repo.where(directory: "#{Utils.config[:repository_prefix]}_#{self.human_readable_name}_#{minted_id}.git").pluck(:directory).present?
       minted_id = SecureRandom.hex(10)
     end
 
-    self[:unique_identifier] = "#{Utils.config.repository_prefix}_#{minted_id}"
-    self[:directory] = "#{Utils.config.repository_prefix}_#{self.human_readable_name}_#{minted_id}"
+    self[:unique_identifier] = "#{Utils.config[:repository_prefix]}_#{minted_id}"
+    self[:directory] = "#{Utils.config[:repository_prefix]}_#{self.human_readable_name}_#{minted_id}"
     _concatenate_git
   end
 

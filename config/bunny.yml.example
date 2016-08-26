@@ -1,0 +1,22 @@
+# Default settings RabbitMQ
+
+development:
+  host: "127.0.0.1"
+  port: "5672"
+  user: "guest"
+  pass: "guest"
+  frame_max: "131072"
+
+test:
+  host: "127.0.0.1"
+  port: "5672"
+  user: "guest"
+  pass: "guest"
+  frame_max: "131072"
+
+production:
+  host: "127.0.0.1"
+  port: "5672"
+  user: "guest"
+  pass: "guest"
+  frame_max: "131072"
