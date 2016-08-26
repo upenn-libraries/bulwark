@@ -20,7 +20,11 @@
 .DS_Store
 
 # Ignore config yml files
-config/*.yml
+config/filesystem.yml
+config/file_extensions.yml
+config/metadata_schema.yml
+config/fedora.yml
+config/jetty.yml
 
 # Ignore bash script
 repo.sh
@@ -28,6 +32,3 @@ just_jetty.sh
 
 # Ignore rdf
 *.rdf
-
-
-*.rdb

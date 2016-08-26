@@ -17,13 +17,36 @@ module MetadataBuilderHelper
   end
 
   def render_sample_xml
-    @object.metadata_builder.xml_preview.html_safe if @object.metadata_builder.xml_preview.present?
+    get_location = "#{@object.version_control_agent.working_path}/#{@object.metadata_subdirectory}"
+    @object.version_control_agent.clone
+    @object.version_control_agent.get(:get_location => get_location)
+    @sample_xml_docs = ""
+    @file_links = Array.new
+    Dir.glob("#{get_location}/*.xml") do |file|
+      if File.exist?(file)
+        @file_links << link_to(prettify(file), "##{file}")
+        anchor_tag = content_tag(:a, "", :name=> file)
+        sample_xml_content = File.open(file, "r"){|io| io.read}
+        sample_xml_doc = REXML::Document.new sample_xml_content
+        sample_xml = ""
+        sample_xml_doc.write(sample_xml, 1)
+        header = content_tag(:h2, "XML Sample for #{prettify(file)}")
+        xml_code = content_tag(:pre, "#{sample_xml}")
+        @sample_xml_docs << content_tag(:div, anchor_tag << header << xml_code, :class => "doc")
+      end
+    end
+    @object.version_control_agent.delete_clone
+    @file_links_html = ""
+    @file_links.each do |file_link|
+      @file_links_html << content_tag(:li, file_link.html_safe)
+    end
+    return content_tag(:ul, @file_links_html.html_safe) << @sample_xml_docs.html_safe
   end
 
   def render_xml_warning_if_out_of_sync
     if @object.metadata_builder.last_xml_generated.present?
       flash[:warning] =  "Metadata has been updated since the last time this XML was generated.  Please press the button below to generate XML with the most current metadata." if @object.metadata_builder.metadata_source.any?{ |ms| @object.metadata_builder.last_xml_generated < ms.last_extraction if ms.last_extraction.present? }
-    end
+    end 
   end
 
   def prettify(file_path_input)
@@ -48,8 +71,7 @@ module MetadataBuilderHelper
   private
 
   def _prettified_working_file(file_path)
-    file_array = file_path.split("/").reverse
-    return "#{Utils.config[:object_data_path]}/#{file_array.second}/#{file_array.first}"
+    return file_path.gsub(@object.version_control_agent.working_path, "")
   end
 
 end
