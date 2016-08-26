@@ -8,7 +8,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   validates :parent_repo, presence: true
 
-  serialize :preserve, Array
+  serialize :preserve, Set
 
   @@xml_tags = Array.new
   @@error_message = nil
@@ -49,16 +49,14 @@ class MetadataBuilder < ActiveRecord::Base
       mb_source.delete unless source_files.include?(mb_source.path)
     end
     source_files.each do |source|
-      self.metadata_source << MetadataSource.create(:path => source) unless MetadataSource.where(:path => source).pluck(:path).present?
+      self.metadata_source << MetadataSource.create(:path => source) unless MetadataSource.where(:metadata_builder_id => self.id, :path => source).pluck(:path).present?
     end
     self.save!
     self.repo.update_steps(:metadata_sources_selected)
   end
 
   def build_xml_files
-    self.metadata_source.each do |source|
-      source.build_xml if source.user_defined_mappings.present?
-    end
+    self.metadata_source.first.build_xml
     self.store_xml_preview
     self.last_xml_generated = DateTime.now()
     self.save!
@@ -111,7 +109,7 @@ class MetadataBuilder < ActiveRecord::Base
     Dir.glob("#{get_location}/*.xml") do |file|
       if File.exist?(file)
         pretty_file = file.gsub(working_path,"")
-        self.preserve << pretty_file if File.basename(file) == self.repo.preservation_filename
+        self.preserve.add(pretty_file) if File.basename(file) == self.repo.preservation_filename
         @file_links << link_to(pretty_file, "##{file}")
         anchor_tag = content_tag(:a, "", :name=> file)
         sample_xml_content = File.open(file, "r"){|io| io.read}

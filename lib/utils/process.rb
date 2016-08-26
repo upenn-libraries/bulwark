@@ -68,8 +68,11 @@ module Utils
     end
 
     def generate_thumbnail(repo)
-      unencrypted_thumbnail_path = "#{@@working_path}/#{repo.assets_subdirectory}/#{ActiveFedora::Base.where(:id => repo.unique_identifier).first.cover.file_name}"
-      thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ""
+      object = ActiveFedora::Base.where(:id => repo.unique_identifier).first
+      if object.cover.present?
+        unencrypted_thumbnail_path = "#{@@working_path}/#{repo.assets_subdirectory}/#{object.cover.file_name}"
+        thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ""
+      end
       return thumbnail_link
     end
 

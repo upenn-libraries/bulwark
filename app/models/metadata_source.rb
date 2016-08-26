@@ -115,13 +115,11 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def build_xml
-    #self.set_metadata_mappings
     @@working_path = self.metadata_builder.repo.version_control_agent.clone
     self.generate_and_build_individual_xml
     self.children.each do |child|
       source = MetadataSource.find(child)
-      #source.set_metadata_mappings
-      source.generate_and_build_individual_xml
+      source.generate_and_build_individual_xml(source.path)
     end
     self.generate_preservation_xml
     self.jettison_unwanted_files(@@jettison_files)
@@ -141,24 +139,26 @@ class MetadataSource < ActiveRecord::Base
 
   def generate_and_build_individual_xml(fname = self.path)
     xml_fname = "#{fname}.xml"
-    case self.source_type
-    when "custom"
-      @xml_content_final_copy = xml_from_custom(fname)
-    when "voyager"
-      @xml_content_final_copy = xml_from_voyager
-    end
-    @@jettison_files.add(xml_fname)
-    _fetch_write_save_preservation_xml(xml_fname, @xml_content_final_copy)
+    if self.user_defined_mappings.present?
+      case self.source_type
+      when "custom"
+        @xml_content_final_copy = xml_from_custom(fname)
+      when "voyager"
+        @xml_content_final_copy = xml_from_voyager
+      end
+      @@jettison_files.add(xml_fname)
+      _fetch_write_save_preservation_xml(xml_fname, @xml_content_final_copy)
+    end 
   end
 
   def generate_preservation_xml
     if self.children.present?
-      self.generate_parent_child_xml
+      @xml_content_final = self.generate_parent_child_xml
     else
       file = File.new(_working_path_check(@@working_path, "#{self.path}.xml"))
-      xml_content = file.readline
-       _fetch_write_save_preservation_xml(xml_content) if self.metadata_builder.canonical_identifier_check(_working_path_check(@@working_path, "#{self.path}.xml"))
+      @xml_content_final = file.readline
     end
+    _fetch_write_save_preservation_xml(@xml_content_final)
     self.metadata_builder.repo.update_steps(:preservation_xml_generated)
   end
 
@@ -204,14 +204,14 @@ class MetadataSource < ActiveRecord::Base
       child_xml_path = _working_path_check(@@working_path, "#{child_path}.xml")
       self.metadata_builder.repo.version_control_agent.get(:get_location => key_xml_path)
       self.metadata_builder.repo.version_control_agent.get(:get_location => child_xml_path)
-      xml_content = File.open(key_xml_path, "r"){|io| io.read}
+      @xml_content = File.open(key_xml_path, "r"){|io| io.read}
       child_xml_content = File.open(child_xml_path, "r"){|io| io.read}
-      _strip_headers(xml_content) && _strip_headers(child_xml_content)
+      _strip_headers(@xml_content) && _strip_headers(child_xml_content)
       end_tag = "</#{self.root_element}>"
-      insert_index = xml_content.index(end_tag)
-      xml_content.insert(insert_index, child_xml_content)
-      _fetch_write_save_preservation_xml(xml_content)
+      insert_index = @xml_content.index(end_tag)
+      @xml_content.insert(insert_index, child_xml_content)
     end
+    return @xml_content
   end
 
   def generate_review_status_xml
