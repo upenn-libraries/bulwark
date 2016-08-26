@@ -21,7 +21,6 @@ module RailsAdmin
                 @object.send("#{name}=", value)
               end
               if object_params = params[@abstract_model.to_param]
-                binding.pry()
                 sanitize_params_for!(request.xhr? ? :modal : :create)
                 @object.set_attributes(@object.attributes.merge(object_params.to_h))
               end

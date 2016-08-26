@@ -1,6 +1,7 @@
 class VersionControlAgentsController < ApplicationController
 
-  def new
+  def create
+    @version_control_agent.current_user = current_user
     @version_control_agent = VersionControlAgent.new(version_control_agent_params)
   end
 
