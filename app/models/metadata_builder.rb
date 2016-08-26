@@ -79,7 +79,7 @@ class MetadataBuilder < ActiveRecord::Base
       end
       Dir.chdir(File.dirname(val))
       `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
-      transformed_file_path = "#{working_path}/#{self.repo.unique_identifier}.xml"
+      transformed_file_path = File.exist?("#{working_path}/#{self.repo.unique_identifier}.xml") ? "#{working_path}/#{self.repo.unique_identifier}.xml" : "#{working_path}/#{self.repo.metadata_subdirectory}/#{self.repo.unique_identifier}.xml"
       @vca.get(:get_location => transformed_file_path)
       @vca.unlock(transformed_file_path)
       @status = self.repo.ingest(transformed_file_path, working_path)

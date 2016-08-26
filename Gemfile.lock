@@ -273,6 +273,8 @@ GEM
       http_logger
       linkeddata (>= 1.1)
       slop
+    letter_opener (1.4.1)
+      launchy (~> 2.2)
     libv8 (3.16.14.13)
     link_header (0.0.8)
     linkeddata (1.99.0)
@@ -571,6 +573,7 @@ DEPENDENCIES
   jettywrapper
   jquery-rails
   launchy
+  letter_opener
   mini_magick
   pry-rails (~> 0.3.4)
   qa
