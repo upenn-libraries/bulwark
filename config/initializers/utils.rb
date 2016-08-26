@@ -1,15 +1,30 @@
-module Utils
-  def config
-    @config ||= config_yaml.with_indifferent_access
+Utils.configure do |config|
+  fs_env_file = Rails.root.join("config", 'filesystem.yml')
+
+  fail "Missing configuration file at: #{fs_env_file}." unless File.exist?(fs_env_file)
+
+  begin
+    fs_yml = YAML.load_file(fs_env_file)
+  rescue StandardError
+    raise("#{fs_env_file} was found, but could not be parsed.\n")
   end
 
-  private
+  if File.exists?(fs_env_file)
+    options = fs_yml.fetch(Rails.env).with_indifferent_access
+    config.object_data_path = options.fetch(:object_data_path)
+    config.object_admin_path = options.fetch(:object_admin_path)
+    config.object_derivatives_path = options.fetch(:object_derivatives_path)
+    config.object_semantics_location = options.fetch(:object_semantics_location)
+    config.email = options.fetch(:email)
+    config.assets_path = options.fetch(:assets_path)
+    config.assets_display_path = options.fetch(:assets_display_path)
+    config.manifest_location = options.fetch(:manifest_location)
+    config.federated_fs_path = options.fetch(:federated_fs_path)
+    config.metadata_path_label = options.fetch(:metadata_path_label)
+    config.file_path_label = options.fetch(:file_path_label)
+    config.working_dir = options.fetch(:working_dir)
+    config.transformed_dir = options.fetch(:transformed_dir)
+    config.repository_prefix = options.fetch(:repository_prefix)
+  end
 
-    def config_yaml
-      config_file = Rails.root.join("config", 'filesystem.yml')
-      fail "Missing configuration file at: #{config_file}." unless File.exist?(config_file)
-      YAML.load(ERB.new(File.read(config_file)).result)[Rails.env]
-    end
-
-    module_function :config, :config_yaml
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160825141400) do
+ActiveRecord::Schema.define(version: 20160815151355) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
@@ -34,7 +34,6 @@ ActiveRecord::Schema.define(version: 20160825141400) do
     t.integer  "repo_id"
     t.integer  "metadata_source_id"
     t.datetime "last_xml_generated"
-    t.string   "xml_preview"
   end
 
   add_index "metadata_builders", ["metadata_source_id"], name: "index_metadata_builders_on_metadata_source_id"
@@ -110,9 +109,10 @@ ActiveRecord::Schema.define(version: 20160825141400) do
   create_table "version_control_agents", force: :cascade do |t|
     t.string   "vc_type"
     t.string   "remote_path"
+    t.string   "working_path"
     t.integer  "repo_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
   end
 
   add_index "version_control_agents", ["repo_id"], name: "index_version_control_agents_on_repo_id"

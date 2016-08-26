@@ -2,6 +2,7 @@ class ReposController < ApplicationController
   before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log, :ingest, :review_status, :detect_metadata, :preview_xml_preview]
 
   def new
+    binding.pry()
   end
 
   def create
@@ -22,7 +23,7 @@ class ReposController < ApplicationController
   end
 
   def checksum_log
-    @message = Utils.generate_checksum_log("#{Utils.config[:assets_path]}/#{@repo.directory}")
+    @message = Utils.generate_checksum_log("#{Utils.config.assets_path}/#{@repo.directory}")
     redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/ingest", :flash => { @message.keys.first => @message.values.first }
   end
 

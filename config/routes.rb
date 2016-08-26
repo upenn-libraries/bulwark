@@ -1,4 +1,3 @@
-require 'sidekiq/web'
 Rails.application.routes.draw do
 
   resources :repos do
@@ -32,5 +31,4 @@ Rails.application.routes.draw do
   blacklight_for :catalog
   devise_for :users
   mount Qa::Engine => '/qa'
-  mount Sidekiq::Web => '/sidekiq'
 end

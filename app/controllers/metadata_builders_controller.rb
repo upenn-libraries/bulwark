@@ -28,8 +28,8 @@ class MetadataBuildersController < ApplicationController
   end
 
   def refresh_metadata
-    MetadataExtractionJob.perform_later(@metadata_builder, root_url)
-    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata being refreshed.  You will receive notification when it is complete."}
+    @metadata_builder.refresh_metadata
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata refreshed.  See output below."}
   end
 
   def generate_metadata
@@ -38,14 +38,14 @@ class MetadataBuildersController < ApplicationController
   end
 
   def generate_preview_xml
-    GenerateXmlJob.perform_later(@metadata_builder, root_url)
-    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :success => "Preservation XML being generated.  You will receive notification when it is complete."}
+    @metadata_builder.build_xml_files
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :success => "Preservation XML generated successfully.  See preview below."}
   end
 
   def ingest
     if params[:to_ingest].present?
-      IngestJob.perform_later(@metadata_builder, params[:to_ingest], root_url)
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :success => "Object queued for processing.  You will receive notification when it is complete." }
+      @message = @metadata_builder.transform_and_ingest(params[:to_ingest])
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { @message.keys.first => @message.values.first }
     else
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :error => "Select at least one file to ingest."}
     end

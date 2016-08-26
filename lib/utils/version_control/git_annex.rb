@@ -5,12 +5,14 @@ module Utils
   module VersionControl
     class GitAnnex
 
+      include Filesystem
+
       attr_accessor :remote_repo_path, :working_repo_path
 
       def initialize(repo)
         @repo = repo
-        @remote_repo_path = "#{Utils.config[:assets_path]}/#{@repo.directory}"
-        @working_repo_path = "#{Dir.mktmpdir}/#{@repo.directory}"
+        @remote_repo_path = "#{Utils.config.assets_path}/#{@repo.directory}"
+        @working_repo_path = "#{Utils.config.working_dir}/#{@remote_repo_path.gsub("/","_")}".gsub("__", "_")
       end
 
       def repo
@@ -29,7 +31,7 @@ module Utils
         rescue => exception
           raise Utils::Error::VersionControl.new(error_message(exception.message))
         end
-        return destination
+
       end
 
       def reset_hard
@@ -130,7 +132,7 @@ module Utils
         when /does not exist/
           error_message = "Git remote does not exist.  Could not clone to perform tasks."
         when /already exists and is not an empty directory/
-          error_message = "Leftover Git remote clone in working directory - #{@working_repo_path}"
+          error_message = "Leftover Git remote clone in working directory"
         end
         return error_message
       end

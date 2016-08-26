@@ -17,9 +17,9 @@ gem "coffee-rails", "~> 4.0.0"
 gem "therubyracer",  platforms: :ruby
 
 gem "hydra", github: "projecthydra/hydra", branch: "pcdm"
+
 gem "hydra-works"
 gem "hydra-pcdm"
-
 gem "qa"
 gem "blacklight_range_limit"
 
@@ -31,10 +31,7 @@ gem "git"
 gem "rubyXL"
 gem "mini_magick"
 gem "sanitize"
-
-gem "bunny"
-gem "sidekiq"
-gem "sinatra", :require => false
+gem "net-ping"
 
 gem "roo"
 
@@ -53,12 +50,9 @@ gem "spring",        group: :development
 gem "rsolr", "~> 1.0.6"
 gem "devise"
 gem "devise-guests", "~> 0.3"
-
 group :development, :test do
   gem "pry-rails", "~> 0.3.4"
   gem "jettywrapper"
-  gem "letter_opener"
-  gem "launchy"
 end
 
 group :test do
@@ -67,4 +61,5 @@ group :test do
   gem "faker"
   gem "capybara"
   gem "guard-rspec"
+  gem "launchy"
 end

@@ -1,6 +1,5 @@
 class VersionControlAgent < ActiveRecord::Base
 
-
   belongs_to :repo
 
   after_create :set_worker_attributes
@@ -13,13 +12,19 @@ class VersionControlAgent < ActiveRecord::Base
     read_attribute(:remote_path) || ''
   end
 
+  def working_path
+    read_attribute(:working_path) || ''
+  end
+
   def vc_type=(vc_type)
     self[:vc_type] = vc_type
   end
 
   def set_worker_attributes
-    remote_repo_path = "#{Utils.config[:assets_path]}/#{self.repo.directory}"
+    remote_repo_path = "#{Utils.config.assets_path}/#{self.repo.directory}"
+    working_repo_path = "#{Utils.config.working_dir}/#{remote_repo_path.gsub("/","_")}".gsub("__", "_")
     self.remote_path = remote_repo_path
+    self.working_path = working_repo_path
     self.save!
   end
 

@@ -14,7 +14,7 @@ describe ReposController do
   describe "POST #checksum_log" do
     context "when files are present" do
       it "triggers checksum log creation for the repo" do
-        FileUtils.touch("#{Utils.config[:assets_path]}/#{@repo.directory}/#{@repo.assets_subdirectory}/fake.tif")
+        FileUtils.touch("#{Utils.config.assets_path}/#{@repo.directory}/#{@repo.assets_subdirectory}/fake.tif")
         post :checksum_log, :id => @repo.id
         expect(flash[:success]).to be_present
       end

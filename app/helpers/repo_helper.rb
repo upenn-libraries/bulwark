@@ -2,7 +2,7 @@ module RepoHelper
   include BlacklightHelper
 
   def render_git_directions_or_actions
-    full_path = "#{Utils.config[:assets_path]}/#{@object.directory}"
+    full_path = "#{assets_path_prefix}/#{@object.directory}"
     if Dir.exists?(full_path)
       render :partial => "repos/git_directions", :locals => {:full_path => full_path}
     else
@@ -11,7 +11,7 @@ module RepoHelper
   end
 
   def render_ingest_or_message
-    if @object.metadata_builder.xml_preview.present?
+    if @object.preserve_exists?
       render :partial => "repos/ingest_select"
     else
       render :partial => "repos/no_xml"

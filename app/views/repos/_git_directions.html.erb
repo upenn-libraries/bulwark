@@ -1,7 +1,7 @@
 <div class="git-directions">
   <h2>Using this Repo</h2>
   <p>Your git remote has been initialized at <%= "#{full_path}" %>.  To begin using this remote, run the following command from the terminal:
-  <pre>git clone <%= "#{full_path}\ncd #{(@object.directory).gsub(".git","")}/#{Utils.config[:object_data_path]}" %></pre></p>
+  <pre>git clone <%= "#{full_path}\ncd #{(@object.directory).gsub(".git","")}/#{Utils.config.object_data_path}" %></pre></p>
   <p>To add content to your remote, use the following syntax:</p>
   <pre>git annex sync --content
 git annex add RELATIVE_PATH_TO_CONTENT
@@ -21,7 +21,7 @@ git annex sync --content</pre>
     <li><strong>Description:</strong> <%= @object.description %></li>
     <li><strong>Metadata Subdirectory:</strong> <%= @object.metadata_subdirectory %></li>
     <li><strong>Assets Subdirectory:</strong> <%= @object.assets_subdirectory %></li>
-    <li><strong>Accepted File Extension(s) for Metadata:</strong> <%= @object.metadata_source_extensions.join(", ") %></li>
+    <li><strong>Accepted File Extension(s) for Metadata:</strong> <%= @object.metadata_source_file_extensions.join(", ") %></li>
     <li><strong>Accepted File Extension(s) for Assets:</strong> <%= @object.file_extensions %></li>
     <li><strong>Preservation XML Filename:</strong> <%= @object.preservation_filename %></li>
   </ul>
