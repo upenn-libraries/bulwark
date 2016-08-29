@@ -75,11 +75,12 @@ class MetadataBuilder < ActiveRecord::Base
         @status = { :error => "No canonical identifier found for /#{self.repo.metadata_subdirectory}/#{File.basename(val)}.  Skipping ingest of this file."}
         next
       end
-      Dir.chdir(File.dirname(val))
-      `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
-      transformed_file_path = File.exist?("#{working_path}/#{self.repo.unique_identifier}.xml") ? "#{working_path}/#{self.repo.unique_identifier}.xml" : "#{working_path}/#{self.repo.metadata_subdirectory}/#{self.repo.unique_identifier}.xml"
+      Dir.chdir(working_path)
+      transformed_file_path = "#{working_path}/#{self.repo.unique_identifier}.xml"
       @vca.get(:get_location => transformed_file_path)
       @vca.unlock(transformed_file_path)
+      FileUtils.rm(transformed_file_path) if File.exist?(transformed_file_path)
+      `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
       @status = self.repo.ingest(transformed_file_path, working_path)
     end
     @vca.reset_hard
