@@ -1,47 +1,7 @@
-<%= render :partial => "repos/problem_files" %>
+<% @document = ActiveFedora::Base.find(@object.unique_identifier) %>
 
-<div class="review-status">
-  <% if @object.review_status.present? %>
-  <h2>Review Status</h2>
-  <div class="review-status-list content-block">
-    <ul>
-      <% @object.review_status.each do |review| %>
-      <li><%= review %></li>
-      <% end -%>
-    </ul>
-  </div>
-  <% end %>
+<%= render :partial => "repos/review_descriptive_metadata" %>
 
+<%= render :partial => "repos/review_page_level_metadata" %>
 
-  <% @object.ingested.each do |ingest| -%>
-    <% @document = ActiveFedora::Base.find(ingest) %>
-      <%= form_for @object, :validate => true, :html => {:class => "ingest-review"}, :method => :post, :url => "/repos/#{@object.id}/review_status" do |f| %>
-      <%= f.label :review_status, "Add a Review Status note for #{@document.identifier.first}" %>
-      <%= f.text_area :review_status, :value => nil %>
-      <%= f.submit "Add note" %>
-    <% end -%>
-
-</div>
-
-<div class="metadata-only-preview content-block">
-  <h2>Alphabetized metadata-only preview of <%= ingest %></h2>
-  <%= attributes_display(@document).html_safe %>
-</div>
-
-<% end -%>
-
-<div class="structural-metadata-preview">
-  <h2>Page-level metadata preview</h2>
-  <% ActiveFedora::Base.where(:id => "#{@document.id}/members").each do |member| %>
-    <% member.contained.each do |container| %>
-      <div class="fragment">
-        <% obj = ActiveFedora::Base.where(:id => ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(container.id)).target_id).first %>
-        <h3><%= obj.id %></h3>
-        <div class="thumbnail">
-          <%= image_tag("#{obj.pageImage.ldp_source.subject}", :alt => "#{obj.file_name}", :width => "100", :height => "100") %>
-        </div>
-        <%= attributes_display(obj).html_safe %>
-      </div>
-    <% end -%>
-  <% end -%>
-</div>
+<%= render :partial => "repos/review_status_form" %>

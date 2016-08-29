@@ -30,6 +30,12 @@ module RepoHelper
     end
   end
 
+  def render_problem_files
+    if @object.try(:problem_files).present?
+      render :partial => "repos/problem_files"
+    end
+  end
+
   def generate_ingest_link(ingested_id)
     begin
       obj = ActiveFedora::Base.find(ingested_id)
