@@ -52,4 +52,12 @@ module RepoHelper
     return link_to("Update Review Status for this Object", "#{root_url}/admin_repo/repo/#{repo_id}/ingest")
   end
 
+  def problem_files(problem_type)
+    selected_problem_files = []
+    @object.problem_files.find_all do |key, value|
+      selected_problem_files << key if value == problem_type
+    end
+    selected_problem_files
+  end
+
 end

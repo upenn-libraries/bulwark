@@ -19,6 +19,7 @@ module Utils
       if check_persisted(@oid)
         object_and_descendants_action(@oid, "update_index")
       end
+      repo.problem_files = {}
       ActiveFedora::Base.where(:id => @oid).first.try(:attach_files, repo)
       thumbnail = generate_thumbnail(repo)
       if thumbnail.present?
@@ -60,9 +61,9 @@ module Utils
       else
         @@status_type = :warning
         if File.exist?(file_link)
-          @@status_message << "Image #{repo.assets_subdirectory}/#{file_name} did not pass validation.  No derivatives made or attached.\n"
+          repo.problem_files["#{repo.assets_subdirectory}/#{file_name}"] = "invalid"
         else
-          @@status_message << "Image #{repo.assets_subdirectory}/#{file_name} not detected in file directory.  No derivatives made or attached.\n"
+          repo.problem_files["#{repo.assets_subdirectory}/#{file_name}"] = "missing"
         end
       end
     end

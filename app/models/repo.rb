@@ -23,6 +23,7 @@ class Repo < ActiveRecord::Base
   serialize :ingested, Array
   serialize :review_status, Array
   serialize :steps, Hash
+  serialize :problem_files, Hash
 
   def set_version_control_agent_and_repo
     yield
