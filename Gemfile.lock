@@ -83,6 +83,9 @@ GEM
       deprecation (~> 0.1)
       linkeddata (~> 1.1)
       rdf (~> 1.1)
+    active_job_status (1.1.0)
+      activejob (~> 4.2)
+      activesupport (~> 4.2)
     activefedora-aggregation (0.8.1)
       active-fedora (~> 9.5)
       activesupport
@@ -437,6 +440,22 @@ GEM
     rdoc (4.2.2)
       json (~> 1.4)
     redis (3.3.1)
+    redis-actionpack (5.0.0)
+      actionpack (>= 4.0.0, < 6)
+      redis-rack (~> 2.0.0.pre)
+      redis-store (~> 1.2.0.pre)
+    redis-activesupport (5.0.1)
+      activesupport (>= 3, < 6)
+      redis-store (~> 1.2.0)
+    redis-rack (2.0.0.pre)
+      rack (> 1.5, < 3)
+      redis-store (~> 1.2.0.pre)
+    redis-rails (5.0.1)
+      redis-actionpack (~> 5.0.0)
+      redis-activesupport (~> 5.0.0)
+      redis-store (~> 1.2.0)
+    redis-store (1.2.0)
+      redis (>= 2.2)
     ref (2.0.0)
     remotipart (1.2.1)
     responders (2.1.2)
@@ -554,6 +573,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  active_job_status
   blacklight_range_limit
   bootstrap-sass (= 3.3.4.1)
   bunny
@@ -580,6 +600,7 @@ DEPENDENCIES
   rails (= 4.2.5)
   rails_admin!
   rails_admin_colenda!
+  redis-rails
   roo
   rsolr (~> 1.0.6)
   rspec-rails

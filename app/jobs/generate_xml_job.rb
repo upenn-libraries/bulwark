@@ -1,4 +1,4 @@
-class GenerateXmlJob < ActiveJob::Base
+class GenerateXmlJob < ActiveJobStatus::TrackableJob
 
   queue_as :xml
 

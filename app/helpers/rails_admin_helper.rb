@@ -24,6 +24,14 @@ module RailsAdminHelper
     render_review_status(repo)
   end
 
+  def get_job_status(job_id)
+    ActiveJobStatus::JobStatus.get_status(job_id: job_id)
+  end
+
+  def render_template_based_on_status(process,job_id)
+    render :partial => job_based_partial(process, job_id)
+  end
+
   def root_element_options
     return MetadataSchema.config[:root_element_options]
   end
@@ -95,6 +103,20 @@ module RailsAdminHelper
     else
       "Submit"
     end
+  end
+
+  def job_based_partial(process, job_id)
+    case process
+    when "ingest"
+      ready_partial = "rails_admin/main/ingest_dashboard"
+    when "metadata_extraction"
+      ready_partial = "rails_admin/main/extract_and_map_metadata"
+    when "generate_xml"
+      ready_partial = "rails_admin/main/preview_xml"
+    else
+      ready_partial = "shared/generic_error"
+    end
+    (get_job_status(job_id) == :queued) || (get_job_status(job_id) == :working) ? "shared/waiting" : ready_partial
   end
 
 end

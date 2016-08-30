@@ -1,7 +1,1 @@
-<div class="mapping-dashboard">
-  <% if @object.metadata_builder.metadata_source.present? %>
-    <%= render :partial => "metadata_sources/generate_metadata" %>
-  <% else %>
-    <%= render :partial => "metadata_sources/no_source" %>
-  <% end %>
-</div>
+<%= render_template_based_on_status("metadata_extraction",session[:metadata_extraction_job_id]) %>

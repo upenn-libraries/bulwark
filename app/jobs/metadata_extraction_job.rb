@@ -1,4 +1,4 @@
-class MetadataExtractionJob < ActiveJob::Base
+class MetadataExtractionJob < ActiveJobStatus::TrackableJob
 
   queue_as :metadata_extraction
 

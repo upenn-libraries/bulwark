@@ -34,6 +34,8 @@ gem "sanitize"
 
 gem "bunny"
 gem "sidekiq"
+gem "active_job_status"
+gem "redis-rails"
 gem "sinatra", :require => false
 
 gem "roo"

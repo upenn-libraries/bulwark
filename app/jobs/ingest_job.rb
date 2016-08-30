@@ -1,4 +1,4 @@
-class IngestJob < ActiveJob::Base
+class IngestJob < ActiveJobStatus::TrackableJob
 
   queue_as :ingest
 
