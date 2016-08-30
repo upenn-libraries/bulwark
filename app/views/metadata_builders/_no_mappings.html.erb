@@ -1,2 +1,1 @@
-<p>No metadata schema mappings have been generated yet.</p>
-<p>To generate the metadata schema to use for creating this preservation XML, use the <%= link_to "Generate Metadata form", rails_admin.generate_metadata_path %>.</p>
+<p><%= t('colenda.metadata_builders.warnings.no_mappings', :href => link_to(t("colenda.metadata_builders.generate_metadata_link_text"), rails_admin.generate_metadata_path)).html_safe %></p>

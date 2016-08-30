@@ -5,27 +5,27 @@
     <div class="metadata-source-mapping">
       <%= f.fields_for :metadata_source, source do |s| %>
 
-      <%= field_set_tag 'Map source metadata to XML' do %>
-        Fill out the fields below to field values from metadata source files to XML.
+      <%= field_set_tag t('colenda.metadata_sources.metadata_mapping.fieldset_label') do %>
+        <%= t('colenda.metadata_sources.metadata_mapping.instructions') %>
       <% end %>
-      <h2>Mappings for <span class="file-path"><%= prettify(source.path)%></span></h2>
+      <h2><%= t('colenda.metadata_sources.metadata_mapping.mappings.heading', :file_name => (content_tag(:span, prettify(source.path), :class=> 'file-path'))).html_safe%></h2>
       <%= content_tag :div, :class => "field" do -%>
-        <%= s.label :root_element, "Root element:" %>
+        <%= s.label :root_element, t('colenda.metadata_sources.metadata_mapping.root_element.label') %>
         <%= s.select :root_element, root_element_options, :include_blank => :true %>
-        <%= content_tag(:div, "Root element of the XML schema generated -- defaults to \"root\" if left blank.", :class => "field-tip") %>
+        <%= content_tag(:div, t('colenda.metadata_sources.metadata_mapping.root_element.tip'), :class => "field-tip") %>
       <% end -%>
       <%= content_tag :div, :class => "field" do -%>
-        <%= s.label :parent_element, "Child element of root, for multi-item spreadsheets (optional):" %>
+        <%= s.label :parent_element, t('colenda.metadata_sources.metadata_mapping.child_element.label') %>
         <%= s.select :parent_element, parent_element_options, :include_blank => :true %>
-        <%= content_tag(:div, "For single spreadsheets that describe more than one item -- Parent of each row of values in metadata source spreadsheet; Child of the root element.", :class => "field-tip") %>
+        <%= content_tag(:div, t('colenda.metadata_sources.metadata_mapping.child_element.tip'), :class => "field-tip") %>
       <% end -%>
 
       <% if source.source_type == "voyager" -%>
         <div class="voyager-descriptive-preview">
-          <h2>Descriptive metadata fetched from Voyager</h2>
+          <h2><%= t('colenda.metadata_sources.metadata_mapping.voyager.heading') %></h2>
           <ul>
             <% source.user_defined_mappings.each do |m| -%>
-              <li><strong><%= "#{m.first}" %>:</strong> <%= "#{m.last}"%></li>
+              <li><strong><%= "#{m.first}" %><%= t('colenda.metadata_sources.metadata_mapping.voyager.field_separator') %></strong> <%= "#{m.last}"%></li>
             <% end -%>
           </ul>
         </div>
@@ -35,7 +35,7 @@
         <% source.original_mappings.each do |p| %>
           <% value = (s.object.user_defined_mappings.present? && s.object.user_defined_mappings[p.first].present?) ? s.object.user_defined_mappings[p.first].values.first : schema_term_default(p.first) %>
           <%= content_tag :div, :class => "field" do -%>
-            <%= s.label "user_defined_mappings[#{p.first}][mapped_value]", "\"#{p.first}\" should map to:" %>
+            <%= s.label "user_defined_mappings[#{p.first}][mapped_value]", t('colenda.metadata_sources.metadata_mapping.custom.field.label', :field => p.first) %>
             <%= select_tag "metadata_builder[metadata_source_attributes][#{counter}][user_defined_mappings][#{p.first}][mapped_value]", options_for_select(schema_terms, value) %>
             <%= content_tag(:div, "Example values from source: #{p.last.to_s}", :class => "field-tip") %>
           <% end -%>

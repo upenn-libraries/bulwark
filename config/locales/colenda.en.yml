@@ -1,0 +1,53 @@
+en:
+  colenda:
+    rails_admin:
+      dashboard_link_text: 'Admin Dashboard'
+      labels:
+        generate_xml:
+          first_time: 'Generate XML'
+          additional_times: 'Regenerate XML'
+        source_select:
+          first_time: 'Select metadata sources'
+          additional_times: 'Update metadata source selections'
+        metadata_mappings:
+          first_time: 'Save metadata mappings'
+          additional_times: 'Update metadata mappings'
+        extract_metadata:
+          first_time: 'Extract metadata from sources'
+          additional_times: 'Refresh extracted metadata from sources'
+        metadata_source_additional_info:
+          first_time: 'Save additional information'
+          additional_times: 'Update additional information'
+        set_source_types:
+          first_time: 'Save source types'
+          additional_times: 'Update source types'
+        publish_preview:
+          first_time: 'Publish preview'
+          additional_times: 'Republish preview'
+    metadata_builders:
+      generate_metadata_link_text: 'Generate Metadata form'
+      warnings:
+        no_qualified_metadata: 'The metadata directory (%{directory}) is empty.  Add some files, upload to the server, and refresh this page to designate metadata sources.'
+        no_mappings: 'No metadata schema mappings have been generated yet.  To generate the metadata schema to use for creating this preservation XML, use the %{href}'
+      source_select:
+        multiple_files: 'Hold down the Shift key to select multiple files.'
+        fieldset_label: 'Select metadata source files from the following:'
+        label: 'Select metadata sources:'
+    metadata_sources:
+      metadata_mapping:
+        fieldset_label: 'Map source metadata to XML'
+        instructions: 'Fill out the fields below to field values from metadata source files to XML.'
+        mappings:
+          heading: 'Mappings for %{file_name}'
+        root_element:
+          label: 'Root element:'
+          tip: 'Root element of the XML schema generated -- defaults to "root" if left blank.'
+        child_element:
+          label: 'Child element of root, for multi-item spreadsheets (optional):'
+          tip: 'For single spreadsheets that describe more than one item -- Parent of each row of values in metadata source spreadsheet; Child of the root element.'
+        voyager:
+          heading: 'Descriptive metadata fetched from Voyager'
+          field_separator: ':'
+        custom:
+          field:
+            label: '"%{field}" should map to:'
