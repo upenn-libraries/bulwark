@@ -19,15 +19,17 @@ en:
         clear_files:
           success: 'Unidentified files have been removed from the repository.'
     mailers:
+      addresses:
+        default: 'colenda@upenn.edu'
       notification:
         ingest:
-          subject: 'Ingestion and Derivative Generation'
+          subject: 'Ingestion and Derivative Generation completed'
           body: '%{uuid} has been ingested and its derivatives generated.  It is ready for review.\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/ingest'
         generate_xml:
-          subject: 'Preservation XML Generated'
+          subject: 'Preservation XML Generation completed'
           body: 'Preservation-level XML generated for %{uuid} has been generated and is ready for review.\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/preview_xml'
         metadata_extraction:
-          subject: 'Metadata Extracted'
+          subject: 'Metadata Extraction completed'
           body: 'Metadata extraction complete for %{uuid}\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/generate_metadata'
     rails_admin:
       dashboard_link_text: 'Admin Dashboard'
