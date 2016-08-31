@@ -117,6 +117,12 @@ en:
         children:
           label: 'Child/children of %{parent}'
     warnings:
+      out_of_sync:
+        extraction: 'Metadata Source settings have been updated since the last extraction of metadata.  Please press the button below to extract metadata based on these new settings.'
+        xml: 'Metadata has been updated since the last time this XML was generated.  Please press the button below to generate XML with the most current metadata.'
       i_broke: 'Something went wrong. Please contact the site administrator.'
+    links:
+      review_status: 'Update Review Status for this Object'
+      new_tab: 'Opens in a new tab'
     image_pages:
       heading: 'Page Details'

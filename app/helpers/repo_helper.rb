@@ -40,7 +40,7 @@ module RepoHelper
     begin
       obj = ActiveFedora::Base.find(ingested_id)
       truncated_title = "#{obj.title.first[0..100]}..."
-      return link_to(truncated_title, Rails.application.routes.url_helpers.catalog_url(obj, :only_path => true), :target => "_blank", :title => "Opens in a new  tab").html_safe
+      return link_to(truncated_title, Rails.application.routes.url_helpers.catalog_url(obj, :only_path => true), :target => "_blank", :title => t('colenda.links.new_tab')).html_safe
     rescue ActiveFedora::ObjectNotFoundError
       @object.ingested.delete(ingested_id)
       @object.save!
@@ -55,7 +55,7 @@ module RepoHelper
   end
 
   def render_review_link(repo_id)
-    return link_to("Update Review Status for this Object", "#{root_url}/admin_repo/repo/#{repo_id}/ingest")
+    return link_to(t('colenda.links.review_status'), "#{root_url}/admin_repo/repo/#{repo_id}/ingest")
   end
 
   def problem_files(problem_type)
