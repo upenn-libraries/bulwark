@@ -15,9 +15,9 @@ class ReposController < ApplicationController
 
   def update
     if @repo.update(repo_params)
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_actions", :flash => { :success => "Repo updated successfully."}
+      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_actions", :flash => { :success => t('colenda.controllers.repos.update.success')}
     else
-      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_actions", :flash => { :error => "Repo was not updated successfully."}
+      redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/git_actions", :flash => { :error => t('colenda.controllers.repos.update.error')}
     end
   end
 
@@ -28,7 +28,7 @@ class ReposController < ApplicationController
 
   def review_status
     @message = @repo.update(repo_params)
-    redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/ingest", :flash => { :success => "Review status note added." }
+    redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/ingest", :flash => { :success => t('colenda.controllers.repos.review_status.success') }
   end
 
   def preview_xml_preview
@@ -53,7 +53,7 @@ class ReposController < ApplicationController
     end
 
     def format_review_status(message)
-      message << " -- #{current_user.email} || #{Time.now}"
+      message << t('colenda.controllers.repos.review_status.suffix', :email => current_user.email, :timestamp => Time.now)
       return message
     end
 end

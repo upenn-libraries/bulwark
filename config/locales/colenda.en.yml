@@ -1,5 +1,24 @@
 en:
   colenda:
+    controllers:
+      repos:
+        update:
+          success: 'Repo updated successfully.'
+          error: 'Repo was not updated successfully.'
+        review_status:
+          success: 'Review status note added.'
+          suffix: ' -- %{email} || %{timestamp}'
+      metadata_builders:
+        update:
+          success: 'Metadata Builder updated successfully.'
+          error: 'Metadata Builder was not updated successfully.'
+        ingest:
+          error: 'Select at least one file to ingest.'
+        set_source:
+          success: 'Metadata sources set successfully.'
+        clear_files:
+          success: 'Unidentified files have been removed from the repository.'
+      metadata_sources:
     rails_admin:
       dashboard_link_text: 'Admin Dashboard'
       processing_job_message: 'Processing your job in the background.  You will receive an email when it is complete.'
