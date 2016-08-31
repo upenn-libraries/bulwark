@@ -2,7 +2,7 @@
   <%= form_for @object.metadata_builder, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
     <% @object.metadata_builder.metadata_source.where(source_type: "custom").each do |source| %>
       <%= f.fields_for :metadata_source, source do |s| %>
-      <%= field_set_tag "Define the orientation of the field mappings for <span class=\"file-path\">#{prettify(source.path)}</span>".html_safe do %>
+      <%= field_set_tag t('colenda.metadata_sources.describe.xy.fieldset_label', :source => content_tag(:span, prettify(source.path), :class => "file-path")).html_safe do %>
       <div class="source-type">
         <% MetadataSource.sheet_types.each do |mb| %>
         <div class="visual-illustration">
@@ -18,7 +18,7 @@
       <div class="source-coordinates">
         <div class="visual-illustration">
           <div id="xy-start"></div>
-          <%= field_set_tag "Define the X & Y coordinates of the cell at which field mappings begin:" do %>
+          <%= field_set_tag t('colenda.metadata_sources.describe.xy.start_label') do %>
           <%= s.label :x_start %>
           <%= s.number_field :x_start %>
           <%= s.label :y_start %>
@@ -29,7 +29,7 @@
       <div class="source-coordinates">
         <div class="visual-illustration">
           <div id="xy-stop"></div>
-          <%= field_set_tag "Define the X & Y coordinates of the cell at which field mappings end:" do %>
+          <%= field_set_tag t('colenda.metadata_sources.describe.xy.end_label') do %>
           <%= s.label :x_stop %>
           <%= s.number_field :x_stop %>
           <%= s.label :y_stop %>
@@ -42,8 +42,8 @@
           <div id="numbered-horiz"></div>
           <div id="numbered-vert"></div>
         </div>
-        <%= field_set_tag "If this metadata source describes a repeating entity, how many entities does it describe?" do %>
-        <%= s.label :num_objects, "Number of entities described by this source (for example, pages in a book):" %>
+        <%= field_set_tag t('colenda.metadata_sources.describe.number.fieldset_label') do %>
+        <%= s.label :num_objects, t('colenda.metadata_source.describe.number.label') %>
         <%= s.number_field :num_objects %>
         <% end -%>
       </div>

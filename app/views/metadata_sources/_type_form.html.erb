@@ -1,11 +1,11 @@
 <div class="metadata-source-types">
   <%= form_for @object.metadata_builder, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
-  <%= field_set_tag "Describe metadata source types:" do %>
+  <%= field_set_tag t('colenda.metadata_sources.describe.source_type.fieldset_label') do %>
       <% @object.metadata_builder.metadata_source.each do |source| %>
-        <h3>What type of metadata source is <span class="file-path"><%= prettify(source.path) %></span>?</h3>
+        <h3><%= t('colenda.metadata_sources.describe.source_type.heading', :source => content_tag(:span, prettify(source.path), :class => "file-path")).html_safe %></h3>
         <%= f.fields_for :metadata_source, source do |s| %>
           <div class="input-fields">
-            <%= s.label :source_type, "Source Type" %>
+            <%= s.label :source_type, t('colenda.metadata_sources.describe.source_type.label') %>
             <%= s.select :source_type, MetadataSource.source_types %>
           </div>
         <% end %>

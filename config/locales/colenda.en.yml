@@ -2,6 +2,7 @@ en:
   colenda:
     rails_admin:
       dashboard_link_text: 'Admin Dashboard'
+      processing_job_message: 'Processing your job in the background.  You will receive an email when it is complete.'
       labels:
         generate_xml:
           first_time: 'Generate XML'
@@ -24,16 +25,58 @@ en:
         publish_preview:
           first_time: 'Publish preview'
           additional_times: 'Republish preview'
+    repos:
+      create_remote_link_text: 'Create Remote'
+      preservation_xml_link_text: 'Create Preservation XML'
+      warnings:
+        no_xml: 'No preservation XML has been generated for ingest yet.  To generate XML, go to the %{href} and click the "%{button_label}" button.'
+      actions:
+        heading: 'Additional Repo Actions'
+        label: 'Repo Owner:'
+        submit: 'Reassign Owner'
+      ingest:
+        select:
+          heading: 'Select file for ingest into the repository'
+        review:
+          heading: 'Click below to review of ingested item:'
+          link_text: '(Opens in a new tab) - %{href}'
+          actions:
+            heading: 'Admin Actions'
+          status:
+            heading: 'Review Status'
+          problem_files:
+            heading: 'File Issues Detected for %{human_readable_name}'
+            li: 'Filename: %{filename} - %{problem}'
+          metadata:
+            descriptive:
+              heading: 'Alphabetized metadata-only preview of %{human_readable_name}'
+            structural:
+              heading: 'Page-level metadata preview'
     metadata_builders:
       generate_metadata_link_text: 'Generate Metadata form'
       warnings:
         no_qualified_metadata: 'The metadata directory (%{directory}) is empty.  Add some files, upload to the server, and refresh this page to designate metadata sources.'
-        no_mappings: 'No metadata schema mappings have been generated yet.  To generate the metadata schema to use for creating this preservation XML, use the %{href}'
+        no_mappings: 'No metadata schema mappings have been generated yet.  To generate the metadata schema to use for creating this preservation XML, use the %{href}.'
       source_select:
         multiple_files: 'Hold down the Shift key to select multiple files.'
         fieldset_label: 'Select metadata source files from the following:'
         label: 'Select metadata sources:'
     metadata_sources:
+      select_sources_link_text: 'Select some metadata sources'
+      warnings:
+        no_sources: 'No metadata sources have been selected yet for %{source}.  %{href} based on the available files to begin generating metadata for this item.'
+      describe:
+        source_type:
+          fieldset_label: 'Describe metadata source types:'
+          heading: 'What type of metadata source is %{source}?'
+          label: 'Source Type'
+        xy:
+          fieldset_label: 'Define the orientation of the field mappings for %{source}'
+          start_label: 'Define the X & Y coordinates of the cell at which field mappings begin:'
+          end_label: 'Define the X & Y coordinates of the cell at which field mappings end:'
+        number:
+          fieldset_label: 'If this metadata source describes a repeating entity, how many entities does it describe?'
+          label: 'Number of entities described by this source (for example, pages in a book):'
       metadata_mapping:
         fieldset_label: 'Map source metadata to XML'
         instructions: 'Fill out the fields below to field values from metadata source files to XML.'
@@ -51,3 +94,10 @@ en:
         custom:
           field:
             label: '"%{field}" should map to:'
+            tip: 'Example values from source: %{example}'
+        children:
+          label: 'Child/children of %{parent}'
+    warnings:
+      i_broke: 'Something went wrong. Please contact the site administrator.'
+    image_pages:
+      heading: 'Page Details'

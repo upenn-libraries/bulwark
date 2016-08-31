@@ -1,2 +1,1 @@
-<p>No metadata sources have been selected yet for <%= "#{@object.directory}/#{@object.metadata_subdirectory}" %>.</p>
-<p><%= link_to "Select some metadata sources", rails_admin.preserve_path %> based on the available files to begin generating metadata for this item.</p>
+<p><%= t('colenda.metadata_sources.warnings.no_sources', :source => "#{@object.directory}/#{@object.metadata_subdirectory}", :href => link_to(t('colenda.metadata_sources.select_sources_link_text'), rails_admin.preserve_path)).html_safe %></p>

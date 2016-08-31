@@ -1,6 +1,6 @@
 <div class="review-status">
   <% if @object.review_status.present? %>
-  <h2>Review Status</h2>
+  <h2><%= t('colenda.repos.ingest.review.status.heading') %></h2>
   <div class="review-status-list content-block">
     <ul>
       <% @object.review_status.each do |review| %>

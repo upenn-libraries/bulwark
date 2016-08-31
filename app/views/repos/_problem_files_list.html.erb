@@ -1,5 +1,5 @@
 <ul>
   <% problem_files(problem_type).each do |file| %>
-    <li>Filename: <%= file %> - <%= problem_type.upcase %></li>
+    <li><%= t('colenda.repos.ingest.review.problem_files.li', :filename => file, :problem => problem_type.upcase) %></li>
   <% end -%>
 </ul>

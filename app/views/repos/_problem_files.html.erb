@@ -1,5 +1,5 @@
 <div class="problem-files content-block">
-  <h2>File Issues Detected for <%= @object.human_readable_name %></h2>
+  <h2><%= t('colenda.repos.ingest.review.problem_files.heading', :human_readable_name => @object.human_readable_name) %></h2>
   <%= render partial: "repos/problem_files_list", locals: {problem_type: "missing"} %>
   <%= render partial: "repos/problem_files_list", locals: {problem_type: "invalid"} %>
 </div>

@@ -1,5 +1,5 @@
 <div class="select-for-ingest">
-  <h2>Select file for ingest into the repository</h2>
+  <h2><%= t('colenda.repos.ingest.select.heading')%></h2>
   <%= form_for @object.metadata_builder, :validate => true, :method => :post, :html => { :class => "ingest-select-form" }, :url => "/metadata_builders/#{@object.metadata_builder.id}/ingest" do |f| %>
     <% @object.metadata_builder.preserve.each do |preserve| %>
     <div class="checkbox">

@@ -1,8 +1,8 @@
 <div class="additional-repo-actions">
-  <h2>Additional Repo Actions</h2>
+  <h2><%= t('colenda.repos.actions.heading') %></h2>
   <%= form_for @object, :validate => true, :html => {:class => "update-owner"}, :method => :post, :url => "/repos/#{@object.id}" do |f| %>
-    <%= f.label :owner, "Repo Owner:" %>
+    <%= f.label :owner, t('colenda.repos.actions.label') %>
     <%= f.select :owner, Repo.repo_owners %>
-    <%= f.submit "Reassign Owner"%>
+    <%= f.submit t('colenda.repos.actions.submit') %>
   <% end %>
 </div>

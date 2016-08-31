@@ -1,4 +1,4 @@
 <div class="metadata-only-preview content-block">
-  <h2>Alphabetized metadata-only preview of <%= @object.human_readable_name %></h2>
+  <h2><%= t('colenda.repos.ingest.review.metadata.descriptive.heading', :human_readable_name => @object.human_readable_name) %></h2>
   <%= attributes_display(@document).html_safe %>
 </div>

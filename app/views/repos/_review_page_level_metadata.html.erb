@@ -1,5 +1,5 @@
 <div class="structural-metadata-preview">
-  <h2>Page-level metadata preview</h2>
+  <h2><%= t('colenda.repos.ingest.review.metadata.structural.heading') %></h2>
   <% ActiveFedora::Base.where(:id => "#{@document.id}/members").each do |member| %>
     <% member.contained.each do |container| %>
       <div class="fragment">
