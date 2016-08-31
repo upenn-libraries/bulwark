@@ -18,7 +18,17 @@ en:
           success: 'Metadata sources set successfully.'
         clear_files:
           success: 'Unidentified files have been removed from the repository.'
-      metadata_sources:
+    mailers:
+      notification:
+        ingest:
+          subject: 'Ingestion and Derivative Generation'
+          body: '%{uuid} has been ingested and its derivatives generated.  It is ready for review.\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/ingest'
+        generate_xml:
+          subject: 'Preservation XML Generated'
+          body: 'Preservation-level XML generated for %{uuid} has been generated and is ready for review.\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/preview_xml'
+        metadata_extraction:
+          subject: 'Metadata Extracted'
+          body: 'Metadata extraction complete for %{uuid}\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/generate_metadata'
     rails_admin:
       dashboard_link_text: 'Admin Dashboard'
       processing_job_message: 'Processing your job in the background.  You will receive an email when it is complete.'

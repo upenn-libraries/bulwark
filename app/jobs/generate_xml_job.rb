@@ -14,9 +14,7 @@ class GenerateXmlJob < ActiveJobStatus::TrackableJob
   private
 
   def relay_message
-    MessengerClient.client.publish("XML generated")
-    NotificationMailer.process_completed_email("Preservation XML Generated", @user_email, "Preservation-level XML generated for #{@metadata_builder.repo.unique_identifier} has been generated and is ready for review.\n\nReview at: #{@root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml").deliver_now
-
+    MessengerClient.client.publish(I18n.t('rabbitmq.publish.messages.generate_xml'))
+    NotificationMailer.process_completed_email(I18n.t('colenda.mailers.notification.generate_xml.subject'), @user_email, I18n.t('colenda.mailers.notification.generate_xml.body', :uuid => @metadata_builder.repo.unique_identifier, :root_url => @root_url, :link_fragment => @metadata_builder.repo.id)).deliver_now
   end
-
 end

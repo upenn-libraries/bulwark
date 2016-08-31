@@ -52,7 +52,7 @@ class MetadataBuildersController < ApplicationController
     if params[:to_ingest].present?
       @job = IngestJob.perform_later(@metadata_builder, params[:to_ingest], root_url, current_user.email)
       session[:ingest_job_id] = @job.job_id
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest",
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest"
     else
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :error => t('colenda.controllers.metadata_builders.ingest.error')}
     end

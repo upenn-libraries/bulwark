@@ -14,8 +14,8 @@ class IngestJob < ActiveJobStatus::TrackableJob
   private
 
   def relay_message
-    MessengerClient.client.publish("Ingest complete")
-    NotificationMailer.process_completed_email("Ingestion and Derivative Generation", @user_email, "#{@metadata_builder.repo.unique_identifier} has been ingested and its derivatives generated.  It is ready for review.\n\nReview at: #{@root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest").deliver_now
+    MessengerClient.client.publish(I18n.t('rabbitmq.publish.messages.ingest'))
+    NotificationMailer.process_completed_email(I18n.t('colenda.mailers.notification.ingest.subject'), @user_email, I18n.t('colenda.mailers.notification.ingest.body', :uuid => @metadata_builder.repo.unique_identifier, :root_url => @root_url, :link_fragment => @metadata_builder.repo.id)).deliver_now
 
   end
 
