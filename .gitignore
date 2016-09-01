@@ -34,3 +34,4 @@ just_jetty.sh
 
 
 *.rdb
+.DS_Store
