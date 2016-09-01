@@ -1,0 +1,7 @@
+<div class="mapping-dashboard">
+  <% if @object.metadata_builder.metadata_source.present? %>
+    <%= render :partial => "metadata_sources/generate_metadata" %>
+  <% else %>
+    <%= render :partial => "metadata_sources/no_source" %>
+  <% end %>
+</div>

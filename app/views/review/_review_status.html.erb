@@ -1,10 +1,10 @@
 <div class="panel panel-default review-status">
   <div class="panel-heading">
-    <h2>Admin Actions</h2>
+    <h2><%= t('colenda.repos.ingest.review.actions.heading') %></h2>
   </div>
   <div class="panel-body">
     <% if local_assigns.has_key? :stats %>
-    <h3>Review Status</h3>
+    <h3><%= t('colenda.repos.ingest.review.status.heading') %></h3>
     <ul class="review-status">
       <% stats.each do |stat| %>
         <li>

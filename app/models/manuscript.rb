@@ -95,8 +95,10 @@ class Manuscript < ActiveFedora::Base
 ##########
   def attach_files(repo)
     Page.where(:parent_manuscript => self.id).each do |page|
-      Utils::Process.attach_file(repo, page, page.file_name, "pageImage")
-      self.members << page
+      if page.file_name.present?
+        Utils::Process.attach_file(repo, page, page.file_name, "pageImage")
+        self.members << page
+      end
     end
     self.save
   end

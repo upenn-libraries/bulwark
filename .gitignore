@@ -22,6 +22,9 @@
 # Ignore config yml files
 config/*.yml
 
+# Ignore custom git instructions
+/app/views/repos/_git_instructions_custom.html.erb
+
 # Ignore bash script
 repo.sh
 just_jetty.sh
@@ -31,3 +34,4 @@ just_jetty.sh
 
 
 *.rdb
+.DS_Store

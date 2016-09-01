@@ -1,7 +1,7 @@
 <div class="<%= cycle('left', 'right') -%> page">
   <%= image_tag(key) %>
   <div class="details">
-    <h2>Page Details</h2>
+    <h2><%= t('colenda.image_pages.heading') %></h2>
     <ul>
       <% @image_hash[key].each do |a| %>
         <% a_string = a.last.try(:to_sentence) || a.last %>

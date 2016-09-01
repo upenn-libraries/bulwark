@@ -15,9 +15,9 @@ module Utils
           checksum_manifest = Utils::Manifests::Manifest.new(Utils::Manifests::Checksum, checksum_path, b.content)
           checksum_manifest.save
         else
-          return {:error => "No files detected for #{directory}/#{manifest[Utils[:config].file_path_label]}"}
+          return {:error => I18n.t('colenda.utils.warnings.no_files')}
         end
-        return { :success => "Checksum log generated" }
+        return { :success => I18n.t('colenda.utils.success.checksum_log_generated') }
       end
     end
 

@@ -1,4 +1,4 @@
-class MetadataExtractionJob < ActiveJob::Base
+class MetadataExtractionJob < ActiveJobStatus::TrackableJob
 
   queue_as :metadata_extraction
 
@@ -16,8 +16,8 @@ class MetadataExtractionJob < ActiveJob::Base
   private
 
   def relay_message
-    MessengerClient.client.publish("Metadata extracted")
-    NotificationMailer.process_completed_email("Metadata Extraction", @user_email, "Metadata extraction complete for #{@metadata_builder.repo.unique_identifier}\n\nReview at: #{@root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata").deliver_now
+    MessengerClient.client.publish(I18n.t('rabbitmq.publish.messages.metadata_extraction'))
+    NotificationMailer.process_completed_email(I18n.t('colenda.mailers.notification.metadata_extraction.subject'), @user_email, I18n.t('colenda.mailers.notification.metadata_extraction.body', :uuid => @metadata_builder.repo.unique_identifier, :root_url => @root_url, :link_fragment => @metadata_builder.repo.id)).deliver_now
   end
 
 end

@@ -1,0 +1,15 @@
+<div class="structural-metadata-preview">
+  <h2><%= t('colenda.repos.ingest.review.metadata.structural.heading') %></h2>
+  <% ActiveFedora::Base.where(:id => "#{@document.id}/members").each do |member| %>
+    <% member.contained.each do |container| %>
+      <div class="fragment">
+        <% obj = ActiveFedora::Base.where(:id => ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(container.id)).target_id).first %>
+        <h3><%= obj.id %></h3>
+        <div class="thumbnail">
+          <%= image_tag("#{obj.pageImage.ldp_source.subject}", :alt => "#{obj.file_name}", :width => "100", :height => "100") %>
+        </div>
+        <%= attributes_display(obj).html_safe %>
+      </div>
+    <% end -%>
+  <% end -%>
+</div>

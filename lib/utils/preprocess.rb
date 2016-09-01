@@ -24,7 +24,7 @@ module Utils
         file_list = Dir.glob("#{parent_directory}/#{@manifest["#{Utils.config[:file_path_label]}"]}")
         return file_list
       rescue
-        puts "File list could not be generated, as the manifest has not been created.  Run `Utils::Preprocess.build_for_preprocessing(#{parent_directory})` or `Utils::Preprocess.get_filesystem_manifest_hash(#{parent_directory}/#{Utils.config[:object_semantics_location]}) before calling this method to resolve.`"
+        raise I18n.t('colenda.utils.preprocess.warnings.no_file_list', :parent_directory => parent_directory, :object_semantics_location => Utils.config[:object_semantics_location])
       end
     end
 
@@ -34,7 +34,7 @@ module Utils
       file_list = get_file_list(parent_directory)
       return manifest, file_list
       unless File.exists?(manifest_path)
-        Rails.logger.debug "WARNING: No filesystem manifest found at #{manifest_path}, skipping..."
+        Rails.logger.debug I18n.t('colenda.utils.preprocess.warnings.no_filesystem_manifest', :manifest_path => manifest_path)
       end
     end
   end

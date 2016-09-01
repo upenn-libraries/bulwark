@@ -1,0 +1,204 @@
+en:
+  colenda:
+    controllers:
+      repos:
+        update:
+          success: 'Repo updated successfully.'
+          error: 'Repo was not updated successfully.'
+        review_status:
+          success: 'Review status note added.'
+          suffix: ' -- %{email} || %{timestamp}'
+      metadata_builders:
+        update:
+          success: 'Metadata Builder updated successfully.'
+          error: 'Metadata Builder was not updated successfully.'
+        ingest:
+          error: 'Select at least one file to ingest.'
+        set_source:
+          success: 'Metadata sources set successfully.'
+        clear_files:
+          success: 'Unidentified files have been removed from the repository.'
+    mailers:
+      addresses:
+        default: 'colenda@upenn.edu'
+      notification:
+        ingest:
+          subject: 'Ingestion and Derivative Generation completed'
+          body: '%{uuid} has been ingested and its derivatives generated.  It is ready for review.\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/ingest'
+        generate_xml:
+          subject: 'Preservation XML Generation completed'
+          body: 'Preservation-level XML generated for %{uuid} has been generated and is ready for review.\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/preview_xml'
+        metadata_extraction:
+          subject: 'Metadata Extraction completed'
+          body: 'Metadata extraction complete for %{uuid}\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/generate_metadata'
+    validators:
+      xml_tags:
+        starts_with_xml: 'Invalid tag "%{mapped_value}" specified for "%{key}" - valid XML tags cannot start with %{xml}'
+        starts_with_number: 'Invalid tag "%{mapped_value}" specified for "%{key}" - valid XML tags cannot begin with numbers'
+        invalid_characters: 'Invalid tag "%{mapped_value}" specified for "%{key}" - valid XML tags can only contain letters, numbers, underscores, hyphens, and periods'
+    rails_admin:
+      new_repo:
+        metadata_subdirectory:
+          help: 'Required - subdirectory within the directory specified above that will serve as the location for the metadata to be processed by the application.'
+        assets_subdirectory:
+          help: 'Required - subdirectory within the directory specified above that will serve as the location for the assets to be processed by the application.'
+        file_extensions:
+          help: 'Required - comma-separated list of accepted file extensions for assets to be served to production from the assets subdirectory.  Example: jpeg,tif'
+        metadata_source_extensions:
+          help: 'Required - comma-separated list of accepted file extensions for metadata source files to be served from the metadata subdirectory.'
+        preservation_filename:
+          help: 'Required - Filename for long-term preservation XML file'
+      dashboard_link_text: 'Admin Dashboard'
+      processing_job_message: 'Processing your job in the background.  You will receive an email when it is complete.'
+      labels:
+        generate_xml:
+          first_time: 'Generate XML'
+          additional_times: 'Regenerate XML'
+        source_select:
+          first_time: 'Select metadata sources'
+          additional_times: 'Update metadata source selections'
+        metadata_mappings:
+          first_time: 'Save metadata mappings'
+          additional_times: 'Update metadata mappings'
+        extract_metadata:
+          first_time: 'Extract metadata from sources'
+          additional_times: 'Refresh extracted metadata from sources'
+        metadata_source_additional_info:
+          first_time: 'Save additional information'
+          additional_times: 'Update additional information'
+        set_source_types:
+          first_time: 'Save source types'
+          additional_times: 'Update source types'
+        publish_preview:
+          first_time: 'Publish preview'
+          additional_times: 'Republish preview'
+    repos:
+      create_remote_link_text: 'Create Remote'
+      preservation_xml_link_text: 'Create Preservation XML'
+      warnings:
+        no_xml: 'No preservation XML has been generated for ingest yet.  To generate XML, go to the %{href} and click the "%{button_label}" button.'
+      actions:
+        heading: 'Additional Repo Actions'
+        label: 'Repo Owner:'
+        submit: 'Reassign Owner'
+      ingest:
+        select:
+          heading: 'Select file for ingest into the repository'
+        review:
+          heading: 'Click below to review of ingested item:'
+          link_text: '(Opens in a new tab) - %{href}'
+          actions:
+            heading: 'Admin Actions'
+          status:
+            heading: 'Review Status'
+          problem_files:
+            heading: 'File Issues Detected for %{human_readable_name}'
+            li: 'Filename: %{filename} - %{problem}'
+          metadata:
+            descriptive:
+              heading: 'Alphabetized metadata-only preview of %{human_readable_name}'
+            structural:
+              heading: 'Page-level metadata preview'
+    metadata_builders:
+      generate_metadata_link_text: 'Generate Metadata form'
+      xml_preview_header: 'XML Sample for %{file}'
+      warnings:
+        no_qualified_metadata: 'The metadata directory (%{directory}) is empty.  Add some files, upload to the server, and refresh this page to designate metadata sources.'
+        no_mappings: 'No metadata schema mappings have been generated yet.  To generate the metadata schema to use for creating this preservation XML, use the %{href}.'
+      source_select:
+        multiple_files: 'Hold down the Shift key to select multiple files.'
+        fieldset_label: 'Select metadata source files from the following:'
+        label: 'Select metadata sources:'
+    metadata_sources:
+      select_sources_link_text: 'Select some metadata sources'
+      warnings:
+        no_sources: 'No metadata sources have been selected yet for %{source}.  %{href} based on the available files to begin generating metadata for this item.'
+      describe:
+        source_type:
+          fieldset_label: 'Describe metadata source types:'
+          heading: 'What type of metadata source is %{source}?'
+          label: 'Source Type'
+          list:
+            voyager_bibid: 'Voyager BibID Lookup Spreadsheet (XLSX)'
+            custom: 'Custom Structural Metadata Spreadsheet (XLSX)'
+        orientation:
+          vertical: 'Vertical'
+          horizontal: 'Horizontal'
+        xy:
+          fieldset_label: 'Define the orientation of the field mappings for %{source}'
+          start_label: 'Define the X & Y coordinates of the cell at which field mappings begin:'
+          end_label: 'Define the X & Y coordinates of the cell at which field mappings end:'
+        number:
+          fieldset_label: 'If this metadata source describes a repeating entity, how many entities does it describe?'
+          label: 'Number of entities described by this source (for example, pages in a book):'
+      metadata_mapping:
+        fieldset_label: 'Map source metadata to XML'
+        instructions: 'Fill out the fields below to field values from metadata source files to XML.'
+        mappings:
+          heading: 'Mappings for %{file_name}'
+        root_element:
+          label: 'Root element:'
+          tip: 'Root element of the XML schema generated -- defaults to "root" if left blank.'
+        child_element:
+          label: 'Child element of root, for multi-item spreadsheets (optional):'
+          tip: 'For single spreadsheets that describe more than one item -- Parent of each row of values in metadata source spreadsheet; Child of the root element.'
+        voyager:
+          heading: 'Descriptive metadata fetched from Voyager'
+          field_separator: ':'
+        custom:
+          field:
+            label: '"%{field}" should map to:'
+            tip: 'Example values from source: %{example}'
+        children:
+          label: 'Child/children of %{parent}'
+      xml:
+        review_tag: 'review_status'
+    version_control_agents:
+      commit_messages:
+        commit_bare: 'Added subdirectories according to the configuration specified in the repo configuration'
+        package_metadata_info: 'Added packaging info about metadata sources to admin directory'
+        voyager_derivative_spreadsheet: 'Created derivative spreadsheet of Voyager metadata'
+        generated_derivative: 'Generated derivative for %{file_name}'
+        jettison_files: 'Removed files not identified as metadata source and/or for long-term preservation'
+        write_preservation_xml: 'Generated unified XML for %{metadata_source_path} at %{xml_path}'
+      packaging_info: 'Source information for %{source_path}\npath: %{source_path}\nid (use to correlate children): %{source_id}\nsource_type: %{source_type}\nview_type: %{source_view_type}\nnum_objects: %{source_num_objects}\nx_start: %{source_x_start}\nx_stop: %{source_x_stop}\ny_start: %{source_y_start}\ny_stop: %{source_y_stop}\nchildren: %{source_children}\n\n'
+    utils:
+      warnings:
+        no_files: 'No files detected'
+      success:
+        checksum_log_generated: 'Checksum log generated'
+      version_control:
+        git_annex:
+          errors:
+            sync: 'Trying to perform git annex sync outside of an annexed repository.'
+            leftover_clone: 'Leftover Git remote clone in working directory - %{directory}.'
+            does_not_exist: 'Git remote does not exist.  Could not clone to perform tasks.'
+            no_changes: 'Nothing staged for commit.'
+      preprocess:
+        warnings:
+          no_filesystem_manifest: 'WARNING: No filesystem manifest found at %{manifest_path}, skipping...'
+          no_file_list: 'File list could not be generated, as the manifest has not been created.  Run `Utils::Preprocess.build_for_preprocessing(%{parent_directory})` or `Utils::Preprocess.get_filesystem_manifest_hash(%{parent_directory}/%{object_semantics_location}) before calling this method to resolve.`'
+      process:
+        warnings:
+          missing_identifier: 'Object(s) missing identifier.  Please check metadata source.'
+          invalid_curl_command: 'Invalid command type specified.  Command not built.'
+        success:
+          ingest_complete: 'Ingestion complete.  See link(s) below to preview ingested items associated with this repo.'
+    warnings:
+      out_of_sync:
+        extraction: 'Metadata Source settings have been updated since the last extraction of metadata.  Please press the button below to extract metadata based on these new settings.'
+        xml: 'Metadata has been updated since the last time this XML was generated.  Please press the button below to generate XML with the most current metadata.'
+      i_broke: 'Something went wrong. Please contact the site administrator.'
+    errors:
+      repos:
+        ingest_error: 'Ingest and index failed due to the following error(s): %{backtrace}'
+      metadata_sources:
+        illegal_view_type: 'Illegal view type %{view_type} for %{source}'
+        illegal_source_type: 'Illegal source type %{source_type} for %{source}'
+        illegal_source_type_generic: 'Illegal source unit type'
+        conversion_error: 'Metadata conversion failed due to the following error(s): %{backtrace}'
+    links:
+      review_status: 'Update Review Status for this Object'
+      new_tab: 'Opens in a new tab'
+    image_pages:
+      heading: 'Page Details'

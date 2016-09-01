@@ -20,16 +20,17 @@ class MetadataBuildersController < ApplicationController
         errors_rendered = Array[*@metadata_builder.errors.messages.values.flatten(1)].join(";  ").html_safe
         redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/#{_return_location}", :flash => { :error => errors_rendered }
       else
-        redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/#{_return_location}", :flash => { :success => "Metadata Builder updated successfully."}
+        redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/#{_return_location}", :flash => { :success => t('colenda.controllers.metadata_builders.update.success')}
       end
     else
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/#{_return_location}", :flash => { :error => "Metadata Builder was not updated successfully."}
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/#{_return_location}", :flash => { :error => t('colenda.controllers.metadata_builders.update.error')}
     end
   end
 
   def refresh_metadata
-    MetadataExtractionJob.perform_later(@metadata_builder, root_url, current_user.email)
-    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { :success => "Metadata being refreshed.  You will receive notification when it is complete."}
+    @job = MetadataExtractionJob.perform_later(@metadata_builder, root_url, current_user.email)
+    session[:metadata_extraction_job_id] = @job.job_id
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata"
   end
 
   def generate_metadata
@@ -37,28 +38,34 @@ class MetadataBuildersController < ApplicationController
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { @message.keys.first => @message.values.first }
   end
 
+  def custom_metadata_mapping
+    @job_id = @job.job_id
+  end
+
   def generate_preview_xml
-    GenerateXmlJob.perform_later(@metadata_builder, root_url, current_user.email)
-    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml", :flash => { :success => "Preservation XML being generated.  You will receive notification when it is complete."}
+    @job = GenerateXmlJob.perform_later(@metadata_builder, root_url, current_user.email)
+    session[:generate_xml_job_id] = @job.job_id
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml"
   end
 
   def ingest
     if params[:to_ingest].present?
-      IngestJob.perform_later(@metadata_builder, params[:to_ingest], root_url, current_user.email)
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :success => "Object queued for processing.  You will receive notification when it is complete." }
+      @job = IngestJob.perform_later(@metadata_builder, params[:to_ingest], root_url, current_user.email)
+      session[:ingest_job_id] = @job.job_id
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest"
     else
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :error => "Select at least one file to ingest."}
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :error => t('colenda.controllers.metadata_builders.ingest.error')}
     end
   end
 
   def set_source
     @metadata_builder.set_source(params[:metadata_builder][:source].reject!(&:empty?))
-    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preserve", :flash => { :success => "Metadata sources set successfully." }
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preserve", :flash => { :success => t('colenda.controllers.metadata_builders.set_source.success') }
   end
 
   def clear_files
     @metadata_builder.clear_unidentified_files
-    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preserve", :flash => { :success => "Unidentified files have been removed from the repository." }
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preserve", :flash => { :success => t('colenda.controllers.metadata_builders.clear_files.success') }
   end
 
   private

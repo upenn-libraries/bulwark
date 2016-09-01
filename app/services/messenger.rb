@@ -9,7 +9,7 @@ class Messenger
   def publish(message)
     exchange.publish(message, persistent: true)
   rescue
-    Rails.logger.warn "Could not publish message to #{amqp_host}"
+    Rails.logger.warn I18n.t('rabbitmq.errors.publish', :host => amqp_host)
   end
 
   private

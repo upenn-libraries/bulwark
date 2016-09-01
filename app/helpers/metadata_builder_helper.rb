@@ -22,7 +22,7 @@ module MetadataBuilderHelper
 
   def render_xml_warning_if_out_of_sync
     if @object.metadata_builder.last_xml_generated.present?
-      flash[:warning] =  "Metadata has been updated since the last time this XML was generated.  Please press the button below to generate XML with the most current metadata." if @object.metadata_builder.metadata_source.any?{ |ms| @object.metadata_builder.last_xml_generated < ms.last_extraction if ms.last_extraction.present? }
+      flash[:warning] =  t('colenda.warnings.out_of_sync.xml') if @object.metadata_builder.metadata_source.any?{ |ms| @object.metadata_builder.last_xml_generated < ms.last_extraction if ms.last_extraction.present? }
     end
   end
 

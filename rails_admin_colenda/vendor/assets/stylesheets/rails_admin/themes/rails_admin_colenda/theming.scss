@@ -131,10 +131,16 @@ span.inline-pre,
 .ingested-links h2,
 .review-status h2,
 .metadata-only-preview h2,
-.structural-metadata-preview h2 {
+.structural-metadata-preview h2,
+.problem-files h2 {
   font-size: 16px;
   font-weight: bold;
   padding: 10px 0px;
+}
+
+.problem-files h3 {
+  font-size: 14px;
+  font-weight:bold;
 }
 
 .select-for-ingest {

@@ -1,10 +1,10 @@
 <div class="metadata-source-select">
   <%= form_for @object.metadata_builder, :validate => true, :method => :post, :url => "/metadata_builders/#{@object.metadata_builder.id}/set_source" do |f| %>
-    <%= field_set_tag "Select metadata source files from the following:" do %>
-      <p>Hold down the Shift key to select multiple files.</p>
+    <%= field_set_tag t('colenda.metadata_builders.source_select.fieldset_label') do %>
+      <p><%= t('colenda.metadata_builders.source_select.multiple_files') %></p>
       <% @preserve = @object.metadata_builder.qualified_metadata_files %>
       <div class="source-select">
-        <%= f.label :source, "Select metadata sources:" %>
+        <%= f.label :source, t('colenda.metadata_builders.source_select.label') %>
         <%= f.select :source, prettify(@preserve).zip(@preserve), {}, { :multiple => true }  %>
       </div>
       <%= f.submit form_label("source_select", @object.steps) %>

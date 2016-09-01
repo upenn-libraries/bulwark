@@ -1,9 +1,4 @@
 <% render_xml_warning_if_out_of_sync %>
-<div class="wait hide">
-  Generating XML...<br />
-  Please do not close this window until this process completes.
-</div>
-
 <div class="xml-preview">
 <%= form_for @object.metadata_builder, :validate => true, :method => :post, :html => { :class => "xml-preview-form" }, :url => "/metadata_builders/#{@object.metadata_builder.id}/generate_preview_xml" do |f| %>
   <%= f.submit form_label("generate_xml", @object.steps), :id => "xml_preview_submit" %>

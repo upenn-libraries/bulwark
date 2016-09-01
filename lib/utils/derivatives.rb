@@ -19,7 +19,6 @@ module Utils
         image.write(derivative_link)
         return "#{fpath}/#{fname}"
       rescue
-        #TODO: log missing assets
         return
       end
     end

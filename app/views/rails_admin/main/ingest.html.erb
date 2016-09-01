@@ -1,9 +1,1 @@
-<div class="wait hide">
-  Processing and rendering previews...<br />
-  Please do not close this window until this process completes.
-</div>
-<div class="ingest-dashboard">
-  <%= render_ingest_select_form %>
-  <%= render_ingest_links %>
-  <%= render_preview_ingested %>
-</div>
+<%= render_template_based_on_status("ingest",session[:ingest_job_id]) %>
