@@ -2,9 +2,9 @@ class XmlTagsValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
     unless record.source_type == "voyager"
       value.each do |key, mapping|
-        record.errors[attribute] << "Invalid tag \"#{mapping[:mapped_value]}\" specified for \"#{key}\" - valid XML tags cannot start with #{mapping[:mapped_value].first_three}" if mapping[:mapped_value].starts_with_xml?
-        record.errors[attribute] << "Invalid tag \"#{mapping[:mapped_value]}\" specified for \"#{key}\" - valid XML tags cannot begin with numbers" if mapping[:mapped_value].starts_with_number?
-        record.errors[attribute] << "Invalid tag \"#{mapping[:mapped_value]}\" specified for \"#{key}\" - valid XML tags can only contain letters, numbers, underscores, hyphens, and periods" if mapping[:mapped_value].contains_xml_invalid_characters?
+        record.errors[attribute] << I18n.t('colenda.validators.xml.starts_with_xml', :mapped_value => mapping[:mapped_value], :key => key, :xml => mapping[:mapped_value].first_three) if mapping[:mapped_value].starts_with_xml?
+        record.errors[attribute] << I18n.t('colenda.validators.xml.starts_with_number', :mapped_value => mapping[:mapped_value], :key => key) if mapping[:mapped_value].starts_with_number?
+        record.errors[attribute] << I18n.t('colenda.validators.xml.invalid_characters', :mapped_value => mapping[:mapped_value], :key => key) if mapping[:mapped_value].contains_xml_invalid_characters?
       end
     end
   end

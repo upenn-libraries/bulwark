@@ -2,6 +2,8 @@ en:
   rabbitmq:
     publish:
       messages:
-        generate_xml: "XML generated"
-        metadata_extraction: "Metadata extracted"
-        ingest: "Ingest complete"
+        generate_xml: 'XML generated'
+        metadata_extraction: 'Metadata extracted'
+        ingest: 'Ingest complete'
+    errors:
+      publish: 'Could not publish message to %{host}'

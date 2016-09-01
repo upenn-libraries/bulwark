@@ -31,6 +31,11 @@ en:
         metadata_extraction:
           subject: 'Metadata Extraction completed'
           body: 'Metadata extraction complete for %{uuid}\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/generate_metadata'
+    validators:
+      xml_tags:
+        starts_with_xml: 'Invalid tag "%{mapped_value}" specified for "%{key}" - valid XML tags cannot start with %{xml}'
+        starts_with_number: 'Invalid tag "%{mapped_value}" specified for "%{key}" - valid XML tags cannot begin with numbers'
+        invalid_characters: 'Invalid tag "%{mapped_value}" specified for "%{key}" - valid XML tags can only contain letters, numbers, underscores, hyphens, and periods'
     rails_admin:
       dashboard_link_text: 'Admin Dashboard'
       processing_job_message: 'Processing your job in the background.  You will receive an email when it is complete.'
