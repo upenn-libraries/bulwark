@@ -439,7 +439,7 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def self.sheet_types
-      sheet_types = [[I18n.t('colenda.metadata_sources.describe.orientation.vertical'), 'horizontal'], [I18n.t('colenda.metadata_sources.describe.orientation.Horizontal', 'horizontal']]
+      sheet_types = [[I18n.t('colenda.metadata_sources.describe.orientation.vertical'), 'vertical'], [I18n.t('colenda.metadata_sources.describe.orientation.horizontal'), 'horizontal']]
     end
 
     def self.source_types
