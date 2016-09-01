@@ -85,6 +85,7 @@ en:
               heading: 'Page-level metadata preview'
     metadata_builders:
       generate_metadata_link_text: 'Generate Metadata form'
+      xml_preview_header: 'XML Sample for %{file}'
       warnings:
         no_qualified_metadata: 'The metadata directory (%{directory}) is empty.  Add some files, upload to the server, and refresh this page to designate metadata sources.'
         no_mappings: 'No metadata schema mappings have been generated yet.  To generate the metadata schema to use for creating this preservation XML, use the %{href}.'
@@ -101,6 +102,12 @@ en:
           fieldset_label: 'Describe metadata source types:'
           heading: 'What type of metadata source is %{source}?'
           label: 'Source Type'
+          list:
+            voyager_bibid: 'Voyager BibID Lookup Spreadsheet (XLSX)'
+            custom: 'Custom Structural Metadata Spreadsheet (XLSX)'
+        orientation:
+          vertical: 'Vertical'
+          horizontal: 'Horizontal'
         xy:
           fieldset_label: 'Define the orientation of the field mappings for %{source}'
           start_label: 'Define the X & Y coordinates of the cell at which field mappings begin:'
@@ -128,11 +135,29 @@ en:
             tip: 'Example values from source: %{example}'
         children:
           label: 'Child/children of %{parent}'
+      xml:
+        review_tag: 'review_status'
+    version_control_agents:
+      commit_messages:
+        commit_bare: 'Added subdirectories according to the configuration specified in the repo configuration'
+        package_metadata_info: 'Added packaging info about metadata sources to admin directory'
+        voyager_derivative_spreadsheet: 'Created derivative spreadsheet of Voyager metadata'
+        jettison_files: 'Removed files not identified as metadata source and/or for long-term preservation'
+        write_preservation_xml: 'Generated unified XML for %{metadata_source_path} at %{xml_path}'
+      packaging_info: 'Source information for %{source_path}\npath: %{source_path}\nid (use to correlate children): %{source_id}\nsource_type: %{source_type}\nview_type: %{source_view_type}\nnum_objects: %{source_num_objects}\nx_start: %{source_x_start}\nx_stop: %{source_x_stop}\ny_start: %{source_y_start}\ny_stop: %{source_y_stop}\nchildren: %{source_children}\n\n'
     warnings:
       out_of_sync:
         extraction: 'Metadata Source settings have been updated since the last extraction of metadata.  Please press the button below to extract metadata based on these new settings.'
         xml: 'Metadata has been updated since the last time this XML was generated.  Please press the button below to generate XML with the most current metadata.'
       i_broke: 'Something went wrong. Please contact the site administrator.'
+    errors:
+      repos:
+        ingest_error: 'Ingest and index failed due to the following error(s): %{backtrace}'
+      metadata_sources:
+        illegal_view_type: 'Illegal view type %{view_type} for %{source}'
+        illegal_source_type: 'Illegal source type %{source_type} for %{source}'
+        illegal_source_type_generic: 'Illegal source unit type'
+        conversion_error: 'Metadata conversion failed due to the following error(s): %{backtrace}'
     links:
       review_status: 'Update Review Status for this Object'
       new_tab: 'Opens in a new tab'

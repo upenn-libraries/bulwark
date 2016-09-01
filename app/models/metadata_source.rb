@@ -132,7 +132,7 @@ class MetadataSource < ActiveRecord::Base
       self.metadata_builder.repo.version_control_agent.unlock(f)
       self.metadata_builder.repo.version_control_agent.drop(:drop_location => f) && `rm -rf #{f}`
     end
-    self.metadata_builder.repo.version_control_agent.commit("Removed files not identified as metadata source and/or for long-term preservation.")
+    self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.jettison_files'))
     self.metadata_builder.repo.version_control_agent.push
     @@jettison_files = Set.new
   end
@@ -148,7 +148,7 @@ class MetadataSource < ActiveRecord::Base
       end
       @@jettison_files.add(xml_fname)
       _fetch_write_save_preservation_xml(xml_fname, @xml_content_final_copy)
-    end 
+    end
   end
 
   def generate_preservation_xml
@@ -217,7 +217,7 @@ class MetadataSource < ActiveRecord::Base
   def generate_review_status_xml
     review_status_xml = ""
     self.metadata_builder.repo.review_status.each do |review_status|
-      review_status_xml << "<review_status>#{review_status}</review_status>"
+      review_status_xml << "<#{I18n.t('colenda.metadata_sources.xml.review_tag')}>#{review_status}</#{I18n.t('colenda.metadata_sources.xml.review_tag')}>"
     end
     return review_status_xml
   end
@@ -296,11 +296,11 @@ class MetadataSource < ActiveRecord::Base
           self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
           @mappings = _generate_mapping_options_xlsx(full_path)
         else
-          raise "Illegal metadata source unit type"
+          raise I18n.t('colenda.errors.metadata_sources.illegal_source_type_generic')
         end
         return @mappings
       rescue
-        raise $!, "Metadata conversion failed due to the following error(s): #{$!}", $!.backtrace
+        raise $!, I18n.t('colenda.errors.metadata_sources.conversion_error', :backtrace => $!.backtrace)
       end
     end
 
@@ -339,7 +339,7 @@ class MetadataSource < ActiveRecord::Base
           iterator += 1
         end
       else
-        raise "Illegal source type #{self.view_type} for #{self.path}"
+        raise I18n.t('colenda.errors.metadata_sources.illegal_view_type', :view_type => self.view_type, :source => self.path)
       end
       return mappings
     end
@@ -362,7 +362,7 @@ class MetadataSource < ActiveRecord::Base
           xml_content << "</#{self.parent_element}>"
         end
       else
-        raise "Illegal source type #{self.source_type[source]} for #{source}"
+        raise I18n.t('colenda.errors.metadata_sources.illegal_source_type', :source_type => self.source_type[source], :source => source)
       end
       return xml_content
     end
@@ -421,7 +421,7 @@ class MetadataSource < ActiveRecord::Base
       file_path = _working_path_check(@@working_path, file_path)
       self.metadata_builder.repo.version_control_agent.unlock(file_path) if File.exists?(file_path)
       _build_preservation_xml(file_path,xml_content)
-      self.metadata_builder.repo.version_control_agent.commit("Generated unified XML for #{self.path} at #{file_path}")
+      self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_preservation_xml', :metadata_source_path => self.path, :xml_path => file_path))
       self.metadata_builder.repo.version_control_agent.push
       self.metadata_builder.save!
     end
@@ -439,11 +439,11 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def self.sheet_types
-      sheet_types = [["Vertical", "vertical"], ["Horizontal", "horizontal"]]
+      sheet_types = [[I18n.t('colenda.metadata_sources.describe.orientation.vertical'), 'horizontal'], [I18n.t('colenda.metadata_sources.describe.orientation.Horizontal', 'horizontal']]
     end
 
     def self.source_types
-      source_types = [["Voyager BibID Lookup Spreadsheet (XLSX)", "voyager"], ["Custom Structural Metadata Spreadsheet (XLSX)", "custom"]]
+      source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.voyager_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
     end
 
     def self.settings_fields
@@ -468,7 +468,7 @@ class MetadataSource < ActiveRecord::Base
     #     end
     #   end
     #   workbook.write(spreadsheet_derivative_path)
-    #   self.metadata_builder.repo.version_control_agent.commit("Created derivative spreadsheet of Voyager metadata")
+    #   self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.voyager_derivative_spreadsheet'))
     #   self.metadata_builder.repo.version_control_agent.push
     #   generate_and_build_individual_xml("#{@@working_path}/#{Utils.config[:object_derivatives_path]}/#{self.original_mappings["bibid"]}.xlsx")
     # end

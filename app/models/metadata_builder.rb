@@ -60,7 +60,6 @@ class MetadataBuilder < ActiveRecord::Base
     self.store_xml_preview
     self.last_xml_generated = DateTime.now()
     self.save!
-    return {:success => "Preservation XML generated successfully.  See preview below."}
   end
 
   def transform_and_ingest(array)
@@ -72,7 +71,6 @@ class MetadataBuilder < ActiveRecord::Base
       @vca.get(:get_location => val)
       @vca.unlock(val)
       unless canonical_identifier_check(val)
-        @status = { :error => "No canonical identifier found for /#{self.repo.metadata_subdirectory}/#{File.basename(val)}.  Skipping ingest of this file."}
         next
       end
       Dir.chdir(working_path)
@@ -81,11 +79,10 @@ class MetadataBuilder < ActiveRecord::Base
       @vca.unlock(transformed_file_path)
       FileUtils.rm(transformed_file_path) if File.exist?(transformed_file_path)
       `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
-      @status = self.repo.ingest(transformed_file_path, working_path)
+      self.repo.ingest(transformed_file_path, working_path)
     end
     @vca.reset_hard
     @vca.delete_clone
-    return @status
   end
 
   def canonical_identifier_check(xml_file)
@@ -117,7 +114,7 @@ class MetadataBuilder < ActiveRecord::Base
         sample_xml_doc = REXML::Document.new sample_xml_content
         sample_xml = ""
         sample_xml_doc.write(sample_xml, 1)
-        header = content_tag(:h2, "XML Sample for #{pretty_file}")
+        header = content_tag(:h2, I18n.t('colenda.metadata_builders.xml_preview_header', :file => pretty_file))
         xml_code = content_tag(:pre, "#{sample_xml}")
         @sample_xml_docs << content_tag(:div, anchor_tag << header << xml_code, :class => "doc")
       end

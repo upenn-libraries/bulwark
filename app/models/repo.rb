@@ -121,7 +121,7 @@ class Repo < ActiveRecord::Base
       self.version_control_agent.init_bare
       working_path = self.version_control_agent.clone
       _build_and_populate_directories(working_path)
-      self.version_control_agent.commit_bare("Added subdirectories according to the configuration specified in the repo configuration")
+      self.version_control_agent.commit_bare(I18n.t('colenda.version_control_agents.commit_messages.commit_bare'))
       self.version_control_agent.push_bare
       self.version_control_agent.delete_clone
     end
@@ -139,7 +139,7 @@ class Repo < ActiveRecord::Base
       self.update_steps(:published_preview)
       return @status
     rescue
-      raise $!, "Ingest and index failed due to the following error(s): #{$!}", $!.backtrace
+      raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => $!.backtrace)
     end
   end
 
@@ -167,10 +167,10 @@ class Repo < ActiveRecord::Base
   def package_metadata_info(working_path)
     File.open("#{working_path}/#{self.admin_subdirectory}/#{self.directory.gsub(/\.git$/, '')}", "w+") do |f|
       self.metadata_builder.metadata_source.each do |source|
-        f.puts "Source information for #{source.path}\npath: #{source.path}\nid (use to correlate children): #{source.id}\nsource_type: #{source.source_type}\nview_type: #{source.view_type}\nnum_objects: #{source.num_objects}\nx_start: #{source.x_start}\nx_stop: #{source.x_stop}\ny_start: #{source.y_start}\ny_stop: #{source.y_stop}\nchildren: #{source.children}\n\n"
+        f.puts I18n.t('colenda.version_control_agents.packaging_info', :source_path => source.path, :source_id => source.id, :source_type => source.source_type, :source_view_type => source.view_type, :source_num_objects => source.num_objects, :source_x_start => source.x_start, :source_x_stop => source.x_stop, :source_y_start => source.y_start, :source_y_stop => source.y_stop, :source_children => source.children)
       end
     end
-    self.version_control_agent.commit("Added packaging info about metadata sources to admin directory")
+    self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.package_metadata_info'))
     self.version_control_agent.push
   end
 
