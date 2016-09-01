@@ -37,6 +37,17 @@ en:
         starts_with_number: 'Invalid tag "%{mapped_value}" specified for "%{key}" - valid XML tags cannot begin with numbers'
         invalid_characters: 'Invalid tag "%{mapped_value}" specified for "%{key}" - valid XML tags can only contain letters, numbers, underscores, hyphens, and periods'
     rails_admin:
+      new_repo:
+        metadata_subdirectory:
+          help: 'Required - subdirectory within the directory specified above that will serve as the location for the metadata to be processed by the application.'
+        assets_subdirectory:
+          help: 'Required - subdirectory within the directory specified above that will serve as the location for the assets to be processed by the application.'
+        file_extensions:
+          help: 'Required - comma-separated list of accepted file extensions for assets to be served to production from the assets subdirectory.  Example: jpeg,tif'
+        metadata_source_extensions:
+          help: 'Required - comma-separated list of accepted file extensions for metadata source files to be served from the metadata subdirectory.'
+        preservation_filename:
+          help: 'Required - Filename for long-term preservation XML file'
       dashboard_link_text: 'Admin Dashboard'
       processing_job_message: 'Processing your job in the background.  You will receive an email when it is complete.'
       labels:
@@ -147,9 +158,32 @@ en:
         commit_bare: 'Added subdirectories according to the configuration specified in the repo configuration'
         package_metadata_info: 'Added packaging info about metadata sources to admin directory'
         voyager_derivative_spreadsheet: 'Created derivative spreadsheet of Voyager metadata'
+        generated_derivative: 'Generated derivative for %{file_name}'
         jettison_files: 'Removed files not identified as metadata source and/or for long-term preservation'
         write_preservation_xml: 'Generated unified XML for %{metadata_source_path} at %{xml_path}'
       packaging_info: 'Source information for %{source_path}\npath: %{source_path}\nid (use to correlate children): %{source_id}\nsource_type: %{source_type}\nview_type: %{source_view_type}\nnum_objects: %{source_num_objects}\nx_start: %{source_x_start}\nx_stop: %{source_x_stop}\ny_start: %{source_y_start}\ny_stop: %{source_y_stop}\nchildren: %{source_children}\n\n'
+    utils:
+      warnings:
+        no_files: 'No files detected'
+      success:
+        checksum_log_generated: 'Checksum log generated'
+      version_control:
+        git_annex:
+          errors:
+            sync: 'Trying to perform git annex sync outside of an annexed repository.'
+            leftover_clone: 'Leftover Git remote clone in working directory - %{directory}.'
+            does_not_exist: 'Git remote does not exist.  Could not clone to perform tasks.'
+            no_changes: 'Nothing staged for commit.'
+      preprocess:
+        warnings:
+          no_filesystem_manifest: 'WARNING: No filesystem manifest found at %{manifest_path}, skipping...'
+          no_file_list: 'File list could not be generated, as the manifest has not been created.  Run `Utils::Preprocess.build_for_preprocessing(%{parent_directory})` or `Utils::Preprocess.get_filesystem_manifest_hash(%{parent_directory}/%{object_semantics_location}) before calling this method to resolve.`'
+      process:
+        warnings:
+          missing_identifier: 'Object(s) missing identifier.  Please check metadata source.'
+          invalid_curl_command: 'Invalid command type specified.  Command not built.'
+        success:
+          ingest_complete: 'Ingestion complete.  See link(s) below to preview ingested items associated with this repo.'
     warnings:
       out_of_sync:
         extraction: 'Metadata Source settings have been updated since the last extraction of metadata.  Please press the button below to extract metadata based on these new settings.'

@@ -15,7 +15,7 @@ module Utils
       @@status_type = :error
       delete_duplicate(@oid)
       @command = _build_command("import", :file => file)
-      @@status_message = contains_blanks(file) ? "Object(s) missing identifier.  Please check metadata source." : _execute_curl
+      @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : _execute_curl
       if check_persisted(@oid)
         object_and_descendants_action(@oid, "update_index")
       end
@@ -34,7 +34,7 @@ module Utils
       repo.version_control_agent.commit("Generated derivatives for #{@oid}")
       repo.version_control_agent.push
       @@status_type = :success
-      @@status_message = "Ingestion complete.  See link(s) below to preview ingested items associated with this repo.\n"
+      @@status_message = I18n.t('colenda.utils.process.success.ingest_complete')
       return {@@status_type => @@status_message}
     end
 
@@ -57,7 +57,7 @@ module Utils
         @command = _build_command("file_attach", :file => derivative_link, :fid => parent.id, :child_container => child_container)
         _execute_curl
         repo.version_control_agent.add(:add_location => "#{@@derivatives_working_destination}")
-        repo.version_control_agent.commit("Generated derivative for #{parent.file_name}")
+        repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_derivative', :file_name => parent.file_name))
       else
         @@status_type = :warning
         if File.exist?(file_link)
@@ -152,7 +152,7 @@ module Utils
       when "delete_tombstone"
         command = "curl -u #{@fedora_user}:#{@fedora_password} -X DELETE \"#{object_uri}/fcr:tombstone\""
       else
-        raise "Invalid command type specified.  Command not built."
+        raise I18n.t('colenda.utils.process.warnings.invalid_curl_command')
       end
       return command
     end

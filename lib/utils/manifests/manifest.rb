@@ -30,7 +30,7 @@ module Utils
         begin
           FileUtils.mv(@temp_path, @path)
         rescue Exception
-          puts "Destination #{@path} does not exist.  Manifest not saved properly."
+          raise "Destination #{@path} does not exist.  Manifest not saved properly."
         end
       end
     end

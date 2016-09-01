@@ -2,7 +2,6 @@ require Rails.root.join('lib', 'rails_admin', 'git_actions.rb')
 require Rails.root.join('lib', 'rails_admin', 'create_remote.rb')
 require Rails.root.join('lib', 'rails_admin', 'clone_from_production.rb')
 require Rails.root.join('lib', 'rails_admin', 'sign_off_production.rb')
-require Rails.root.join('lib', 'rails_admin', 'report_flagged.rb')
 require Rails.root.join('lib', 'rails_admin', 'ingest.rb')
 require Rails.root.join('lib', 'rails_admin', 'generate_metadata.rb')
 require Rails.root.join('lib', 'rails_admin', 'preview_xml.rb')
@@ -64,11 +63,11 @@ RailsAdmin.config do |config|
     end
     field :metadata_subdirectory do
       required(true)
-      help "Required - subdirectory within the directory specified above that will serve as the location for the metadata to be processed by the application"
+      help I18n.t('colenda.rails_admin.new_repo.metadata_subdirectory.help')
     end
     field :assets_subdirectory do
       required(true)
-      help "Required - subdirectory within the directory specified above that will serve as the location for the assets to be processed by the application"
+      help I18n.t('colenda.rails_admin.new_repo.assets_subdirectory.help')
     end
     field :file_extensions, :enum do
       required(true)
@@ -78,7 +77,7 @@ RailsAdmin.config do |config|
       multiple do
         true
       end
-      help "Required - comma-separated list of accepted file extensions for assets to be served to production from the assets subdirectory.  Example: jpeg,tif"
+      help I18n.t('colenda.rails_admin.new_repo.file_extensions.help')
     end
     field :metadata_source_extensions, :enum do
       required(true)
@@ -88,11 +87,11 @@ RailsAdmin.config do |config|
       multiple do
         false
       end
-      help "Required - comma-separated list of accepted file extensions for metadata source files to be served from the metadata subdirectory."
+      help I18n.t('colenda.rails_admin.new_repo.metadata_source_extensions.help')
     end
     field :preservation_filename do
       required(true)
-      help "Required - Filename for long-term preservation XML file"
+      help I18n.t('colenda.rails_admin.new_repo.preservation_filename.help')
     end
     list do
       field :directory do

@@ -41,7 +41,7 @@ module Utils
         begin
           `git annex sync #{options}`
         rescue
-          puts "Trying to perform git annex sync outside of an annexed repository"
+          raise I18n.t('colenda.utils.version_control.git_annex.errors.sync')
         end
       end
 
@@ -126,11 +126,11 @@ module Utils
       def error_message(message)
         case(message)
         when /no changes/
-          error_message = "Nothing staged for commit."
+          error_message = I18n.t('colenda.utils.version_control.git_annex.errors.no_changes')
         when /does not exist/
-          error_message = "Git remote does not exist.  Could not clone to perform tasks."
+          error_message = I18n.t('colenda.utils.version_control.git_annex.errors.does_not_exist')
         when /already exists and is not an empty directory/
-          error_message = "Leftover Git remote clone in working directory - #{@working_repo_path}"
+          error_message = I18n.t('colenda.utils.version_control.git_annex.errors.leftover_clone', :directory => @working_repo_path)
         end
         return error_message
       end
