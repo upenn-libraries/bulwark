@@ -2,28 +2,10 @@ module ApplicationHelper
 
   include RailsAdmin::ApplicationHelper
 
-  def fetch_files(doc)
-    model = doc['active_fedora_model_ssi']
-    if model == "Manuscript"
-      image_hash = Hash.new
-      manuscript = model.constantize.find(doc.id)
-      ######
-      ######
-      # TODO: Make pages properly associate with manuscript without relying on parent_manuscript
-      ######
-      ######
-      pages = Page.where(parent_manuscript: manuscript.id).to_a.sort_by! {|p| p.page_number}
-      pages.each do |page|
-        file_print = page.pageImage.uri
-        image_hash[file_print.to_s.html_safe] = page.attributes
-      end
-    end
-    return image_hash
-  end
-
   def render_image_list
-    image_hash = fetch_files(@document)
-    content_tag(:div, "", id: "pages", data: image_hash.keys.to_json )
+    repo = Repo.where(:unique_identifier => @document.id).first
+    images_to_render = repo.images_to_render
+    content_tag(:div, "", id: "pages", data: images_to_render.keys.to_json )
   end
 
   def flash_class(level)

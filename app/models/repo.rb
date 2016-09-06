@@ -24,6 +24,7 @@ class Repo < ActiveRecord::Base
   serialize :review_status, Array
   serialize :steps, Hash
   serialize :problem_files, Hash
+  serialize :images_to_render, Hash
 
   def set_version_control_agent_and_repo
     yield
@@ -48,6 +49,7 @@ class Repo < ActiveRecord::Base
     self[:assets_subdirectory] = "#{Utils.config[:object_data_path]}/#{assets_subdirectory}"
   end
 
+
   def file_extensions=(file_extensions)
     self[:file_extensions] = Array.wrap(file_extensions).reject(&:empty?)
   end
@@ -66,6 +68,10 @@ class Repo < ActiveRecord::Base
 
   def review_status=(review_status)
     self[:review_status].push(Sanitize.fragment(review_status, Sanitize::Config::RESTRICTED)) if review_status.present?
+  end
+
+  def images_to_render=(images_to_render)
+    self[:images_to_render] = images_to_render.present? ? images_to_render : {}
   end
 
   def human_readable_name
@@ -108,6 +114,10 @@ class Repo < ActiveRecord::Base
     read_attribute(:steps) || ''
   end
 
+  def images_to_render
+    read_attribute(:images_to_render) || ''
+  end
+
   def has_thumbnail
     read_attribute(:has_thumbnail) || false
   end
@@ -131,6 +141,7 @@ class Repo < ActiveRecord::Base
     begin
       ingest_array = Array.new
       @status = Utils::Process.import(file, self, working_path)
+      binding.pry()
       ingest_array << File.basename(file, File.extname(file))
       self.ingested = ingest_array
       Utils::Process.refresh_assets(self)

@@ -14,6 +14,8 @@ development:
   voyager:
     root_element: root
     http_lookup: http://url/to/http/no/trailing/slash
+    structural_http_lookup: http://url/to/http/no/trailing/slash
+    structural_identifier_prefix:
     multivalue_fields:
       - language
       - subject
@@ -33,6 +35,8 @@ test:
   voyager:
     root_element: root
     http_lookup: http://url/to/http/no/trailing/slash
+    structural_http_lookup: http://url/to/http/no/trailing/slash
+    structural_identifier_prefix:
     multivalue_fields:
       - language
       - subject
@@ -52,6 +56,8 @@ production:
   voyager:
     root_element: root
     http_lookup: http://url/to/http/no/trailing/slash
+    structural_http_lookup: http://url/to/http/no/trailing/slash
+    structural_identifier_prefix:
     multivalue_fields:
       - language
       - subject

@@ -77,10 +77,6 @@ class Manuscript < ActiveFedora::Base
     index.as :stored_searchable
   end
 
-  property :file_list, predicate: ::RDF::URI.new("http://library.upenn.edu/pqc/ns/file_list") do |index|
-    index.as :displayable
-  end
-
   def init
     self.item_type ||= "Manuscript"
   end
@@ -94,12 +90,23 @@ class Manuscript < ActiveFedora::Base
 #
 ##########
   def attach_files(repo)
-    Page.where(:parent_manuscript => self.id).each do |page|
+    @images_hash = {}
+    pages = Page.where(:parent_manuscript => self.id)
+    pages.each do |page|
       if page.file_name.present?
         Utils::Process.attach_file(repo, page, page.file_name, "pageImage")
         self.members << page
       end
     end
+    pages_sorted = pages.to_a.sort_by! { |p| p.page_number }
+    pages_sorted.each do |page|
+      @images_hash[page.file_name] = page.attributes
+    end
+    binding.pry()
+    repo.images_to_render = @images_hash
+    binding.pry()
+    repo.save!
+    binding.pry()
     self.save
   end
 

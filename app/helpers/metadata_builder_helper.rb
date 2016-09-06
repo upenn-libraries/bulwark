@@ -37,7 +37,7 @@ module MetadataBuilderHelper
         file_path_string = _prettified_working_file(file_path_input)
         return file_path_string
       else
-        raise "Invalid argument #{file_path_input}. prettify can only accept strings and arrays of strings."
+        raise t('colenda.warnings.invalid_prettify_argument', :argument => file_path_input)
       end
   end
 

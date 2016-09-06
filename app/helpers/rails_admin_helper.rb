@@ -57,18 +57,18 @@ module RailsAdminHelper
   end
 
   def attributes_display(object)
-    display_hash = {}
+    atrributes_for_display = {}
     object.attribute_names.sort.each do |a_name|
       if object.try(a_name).present?
         items_for_display = []
         Array[object.try(a_name)].flatten(1).each do |value|
           items_for_display << value
         end
-        display_hash[a_name.capitalize.to_sym] = items_for_display
+        atrributes_for_display[a_name.capitalize.to_sym] = items_for_display
       end
     end
     attributes_display = ""
-    display_hash.each do |key, values|
+    atrributes_for_display.each do |key, values|
       items = wrap_values(values)
       attributes_display << content_tag(:strong, key)
       attributes_display << content_tag(:ul, items)

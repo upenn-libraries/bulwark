@@ -33,9 +33,9 @@ en:
           body: 'Metadata extraction complete for %{uuid}\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/generate_metadata'
     validators:
       xml_tags:
-        starts_with_xml: 'Invalid tag "%{mapped_value}" specified for "%{key}" - valid XML tags cannot start with %{xml}'
-        starts_with_number: 'Invalid tag "%{mapped_value}" specified for "%{key}" - valid XML tags cannot begin with numbers'
-        invalid_characters: 'Invalid tag "%{mapped_value}" specified for "%{key}" - valid XML tags can only contain letters, numbers, underscores, hyphens, and periods'
+        starts_with_xml: 'Invalid tag "%{value}" specified for "%{key}" - valid XML tags cannot start with %{xml}'
+        starts_with_number: 'Invalid tag "%{value}" specified for "%{key}" - valid XML tags cannot begin with numbers'
+        invalid_characters: 'Invalid tag "%{value}" specified for "%{key}" - valid XML tags can only contain letters, numbers, underscores, hyphens, and periods'
     rails_admin:
       new_repo:
         metadata_subdirectory:
@@ -103,7 +103,7 @@ en:
       generate_metadata_link_text: 'Generate Metadata form'
       xml_preview_header: 'XML Sample for %{file}'
       warnings:
-        no_qualified_metadata: 'The metadata directory (%{directory}) is empty.  Add some files, upload to the server, and refresh this page to designate metadata sources.'
+        no_qualified_metadata_files: 'The metadata directory (%{directory}) is empty.  Add some files, upload to the server, and refresh this page to designate metadata sources.'
         no_mappings: 'No metadata schema mappings have been generated yet.  To generate the metadata schema to use for creating this preservation XML, use the %{href}.'
       source_select:
         multiple_files: 'Hold down the Shift key to select multiple files.'
@@ -113,6 +113,7 @@ en:
       select_sources_link_text: 'Select some metadata sources'
       warnings:
         no_sources: 'No metadata sources have been selected yet for %{source}.  %{href} based on the available files to begin generating metadata for this item.'
+        unknown_source_type: 'Unknown source type.'
       describe:
         source_type:
           fieldset_label: 'Describe metadata source types:'
@@ -120,6 +121,7 @@ en:
           label: 'Source Type'
           list:
             voyager_bibid: 'Voyager BibID Lookup Spreadsheet (XLSX)'
+            structural_bibid: 'Structural Metadata from BibID Lookup Spreadsheet (XLSX)'
             custom: 'Custom Structural Metadata Spreadsheet (XLSX)'
         orientation:
           vertical: 'Vertical'
@@ -182,9 +184,11 @@ en:
         warnings:
           missing_identifier: 'Object(s) missing identifier.  Please check metadata source.'
           invalid_curl_command: 'Invalid command type specified.  Command not built.'
+          object_method_missing: 'No %{method_name} method defined for this object.'
         success:
           ingest_complete: 'Ingestion complete.  See link(s) below to preview ingested items associated with this repo.'
     warnings:
+      invalid_prettify_argument: 'Invalid argument %{argument}. prettify can only accept strings and arrays of strings.'
       out_of_sync:
         extraction: 'Metadata Source settings have been updated since the last extraction of metadata.  Please press the button below to extract metadata based on these new settings.'
         xml: 'Metadata has been updated since the last time this XML was generated.  Please press the button below to generate XML with the most current metadata.'

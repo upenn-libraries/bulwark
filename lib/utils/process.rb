@@ -20,7 +20,16 @@ module Utils
         object_and_descendants_action(@oid, "update_index")
       end
       repo.problem_files = {}
-      ActiveFedora::Base.where(:id => @oid).first.try(:attach_files, repo)
+
+
+
+      begin
+        binding.pry()
+        ActiveFedora::Base.where(:id => @oid).first.attach_files(repo)
+      rescue
+        raise I18n.t('colenda.utils.process.warnings.object_method_missing', :method_name => "attach_files")
+      end
+
       thumbnail = generate_thumbnail(repo)
       if thumbnail.present?
         repo.has_thumbnail = true
