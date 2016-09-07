@@ -138,10 +138,9 @@ class Repo < ActiveRecord::Base
   end
 
   def ingest(file, working_path)
-    begin
+    # begin
       ingest_array = Array.new
       @status = Utils::Process.import(file, self, working_path)
-      binding.pry()
       ingest_array << File.basename(file, File.extname(file))
       self.ingested = ingest_array
       Utils::Process.refresh_assets(self)
@@ -149,9 +148,9 @@ class Repo < ActiveRecord::Base
       self.package_metadata_info(working_path)
       self.update_steps(:published_preview)
       return @status
-    rescue
-      raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => $!.backtrace)
-    end
+    # rescue
+    #   raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => $!.backtrace)
+    # end
   end
 
   def load_file_extensions

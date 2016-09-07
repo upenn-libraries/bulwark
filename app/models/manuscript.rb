@@ -90,7 +90,6 @@ class Manuscript < ActiveFedora::Base
 #
 ##########
   def attach_files(repo)
-    @images_hash = {}
     pages = Page.where(:parent_manuscript => self.id)
     pages.each do |page|
       if page.file_name.present?
@@ -100,13 +99,10 @@ class Manuscript < ActiveFedora::Base
     end
     pages_sorted = pages.to_a.sort_by! { |p| p.page_number }
     pages_sorted.each do |page|
-      @images_hash[page.file_name] = page.attributes
+      display_values = {}
+      file_print = page.pageImage.uri
+      repo.images_to_render[file_print.to_s.html_safe] = page.serialized_attributes
     end
-    binding.pry()
-    repo.images_to_render = @images_hash
-    binding.pry()
-    repo.save!
-    binding.pry()
     self.save
   end
 

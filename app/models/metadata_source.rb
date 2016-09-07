@@ -309,7 +309,7 @@ class MetadataSource < ActiveRecord::Base
       data.xpath("//xml/page").each do |page|
         mapped_values["page_number"] << page["number"]
         mapped_values["identifier"] << page["id"]
-        mapped_values["file_name"] << page["image.id"]
+        mapped_values["file_name"] << "#{page["image.id"]}.tif"
         mapped_values["description"] << page["visiblepage"]
       end
       return mapped_values
@@ -427,8 +427,8 @@ class MetadataSource < ActiveRecord::Base
       xml_content = ""
       self.num_objects.times do |i|
         xml_content << "<#{self.parent_element}>"
-        self.user_defined_mappings.each do |key,value|
-          xml_content << "<#{key}>#{value[i]}</#{key}>"
+        self.user_defined_mappings.each do |key, value|
+          xml_content << "<#{key}>#{self.user_defined_mappings["#{key}"][i]}</#{key}>"
         end
         xml_content << "</#{self.parent_element}>"
       end

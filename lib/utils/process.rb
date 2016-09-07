@@ -20,16 +20,7 @@ module Utils
         object_and_descendants_action(@oid, "update_index")
       end
       repo.problem_files = {}
-
-
-
-      begin
-        binding.pry()
-        ActiveFedora::Base.where(:id => @oid).first.attach_files(repo)
-      rescue
-        raise I18n.t('colenda.utils.process.warnings.object_method_missing', :method_name => "attach_files")
-      end
-
+      attach_files(@oid, repo)
       thumbnail = generate_thumbnail(repo)
       if thumbnail.present?
         repo.has_thumbnail = true
@@ -54,6 +45,24 @@ module Utils
         @command = _build_command("delete_tombstone", :object_uri => obj.translate_id_to_uri.call(obj.id))
         _execute_curl
       end
+    end
+
+    def attach_files(oid = @oid, repo)
+      manuscript = Manuscript.find(@oid)
+      pages = Page.where(:parent_manuscript => @oid)
+      pages.each do |page|
+        if page.file_name.present?
+          attach_file(repo, page, page.file_name, "pageImage")
+          manuscript.members << page
+        end
+      end
+      pages_sorted = pages.to_a.sort_by! { |p| p.page_number }
+      pages_sorted.each do |page|
+        display_values = {}
+        file_print = page.pageImage.uri
+        repo.images_to_render[file_print.to_s.html_safe] = page.serialized_attributes
+      end
+      manuscript.save
     end
 
     def attach_file(repo, parent, file_name, child_container = "child")

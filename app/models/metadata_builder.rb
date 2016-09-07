@@ -83,7 +83,6 @@ class MetadataBuilder < ActiveRecord::Base
     end
     @vca.reset_hard
     @vca.delete_clone
-    binding.pry()
   end
 
   def canonical_identifier_check(xml_file)
