@@ -59,12 +59,12 @@ module RailsAdminHelper
   def render_display_attributes(view_type, attributes, image_key = "")
     attributes_display = ""
     attributes_display << content_tag(:h3, "#{view_type.capitalize} preview for #{identifier_selection(attributes)}")
+    attributes_display << content_tag(:div, thumbnail_preview(image_key), :class => "thumbnail") if image_key.present?
     attributes.each do |key, value|
       items = wrap_values(value)
       attributes_display << content_tag(:strong, key)
       attributes_display << content_tag(:ul, items)
     end
-    attributes_display << content_tag(:div, thumbnail_preview(image_key), :class => "thumbnail") if image_key.present?
     return content_tag(:div, attributes_display.html_safe, :class => "fragment").html_safe
   end
 
