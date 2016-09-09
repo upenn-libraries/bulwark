@@ -148,7 +148,7 @@ en:
           heading: 'Descriptive metadata fetched from Voyager'
           field_separator: ':'
         structural_bibid:
-          heading: 'Structural metadata fetched from Voyager'
+          heading: 'Sample of structural metadata fetched from Voyager (first 10 entries or fewer)'
           field_separator: ':'
         custom:
           field:
