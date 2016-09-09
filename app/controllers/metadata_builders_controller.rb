@@ -29,7 +29,7 @@ class MetadataBuildersController < ApplicationController
 
   def refresh_metadata
     @job = MetadataExtractionJob.perform_later(@metadata_builder, root_url, current_user.email)
-    session[:metadata_extraction_job_id] = @job.job_id
+    session["metadata_extraction_job_id_#{@metadata_builder.repo.unique_identifier}"] = @job.job_id
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata"
   end
 
@@ -44,14 +44,14 @@ class MetadataBuildersController < ApplicationController
 
   def generate_preview_xml
     @job = GenerateXmlJob.perform_later(@metadata_builder, root_url, current_user.email)
-    session[:generate_xml_job_id] = @job.job_id
+    session["generate_xml_job_id_#{@metadata_builder.repo.unique_identifier}"] = @job.job_id
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml"
   end
 
   def ingest
     if params[:to_ingest].present?
       @job = IngestJob.perform_later(@metadata_builder, params[:to_ingest], root_url, current_user.email)
-      session[:ingest_job_id] = @job.job_id
+      session["ingest_job_id_#{@metadata_builder.repo.unique_identifier}"] = @job.job_id
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest"
     else
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :error => t('colenda.controllers.metadata_builders.ingest.error')}

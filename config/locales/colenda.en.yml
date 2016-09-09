@@ -147,6 +147,9 @@ en:
         voyager:
           heading: 'Descriptive metadata fetched from Voyager'
           field_separator: ':'
+        structural_bibid:
+          heading: 'Structural metadata fetched from Voyager'
+          field_separator: ':'
         custom:
           field:
             label: '"%{field}" should map to:'

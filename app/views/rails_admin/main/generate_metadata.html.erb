@@ -1,1 +1,1 @@
-<%= render_template_based_on_status("metadata_extraction",session[:metadata_extraction_job_id]) %>
+<%= render_template_based_on_status("metadata_extraction",session["metadata_extraction_job_id_#{@object.unique_identifier}"]) %>

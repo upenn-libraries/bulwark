@@ -33,15 +33,15 @@ module RailsAdminHelper
   end
 
   def root_element_options
-    return MetadataSchema.config[:root_element_options]
+    MetadataSchema.config[:root_element_options]
   end
 
   def parent_element_options
-    return MetadataSchema.config[:parent_element_options]
+    MetadataSchema.config[:parent_element_options]
   end
 
   def schema_terms
-    return MetadataSchema.config[:schema_terms]
+    MetadataSchema.config[:schema_terms]
   end
 
   def schema_term_default(source_value)
@@ -53,7 +53,7 @@ module RailsAdminHelper
     else
       best_guess = schema_terms.first
     end
-    return best_guess
+    best_guess
   end
 
   def render_display_attributes(view_type, attributes, image_key = "")
@@ -65,11 +65,11 @@ module RailsAdminHelper
       attributes_display << content_tag(:strong, key)
       attributes_display << content_tag(:ul, items)
     end
-    return content_tag(:div, attributes_display.html_safe, :class => "fragment").html_safe
+    content_tag(:div, attributes_display.html_safe, :class => "fragment").html_safe
   end
 
   def wrap_values(value)
-    return content_tag(:li, value.blank? ? "N/A" : Array(value).join(", ") ).html_safe
+    content_tag(:li, value.blank? ? "N/A" : Array(value).join(", ") ).html_safe
   end
 
   def form_label(form_type, repo_steps)
@@ -108,7 +108,7 @@ module RailsAdminHelper
   end
 
   def identifier_selection(attributes)
-    return attributes["id"].present? ? attributes["id"] : "Object"
+    attributes["id"].present? ? attributes["id"] : "Object"
   end
 
   def thumbnail_preview(thumbnail_link)

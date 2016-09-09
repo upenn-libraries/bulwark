@@ -63,26 +63,25 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def transform_and_ingest(array)
-    @vca = self.repo.version_control_agent
-    working_path = @vca.clone
+    working_path = self.repo.version_control_agent.clone
     array.each do |p|
       key, val = p
       val = "#{working_path}#{val}"
-      @vca.get(:get_location => val)
-      @vca.unlock(val)
+      self.repo.version_control_agent.get(:get_location => val)
+      self.repo.version_control_agent.unlock(val)
       unless canonical_identifier_check(val)
         next
       end
       Dir.chdir(working_path)
       transformed_file_path = "#{working_path}/#{self.repo.unique_identifier}.xml"
-      @vca.get(:get_location => transformed_file_path)
-      @vca.unlock(transformed_file_path)
+      self.repo.version_control_agent.get(:get_location => transformed_file_path)
+      self.repo.version_control_agent.unlock(transformed_file_path)
       FileUtils.rm(transformed_file_path) if File.exist?(transformed_file_path)
       `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
       self.repo.ingest(transformed_file_path, working_path)
     end
-    @vca.reset_hard
-    @vca.delete_clone
+    self.repo.version_control_agent.reset_hard
+    self.repo.version_control_agent.delete_clone
   end
 
   def canonical_identifier_check(xml_file)

@@ -99,15 +99,17 @@ class MetadataSource < ActiveRecord::Base
   def set_metadata_mappings(working_path = @@working_path)
     if self.source_type.present?
       case self.source_type
-      when "custom"
+      when 'custom'
         unless self.root_element.present?
           self.root_element = "pages"
           self.parent_element = "page"
         end
         self.original_mappings = _convert_metadata(working_path)
-      when "structural_bibid"
+        when 'structural_bibid'
+        self.root_element = "pages"
+        self.parent_element = "page"
         self.user_defined_mappings = _set_voyager_structural_metadata(working_path)
-      when "voyager"
+      when 'voyager'
         self.root_element = MetadataSchema.config[:voyager][:root_element] || "voyager_object"
         self.user_defined_mappings = _set_voyager_data(working_path)
       end
@@ -143,11 +145,11 @@ class MetadataSource < ActiveRecord::Base
     xml_fname = "#{fname}.xml"
     if self.user_defined_mappings.present?
       case self.source_type
-      when "custom"
+      when 'custom'
         @xml_content_final_copy = xml_from_custom(fname)
-      when "voyager"
+      when 'voyager'
         @xml_content_final_copy = xml_from_voyager
-      when "structural_bibid"
+      when 'structural_bibid'
         @xml_content_final_copy = xml_from_structural_bibid
       end
       @@jettison_files.add(xml_fname)
@@ -320,11 +322,11 @@ class MetadataSource < ActiveRecord::Base
       self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
       worksheet = RubyXL::Parser.parse(full_path)
       case self.source_type
-      when "voyager"
+      when 'voyager'
         page = 0
         x = 0
         y = 1
-      when "structural_bibid"
+      when 'structural_bibid'
         page = 0
         x = 0
         y = 0
@@ -347,7 +349,7 @@ class MetadataSource < ActiveRecord::Base
         pathname = Pathname.new(self.path)
         ext = pathname.extname.to_s[1..-1]
         case ext
-        when "xlsx"
+        when 'xlsx'
           full_path = _working_path_check(working_path,"#{self.path}")
           self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
           @mappings = _generate_mapping_options_xlsx(full_path)
@@ -367,7 +369,7 @@ class MetadataSource < ActiveRecord::Base
       x_start, y_start, x_stop, y_stop = _offset
       workbook = RubyXL::Parser.parse(full_path)
       case self.view_type
-      when "horizontal"
+      when 'horizontal'
         while((x_stop >= (x_start+iterator)) && (workbook[0][y_start].present?) && (workbook[0][y_start][x_start+iterator].present?))
           header = workbook[0][y_start][x_start+iterator].value
           headers << header
@@ -381,7 +383,7 @@ class MetadataSource < ActiveRecord::Base
           mappings[header] = vals
           iterator += 1
         end
-      when "vertical"
+      when 'vertical'
         while((y_stop >= (y_start+iterator)) && (workbook[0][y_start+iterator].present?) && (workbook[0][y_start+iterator][x_start].present?))
           header = workbook[0][y_start+iterator][x_start].value
           headers << header
@@ -405,13 +407,13 @@ class MetadataSource < ActiveRecord::Base
       x_start, y_start, x_stop, y_stop = _offset
       xml_content = ""
       case self.view_type
-      when "horizontal"
+      when 'horizontal'
         self.num_objects.times do |i|
           xml_content << "<#{self.parent_element}>"
           xml_content << _get_row_values(workbook, i, x_start, y_start, x_stop, y_stop)
           xml_content << "</#{self.parent_element}>"
         end
-      when "vertical"
+      when 'vertical'
         self.num_objects.times do |i|
           xml_content << "<#{self.parent_element}>"
           xml_content << _get_column_values(workbook, i, x_start, y_start, x_stop, y_stop)

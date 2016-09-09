@@ -32,10 +32,9 @@ module MetadataBuilderHelper
         file_path_input.each do |file_path|
           file_path_array << _prettified_working_file(file_path)
         end
-        return file_path_array
+        file_path_array
       elsif file_path_input.is_a? String
-        file_path_string = _prettified_working_file(file_path_input)
-        return file_path_string
+        _prettified_working_file(file_path_input)
       else
         raise t('colenda.warnings.invalid_prettify_argument', :argument => file_path_input)
       end
@@ -49,7 +48,7 @@ module MetadataBuilderHelper
 
   def _prettified_working_file(file_path)
     file_array = file_path.split("/").reverse
-    return "#{Utils.config[:object_data_path]}/#{file_array.second}/#{file_array.first}"
+    "#{Utils.config[:object_data_path]}/#{file_array.second}/#{file_array.first}"
   end
 
 end
