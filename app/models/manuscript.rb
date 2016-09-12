@@ -81,31 +81,6 @@ class Manuscript < ActiveFedora::Base
     self.item_type ||= "Manuscript"
   end
 
-##########
-#
-# Each content type should specify their own attach_files method
-# leveraging the Utils::Process module's attach_file method to
-# attach assets, and return an error message as a string if the asset
-# does not exist
-#
-##########
-  def attach_files(repo)
-    pages = Page.where(:parent_manuscript => self.id)
-    pages.each do |page|
-      if page.file_name.present?
-        Utils::Process.attach_file(repo, page, page.file_name, "pageImage")
-        self.members << page
-      end
-    end
-    pages_sorted = pages.to_a.sort_by! { |p| p.page_number }
-    pages_sorted.each do |page|
-      display_values = {}
-      file_print = page.pageImage.uri
-      repo.images_to_render[file_print.to_s.html_safe] = page.serialized_attributes
-    end
-    self.save
-  end
-
   def thumbnail_link
     self.thumbnail.ldp_source.subject
   end

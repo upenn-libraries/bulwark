@@ -28,8 +28,9 @@ module RailsAdminHelper
     ActiveJobStatus::JobStatus.get_status(job_id: job_id)
   end
 
-  def render_template_based_on_status(process,job_id)
-    render :partial => job_based_partial(process, job_id)
+  def render_status_based_template(process)
+    current_user.update_jobs
+    render :partial => job_based_partial(current_user.job_activity, process)
   end
 
   def root_element_options
@@ -93,18 +94,24 @@ module RailsAdminHelper
     end
   end
 
-  def job_based_partial(process, job_id)
+  def job_based_partial(job_data, process)
+    job_id = job_data.find{|key,value| value[:unique_identifier] == @object.unique_identifier && value[:process] == process}.try(:first)
+    (ActiveJobStatus::JobStatus.get_status(job_id: job_id) == :queued) || (ActiveJobStatus::JobStatus.get_status(job_id: job_id) == :working) ? "shared/waiting" : ready_partial(process)
+  end
+
+  def ready_partial(process)
+    partial = ''
     case process
     when "ingest"
-      ready_partial = "rails_admin/main/ingest_dashboard"
+      partial = "rails_admin/main/ingest_dashboard"
     when "metadata_extraction"
-      ready_partial = "rails_admin/main/extract_and_map_metadata"
+      partial = "rails_admin/main/extract_and_map_metadata"
     when "generate_xml"
-      ready_partial = "rails_admin/main/preview_xml"
+      partial = "rails_admin/main/preview_xml"
     else
-      ready_partial = "shared/generic_error"
+      partial = "shared/generic_error"
     end
-    (get_job_status(job_id) == :queued) || (get_job_status(job_id) == :working) ? "shared/waiting" : ready_partial
+    partial
   end
 
   def identifier_selection(attributes)

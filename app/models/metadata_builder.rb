@@ -26,8 +26,7 @@ class MetadataBuilder < ActiveRecord::Base
   def unidentified_files
     identified = (eval(self.source) + self.repo.preservation_filename)
     identified.uniq!
-    unidentified = self.all_metadata_files - identified
-    return unidentified
+    self.all_metadata_files - identified
   end
 
   def refresh_metadata
@@ -89,12 +88,11 @@ class MetadataBuilder < ActiveRecord::Base
     MetadataSchema.config[:canonical_identifier_path].each do |canon|
       @presence = doc.at("#{canon}").present?
     end
-    return @presence
+    @presence
   end
 
   def qualified_metadata_files
-    qualified_metadata_files = _available_files
-    return qualified_metadata_files
+    _available_files
   end
 
   def store_xml_preview
@@ -136,7 +134,7 @@ class MetadataBuilder < ActiveRecord::Base
       available_files << file.gsub(working_path,"")
     end
     self.repo.version_control_agent.delete_clone
-    return available_files
+    available_files
   end
 
 end

@@ -1,6 +1,6 @@
 class MetadataBuildersController < ApplicationController
 
-  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :set_preserve, :clear_files, :refresh_metadata, :fetch_voyager, :generate_metadata, :generate_preview_xml]
+  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :clear_files, :refresh_metadata, :generate_metadata, :generate_preview_xml]
 
   def show
   end
@@ -29,7 +29,7 @@ class MetadataBuildersController < ApplicationController
 
   def refresh_metadata
     @job = MetadataExtractionJob.perform_later(@metadata_builder, root_url, current_user.email)
-    session["metadata_extraction_job_id_#{@metadata_builder.repo.unique_identifier}"] = @job.job_id
+    initialize_job_activity("metadata_extraction")
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata"
   end
 
@@ -38,20 +38,16 @@ class MetadataBuildersController < ApplicationController
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata", :flash => { @message.keys.first => @message.values.first }
   end
 
-  def custom_metadata_mapping
-    @job_id = @job.job_id
-  end
-
   def generate_preview_xml
     @job = GenerateXmlJob.perform_later(@metadata_builder, root_url, current_user.email)
-    session["generate_xml_job_id_#{@metadata_builder.repo.unique_identifier}"] = @job.job_id
+    initialize_job_activity("generate_xml")
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml"
   end
 
   def ingest
     if params[:to_ingest].present?
       @job = IngestJob.perform_later(@metadata_builder, params[:to_ingest], root_url, current_user.email)
-      session["ingest_job_id_#{@metadata_builder.repo.unique_identifier}"] = @job.job_id
+      initialize_job_activity("ingest")
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest"
     else
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :error => t('colenda.controllers.metadata_builders.ingest.error')}
@@ -66,6 +62,11 @@ class MetadataBuildersController < ApplicationController
   def clear_files
     @metadata_builder.clear_unidentified_files
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preserve", :flash => { :success => t('colenda.controllers.metadata_builders.clear_files.success') }
+  end
+
+  def initialize_job_activity(process)
+    current_user.job_activity[@job.job_id] = { :unique_identifier => @metadata_builder.repo.unique_identifier, :process => process, :started => DateTime.now }
+    current_user.save
   end
 
   private

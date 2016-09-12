@@ -18,9 +18,9 @@ class MetadataSource < ActiveRecord::Base
   $xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root>"
   $xml_footer = "</root>"
 
-  @@jettison_files = Set.new
+  $jettison_files = Set.new
 
-  @@working_path
+  $working_path
 
   def path
     read_attribute(:path) || ''
@@ -96,7 +96,7 @@ class MetadataSource < ActiveRecord::Base
     self.metadata_builder.repo.update_steps(:metadata_mappings_generated) if user_defined_mappings.present?
   end
 
-  def set_metadata_mappings(working_path = @@working_path)
+  def set_metadata_mappings(working_path = $working_path)
     if self.source_type.present?
       case self.source_type
       when 'custom'
@@ -119,26 +119,26 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def build_xml
-    @@working_path = self.metadata_builder.repo.version_control_agent.clone
+    $working_path = self.metadata_builder.repo.version_control_agent.clone
     self.generate_and_build_individual_xml
     self.children.each do |child|
       source = MetadataSource.find(child)
       source.generate_and_build_individual_xml(source.path)
     end
     self.generate_preservation_xml
-    self.jettison_unwanted_files(@@jettison_files)
+    self.jettison_unwanted_files($jettison_files)
     self.metadata_builder.repo.version_control_agent.delete_clone
   end
 
   def jettison_unwanted_files(files_to_jettison)
     files_to_jettison.each do |f|
-      f = _working_path_check(@@working_path, f)
+      f = _working_path_check($working_path, f)
       self.metadata_builder.repo.version_control_agent.unlock(f)
       self.metadata_builder.repo.version_control_agent.drop(:drop_location => f) && `rm -rf #{f}`
     end
     self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.jettison_files'))
     self.metadata_builder.repo.version_control_agent.push
-    @@jettison_files = Set.new
+    $jettison_files = Set.new
   end
 
   def generate_and_build_individual_xml(fname = self.path)
@@ -152,7 +152,7 @@ class MetadataSource < ActiveRecord::Base
       when 'structural_bibid'
         @xml_content_final_copy = xml_from_structural_bibid
       end
-      @@jettison_files.add(xml_fname)
+      $jettison_files.add(xml_fname)
       _fetch_write_save_preservation_xml(xml_fname, @xml_content_final_copy)
     end
   end
@@ -161,7 +161,7 @@ class MetadataSource < ActiveRecord::Base
     if self.children.present?
       @xml_content_final = self.generate_parent_child_xml
     else
-      file = File.new(_working_path_check(@@working_path, "#{self.path}.xml"))
+      file = File.new(_working_path_check($working_path, "#{self.path}.xml"))
       @xml_content_final = file.readline
     end
     _fetch_write_save_preservation_xml(@xml_content_final)
@@ -178,12 +178,11 @@ class MetadataSource < ActiveRecord::Base
       end
     end
     @xml_content_transformed = "<#{self.root_element}>#{@xml_content}</#{self.root_element}>"
-    @xml_content_transformed
   end
 
   def xml_from_custom(fname)
     @xml_content = ""
-    unless self.children.empty?
+    if self.children.present?
       self.user_defined_mappings.each do |mapping|
         tag = mapping.last["mapped_value"]
         self.original_mappings[mapping.first].each do |field_value|
@@ -191,8 +190,8 @@ class MetadataSource < ActiveRecord::Base
         end
       end
     else
-      self.metadata_builder.repo.version_control_agent.get(:get_location => "#{@@working_path}/#{fname}")
-      @xml_content << _child_values("#{@@working_path}/#{fname}")
+      self.metadata_builder.repo.version_control_agent.get(:get_location => "#{$working_path}/#{fname}")
+      @xml_content << _child_values("#{$working_path}/#{fname}")
     end
     if self.root_element.present?
       @xml_content_transformed = "<#{root_element}>#{@xml_content}</#{root_element}>"
@@ -204,7 +203,7 @@ class MetadataSource < ActiveRecord::Base
 
   def xml_from_structural_bibid
     @xml_content = ""
-    unless self.children.empty?
+    if self.children.present?
       self.user_defined_mappings.each do |mapping|
         tag = mapping.last["mapped_value"]
         self.original_mappings[mapping.first].each do |field_value|
@@ -226,10 +225,10 @@ class MetadataSource < ActiveRecord::Base
 
   def generate_parent_child_xml
     self.children.each do |child|
-      metadata_path = "#{@@working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
+      metadata_path = "#{$working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
       child_path = MetadataSource.where(:id => child).pluck(:path).first
-      key_xml_path = _working_path_check(@@working_path, "#{self.path}.xml")
-      child_xml_path = _working_path_check(@@working_path, "#{child_path}.xml")
+      key_xml_path = _working_path_check($working_path, "#{self.path}.xml")
+      child_xml_path = _working_path_check($working_path, "#{child_path}.xml")
       self.metadata_builder.repo.version_control_agent.get(:get_location => key_xml_path)
       self.metadata_builder.repo.version_control_agent.get(:get_location => child_xml_path)
       @xml_content = File.open(key_xml_path, "r"){|io| io.read}
@@ -239,7 +238,7 @@ class MetadataSource < ActiveRecord::Base
       insert_index = @xml_content.index(end_tag)
       @xml_content.insert(insert_index, child_xml_content)
     end
-    return @xml_content
+    @xml_content
   end
 
   def generate_review_status_xml
@@ -247,7 +246,7 @@ class MetadataSource < ActiveRecord::Base
     self.metadata_builder.repo.review_status.each do |review_status|
       review_status_xml << "<#{I18n.t('colenda.metadata_sources.xml.review_tag')}>#{review_status}</#{I18n.t('colenda.metadata_sources.xml.review_tag')}>"
     end
-    return review_status_xml
+    review_status_xml
   end
 
   def parse_error_messages(error_messages)
@@ -256,17 +255,17 @@ class MetadataSource < ActiveRecord::Base
       parsed << "<li>#{message}</li>"
     end
     parsed << "</ul>"
-    return parsed
+    parsed
   end
 
   def update_last_used_settings
-    self.last_settings_updated = DateTime.now()
+    self.last_settings_updated = DateTime.now
     self.save!
   end
 
   private
 
-    def _set_voyager_data(working_path = @@working_path)
+    def _set_voyager_data(working_path = $working_path)
       _refresh_bibid(working_path)
       mapped_values = {}
       voyager_source = open("#{MetadataSchema.config[:voyager][:http_lookup]}/#{self.original_mappings["bibid"]}.xml")
@@ -296,10 +295,10 @@ class MetadataSource < ActiveRecord::Base
       mapped_values.each do |entry|
         mapped_values[entry.first] = entry.last.join(" ") unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
       end
-      return mapped_values
+      mapped_values
     end
 
-    def _set_voyager_structural_metadata(working_path = @@working_path)
+    def _set_voyager_structural_metadata(working_path = $working_path)
       mapped_values = {}
       mapped_values["page_number"] = []
       mapped_values["identifier"] = []
@@ -314,10 +313,10 @@ class MetadataSource < ActiveRecord::Base
         mapped_values["file_name"] << "#{page["image.id"]}.tif"
         mapped_values["description"] << page["visiblepage"]
       end
-      return mapped_values
+      mapped_values
     end
 
-    def _refresh_bibid(working_path = @@working_path)
+    def _refresh_bibid(working_path = $working_path)
       full_path = _working_path_check(working_path, "#{self.path}")
       self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
       worksheet = RubyXL::Parser.parse(full_path)
@@ -331,20 +330,20 @@ class MetadataSource < ActiveRecord::Base
         x = 0
         y = 0
       else
-        raise I18n.t('colenda.metadata_sources.errors.unknown_source_type')
+        raise I18n.t('colenda.errors.metadata_sources.illegal_source_type')
       end
         self.original_mappings = {"bibid" => worksheet[page][y][x].value}
     end
 
     def _fetch_header_from_voyager(voyager_field)
-      return CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes["tag"].value]["*"]
+      CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes["tag"].value]["*"]
     end
 
     def _fetch_header_from_subfield_voyager(tag_value, voyager_child_field)
-      return CustomEncodings::Marc21::Constants::TAGS[tag_value][voyager_child_field.attributes["code"].value]
+      CustomEncodings::Marc21::Constants::TAGS[tag_value][voyager_child_field.attributes["code"].value]
     end
 
-    def _convert_metadata(working_path = @@working_path)
+    def _convert_metadata(working_path = $working_path)
       begin
         pathname = Pathname.new(self.path)
         ext = pathname.extname.to_s[1..-1]
@@ -370,13 +369,13 @@ class MetadataSource < ActiveRecord::Base
       workbook = RubyXL::Parser.parse(full_path)
       case self.view_type
       when 'horizontal'
-        while((x_stop >= (x_start+iterator)) && (workbook[0][y_start].present?) && (workbook[0][y_start][x_start+iterator].present?))
+        while (x_stop >= (x_start+iterator)) && (workbook[0][y_start].present?) && (workbook[0][y_start][x_start+iterator].present?)
           header = workbook[0][y_start][x_start+iterator].value
           headers << header
           vals = []
           #This variable could be user-defined in order to let the user set the values _offset
           vals_iterator = 1
-          while(workbook[0][y_start+vals_iterator].present? && workbook[0][y_start+vals_iterator][x_start+iterator].present?) do
+          while workbook[0][y_start+vals_iterator].present? && workbook[0][y_start+vals_iterator][x_start+iterator].present? do
             vals << workbook[0][y_start+vals_iterator][x_start+iterator].value
             vals_iterator += 1
           end
@@ -384,12 +383,12 @@ class MetadataSource < ActiveRecord::Base
           iterator += 1
         end
       when 'vertical'
-        while((y_stop >= (y_start+iterator)) && (workbook[0][y_start+iterator].present?) && (workbook[0][y_start+iterator][x_start].present?))
+        while (y_stop >= (y_start+iterator)) && (workbook[0][y_start+iterator].present?) && (workbook[0][y_start+iterator][x_start].present?)
           header = workbook[0][y_start+iterator][x_start].value
           headers << header
           vals = []
           vals_iterator = 1
-          while(workbook[0][y_start+iterator].present? && workbook[0][y_start+iterator][x_start+vals_iterator].present?) do
+          while workbook[0][y_start+iterator].present? && workbook[0][y_start+iterator][x_start+vals_iterator].present? do
             vals << workbook[0][y_start+iterator][x_start+vals_iterator].value
             vals_iterator += 1
           end
@@ -399,7 +398,7 @@ class MetadataSource < ActiveRecord::Base
       else
         raise I18n.t('colenda.errors.metadata_sources.illegal_view_type', :view_type => self.view_type, :source => self.path)
       end
-      return mappings
+      mappings
     end
 
     def _child_values(source)
@@ -422,7 +421,7 @@ class MetadataSource < ActiveRecord::Base
       else
         raise I18n.t('colenda.errors.metadata_sources.illegal_source_type', :source_type => self.source_type[source], :source => source)
       end
-      return xml_content
+      xml_content
     end
 
     def _child_values_voyager
@@ -434,7 +433,7 @@ class MetadataSource < ActiveRecord::Base
         end
         xml_content << "</#{self.parent_element}>"
       end
-      return xml_content
+      xml_content
     end
 
     def _get_row_values(workbook, index, x_start, y_start, x_stop, y_stop)
@@ -445,7 +444,7 @@ class MetadataSource < ActiveRecord::Base
         field_val = workbook[0][y_start+index+_offset][x_start+h_index].present? ? workbook[0][y_start+index+_offset][x_start+h_index].value : ""
         row_value << "<#{self.user_defined_mappings[header]["mapped_value"]}>#{field_val}</#{self.user_defined_mappings[header]["mapped_value"]}>" if self.user_defined_mappings[header].present?
       end
-      return row_value
+      row_value
     end
 
     def _get_column_values(workbook, index, x_start, y_start, x_stop, y_stop)
@@ -461,12 +460,12 @@ class MetadataSource < ActiveRecord::Base
         field_val = workbook[0][y_start+h_index][index+_offset].present? ? workbook[0][y_start+h_index][index+_offset].value : ""
         column_value << "<#{self.user_defined_mappings[header]["mapped_value"]}>#{field_val}</#{self.user_defined_mappings[header]["mapped_value"]}>"
       end
-      return column_value
+      column_value
     end
 
     def _build_preservation_xml(metadata_path_and_filename, content)
-      full_filename = _working_path_check(@@working_path,"#{metadata_path_and_filename}")
-      full_preservation_filename = _working_path_check(@@working_path, "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}")
+      full_filename = _working_path_check($working_path,"#{metadata_path_and_filename}")
+      full_preservation_filename = _working_path_check($working_path, "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}")
       _manage_canonical_identifier(content) if full_filename == full_preservation_filename
       tmp_filename = "#{full_filename}.tmp"
       if File.basename(metadata_path_and_filename) == self.metadata_builder.repo.preservation_filename
@@ -488,7 +487,7 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def _fetch_write_save_preservation_xml(file_path = "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}", xml_content)
-      file_path = _working_path_check(@@working_path, file_path)
+      file_path = _working_path_check($working_path, file_path)
       self.metadata_builder.repo.version_control_agent.unlock(file_path) if File.exists?(file_path)
       _build_preservation_xml(file_path,xml_content)
       self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_preservation_xml', :metadata_source_path => self.path, :xml_path => file_path))
@@ -526,7 +525,7 @@ class MetadataSource < ActiveRecord::Base
 
 
     # def _build_spreadsheet_derivative(spreadsheet_values, options = {})
-    #   spreadsheet_derivative_path = "#{@@working_path}/#{Utils.config[:object_derivatives_path]}/#{self.original_mappings["bibid"]}.xlsx"
+    #   spreadsheet_derivative_path = "#{$working_path}/#{Utils.config[:object_derivatives_path]}/#{self.original_mappings["bibid"]}.xlsx"
     #   self.metadata_builder.metadata_source << MetadataSource.create(path: spreadsheet_derivative_path, source_type: "voyager_derivative", view_type: options[:view_type], x_start: options[:x_start], y_start: options[:y_start], x_stop: options[:x_stop], y_stop: options[:y_stop]) unless self.metadata_builder.metadata_source.where(metadata_builder_id: self.metadata_builder.id).pluck(:path) == spreadsheet_derivative_path
     #   self.metadata_builder.save!
     #   workbook = RubyXL::Workbook.new
@@ -540,7 +539,7 @@ class MetadataSource < ActiveRecord::Base
     #   workbook.write(spreadsheet_derivative_path)
     #   self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.voyager_derivative_spreadsheet'))
     #   self.metadata_builder.repo.version_control_agent.push
-    #   generate_and_build_individual_xml("#{@@working_path}/#{Utils.config[:object_derivatives_path]}/#{self.original_mappings["bibid"]}.xlsx")
+    #   generate_and_build_individual_xml("#{$working_path}/#{Utils.config[:object_derivatives_path]}/#{self.original_mappings["bibid"]}.xlsx")
     # end
 
 end

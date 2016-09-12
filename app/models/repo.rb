@@ -39,6 +39,7 @@ class Repo < ActiveRecord::Base
     mint_ezid
     self[:derivatives_subdirectory] = "#{Utils.config[:object_derivatives_path]}"
     self[:admin_subdirectory] = "#{Utils.config[:object_admin_path]}"
+    self[:has_thumbnail] = false
   end
 
   def metadata_subdirectory=(metadata_subdirectory)
@@ -119,9 +120,8 @@ class Repo < ActiveRecord::Base
   end
 
   def has_thumbnail
-    read_attribute(:has_thumbnail) || false
+    read_attribute(:has_thumbnail) || ''
   end
-
   alias_method :has_thumbnail?, :has_thumbnail
 
   def create_remote
@@ -147,22 +147,22 @@ class Repo < ActiveRecord::Base
       self.save!
       self.package_metadata_info(working_path)
       self.update_steps(:published_preview)
-      return @status
+      @status
     # rescue
     #   raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => $!.backtrace)
     # end
   end
 
   def load_file_extensions
-    return FileExtensions.asset_file_extensions
+    FileExtensions.asset_file_extensions
   end
 
   def load_metadata_source_extensions
-    return FileExtensions.metadata_source_file_extensions
+    FileExtensions.metadata_source_file_extensions
   end
 
   def preserve_exists?
-    return _check_if_preserve_exists
+    _check_if_preserve_exists
   end
 
   def update_object_review_status
@@ -171,7 +171,7 @@ class Repo < ActiveRecord::Base
 
   def directory_link
     url = "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{self.id}/git_actions"
-    return "<a href=\"#{url}\">#{self.directory}</a>"
+    "<a href=\"#{url}\">#{self.directory}</a>"
   end
 
   def package_metadata_info(working_path)
@@ -194,7 +194,7 @@ class Repo < ActiveRecord::Base
   end
 
   def self.repo_owners
-    return User.where(guest: false).pluck(:email, :email)
+    User.where(guest: false).pluck(:email, :email)
   end
 
   def format_types(extensions_array)
@@ -204,7 +204,7 @@ class Repo < ActiveRecord::Base
     else
       formatted_types = _format_singular(extensions_array)
     end
-    return formatted_types
+    formatted_types
   end
 
 private
@@ -237,14 +237,14 @@ private
 
   def _format_singular(extension)
     formatted_ft = "*.#{extension.first}"
-    return formatted_ft
+    formatted_ft
   end
 
   def _format_multiple(extensions)
     ft = extensions.map { |f| ".#{f}"}
     formatted_ft = ft.join(',')
     formatted_ft = "*{#{formatted_ft}}"
-    return formatted_ft
+    formatted_ft
   end
 
   def _initialize_steps
@@ -278,7 +278,7 @@ private
     exist_status = File.exists?(fname)
     self.version_control_agent.drop
     self.version_control_agent.delete_clone
-    return exist_status
+    exist_status
   end
 
   def _mint_and_format_ezid

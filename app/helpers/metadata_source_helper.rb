@@ -23,19 +23,18 @@ module MetadataSourceHelper
   end
 
   def render_metadata_preview(source)
-  accepted_types = ["voyager","structural_bibid"]
-  if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
-    heading_text_label = "colenda.metadata_sources.metadata_mapping.#{source.source_type}.heading"
-    field_separator_label = "colenda.metadata_sources.metadata_mapping.#{source.source_type}.field_separator"
-    mappings = ""
-    metadata_preview = content_tag(:h2,t(heading_text_label))
-    source.user_defined_mappings.each do |m,b|
-
-      mappings << content_tag(:li, "#{m}#{t(field_separator_label)} #{b.is_a?(Array) ? b.take(10).join(", ") : b}")
+    accepted_types = ["voyager","structural_bibid"]
+    if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
+      heading_text_label = "colenda.metadata_sources.metadata_mapping.#{source.source_type}.heading"
+      field_separator_label = "colenda.metadata_sources.metadata_mapping.#{source.source_type}.field_separator"
+      mappings = ""
+      metadata_preview = content_tag(:h2,t(heading_text_label))
+      source.user_defined_mappings.each do |m,b|
+        mappings << content_tag(:li, "#{m}#{t(field_separator_label)} #{b.is_a?(Array) ? b.take(10).join(", ") : b}")
+      end
+      metadata_preview << content_tag(:ul, mappings.html_safe)
+      content_tag(:div, metadata_preview.html_safe, :class => "#{source.source_type}-preview").html_safe
     end
-    metadata_preview << content_tag(:ul, mappings.html_safe)
-  end
-    content_tag(:div, metadata_preview.html_safe, :class => "#{source.source_type}-preview").html_safe
   end
 
   def render_warning_if_out_of_sync

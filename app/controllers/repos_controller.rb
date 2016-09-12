@@ -1,5 +1,5 @@
 class ReposController < ApplicationController
-  before_action :set_repo, only: [:show, :edit, :update, :destroy, :checksum_log, :ingest, :review_status, :detect_metadata, :preview_xml_preview]
+  before_action :set_repo, only: [:show, :update, :checksum_log, :review_status, :detect_metadata, :preview_xml_preview]
 
   def new
   end
@@ -54,6 +54,6 @@ class ReposController < ApplicationController
 
     def format_review_status(message)
       message << t('colenda.controllers.repos.review_status.suffix', :email => current_user.email, :timestamp => Time.now)
-      return message
+      message
     end
 end

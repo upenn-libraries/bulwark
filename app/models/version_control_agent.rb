@@ -25,77 +25,77 @@ class VersionControlAgent < ActiveRecord::Base
 
   def init_bare
     _initialize_worker
-    @@worker.initialize_bare_remote
+    $worker.initialize_bare_remote
   end
 
   def clone(options = {})
     _initialize_worker
-    options[:destination].nil? ? @@worker.clone : @@worker.clone(options[:destination])
+    options[:destination].nil? ? $worker.clone : $worker.clone(options[:destination])
   end
 
   def reset_hard
     _initialize_worker
-    @@worker.reset_hard
+    $worker.reset_hard
   end
 
   def push_bare
     _initialize_worker
-    @@worker.push_bare
+    $worker.push_bare
   end
 
   def push
     _initialize_worker
-    @@worker.push
+    $worker.push
   end
 
   def commit_bare(message)
     _initialize_worker
-    @@worker.commit_bare(message)
+    $worker.commit_bare(message)
   end
 
   def add(options)
     _initialize_worker
-    options[:get_location].nil? ? @@worker.add : @@worker.add(options[:add_location])
+    options[:get_location].nil? ? $worker.add : $worker.add(options[:add_location])
   end
 
   def commit(message)
     _initialize_worker
-    @@worker.commit(message)
+    $worker.commit(message)
   end
 
   def get(options = {})
     _initialize_worker
-    options[:get_location].nil? ? @@worker.get : @@worker.get(options[:get_location])
+    options[:get_location].nil? ? $worker.get : $worker.get(options[:get_location])
   end
 
   def sync_content
     _initialize_worker
-    @@worker.sync("--content")
+    $worker.sync("--content")
   end
 
   def drop(options = {})
     _initialize_worker
-    options[:drop_location].nil? ? @@worker.drop : @@worker.drop(options[:drop_location])
+    options[:drop_location].nil? ? $worker.drop : $worker.drop(options[:drop_location])
   end
 
   def unlock(filename)
     _initialize_worker
-    @@worker.unlock(filename)
+    $worker.unlock(filename)
   end
 
   def lock(filename)
     _initialize_worker
-    @@worker.lock(filename)
+    $worker.lock(filename)
   end
 
   def delete_clone(options = {})
     _initialize_worker
-    options[:drop_location].nil? ? @@worker.drop : @@worker.drop(options[:drop_location])
-    @@worker.remove_working_directory
+    options[:drop_location].nil? ? $worker.drop : $worker.drop(options[:drop_location])
+    $worker.remove_working_directory
   end
 
   def _initialize_worker
-    @@worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo) unless (defined?(@@worker) && @@worker.repo == repo)
+    $worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo) unless (defined?($worker) && $worker.repo == repo)
   end
 
 end
