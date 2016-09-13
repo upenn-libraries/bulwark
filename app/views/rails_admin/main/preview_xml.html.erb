@@ -1,1 +1,2 @@
-<%= render_status_based_template("generate_xml") %>
+<% render_job_statuses(@object.unique_identifier, "generate_xml") %>
+<%= render_status_based_template(@object.unique_identifier, "generate_xml") %>

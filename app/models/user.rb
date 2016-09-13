@@ -37,5 +37,7 @@ class User < ActiveRecord::Base
         self.job_activity.delete(key)
       end
     end
+    self.save
   end
+
 end
