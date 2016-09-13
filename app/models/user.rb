@@ -13,6 +13,8 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
+  serialize :job_activity, Hash
+
   # Method added by Blacklight; Blacklight uses #to_s on your
   # user class to get a user-displayable login/identifier for
   # the account.
@@ -28,4 +30,14 @@ class User < ActiveRecord::Base
   def to_s
     email
   end
+
+  def update_jobs(process)
+    self.job_activity.keys.each do |key|
+      if self.job_activity[key][:process] == process && ActiveJobStatus::JobStatus.get_status(job_id: key).nil?
+        self.job_activity.delete(key)
+      end
+    end
+    self.save
+  end
+
 end

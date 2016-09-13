@@ -1,1 +1,3 @@
-<%= render_template_based_on_status("generate_xml",session[:generate_xml_job_id]) %>
+<% render_job_statuses(@object.unique_identifier, "generate_xml") %>
+<%= render_status_based_template(@object.unique_identifier, "generate_xml") %>
+<% current_user.update_jobs("generate_xml") %>

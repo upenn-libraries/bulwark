@@ -22,6 +22,21 @@ module MetadataSourceHelper
       end
   end
 
+  def render_metadata_preview(source)
+    accepted_types = ["voyager","structural_bibid"]
+    if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
+      heading_text_label = "colenda.metadata_sources.metadata_mapping.#{source.source_type}.heading"
+      field_separator_label = "colenda.metadata_sources.metadata_mapping.#{source.source_type}.field_separator"
+      mappings = ""
+      metadata_preview = content_tag(:h2,t(heading_text_label))
+      source.user_defined_mappings.each do |m,b|
+        mappings << content_tag(:li, "#{m}#{t(field_separator_label)} #{b.is_a?(Array) ? b.take(10).join(", ") : b}")
+      end
+      metadata_preview << content_tag(:ul, mappings.html_safe)
+      content_tag(:div, metadata_preview.html_safe, :class => "#{source.source_type}-preview").html_safe
+    end
+  end
+
   def render_warning_if_out_of_sync
     flash[:warning] =  t('colenda.warnings.out_of_sync.extraction') if @object.metadata_builder.metadata_source.any?{ |ms| ms.last_settings_updated > ms.last_extraction if ms.last_extraction.present? }
   end
@@ -35,7 +50,7 @@ module MetadataSourceHelper
     child_candidates.each do |child|
       child_array << [prettify(child.first), child.last]
     end
-    return child_array
+    child_array
   end
 
 end

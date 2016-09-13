@@ -122,17 +122,18 @@ span.inline-pre,
 .about-repo h2,
 .additional-repo-actions h2,
 .git-directions h2,
-.metadata-source-select label,
-.metadata-source-types h3,
 .metadata-source-mapping h2,
-.source-coordinates legend,
 .xml-preview h2,
 .select-for-ingest h2,
 .ingested-links h2,
 .review-status h2,
 .metadata-only-preview h2,
 .structural-metadata-preview h2,
-.problem-files h2 {
+.problem-files h2,
+.metadata-source-types h3,
+.metadata-only-preview h3,
+.metadata-source-select label,
+.source-coordinates legend {
   font-size: 16px;
   font-weight: bold;
   padding: 10px 0px;
@@ -229,7 +230,8 @@ span.inline-pre,
 
 
 
-.voyager-descriptive-preview,
+.voyager-preview,
+.structural_bibid-preview,
 .doc pre,
 .content-block {
   background: $light-grey;

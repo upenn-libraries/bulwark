@@ -16,11 +16,8 @@ module Utils
       delete_duplicate(@oid)
       @command = _build_command("import", :file => file)
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : _execute_curl
-      if check_persisted(@oid)
-        object_and_descendants_action(@oid, "update_index")
-      end
       repo.problem_files = {}
-      ActiveFedora::Base.where(:id => @oid).first.try(:attach_files, repo)
+      attach_files(@oid, repo, Manuscript, Page)
       thumbnail = generate_thumbnail(repo)
       if thumbnail.present?
         repo.has_thumbnail = true
@@ -29,6 +26,7 @@ module Utils
       else
         repo.has_thumbnail = false
       end
+      update_index(@oid)
       repo.save!
       repo.version_control_agent.add(:add_location => "#{@@derivatives_working_destination}")
       repo.version_control_agent.commit("Generated derivatives for #{@oid}")
@@ -45,6 +43,29 @@ module Utils
         @command = _build_command("delete_tombstone", :object_uri => obj.translate_id_to_uri.call(obj.id))
         _execute_curl
       end
+    end
+
+    def attach_files(oid = @oid, repo, parent_model, child_model)
+      children = []
+      parent = ActiveFedora::Base.find(@oid)
+      object_uri = ActiveFedora::Base.id_to_uri(oid)
+      children_uris = ActiveFedora::Base.descendant_uris(object_uri)
+      children_uris.delete_if { |c| c == object_uri }
+      children_uris.each do |child_uri|
+        child = ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(child_uri))
+        children << child
+        if child.file_name.present?
+          attach_file(repo, child, child.file_name, "pageImage")
+          parent.members << child
+        end
+      end
+      children_sorted = children.sort_by! { |c| c.page_number }
+      children_sorted.each do |child_sorted|
+        display_values = {}
+        file_print = child_sorted.pageImage.uri
+        repo.images_to_render[file_print.to_s.html_safe] = child_sorted.serialized_attributes
+      end
+      parent.save
     end
 
     def attach_file(repo, parent, file_name, child_container = "child")
@@ -85,6 +106,12 @@ module Utils
       else
         repo.version_control_agent.clone(:destination => display_path)
         refresh_assets(repo)
+      end
+    end
+
+    def update_index(object_id)
+      if check_persisted(object_id)
+        object_and_descendants_action(object_id, "update_index")
       end
     end
 
@@ -130,13 +157,14 @@ module Utils
 
     private
 
-    @fedora_yml = "#{Rails.root}/config/fedora.yml"
-    fedora_config = YAML.load_file(File.expand_path(@fedora_yml, __FILE__))
-    @fedora_user = fedora_config['development']['user']
-    @fedora_password = fedora_config['development']['password']
-    @fedora_link = "#{fedora_config['development']['url']}#{fedora_config['development']['base_path']}"
-
     def _build_command(type, options = {})
+
+      @fedora_yml = "#{Rails.root}/config/fedora.yml"
+      fedora_config = YAML.load_file(File.expand_path(@fedora_yml, __FILE__))
+      @fedora_user = fedora_config['development']['user']
+      @fedora_password = fedora_config['development']['password']
+      @fedora_link = "#{fedora_config['development']['url']}#{fedora_config['development']['base_path']}"
+
       child_container = options[:child_container]
       file = options[:file]
       fid = options[:fid]

@@ -32,4 +32,8 @@ class Page < ActiveFedora::Base
 
   belongs_to :manuscript, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
 
+  def serialized_attributes
+    self.attribute_names.each_with_object("id" => id) { |key, hash| hash[key] = eval(self[key].inspect) }
+  end
+
 end

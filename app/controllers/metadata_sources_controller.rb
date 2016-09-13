@@ -2,8 +2,6 @@ class MetadataSourcesController < ApplicationController
 
   layout 'application'
 
-  before_action :set_metadata_source, only: [:show, :edit, :update]
-
   def new
     @metadata_source = MetadataSource.new
   end

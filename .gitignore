@@ -32,6 +32,6 @@ just_jetty.sh
 # Ignore rdf
 *.rdf
 
-
+# Other stuff
 *.rdb
-.DS_Store
+/.idea

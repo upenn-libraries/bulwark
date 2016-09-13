@@ -77,30 +77,8 @@ class Manuscript < ActiveFedora::Base
     index.as :stored_searchable
   end
 
-  property :file_list, predicate: ::RDF::URI.new("http://library.upenn.edu/pqc/ns/file_list") do |index|
-    index.as :displayable
-  end
-
   def init
     self.item_type ||= "Manuscript"
-  end
-
-##########
-#
-# Each content type should specify their own attach_files method
-# leveraging the Utils::Process module's attach_file method to
-# attach assets, and return an error message as a string if the asset
-# does not exist
-#
-##########
-  def attach_files(repo)
-    Page.where(:parent_manuscript => self.id).each do |page|
-      if page.file_name.present?
-        Utils::Process.attach_file(repo, page, page.file_name, "pageImage")
-        self.members << page
-      end
-    end
-    self.save
   end
 
   def thumbnail_link

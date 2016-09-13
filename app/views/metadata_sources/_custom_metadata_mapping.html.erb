@@ -20,16 +20,7 @@
         <%= content_tag(:div, t('colenda.metadata_sources.metadata_mapping.child_element.tip'), :class => "field-tip") %>
       <% end -%>
 
-      <% if source.source_type == "voyager" -%>
-        <div class="voyager-descriptive-preview">
-          <h2><%= t('colenda.metadata_sources.metadata_mapping.voyager.heading') %></h2>
-          <ul>
-            <% source.user_defined_mappings.each do |m| -%>
-              <li><strong><%= "#{m.first}" %><%= t('colenda.metadata_sources.metadata_mapping.voyager.field_separator') %></strong> <%= "#{m.last}"%></li>
-            <% end -%>
-          </ul>
-        </div>
-      <% end -%>
+      <%= render_metadata_preview(source) %>
 
       <% if source.source_type == "custom" -%>
         <% source.original_mappings.each do |p| %>
