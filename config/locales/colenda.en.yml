@@ -50,6 +50,10 @@ en:
           help: 'Required - Filename for long-term preservation XML file'
       dashboard_link_text: 'Admin Dashboard'
       processing_job_message: 'Processing your job in the background.  You will receive an email when it is complete.'
+      jobs:
+        queued: 'Your %{process} job for %{unique_identifier}, started on %{started}, is in the queue'
+        processing: 'Your %{process} job for %{unique_identifier}, started on %{started}, is being processed in the background'
+        complete: 'Your %{process} job for %{unique_identifier}, started on %{started}, is complete'
       labels:
         generate_xml:
           first_time: 'Generate XML'
@@ -95,10 +99,8 @@ en:
             heading: 'File Issues Detected for %{human_readable_name}'
             li: 'Filename: %{filename} - %{problem}'
           metadata:
-            descriptive:
-              heading: 'Alphabetized metadata-only preview of %{human_readable_name}'
-            structural:
-              heading: 'Page-level metadata preview'
+            preview:
+              heading: '%{view_type} preview for %{selected_attributes}'
     metadata_builders:
       generate_metadata_link_text: 'Generate Metadata form'
       xml_preview_header: 'XML Sample for %{file}'

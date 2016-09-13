@@ -54,7 +54,7 @@ module RailsAdminHelper
 
   def render_display_attributes(view_type, attributes, image_key = '')
     attributes_display = ''
-    attributes_display << content_tag(:h3, "#{view_type.capitalize} preview for #{identifier_selection(attributes)}")
+    attributes_display << content_tag(:h3, t('colenda.repos.ingest.review.metadata.preview.heading', :view_type => view_type.capitalize, :selected_attributes => identifier_selection(attributes)))
     attributes_display << content_tag(:div, thumbnail_preview(image_key), :class => 'thumbnail') if image_key.present?
     attributes.each do |key, value|
       items = wrap_values(value)
@@ -125,11 +125,11 @@ module RailsAdminHelper
   job_status = ActiveJobStatus::JobStatus.get_status(job_id: job_id)
   case job_status
     when :queued
-      [:warning, "Your #{job_info[:process]} job for #{job_info[:unique_identifier]}, started on #{job_info[:started]}, is in the queue"]
+      [:warning, t('colenda.rails_admin.jobs.queued', :process => job_info[:process], :unique_identifier => job_info[:unique_identifier], :started => job_info[:started])]
     when :working
-      [:warning, "Your #{job_info[:process]} job for #{job_info[:unique_identifier]}, started on #{job_info[:started]}, is being processed"]
+      [:warning, t('colenda.rails_admin.jobs.processing', :process => job_info[:process], :unique_identifier => job_info[:unique_identifier], :started => job_info[:started])]
     when nil
-      [:success, "Your #{job_info[:process]} job for #{job_info[:unique_identifier]}, started on #{job_info[:started]}, is complete"]
+      [:success, t('colenda.rails_admin.jobs.complete', :process => job_info[:process], :unique_identifier => job_info[:unique_identifier], :started => job_info[:started])]
     else
       nil
   end

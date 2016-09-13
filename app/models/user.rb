@@ -31,9 +31,9 @@ class User < ActiveRecord::Base
     email
   end
 
-  def update_jobs
+  def update_jobs(process)
     self.job_activity.keys.each do |key|
-      if ActiveJobStatus::JobStatus.get_status(job_id: key).nil?
+      if self.job_activity[key][:process] == process && ActiveJobStatus::JobStatus.get_status(job_id: key).nil?
         self.job_activity.delete(key)
       end
     end
