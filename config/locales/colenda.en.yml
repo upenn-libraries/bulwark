@@ -124,6 +124,7 @@ en:
           list:
             voyager_bibid: 'Voyager BibID Lookup Spreadsheet (XLSX)'
             structural_bibid: 'Structural Metadata from BibID Lookup Spreadsheet (XLSX)'
+            bibphilly: 'BibPhilly (XLSX)'
             custom: 'Custom Structural Metadata Spreadsheet (XLSX)'
         orientation:
           vertical: 'Vertical'
