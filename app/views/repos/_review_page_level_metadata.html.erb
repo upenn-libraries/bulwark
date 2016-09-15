@@ -1,5 +1,4 @@
 <div class="structural-metadata-preview">
-  <h2><%= t('colenda.repos.ingest.review.metadata.structural.heading') %></h2>
   <% @object.images_to_render.each do |segment| %>
       <%= render_display_attributes("structural", segment.last, segment.first) %>
   <% end -%>

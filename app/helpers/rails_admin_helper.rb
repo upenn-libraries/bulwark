@@ -54,7 +54,7 @@ module RailsAdminHelper
 
   def render_display_attributes(view_type, attributes, image_key = '')
     attributes_display = ''
-    attributes_display << content_tag(:h3, t('colenda.repos.ingest.review.metadata.preview.heading', :view_type => view_type.capitalize, :selected_attributes => identifier_selection(attributes)))
+    attributes_display << content_tag(:h2, t('colenda.repos.ingest.review.metadata.preview.heading', :view_type => view_type.capitalize, :selected_attributes => identifier_selection(attributes)))
     attributes_display << content_tag(:div, thumbnail_preview(image_key), :class => 'thumbnail') if image_key.present?
     attributes.each do |key, value|
       items = wrap_values(value)
