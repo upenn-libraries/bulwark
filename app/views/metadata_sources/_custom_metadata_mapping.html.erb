@@ -34,7 +34,7 @@
       <% end -%>
 
 
-      <% if @object.metadata_builder.metadata_source.size > 1 %>
+      <% if @object.metadata_builder.metadata_source.size > 1 && @object.metadata_builder.metadata_source.all? { |a| a.source_type != "bibphilly" } %>
         <h2>Define relationships</h2>
         <p>Structure relationships between multiple metadata source files</p>
         <%= content_tag :div, :class => "field" do -%>

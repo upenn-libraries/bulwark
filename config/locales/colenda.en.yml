@@ -153,6 +153,12 @@ en:
         structural_bibid:
           heading: 'Sample of structural metadata fetched from Voyager (first 10 entries or fewer)'
           field_separator: ':'
+        bibphilly:
+          heading: 'Sample metadata fetched from BibPhilly spreadsheet'
+          field_separator: ':'
+        bibphilly_structural:
+          heading: 'Sample structural metadata fetched from Page 2 of BibPhilly spreadsheet'
+          field_separator: ':'
         custom:
           field:
             label: '"%{field}" should map to:'

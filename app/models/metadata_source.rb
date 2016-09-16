@@ -272,25 +272,13 @@ class MetadataSource < ActiveRecord::Base
     self.y_stop = 72
     self.x_start = 2
 
-    structural = MetadataSource.create
-    structural.metadata_builder = self.metadata_builder
-    structural.source_type = 'bibphilly_structural'
-    structural.root_element= 'pages'
-    structural.parent_element= 'page'
-    structural.view_type = 'horizontal'
-    structural.z = 2
-    structural.y_start = 3
-    structural.y_stop = 3
-    structural.x_start = 1
-    structural.x_stop = 3
+    structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'bibphilly_structural'} ? MetadataSource.find(self.children.first) : initialize_bibphilly_structural(self.path)
 
     full_path = "#{working_path}#{self.path}"
     self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
 
     self.generate_bibphilly_descrip_md(full_path)
     structural.generate_bibphilly_struct_md(full_path)
-
-    binding.pry
 
   end
 
@@ -310,10 +298,16 @@ class MetadataSource < ActiveRecord::Base
     (1..(iterator)).each do |i|
       mapped_values = {}
       workbook[z][y_start+i].cells.each do |c|
-        mapped_values[headers[c.column]] = c.value if c.present?
+
+        if c.present? && headers[c.column].start_with?('TAG')
+          mapped_values['TAG'] = { headers[c.column] => c.value }
+        else
+          mapped_values[headers[c.column]] = c.value if c.present?
+        end
       end
       mappings[i] = mapped_values
     end
+    self.original_mappings = mappings
     self.user_defined_mappings = mappings
     self.save!
   end
@@ -338,8 +332,28 @@ class MetadataSource < ActiveRecord::Base
       end
       iterator += 1
     end
+    self.original_mappings = mappings
     self.user_defined_mappings = mappings
     self.save!
+  end
+
+  def initialize_bibphilly_structural(parent)
+    struct = MetadataSource.create
+    struct.metadata_builder = self.metadata_builder
+    struct.source_type = 'bibphilly_structural'
+    struct.root_element= 'pages'
+    struct.parent_element= 'page'
+    struct.view_type = 'horizontal'
+    struct.path = "#{parent.path} Page 2 (Structural)"
+    struct.z = 2
+    struct.y_start = 3
+    struct.y_stop = 3
+    struct.x_start = 1
+    struct.x_stop = 3
+    parent.children << struct
+    struct.save!
+    parent.save!
+    struct
   end
 
   private
