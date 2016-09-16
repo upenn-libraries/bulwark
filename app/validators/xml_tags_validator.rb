@@ -32,6 +32,10 @@ class XmlTagsValidator < ActiveModel::EachValidator
       self[0,3]
     end
 
+    def valid_xml
+      self.downcase.gsub(' ','_').gsub(/[^a-zA-Z0-9_.-]/, '')
+    end
+
   end
 
 end

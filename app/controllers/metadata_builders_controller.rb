@@ -40,8 +40,9 @@ class MetadataBuildersController < ApplicationController
   end
 
   def generate_preview_xml
-    @job = GenerateXmlJob.perform_later(@metadata_builder, root_url, current_user.email)
-    initialize_job_activity("generate_xml")
+    @metadata_builder.build_xml_files
+    #@job = GenerateXmlJob.perform_later(@metadata_builder, root_url, current_user.email)
+    #initialize_job_activity("generate_xml")
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml"
   end
 

@@ -125,7 +125,7 @@ class MetadataSource < ActiveRecord::Base
     self.generate_and_build_individual_xml
     self.children.each do |child|
       source = MetadataSource.find(child)
-      source.generate_and_build_individual_xml(source.path)
+      source.generate_and_build_individual_xml(source.path) unless source.source_type == 'bibphilly_structural'
     end
     self.generate_preservation_xml
     self.jettison_unwanted_files($jettison_files)
@@ -153,6 +153,8 @@ class MetadataSource < ActiveRecord::Base
         @xml_content_final_copy = xml_from_voyager
       when 'structural_bibid'
         @xml_content_final_copy = xml_from_structural_bibid
+      when 'bibphilly'
+        @xml_content_final_copy = xml_from_bibphilly
       end
       $jettison_files.add(xml_fname)
       _fetch_write_save_preservation_xml(xml_fname, @xml_content_final_copy)
@@ -160,7 +162,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def generate_preservation_xml
-    if self.children.present?
+    if self.children.present? && self.source_type != 'bibphilly'
       @xml_content_final = self.generate_parent_child_xml
     else
       file = File.new(_working_path_check($working_path, "#{self.path}.xml"))
@@ -225,6 +227,28 @@ class MetadataSource < ActiveRecord::Base
     @xml_content_transformed
   end
 
+  def xml_from_bibphilly
+    @parent_xml_content = ""
+    @child_xml_content = ""
+    self.user_defined_mappings.each do |mapping|
+      tag = mapping.first.valid_xml
+      mapping.last.each do |value|
+        @parent_xml_content << "<#{tag}>#{value}</#{tag}>"
+      end
+    end
+    structural = MetadataSource.find(self.children.first)
+    structural.user_defined_mappings.each do |mapping|
+      @child_xml_content << "<#{structural.parent_element}>"
+      mapping.last.each do |key, value|
+        @child_xml_content << "<#{key.valid_xml}>#{value}</#{key.valid_xml}>"
+
+      end
+      @child_xml_content << "</#{structural.parent_element}>"
+    end
+    @xml_content_transformed = "<#{self.root_element}>#{@parent_xml_content}<#{structural.root_element}>#{@child_xml_content}</#{structural.root_element}></#{self.root_element}>"
+    @xml_content_transformed
+  end
+
   def generate_parent_child_xml
     self.children.each do |child|
       metadata_path = "#{$working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
@@ -272,7 +296,7 @@ class MetadataSource < ActiveRecord::Base
     self.y_stop = 72
     self.x_start = 2
 
-    structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'bibphilly_structural'} ? MetadataSource.find(self.children.first) : initialize_bibphilly_structural(self.path)
+    structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'bibphilly_structural'} ? MetadataSource.find(self.children.first) : initialize_bibphilly_structural(self)
 
     full_path = "#{working_path}#{self.path}"
     self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
@@ -282,6 +306,28 @@ class MetadataSource < ActiveRecord::Base
 
   end
 
+  def generate_bibphilly_descrip_md(full_path)
+    mappings = {}
+    iterator = 0
+    x_start, y_start, x_stop, y_stop, z = _offset
+    workbook = RubyXL::Parser.parse(full_path)
+    (y_start..y_stop).each do |i|
+      if workbook[z][y_start+iterator].present? && workbook[z][y_start+iterator][x_start].present?
+        header = workbook[z][y_start+iterator][x_start].value
+        vals = []
+        vals_iterator = 2
+        while workbook[z][y_start+iterator].present? && workbook[z][y_start+iterator][x_start+vals_iterator].present? do
+          vals << workbook[z][y_start+iterator][x_start+vals_iterator].value if workbook[z][y_start+iterator][x_start+vals_iterator].value.present?
+          vals_iterator += 1
+        end
+        mappings[header] = vals if header.present? && vals.present?
+      end
+      iterator += 1
+    end
+    self.original_mappings = mappings
+    self.user_defined_mappings = mappings
+    self.save!
+  end
 
   def generate_bibphilly_struct_md(full_path)
     mappings = {}
@@ -298,12 +344,7 @@ class MetadataSource < ActiveRecord::Base
     (1..(iterator)).each do |i|
       mapped_values = {}
       workbook[z][y_start+i].cells.each do |c|
-
-        if c.present? && headers[c.column].start_with?('TAG')
-          mapped_values['TAG'] = { headers[c.column] => c.value }
-        else
-          mapped_values[headers[c.column]] = c.value if c.present?
-        end
+        mapped_values[headers[c.column].downcase] = c.value if c.present?
       end
       mappings[i] = mapped_values
     end
@@ -312,30 +353,6 @@ class MetadataSource < ActiveRecord::Base
     self.save!
   end
 
-  def generate_bibphilly_descrip_md(full_path)
-    mappings = {}
-    headers = []
-    iterator = 0
-    x_start, y_start, x_stop, y_stop, z = _offset
-    workbook = RubyXL::Parser.parse(full_path)
-    (y_start..y_stop).each do |i|
-      if workbook[z][y_start+iterator].present?
-        header = workbook[z][y_start+iterator][x_start].value if workbook[z][y_start+iterator][x_start].present?
-        headers << header
-        vals = []
-        vals_iterator = 1
-        while workbook[z][y_start+iterator].present? && workbook[z][y_start+iterator][x_start+vals_iterator].present? do
-          vals << workbook[z][y_start+iterator][x_start+vals_iterator].value if workbook[z][y_start+iterator][x_start+vals_iterator].value.present?
-          vals_iterator += 1
-        end
-        mappings[header] = vals
-      end
-      iterator += 1
-    end
-    self.original_mappings = mappings
-    self.user_defined_mappings = mappings
-    self.save!
-  end
 
   def initialize_bibphilly_structural(parent)
     struct = MetadataSource.create
