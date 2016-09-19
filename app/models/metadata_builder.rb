@@ -71,12 +71,15 @@ class MetadataBuilder < ActiveRecord::Base
       unless canonical_identifier_check(val)
         next
       end
+
+      xslt_file = self.metadata_source.any?{|ms| ms.source_type == 'bibphilly'} ? 'bibphilly' : 'sv'
       Dir.chdir(working_path)
       transformed_file_path = "#{working_path}/#{self.repo.unique_identifier}.xml"
       self.repo.version_control_agent.get(:get_location => transformed_file_path)
       self.repo.version_control_agent.unlock(transformed_file_path)
+
       FileUtils.rm(transformed_file_path) if File.exist?(transformed_file_path)
-      `xsltproc #{Rails.root}/lib/tasks/sv.xslt #{val}`
+      `xsltproc #{Rails.root}/lib/tasks/#{xslt_file}.xslt #{val}`
       self.repo.ingest(transformed_file_path, working_path)
     end
     self.repo.version_control_agent.reset_hard
