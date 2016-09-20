@@ -67,7 +67,7 @@
             <xsl:apply-templates select="administrative_contact" />
           </sv:property>
 
-          <sv:property sv:name="ns004:administrativeContactEmil" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns004:administrativeContactEmail" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="administrative_contact_email" />
           </sv:property>
 
@@ -99,8 +99,8 @@
             <xsl:apply-templates select="source_collection" />
           </sv:property>
 
-          <sv:property sv:name="ns004:callNumberId" sv:type="String" sv:multiple="false">
-            <xsl:apply-templates select="call_number_id" />
+          <sv:property sv:name="ns004:callNumberid" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="call_numberid" />
           </sv:property>
 
           <sv:property sv:name="ns004:recordUrl" sv:type="String" sv:multiple="false">
@@ -329,7 +329,7 @@
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
 
-    <xsl:template match="call_number_id">
+    <xsl:template match="call_numberid">
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
 
@@ -513,6 +513,8 @@
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
 
+
+
     <xsl:template match="pages/page">
       <sv:node>
       <xsl:attribute name="sv:name"><xsl:value-of select="serial_num" /></xsl:attribute>
@@ -601,6 +603,10 @@
       </sv:property>
 
     </sv:node>
+  </xsl:template>
+
+  <xsl:template match="file_name">
+    <sv:value><xsl:apply-templates /></sv:value>
   </xsl:template>
 
 </xsl:stylesheet>

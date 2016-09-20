@@ -41,7 +41,7 @@ class Manuscript < ActiveFedora::Base
     index.as :stored_searchable, :facetable
   end
 
-  property :call_number_id, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/callNumberId'), multiple: true do |index|
+  property :call_numberid, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/callNumberid'), multiple: true do |index|
     index.as :stored_searchable, :facetable
   end
 

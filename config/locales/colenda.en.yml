@@ -24,13 +24,13 @@ en:
       notification:
         ingest:
           subject: 'Ingestion and Derivative Generation completed'
-          body: '%{uuid} has been ingested and its derivatives generated.  It is ready for review.\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/ingest'
+          body: '%{uuid} has been ingested and its derivatives generated.  It is ready for review.  Review at: %{root_url}admin_repo/repo/%{link_fragment}/ingest'
         generate_xml:
           subject: 'Preservation XML Generation completed'
-          body: 'Preservation-level XML generated for %{uuid} has been generated and is ready for review.\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/preview_xml'
+          body: 'Preservation-level XML generated for %{uuid} has been generated and is ready for review.  Review at: %{root_url}admin_repo/repo/%{link_fragment}/preview_xml'
         metadata_extraction:
           subject: 'Metadata Extraction completed'
-          body: 'Metadata extraction complete for %{uuid}\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/generate_metadata'
+          body: 'Metadata extraction complete for %{uuid}.  Review at: %{root_url}admin_repo/repo/%{link_fragment}/generate_metadata'
     validators:
       xml_tags:
         starts_with_xml: 'Invalid tag "%{value}" specified for "%{key}" - valid XML tags cannot start with %{xml}'
@@ -203,7 +203,7 @@ en:
       invalid_prettify_argument: 'Invalid argument %{argument}. prettify can only accept strings and arrays of strings.'
       out_of_sync:
         extraction: 'Metadata Source settings have been updated since the last extraction of metadata.  Please press the button below to extract metadata based on these new settings.'
-        xml: 'Metadata has been updated since the last time this XML was generated.  Please press the button below to generate XML with the most current metadata.'
+        xml: 'Metadata has been extracted since the last time this XML was generated.  Please press the button below to generate XML with the most current metadata.'
       i_broke: 'Something went wrong. Please contact the site administrator.'
     errors:
       repos:
