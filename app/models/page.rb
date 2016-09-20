@@ -15,10 +15,6 @@ class Page < ActiveFedora::Base
     index.as :stored_searchable
   end
 
-  property :parent_manuscript, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/parentManuscript'), multiple: true do |index|
-    index.as :stored_searchable
-  end
-
   property :tag1, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/tag1'), multiple: true do |index|
     index.as :stored_searchable
   end
@@ -64,6 +60,17 @@ class Page < ActiveFedora::Base
   end
 
   property :value6, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/value6'), multiple: true do |index|
+    index.as :stored_searchable
+  end
+
+
+  # required
+
+  property :parent_manuscript, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/parentManuscript'), multiple: true do |index|
+    index.as :stored_searchable
+  end
+
+  property :page_number, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/pageNumber'), multiple: true do |index|
     index.as :stored_searchable
   end
 

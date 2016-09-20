@@ -10,7 +10,7 @@
   </div>
   <% end %>
   <%= form_for @object, :validate => true, :html => {:class => "ingest-review"}, :method => :post, :url => "/repos/#{@object.id}/review_status" do |f| %>
-    <%= f.label :review_status, "Add a Review Status note for #{@document.identifier.first}" %>
+    <%= f.label :review_status, "Add a Review Status note for #{@object.unique_identifier}" %>
     <%= f.text_area :review_status, :value => nil %>
     <%= f.submit "Add note" %>
   <% end -%>

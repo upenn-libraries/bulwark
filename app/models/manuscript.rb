@@ -230,6 +230,13 @@ class Manuscript < ActiveFedora::Base
     index.as :stored_searchable, :facetable
   end
 
+
+  # required
+
+  property :title, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/title'), multiple: true do |index|
+    index.as :stored_searchable, :facetable
+  end
+
   def init
     self.item_type ||= 'Manuscript'
   end
