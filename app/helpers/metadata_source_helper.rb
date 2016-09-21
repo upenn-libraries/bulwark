@@ -12,18 +12,8 @@ module MetadataSourceHelper
     end
   end
 
-  def render_metadata_form(source)
-    @source = source
-      case source.source_type
-        when "custom"
-          render :partial => "metadata_sources/generate_custom_metadata", :source => @source
-        else "voyager"
-          render :partial => "metadata_sources/voyager", :source => @source
-      end
-  end
-
   def render_metadata_preview(source)
-    accepted_types = ["voyager","structural_bibid"]
+    accepted_types = ['voyager','structural_bibid', 'bibphilly', 'bibphilly_structural']
     if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
       heading_text_label = "colenda.metadata_sources.metadata_mapping.#{source.source_type}.heading"
       field_separator_label = "colenda.metadata_sources.metadata_mapping.#{source.source_type}.field_separator"

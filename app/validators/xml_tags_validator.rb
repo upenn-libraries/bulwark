@@ -1,6 +1,6 @@
 class XmlTagsValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
-    unless record.source_type == "voyager" || (record.source_type == "structural_bibid")
+    if record.source_type == 'custom'
       value.each do |key, mapping|
         record.errors[attribute] << I18n.t('colenda.validators.xml_tags.starts_with_xml', :value => mapping[:mapped_value], :key => key, :xml => mapping[:mapped_value].first_three) if mapping[:mapped_value].starts_with_xml?
         record.errors[attribute] << I18n.t('colenda.validators.xml_tags.starts_with_number', :value => mapping[:mapped_value], :key => key) if mapping[:mapped_value].starts_with_number?
@@ -30,6 +30,10 @@ class XmlTagsValidator < ActiveModel::EachValidator
 
     def first_three
       self[0,3]
+    end
+
+    def valid_xml
+      self.downcase.gsub(' ','_').gsub(/[^a-zA-Z0-9_.-]/, '')
     end
 
   end

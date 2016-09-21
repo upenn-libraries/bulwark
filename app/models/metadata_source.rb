@@ -105,13 +105,15 @@ class MetadataSource < ActiveRecord::Base
           self.parent_element = "page"
         end
         self.original_mappings = _convert_metadata(working_path)
-        when 'structural_bibid'
+      when 'structural_bibid'
         self.root_element = "pages"
         self.parent_element = "page"
         self.user_defined_mappings = _set_voyager_structural_metadata(working_path)
       when 'voyager'
         self.root_element = MetadataSchema.config[:voyager][:root_element] || "voyager_object"
         self.user_defined_mappings = _set_voyager_data(working_path)
+      when 'bibphilly'
+        self.set_bibphilly_data(working_path)
       end
     end
     self.metadata_builder.repo.update_steps(:metadata_extracted)
@@ -123,7 +125,7 @@ class MetadataSource < ActiveRecord::Base
     self.generate_and_build_individual_xml
     self.children.each do |child|
       source = MetadataSource.find(child)
-      source.generate_and_build_individual_xml(source.path)
+      source.generate_and_build_individual_xml(source.path) unless source.source_type == 'bibphilly_structural'
     end
     self.generate_preservation_xml
     self.jettison_unwanted_files($jettison_files)
@@ -151,6 +153,8 @@ class MetadataSource < ActiveRecord::Base
         @xml_content_final_copy = xml_from_voyager
       when 'structural_bibid'
         @xml_content_final_copy = xml_from_structural_bibid
+      when 'bibphilly'
+        @xml_content_final_copy = xml_from_bibphilly
       end
       $jettison_files.add(xml_fname)
       _fetch_write_save_preservation_xml(xml_fname, @xml_content_final_copy)
@@ -158,7 +162,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def generate_preservation_xml
-    if self.children.present?
+    if self.children.present? && self.source_type != 'bibphilly'
       @xml_content_final = self.generate_parent_child_xml
     else
       file = File.new(_working_path_check($working_path, "#{self.path}.xml"))
@@ -223,6 +227,28 @@ class MetadataSource < ActiveRecord::Base
     @xml_content_transformed
   end
 
+  def xml_from_bibphilly
+    @parent_xml_content = ""
+    @child_xml_content = ""
+    self.user_defined_mappings.each do |mapping|
+      tag = mapping.first.valid_xml
+      mapping.last.each do |value|
+        @parent_xml_content << "<#{tag}>#{value}</#{tag}>"
+      end
+    end
+    structural = MetadataSource.find(self.children.first)
+    structural.user_defined_mappings.each do |mapping|
+      @child_xml_content << "<#{structural.parent_element}>"
+      mapping.last.each do |key, value|
+        @child_xml_content << "<#{key.valid_xml}>#{value}</#{key.valid_xml}>"
+
+      end
+      @child_xml_content << "</#{structural.parent_element}>"
+    end
+    @xml_content_transformed = "<#{self.root_element}>#{@parent_xml_content}<#{structural.root_element}>#{@child_xml_content}</#{structural.root_element}></#{self.root_element}>"
+    @xml_content_transformed
+  end
+
   def generate_parent_child_xml
     self.children.each do |child|
       metadata_path = "#{$working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
@@ -261,6 +287,90 @@ class MetadataSource < ActiveRecord::Base
   def update_last_used_settings
     self.last_settings_updated = DateTime.now
     self.save!
+  end
+
+  def set_bibphilly_data(working_path = $working_path)
+    self.root_element = 'record'
+    self.view_type = 'vertical'
+    self.y_start = 6
+    self.y_stop = 72
+    self.x_start = 2
+
+    structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'bibphilly_structural'} ? MetadataSource.find(self.children.first) : initialize_bibphilly_structural(self)
+
+    full_path = "#{working_path}#{self.path}"
+    self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
+
+    self.generate_bibphilly_descrip_md(full_path)
+    structural.generate_bibphilly_struct_md(full_path)
+
+  end
+
+  def generate_bibphilly_descrip_md(full_path)
+    mappings = {}
+    iterator = 0
+    x_start, y_start, x_stop, y_stop, z = _offset
+    workbook = RubyXL::Parser.parse(full_path)
+    (y_start..y_stop).each do |i|
+      if workbook[z][y_start+iterator].present? && workbook[z][y_start+iterator][x_start].present?
+        header = workbook[z][y_start+iterator][x_start].value
+        vals = []
+        vals_iterator = 2
+        while workbook[z][y_start+iterator].present? && workbook[z][y_start+iterator][x_start+vals_iterator].present? do
+          vals << workbook[z][y_start+iterator][x_start+vals_iterator].value if workbook[z][y_start+iterator][x_start+vals_iterator].value.present?
+          vals_iterator += 1
+        end
+        mappings[header] = vals if header.present? && vals.present?
+      end
+      iterator += 1
+    end
+    self.original_mappings = mappings
+    self.user_defined_mappings = mappings
+    self.save!
+  end
+
+  def generate_bibphilly_struct_md(full_path)
+    mappings = {}
+    headers = []
+    x_start, y_start, x_stop, y_stop, z = _offset
+    workbook = RubyXL::Parser.parse(full_path)
+    iterator = 1
+    workbook[z][y_start].cells.each do |c|
+      headers << c.value
+    end
+    while workbook[z][(y_start+1)+iterator].present? do
+      iterator += 1 if workbook[z][y_start+iterator][x_start].present?
+    end
+    (1..(iterator)).each do |i|
+      mapped_values = {}
+      workbook[z][y_start+i].cells.each do |c|
+        mapped_values[headers[c.column].downcase] = c.value if c.present?
+      end
+      mappings[i] = mapped_values
+    end
+    self.original_mappings = mappings
+    self.user_defined_mappings = mappings
+    self.save!
+  end
+
+
+  def initialize_bibphilly_structural(parent)
+    struct = MetadataSource.create
+    struct.metadata_builder = self.metadata_builder
+    struct.source_type = 'bibphilly_structural'
+    struct.root_element= 'pages'
+    struct.parent_element= 'page'
+    struct.view_type = 'horizontal'
+    struct.path = "#{parent.path} Page 2 (Structural)"
+    struct.z = 2
+    struct.y_start = 3
+    struct.y_stop = 3
+    struct.x_start = 1
+    struct.x_stop = 3
+    parent.children << struct
+    struct.save!
+    parent.save!
+    struct
   end
 
   private
@@ -365,31 +475,30 @@ class MetadataSource < ActiveRecord::Base
       mappings = {}
       headers = []
       iterator = 0
-      x_start, y_start, x_stop, y_stop = _offset
+      x_start, y_start, x_stop, y_stop, z = _offset
       workbook = RubyXL::Parser.parse(full_path)
       case self.view_type
       when 'horizontal'
-        while (x_stop >= (x_start+iterator)) && (workbook[0][y_start].present?) && (workbook[0][y_start][x_start+iterator].present?)
-          header = workbook[0][y_start][x_start+iterator].value
+        while (x_stop >= (x_start+iterator)) && (workbook[z][y_start].present?) && (workbook[z][y_start][x_start+iterator].present?)
+          header = workbook[z][y_start][x_start+iterator].value
           headers << header
           vals = []
-          #This variable could be user-defined in order to let the user set the values _offset
           vals_iterator = 1
-          while workbook[0][y_start+vals_iterator].present? && workbook[0][y_start+vals_iterator][x_start+iterator].present? do
-            vals << workbook[0][y_start+vals_iterator][x_start+iterator].value
+          while workbook[z][y_start+vals_iterator].present? && workbook[z][y_start+vals_iterator][x_start+iterator].present? do
+            vals << workbook[z][y_start+vals_iterator][x_start+iterator].value
             vals_iterator += 1
           end
           mappings[header] = vals
           iterator += 1
         end
       when 'vertical'
-        while (y_stop >= (y_start+iterator)) && (workbook[0][y_start+iterator].present?) && (workbook[0][y_start+iterator][x_start].present?)
-          header = workbook[0][y_start+iterator][x_start].value
+        while (y_stop >= (y_start+iterator)) && (workbook[z][y_start+iterator].present?) && (workbook[z][y_start+iterator][x_start].present?)
+          header = workbook[z][y_start+iterator][x_start].value
           headers << header
           vals = []
           vals_iterator = 1
-          while workbook[0][y_start+iterator].present? && workbook[0][y_start+iterator][x_start+vals_iterator].present? do
-            vals << workbook[0][y_start+iterator][x_start+vals_iterator].value
+          while workbook[z][y_start+iterator].present? && workbook[z][y_start+iterator][x_start+vals_iterator].present? do
+            vals << workbook[z][y_start+iterator][x_start+vals_iterator].value
             vals_iterator += 1
           end
           mappings[header] = vals
@@ -403,19 +512,19 @@ class MetadataSource < ActiveRecord::Base
 
     def _child_values(source)
       workbook = RubyXL::Parser.parse(source)
-      x_start, y_start, x_stop, y_stop = _offset
+      x_start, y_start, x_stop, y_stop, z = _offset
       xml_content = ""
       case self.view_type
       when 'horizontal'
         self.num_objects.times do |i|
           xml_content << "<#{self.parent_element}>"
-          xml_content << _get_row_values(workbook, i, x_start, y_start, x_stop, y_stop)
+          xml_content << _get_row_values(workbook, i, x_start, y_start, x_stop, y_stop, z)
           xml_content << "</#{self.parent_element}>"
         end
       when 'vertical'
         self.num_objects.times do |i|
           xml_content << "<#{self.parent_element}>"
-          xml_content << _get_column_values(workbook, i, x_start, y_start, x_stop, y_stop)
+          xml_content << _get_column_values(workbook, i, x_start, y_start, x_stop, y_stop, z)
           xml_content << "</#{self.parent_element}>"
         end
       else
@@ -436,18 +545,18 @@ class MetadataSource < ActiveRecord::Base
       xml_content
     end
 
-    def _get_row_values(workbook, index, x_start, y_start, x_stop, y_stop)
-      headers = workbook[0][y_start].cells.collect { |cell| cell.value }
+    def _get_row_values(workbook, index, x_start, y_start, x_stop, y_stop, z)
+      headers = workbook[z][y_start].cells.collect { |cell| cell.value }
       row_value = ""
-      _offset = 1
+      offset = 1
       headers.each_with_index do |header,h_index|
-        field_val = workbook[0][y_start+index+_offset][x_start+h_index].present? ? workbook[0][y_start+index+_offset][x_start+h_index].value : ""
+        field_val = workbook[z][y_start+index+offset][x_start+h_index].present? ? workbook[z][y_start+index+offset][x_start+h_index].value : ""
         row_value << "<#{self.user_defined_mappings[header]["mapped_value"]}>#{field_val}</#{self.user_defined_mappings[header]["mapped_value"]}>" if self.user_defined_mappings[header].present?
       end
       row_value
     end
 
-    def _get_column_values(workbook, index, x_start, y_start, x_stop, y_stop)
+    def _get_column_values(workbook, index, x_start, y_start, x_stop, y_stop, z)
       iterator = 0
       column_value = ""
       headers = Array.new
@@ -455,9 +564,9 @@ class MetadataSource < ActiveRecord::Base
         headers << workbook[0][y_start+iterator][x_start].value
         iterator += 1
       end
-      _offset = 1
+      offset = 1
       headers.each_with_index do |header,h_index|
-        field_val = workbook[0][y_start+h_index][index+_offset].present? ? workbook[0][y_start+h_index][index+_offset].value : ""
+        field_val = workbook[z][y_start+h_index][index+offset].present? ? workbook[z][y_start+h_index][index+offset].value : ""
         column_value << "<#{self.user_defined_mappings[header]["mapped_value"]}>#{field_val}</#{self.user_defined_mappings[header]["mapped_value"]}>"
       end
       column_value
@@ -498,9 +607,9 @@ class MetadataSource < ActiveRecord::Base
     def _offset
       x_start = self.x_start - 1
       y_start = self.y_start - 1
-      x_stop = self.x_stop - 1
       y_stop = self.y_stop - 1
-      return x_start, y_start, x_stop, y_stop
+      z = self.z - 1
+      return x_start, y_start, x_stop, y_stop, z
     end
 
     def _strip_headers(xml)
@@ -512,7 +621,7 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def self.source_types
-      source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.voyager_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
+      source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.voyager_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.bibphilly'), 'bibphilly'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
     end
 
     def self.settings_fields

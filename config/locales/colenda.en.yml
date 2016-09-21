@@ -24,13 +24,13 @@ en:
       notification:
         ingest:
           subject: 'Ingestion and Derivative Generation completed'
-          body: '%{uuid} has been ingested and its derivatives generated.  It is ready for review.\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/ingest'
+          body: '%{uuid} has been ingested and its derivatives generated.  It is ready for review.  Review at: %{root_url}admin_repo/repo/%{link_fragment}/ingest'
         generate_xml:
           subject: 'Preservation XML Generation completed'
-          body: 'Preservation-level XML generated for %{uuid} has been generated and is ready for review.\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/preview_xml'
+          body: 'Preservation-level XML generated for %{uuid} has been generated and is ready for review.  Review at: %{root_url}admin_repo/repo/%{link_fragment}/preview_xml'
         metadata_extraction:
           subject: 'Metadata Extraction completed'
-          body: 'Metadata extraction complete for %{uuid}\n\nReview at: %{root_url}admin_repo/repo/%{link_fragment}/generate_metadata'
+          body: 'Metadata extraction complete for %{uuid}.  Review at: %{root_url}admin_repo/repo/%{link_fragment}/generate_metadata'
     validators:
       xml_tags:
         starts_with_xml: 'Invalid tag "%{value}" specified for "%{key}" - valid XML tags cannot start with %{xml}'
@@ -101,6 +101,7 @@ en:
           metadata:
             preview:
               heading: '%{view_type} preview for %{selected_attributes}'
+              not_available: 'N/A'
     metadata_builders:
       generate_metadata_link_text: 'Generate Metadata form'
       xml_preview_header: 'XML Sample for %{file}'
@@ -124,6 +125,7 @@ en:
           list:
             voyager_bibid: 'Voyager BibID Lookup Spreadsheet (XLSX)'
             structural_bibid: 'Structural Metadata from BibID Lookup Spreadsheet (XLSX)'
+            bibphilly: 'BibPhilly (XLSX)'
             custom: 'Custom Structural Metadata Spreadsheet (XLSX)'
         orientation:
           vertical: 'Vertical'
@@ -152,6 +154,12 @@ en:
         structural_bibid:
           heading: 'Sample of structural metadata fetched from Voyager (first 10 entries or fewer)'
           field_separator: ':'
+        bibphilly:
+          heading: 'Sample metadata fetched from BibPhilly spreadsheet'
+          field_separator: ':'
+        bibphilly_structural:
+          heading: 'Sample structural metadata fetched from Page 2 of BibPhilly spreadsheet'
+          field_separator: ':'
         custom:
           field:
             label: '"%{field}" should map to:'
@@ -166,6 +174,7 @@ en:
         package_metadata_info: 'Added packaging info about metadata sources to admin directory'
         voyager_derivative_spreadsheet: 'Created derivative spreadsheet of Voyager metadata'
         generated_derivative: 'Generated derivative for %{file_name}'
+        generated_all_derivatives: 'Generated all derivatives for %{object_id}'
         jettison_files: 'Removed files not identified as metadata source and/or for long-term preservation'
         write_preservation_xml: 'Generated unified XML for %{metadata_source_path} at %{xml_path}'
       packaging_info: 'Source information for %{source_path}\npath: %{source_path}\nid (use to correlate children): %{source_id}\nsource_type: %{source_type}\nview_type: %{source_view_type}\nnum_objects: %{source_num_objects}\nx_start: %{source_x_start}\nx_stop: %{source_x_stop}\ny_start: %{source_y_start}\ny_stop: %{source_y_stop}\nchildren: %{source_children}\n\n'
@@ -196,7 +205,7 @@ en:
       invalid_prettify_argument: 'Invalid argument %{argument}. prettify can only accept strings and arrays of strings.'
       out_of_sync:
         extraction: 'Metadata Source settings have been updated since the last extraction of metadata.  Please press the button below to extract metadata based on these new settings.'
-        xml: 'Metadata has been updated since the last time this XML was generated.  Please press the button below to generate XML with the most current metadata.'
+        xml: 'Metadata has been extracted since the last time this XML was generated.  Please press the button below to generate XML with the most current metadata.'
       i_broke: 'Something went wrong. Please contact the site administrator.'
     errors:
       repos:
