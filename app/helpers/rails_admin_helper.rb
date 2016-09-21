@@ -70,18 +70,19 @@ module RailsAdminHelper
   end
 
   def wrap_values(value)
-
-    content_tag(:li, value_present?(value) ? Array(value).join(', ') : 'N/A' ).html_safe
+    content_tag(:li, value_present?(value) ? Array(value).join(', ') : t('colenda.repos.ingest.review.metadata.preview.not_available') ).html_safe
   end
 
   def value_present?(value)
-    case value.class
-      when String
+    singular_classes = [String, NilClass, ActiveTriples::Relation]
+    multiples_classes = [Array]
+    case
+      when singular_classes.include?(value.class)
         return value.present?
-      when Array
+      when multiples_classes.include?(value.class)
         return value.all?{|a|a.present?}
       else
-        return false
+        return true
     end
   end
 

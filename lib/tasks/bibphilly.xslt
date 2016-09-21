@@ -21,11 +21,10 @@
             xmlns:test="info:fedora/test/"
             xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
             xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-            xmlns:ns004="http://library.upenn.edu/pqc/ns/"
-            xmlns:ns003="http://pcdm.org/models#"
-            xmlns:ns002="http://purl.org/dc/terms/"
-            xmlns:space="preserve"
             xmlns:ns001="info:fedora/fedora-system:def/model#"
+            xmlns:ns002="http://library.upenn.edu/pqc/ns/"
+            xmlns:ns003="http://pcdm.org/models#"
+            xmlns:space="preserve"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:mode="http://www.modeshape.org/1.0"
             xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -55,235 +54,235 @@
           <sv:property sv:name="jcr:createdBy" sv:type="String">
             <sv:value>bypassAdmin</sv:value>
           </sv:property>
-          <sv:property sv:name="ns004:file_list" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:file_list" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="file_list/file" />
           </sv:property>
 
-          <sv:property sv:name="ns004:title" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:title" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="manuscript_name" />
           </sv:property>
 
-          <sv:property sv:name="ns004:administrativeContact" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:administrativeContact" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="administrative_contact" />
           </sv:property>
 
-          <sv:property sv:name="ns004:administrativeContactEmail" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:administrativeContactEmail" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="administrative_contact_email" />
           </sv:property>
 
-          <sv:property sv:name="ns004:metadataCreator" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:metadataCreator" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="metadata_creator" />
           </sv:property>
 
-          <sv:property sv:name="ns004:metadataCreatorEmail" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:metadataCreatorEmail" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="metadata_creator_email" />
           </sv:property>
 
-          <sv:property sv:name="ns004:repositoryCountry" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:repositoryCountry" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="repository_country" />
           </sv:property>
 
-          <sv:property sv:name="ns004:repositoryCity" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:repositoryCity" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="repository_city" />
           </sv:property>
 
-          <sv:property sv:name="ns004:holdingInstitution" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:holdingInstitution" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="holding_institution" />
           </sv:property>
 
-          <sv:property sv:name="ns004:repositoryName" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:repositoryName" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="repository_name" />
           </sv:property>
 
-          <sv:property sv:name="ns004:sourceCollection" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:sourceCollection" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="source_collection" />
           </sv:property>
 
-          <sv:property sv:name="ns004:callNumberid" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:callNumberid" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="call_numberid" />
           </sv:property>
 
-          <sv:property sv:name="ns004:recordUrl" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:recordUrl" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="record_url" />
           </sv:property>
 
-          <sv:property sv:name="ns004:alternateId" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:alternateId" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="alternate_id" />
           </sv:property>
 
-          <sv:property sv:name="ns004:alternateIdType" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:alternateIdType" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="alternate_id_type" />
           </sv:property>
 
-          <sv:property sv:name="ns004:manuscriptName" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:manuscriptName" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="manuscript_name" />
           </sv:property>
 
-          <sv:property sv:name="ns004:authorName" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:authorName" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="author_name" />
           </sv:property>
 
-          <sv:property sv:name="ns004:authorUri" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:authorUri" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="author_uri" />
           </sv:property>
 
-          <sv:property sv:name="ns004:translatorName" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:translatorName" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="translator_name" />
           </sv:property>
 
-          <sv:property sv:name="ns004:translatorUri" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:translatorUri" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="translator_uri" />
           </sv:property>
 
-          <sv:property sv:name="ns004:artistName" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:artistName" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="artist_name" />
           </sv:property>
 
-          <sv:property sv:name="ns004:artistUri" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:artistUri" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="artist_uri" />
           </sv:property>
 
-          <sv:property sv:name="ns004:formerOwnerName" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:formerOwnerName" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="former_owner_name" />
           </sv:property>
 
-          <sv:property sv:name="ns004:formerOwnerUri" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:formerOwnerUri" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="former_owner_uri" />
           </sv:property>
 
-          <sv:property sv:name="ns004:provenance" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:provenance" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="provenance" />
           </sv:property>
 
-          <sv:property sv:name="ns004:dateSingle" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:dateSingle" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="date_single" />
           </sv:property>
 
-          <sv:property sv:name="ns004:dateRangeStart" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:dateRangeStart" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="date_range_start" />
           </sv:property>
 
-          <sv:property sv:name="ns004:dateRangeEnd" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:dateRangeEnd" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="date_range_end" />
           </sv:property>
 
-          <sv:property sv:name="ns004:dateNarrative" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:dateNarrative" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="date_narrative" />
           </sv:property>
 
-          <sv:property sv:name="ns004:placeOfOrigin" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:placeOfOrigin" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="place_of_origin" />
           </sv:property>
 
-          <sv:property sv:name="ns004:originDetails" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:originDetails" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="origin_details" />
           </sv:property>
 
-          <sv:property sv:name="ns004:description" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:description" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="description" />
           </sv:property>
 
-          <sv:property sv:name="ns004:language" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:language" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="language" />
           </sv:property>
 
-          <sv:property sv:name="ns004:foliationPagination" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:foliationPagination" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="foliation_pagination" />
           </sv:property>
 
-          <sv:property sv:name="ns004:flyleavesAndLeaves" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:flyleavesAndLeaves" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="flyleaves_and_leaves" />
           </sv:property>
 
-          <sv:property sv:name="ns004:layout" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:layout" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="layout" />
           </sv:property>
 
-          <sv:property sv:name="ns004:colophon" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:colophon" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="colophon" />
           </sv:property>
 
-          <sv:property sv:name="ns004:collation" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:collation" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="collation" />
           </sv:property>
 
-          <sv:property sv:name="ns004:script" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:script" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="script" />
           </sv:property>
 
-          <sv:property sv:name="ns004:decoration" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:decoration" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="decoration" />
           </sv:property>
 
-          <sv:property sv:name="ns004:binding" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:binding" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="binding" />
           </sv:property>
 
-          <sv:property sv:name="ns004:watermarks" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:watermarks" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="watermarks" />
           </sv:property>
 
-          <sv:property sv:name="ns004:catchwords" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:catchwords" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="catchwords" />
           </sv:property>
 
-          <sv:property sv:name="ns004:signatures" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:signatures" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="signatures" />
           </sv:property>
 
-          <sv:property sv:name="ns004:notes" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:notes" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="notes" />
           </sv:property>
 
-          <sv:property sv:name="ns004:supportMaterial" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:supportMaterial" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="support_material" />
           </sv:property>
 
-          <sv:property sv:name="ns004:pageDimensions" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:pageDimensions" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="page_dimensions" />
           </sv:property>
 
-          <sv:property sv:name="ns004:boundDimensions" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:boundDimensions" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="bound_dimensions" />
           </sv:property>
 
-          <sv:property sv:name="ns004:relatedResource" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:relatedResource" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="related_resource" />
           </sv:property>
 
-          <sv:property sv:name="ns004:relatedResourceUrl" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:relatedResourceUrl" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="related_resource_url" />
           </sv:property>
 
-          <sv:property sv:name="ns004:subjectNames" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:subjectNames" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="subject_names" />
           </sv:property>
 
-          <sv:property sv:name="ns004:subjectNamesUri" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:subjectNamesUri" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="subject_names_uri" />
           </sv:property>
 
-          <sv:property sv:name="ns004:subjectTopical" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:subjectTopical" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="subject_topical" />
           </sv:property>
 
-          <sv:property sv:name="ns004:subjectTopicalUri" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:subjectTopicalUri" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="subject_topical_uri" />
           </sv:property>
 
-          <sv:property sv:name="ns004:subjectGeographic" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:subjectGeographic" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="subject_geographic" />
           </sv:property>
 
-          <sv:property sv:name="ns004:subjectGeographicUri" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:subjectGeographicUri" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="subject_geographic_uri" />
           </sv:property>
 
-          <sv:property sv:name="ns004:subjectGenreForm" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:subjectGenreForm" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="subject_genre_form" />
           </sv:property>
 
-          <sv:property sv:name="ns004:subjectGenreFormUri" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:subjectGenreFormUri" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="subject_genre_form_uri" />
           </sv:property>
 
@@ -534,71 +533,71 @@
       <sv:property sv:name="jcr:createdBy" sv:type="String">
         <sv:value>bypassAdmin</sv:value>
       </sv:property>
-      <sv:property sv:name="ns004:parentManuscript" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:parentManuscript" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="$uuid" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:pageNumber" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:pageNumber" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="serial_num" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:serialNum" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:serialNum" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="serial_num" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:displayPage" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:displayPage" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="display_page" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:fileName" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:fileName" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="file_name" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:tag1" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:tag1" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="tag1" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:value1" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:value1" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="value1" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:tag2" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:tag2" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="tag2" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:value2" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:value2" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="value2" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:tag3" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:tag3" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="tag3" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:value3" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:value3" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="value3" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:tag4" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:tag4" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="tag4" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:value4" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:value4" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="value4" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:tag5" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:tag5" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="tag5" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:value5" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:value5" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="value5" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:tag6" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:tag6" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="tag6" /></sv:value>
       </sv:property>
 
-      <sv:property sv:name="ns004:value6" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:value6" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="value6" /></sv:value>
       </sv:property>
 

@@ -101,6 +101,7 @@ en:
           metadata:
             preview:
               heading: '%{view_type} preview for %{selected_attributes}'
+              not_available: 'N/A'
     metadata_builders:
       generate_metadata_link_text: 'Generate Metadata form'
       xml_preview_header: 'XML Sample for %{file}'

@@ -21,11 +21,10 @@
             xmlns:test="info:fedora/test/"
             xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
             xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-            xmlns:ns004="http://library.upenn.edu/pqc/ns/"
-            xmlns:ns003="http://pcdm.org/models#"
-            xmlns:ns002="http://purl.org/dc/terms/"
-            xmlns:space="preserve"
             xmlns:ns001="info:fedora/fedora-system:def/model#"
+            xmlns:ns002="http://library.upenn.edu/pqc/ns/"
+            xmlns:ns003="http://pcdm.org/models#"
+            xmlns:space="preserve"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:mode="http://www.modeshape.org/1.0"
             xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -55,34 +54,34 @@
           <sv:property sv:name="jcr:createdBy" sv:type="String">
             <sv:value>bypassAdmin</sv:value>
           </sv:property>
-          <sv:property sv:name="ns004:abstract" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:abstract" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="abstract" />
           </sv:property>
-          <sv:property sv:name="ns004:coverage" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:coverage" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="coverage" />
           </sv:property>
-          <sv:property sv:name="ns004:identifier" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="false">
             <sv:value><xsl:apply-templates select="identifier"/></sv:value>
           </sv:property>
-          <sv:property sv:name="ns004:language" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:language" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="language" />
           </sv:property>
-          <sv:property sv:name="ns004:subject" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:subject" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="subject" />
           </sv:property>
-          <sv:property sv:name="ns004:description" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:description" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="description" />
           </sv:property>
-          <sv:property sv:name="ns004:file_list" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:file_list" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="file_list/file" />
           </sv:property>
-          <sv:property sv:name="ns004:type" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:type" sv:type="String" sv:multiple="false">
             <sv:value>Manuscript</sv:value>
           </sv:property>
-          <sv:property sv:name="ns004:title" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:title" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="title" />
           </sv:property>
-          <sv:property sv:name="ns004:date" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:date" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="date" />
           </sv:property>
           <xsl:apply-templates select="pages/page" />
@@ -142,22 +141,22 @@
       <sv:property sv:name="jcr:createdBy" sv:type="String">
         <sv:value>bypassAdmin</sv:value>
       </sv:property>
-      <sv:property sv:name="ns004:parentManuscript" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:parentManuscript" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="$uuid" /></sv:value>
       </sv:property>
-      <sv:property sv:name="ns004:identifier" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="identifier" /></sv:value>
       </sv:property>
-      <sv:property sv:name="ns004:fileName" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:fileName" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="file_name" /></sv:value>
       </sv:property>
-      <sv:property sv:name="ns004:pageNumber" sv:type="Long" sv:multiple="false">
+      <sv:property sv:name="ns002:pageNumber" sv:type="Long" sv:multiple="false">
         <sv:value><xsl:value-of select="page_number" /></sv:value>
       </sv:property>
-      <sv:property sv:name="ns004:pageText" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:pageText" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="ocr_text" /></sv:value>
       </sv:property>
-      <sv:property sv:name="ns004:type" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns002:type" sv:type="String" sv:multiple="false">
         <sv:value>Page</sv:value>
       </sv:property>
     </sv:node>
