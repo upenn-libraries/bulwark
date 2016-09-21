@@ -11,7 +11,7 @@ class Page < ActiveFedora::Base
     index.as :stored_searchable
   end
 
-  property :file_name, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/fileName'), multiple: true do |index|
+  property :file_name, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/fileName'), multiple: false do |index|
     index.as :stored_searchable
   end
 
