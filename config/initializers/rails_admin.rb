@@ -42,8 +42,6 @@ RailsAdmin.config do |config|
     ingest do
       only ["Repo"]
     end
-    edit
-    delete
   end
 
   config.model Repo do
