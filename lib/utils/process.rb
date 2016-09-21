@@ -29,7 +29,7 @@ module Utils
       update_index(@oid)
       repo.save!
       repo.version_control_agent.add(:add_location => "#{@@derivatives_working_destination}")
-      repo.version_control_agent.commit("Generated derivatives for #{@oid}")
+      repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives', :object_id => @oid))
       repo.version_control_agent.push
       @@status_type = :success
       @@status_message = I18n.t('colenda.utils.process.success.ingest_complete')

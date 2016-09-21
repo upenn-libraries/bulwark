@@ -70,7 +70,19 @@ module RailsAdminHelper
   end
 
   def wrap_values(value)
-    content_tag(:li, value.blank? ? 'N/A' : Array(value).join(', ') ).html_safe
+
+    content_tag(:li, value_present?(value) ? Array(value).join(', ') : 'N/A' ).html_safe
+  end
+
+  def value_present?(value)
+    case value.class
+      when String
+        return value.present?
+      when Array
+        return value.all?{|a|a.present?}
+      else
+        return false
+    end
   end
 
   def form_label(form_type, repo_steps)
