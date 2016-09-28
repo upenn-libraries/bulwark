@@ -22,6 +22,9 @@
 # Ignore config yml files
 config/*.yml
 
+# Ignore containerizing ENV file
+.env
+
 # Ignore custom git instructions
 /app/views/repos/_git_instructions_custom.html.erb
 
