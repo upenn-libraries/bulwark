@@ -55,7 +55,7 @@ module Utils
         child = ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(child_uri))
         children << child
         if child.file_name.present?
-          attach_file(repo, child, child.file_name, "pageImage")
+          attach_file(repo, child, child.file_name, 'pageImage')
           parent.members << child
         end
       end
@@ -68,23 +68,23 @@ module Utils
       parent.save
     end
 
-    def attach_file(repo, parent, file_name, child_container = "child")
+    def attach_file(repo, parent, file_name, child_container = 'child')
       file_link = "#{@@working_path}/#{repo.assets_subdirectory}/#{file_name}"
       repo.version_control_agent.get(:get_location => file_link)
       repo.version_control_agent.unlock(file_link)
-      validated = validate_file(file_link) if File.exist?(file_link)
-      if(File.exist?(file_link) && validated)
+      validated =  File.exist?(file_link) ? validate_file(file_link) : false
+      if validated
         derivative_link = "#{Utils.config[:federated_fs_path]}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
-        @command = _build_command("file_attach", :file => derivative_link, :fid => parent.id, :child_container => child_container)
+        @command = _build_command('file_attach', :file => derivative_link, :fid => parent.id, :child_container => child_container)
         _execute_curl
         repo.version_control_agent.add(:add_location => "#{@@derivatives_working_destination}")
         repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_derivative', :file_name => parent.file_name))
       else
         @@status_type = :warning
         if File.exist?(file_link)
-          repo.problem_files["#{repo.assets_subdirectory}/#{file_name}"] = "invalid"
+          repo.problem_files["#{repo.assets_subdirectory}/#{file_name}"] = 'invalid'
         else
-          repo.problem_files["#{repo.assets_subdirectory}/#{file_name}"] = "missing"
+          repo.problem_files["#{repo.assets_subdirectory}/#{file_name}"] = 'missing'
         end
       end
     end
@@ -99,6 +99,7 @@ module Utils
     end
 
     def refresh_assets(repo)
+      jettison_originals(repo) if repo.metadata_builder.metadata_source.any?{ |ms| ms.source_type == 'bibphilly'}
       display_path = "#{Utils.config[:assets_display_path]}/#{repo.directory}"
       if File.directory?("#{Utils.config[:assets_display_path]}/#{repo.directory}")
         Dir.chdir(display_path)
@@ -107,6 +108,10 @@ module Utils
         repo.version_control_agent.clone(:destination => display_path)
         refresh_assets(repo)
       end
+    end
+
+    def jettison_originals(repo)
+      binding.pry
     end
 
     def update_index(object_id)
