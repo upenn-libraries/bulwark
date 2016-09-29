@@ -16,7 +16,7 @@ gem "coffee-rails", "~> 4.0.0"
 # See https://github.com/rails/execjs#readme for more supported runtimes
 gem "therubyracer",  platforms: :ruby
 
-gem "hydra", github: "projecthydra/hydra", branch: "pcdm"
+gem "hydra", git: "https://github.com/projecthydra/hydra", branch: "pcdm"
 gem "hydra-works"
 gem "hydra-pcdm"
 
@@ -24,7 +24,7 @@ gem "qa"
 gem "blacklight_range_limit"
 
 gem "rails_admin_colenda", :path => "rails_admin_colenda"
-gem "rails_admin", github: "kelynch/rails_admin", branch: "js_loading_in_custom_theme"
+gem "rails_admin", git: "https://github.com/kelynch/rails_admin", branch: "js_loading_in_custom_theme"
 
 gem "colorize"
 gem "git"
