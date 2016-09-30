@@ -5,7 +5,7 @@ class MetadataSource < ActiveRecord::Base
   attr_accessor :xml_header, :xml_footer
   attr_accessor :user_defined_mappings
 
-  belongs_to :metadata_builder, :foreign_key => "metadata_builder_id"
+  belongs_to :metadata_builder, :foreign_key => 'metadata_builder_id'
 
   include CustomEncodings
 
@@ -15,8 +15,8 @@ class MetadataSource < ActiveRecord::Base
   serialize :user_defined_mappings, Hash
   serialize :children, Array
 
-  $xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root>"
-  $xml_footer = "</root>"
+  $xml_header = '<?xml version="1.0" encoding="UTF-8"?><root>'
+  $xml_footer = '</root>'
 
   $jettison_files = Set.new
 
@@ -101,16 +101,16 @@ class MetadataSource < ActiveRecord::Base
       case self.source_type
       when 'custom'
         unless self.root_element.present?
-          self.root_element = "pages"
-          self.parent_element = "page"
+          self.root_element = 'pages'
+          self.parent_element = 'page'
         end
         self.original_mappings = _convert_metadata(working_path)
       when 'structural_bibid'
-        self.root_element = "pages"
-        self.parent_element = "page"
+        self.root_element = 'pages'
+        self.parent_element = 'page'
         self.user_defined_mappings = _set_voyager_structural_metadata(working_path)
       when 'voyager'
-        self.root_element = MetadataSchema.config[:voyager][:root_element] || "voyager_object"
+        self.root_element = MetadataSchema.config[:voyager][:root_element] || 'voyager_object'
         self.user_defined_mappings = _set_voyager_data(working_path)
       when 'bibphilly'
         self.set_bibphilly_data(working_path)
@@ -128,11 +128,11 @@ class MetadataSource < ActiveRecord::Base
       source.generate_and_build_individual_xml(source.path) unless source.source_type == 'bibphilly_structural'
     end
     self.generate_preservation_xml
-    self.jettison_unwanted_files($jettison_files)
+    self.jettison_metadata($jettison_files)
     self.metadata_builder.repo.version_control_agent.delete_clone
   end
 
-  def jettison_unwanted_files(files_to_jettison)
+  def jettison_metadata(files_to_jettison)
     files_to_jettison.each do |f|
       f = _working_path_check($working_path, f)
       self.metadata_builder.repo.version_control_agent.unlock(f)
@@ -173,7 +173,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def xml_from_voyager
-    @xml_content = ""
+    @xml_content = ''
     self.user_defined_mappings.each do |mapping|
       tag = mapping.first
       mapped_values_array = mapping.last.try(:each) || Array[*mapping.last.lstrip]
@@ -185,90 +185,88 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def xml_from_custom(fname)
-    @xml_content = ""
+    inner_content = ''
     if self.children.present?
       self.user_defined_mappings.each do |mapping|
-        tag = mapping.last["mapped_value"]
+        tag = mapping.last['mapped_value']
         self.original_mappings[mapping.first].each do |field_value|
-          @xml_content << "<#{tag}>#{field_value}</#{tag}>"
+          inner_content << "<#{tag}>#{field_value}</#{tag}>"
         end
       end
     else
       self.metadata_builder.repo.version_control_agent.get(:get_location => "#{$working_path}/#{fname}")
-      @xml_content << _child_values("#{$working_path}/#{fname}")
+      inner_content << _child_values("#{$working_path}/#{fname}")
     end
     if self.root_element.present?
-      @xml_content_transformed = "<#{root_element}>#{@xml_content}</#{root_element}>"
+      wrapped_content = "<#{root_element}>#{inner_content}</#{root_element}>"
     else
-      @xml_content_transformed = "#{@xml_content}"
+      wrapped_content = "#{inner_content}"
     end
-    @xml_content_transformed
+    wrapped_content
   end
 
   def xml_from_structural_bibid
-    @xml_content = ""
+    inner_content = ''
     if self.children.present?
       self.user_defined_mappings.each do |mapping|
-        tag = mapping.last["mapped_value"]
+        tag = mapping.last['mapped_value']
         self.original_mappings[mapping.first].each do |field_value|
-          @xml_content << "<#{tag}>#{field_value}</#{tag}>"
+          inner_content << "<#{tag}>#{field_value}</#{tag}>"
         end
       end
     else
-      self.num_objects = self.user_defined_mappings["page_number"].size
+      self.num_objects = self.user_defined_mappings['page_number'].size
       self.save!
-      @xml_content << _child_values_voyager
+      inner_content << _child_values_voyager
     end
     if self.root_element.present?
-      @xml_content_transformed = "<#{root_element}>#{@xml_content}</#{root_element}>"
+      wrapped_content = "<#{root_element}>#{inner_content}</#{root_element}>"
     else
-      @xml_content_transformed = "#{@xml_content}"
+      wrapped_content = "#{inner_content}"
     end
-    @xml_content_transformed
+    wrapped_content
   end
 
   def xml_from_bibphilly
-    @parent_xml_content = ""
-    @child_xml_content = ""
+    parent_content = ''
+    child_content = ''
     self.user_defined_mappings.each do |mapping|
       tag = mapping.first.valid_xml
       mapping.last.each do |value|
-        @parent_xml_content << "<#{tag}>#{value}</#{tag}>"
+        parent_content << "<#{tag}>#{value}</#{tag}>"
       end
     end
     structural = MetadataSource.find(self.children.first)
     structural.user_defined_mappings.each do |mapping|
-      @child_xml_content << "<#{structural.parent_element}>"
+      child_content << "<#{structural.parent_element}>"
       mapping.last.each do |key, value|
-        @child_xml_content << "<#{key.valid_xml}>#{value}</#{key.valid_xml}>"
-
+        child_content << "<#{key.valid_xml}>#{value}</#{key.valid_xml}>"
       end
-      @child_xml_content << "</#{structural.parent_element}>"
+      child_content << "</#{structural.parent_element}>"
     end
-    @xml_content_transformed = "<#{self.root_element}>#{@parent_xml_content}<#{structural.root_element}>#{@child_xml_content}</#{structural.root_element}></#{self.root_element}>"
-    @xml_content_transformed
+    "<#{self.root_element}>#{parent_content}<#{structural.root_element}>#{child_content}</#{structural.root_element}></#{self.root_element}>"
   end
 
   def generate_parent_child_xml
+    content = ''
     self.children.each do |child|
-      metadata_path = "#{$working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
       child_path = MetadataSource.where(:id => child).pluck(:path).first
-      key_xml_path = _working_path_check($working_path, "#{self.path}.xml")
-      child_xml_path = _working_path_check($working_path, "#{child_path}.xml")
-      self.metadata_builder.repo.version_control_agent.get(:get_location => key_xml_path)
-      self.metadata_builder.repo.version_control_agent.get(:get_location => child_xml_path)
-      @xml_content = File.open(key_xml_path, "r"){|io| io.read}
-      child_xml_content = File.open(child_xml_path, "r"){|io| io.read}
-      _strip_headers(@xml_content) && _strip_headers(child_xml_content)
+      key_path = _working_path_check($working_path, "#{self.path}.xml")
+      child_content_path = _working_path_check($working_path, "#{child_path}.xml")
+      self.metadata_builder.repo.version_control_agent.get(:get_location => key_path)
+      self.metadata_builder.repo.version_control_agent.get(:get_location => child_content_path)
+      content = File.open(key_path, 'r'){|io| io.read}
+      child_inner_content = File.open(child_content_path, 'r'){|io| io.read}
+      _strip_headers(content) && _strip_headers(child_inner_content)
       end_tag = "</#{self.root_element}>"
-      insert_index = @xml_content.index(end_tag)
-      @xml_content.insert(insert_index, child_xml_content)
+      insert_index = content.index(end_tag)
+      content.insert(insert_index, child_inner_content)
     end
-    @xml_content
+    content
   end
 
   def generate_review_status_xml
-    review_status_xml = ""
+    review_status_xml = ''
     self.metadata_builder.repo.review_status.each do |review_status|
       review_status_xml << "<#{I18n.t('colenda.metadata_sources.xml.review_tag')}>#{review_status}</#{I18n.t('colenda.metadata_sources.xml.review_tag')}>"
     end
@@ -276,11 +274,11 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def parse_error_messages(error_messages)
-    parsed = "<ul>"
+    parsed = '<ul>'
     error_messages.flatten.each do |message|
       parsed << "<li>#{message}</li>"
     end
-    parsed << "</ul>"
+    parsed << '</ul>'
     parsed
   end
 
@@ -295,15 +293,11 @@ class MetadataSource < ActiveRecord::Base
     self.y_start = 6
     self.y_stop = 72
     self.x_start = 2
-
     structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'bibphilly_structural'} ? MetadataSource.find(self.children.first) : initialize_bibphilly_structural(self)
-
     full_path = "#{working_path}#{self.path}"
     self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
-
     self.generate_bibphilly_descrip_md(full_path)
     structural.generate_bibphilly_struct_md(full_path)
-
   end
 
   def generate_bibphilly_descrip_md(full_path)
@@ -378,11 +372,11 @@ class MetadataSource < ActiveRecord::Base
     def _set_voyager_data(working_path = $working_path)
       _refresh_bibid(working_path)
       mapped_values = {}
-      voyager_source = open("#{MetadataSchema.config[:voyager][:http_lookup]}/#{self.original_mappings["bibid"]}.xml")
+      voyager_source = open("#{MetadataSchema.config[:voyager][:http_lookup]}/#{self.original_mappings['bibid']}.xml")
       data = Nokogiri::XML(voyager_source)
       data.children.children.children.children.children.each do |child|
-        if child.name == "datafield" && CustomEncodings::Marc21::Constants::TAGS[child.attributes["tag"].value].present?
-          if CustomEncodings::Marc21::Constants::TAGS[child.attributes["tag"].value]["*"].present?
+        if child.name == 'datafield' && CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value].present?
+          if CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value]['*'].present?
             header = _fetch_header_from_voyager(child)
             mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
             child.children.each do |c|
@@ -390,7 +384,7 @@ class MetadataSource < ActiveRecord::Base
             end
           else
             child.children.each do |c|
-              header = _fetch_header_from_subfield_voyager(child.attributes["tag"].value, c)
+              header = _fetch_header_from_subfield_voyager(child.attributes['tag'].value, c)
               if header.present?
                 mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
                 c.children.each do |s|
@@ -401,27 +395,28 @@ class MetadataSource < ActiveRecord::Base
           end
         end
       end
-      mapped_values["identifier"] = ["#{Utils.config[:repository_prefix]}_#{self.original_mappings["bibid"]}"] unless mapped_values.keys.include?("identifier")
+      mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{self.original_mappings['bibid']}"] unless mapped_values.keys.include?('identifier')
       mapped_values.each do |entry|
-        mapped_values[entry.first] = entry.last.join(" ") unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
+        mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
       end
       mapped_values
     end
 
+    #TODO: Refactor to use config variables
     def _set_voyager_structural_metadata(working_path = $working_path)
       mapped_values = {}
-      mapped_values["page_number"] = []
-      mapped_values["identifier"] = []
-      mapped_values["file_name"] = []
-      mapped_values["description"] = []
+      mapped_values['page_number'] = []
+      mapped_values['identifier'] = []
+      mapped_values['file_name'] = []
+      mapped_values['description'] = []
       _refresh_bibid(working_path)
-      voyager_source = open("#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings["bibid"]}")
+      voyager_source = open("#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}")
       data = Nokogiri::XML(voyager_source)
-      data.xpath("//xml/page").each do |page|
-        mapped_values["page_number"] << page["number"]
-        mapped_values["identifier"] << page["id"]
-        mapped_values["file_name"] << "#{page["image.id"]}.tif"
-        mapped_values["description"] << page["visiblepage"]
+      data.xpath('//xml/page').each do |page|
+        mapped_values['page_number'] << page['number']
+        mapped_values['identifier'] << page['id']
+        mapped_values['file_name'] << "#{page['image.id']}.tif"
+        mapped_values['description'] << page['visiblepage']
       end
       mapped_values
     end
@@ -442,15 +437,15 @@ class MetadataSource < ActiveRecord::Base
       else
         raise I18n.t('colenda.errors.metadata_sources.illegal_source_type')
       end
-        self.original_mappings = {"bibid" => worksheet[page][y][x].value}
+        self.original_mappings = {'bibid' => worksheet[page][y][x].value}
     end
 
     def _fetch_header_from_voyager(voyager_field)
-      CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes["tag"].value]["*"]
+      CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes['tag'].value]['*']
     end
 
     def _fetch_header_from_subfield_voyager(tag_value, voyager_child_field)
-      CustomEncodings::Marc21::Constants::TAGS[tag_value][voyager_child_field.attributes["code"].value]
+      CustomEncodings::Marc21::Constants::TAGS[tag_value][voyager_child_field.attributes['code'].value]
     end
 
     def _convert_metadata(working_path = $working_path)
@@ -513,52 +508,52 @@ class MetadataSource < ActiveRecord::Base
     def _child_values(source)
       workbook = RubyXL::Parser.parse(source)
       x_start, y_start, x_stop, y_stop, z = _offset
-      xml_content = ""
+      content = ''
       case self.view_type
       when 'horizontal'
         self.num_objects.times do |i|
-          xml_content << "<#{self.parent_element}>"
-          xml_content << _get_row_values(workbook, i, x_start, y_start, x_stop, y_stop, z)
-          xml_content << "</#{self.parent_element}>"
+          content << "<#{self.parent_element}>"
+          content << _get_row_values(workbook, i, x_start, y_start, x_stop, y_stop, z)
+          content << "</#{self.parent_element}>"
         end
       when 'vertical'
         self.num_objects.times do |i|
-          xml_content << "<#{self.parent_element}>"
-          xml_content << _get_column_values(workbook, i, x_start, y_start, x_stop, y_stop, z)
-          xml_content << "</#{self.parent_element}>"
+          content << "<#{self.parent_element}>"
+          content << _get_column_values(workbook, i, x_start, y_start, x_stop, y_stop, z)
+          content << "</#{self.parent_element}>"
         end
       else
         raise I18n.t('colenda.errors.metadata_sources.illegal_source_type', :source_type => self.source_type[source], :source => source)
       end
-      xml_content
+      content
     end
 
     def _child_values_voyager
-      xml_content = ""
+      content = ''
       self.num_objects.times do |i|
-        xml_content << "<#{self.parent_element}>"
+        content << "<#{self.parent_element}>"
         self.user_defined_mappings.each do |key, value|
-          xml_content << "<#{key}>#{self.user_defined_mappings["#{key}"][i]}</#{key}>"
+          content << "<#{key}>#{self.user_defined_mappings["#{key}"][i]}</#{key}>"
         end
-        xml_content << "</#{self.parent_element}>"
+        content << "</#{self.parent_element}>"
       end
-      xml_content
+      content
     end
 
     def _get_row_values(workbook, index, x_start, y_start, x_stop, y_stop, z)
       headers = workbook[z][y_start].cells.collect { |cell| cell.value }
-      row_value = ""
+      row_value = ''
       offset = 1
       headers.each_with_index do |header,h_index|
-        field_val = workbook[z][y_start+index+offset][x_start+h_index].present? ? workbook[z][y_start+index+offset][x_start+h_index].value : ""
-        row_value << "<#{self.user_defined_mappings[header]["mapped_value"]}>#{field_val}</#{self.user_defined_mappings[header]["mapped_value"]}>" if self.user_defined_mappings[header].present?
+        field_val = workbook[z][y_start+index+offset][x_start+h_index].present? ? workbook[z][y_start+index+offset][x_start+h_index].value : ''
+        row_value << "<#{self.user_defined_mappings[header]['mapped_value']}>#{field_val}</#{self.user_defined_mappings[header]['mapped_value']}>" if self.user_defined_mappings[header].present?
       end
       row_value
     end
 
     def _get_column_values(workbook, index, x_start, y_start, x_stop, y_stop, z)
       iterator = 0
-      column_value = ""
+      column_value = ''
       headers = Array.new
       while workbook[0][y_start+iterator].present? do
         headers << workbook[0][y_start+iterator][x_start].value
@@ -566,27 +561,27 @@ class MetadataSource < ActiveRecord::Base
       end
       offset = 1
       headers.each_with_index do |header,h_index|
-        field_val = workbook[z][y_start+h_index][index+offset].present? ? workbook[z][y_start+h_index][index+offset].value : ""
-        column_value << "<#{self.user_defined_mappings[header]["mapped_value"]}>#{field_val}</#{self.user_defined_mappings[header]["mapped_value"]}>"
+        field_val = workbook[z][y_start+h_index][index+offset].present? ? workbook[z][y_start+h_index][index+offset].value : ''
+        column_value << "<#{self.user_defined_mappings[header]['mapped_value']}>#{field_val}</#{self.user_defined_mappings[header]['mapped_value']}>"
       end
       column_value
     end
 
     def _build_preservation_xml(metadata_path_and_filename, content)
-      full_filename = _working_path_check($working_path,"#{metadata_path_and_filename}")
-      full_preservation_filename = _working_path_check($working_path, "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}")
-      _manage_canonical_identifier(content) if full_filename == full_preservation_filename
-      tmp_filename = "#{full_filename}.tmp"
+      working_file = _working_path_check($working_path,"#{metadata_path_and_filename}")
+      preservation_file = _working_path_check($working_path, "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}")
+      _manage_canonical_identifier(content) if working_file == preservation_file
+      tmp_filename = "#{working_file}.tmp"
       if File.basename(metadata_path_and_filename) == self.metadata_builder.repo.preservation_filename
-        xml_review_status = generate_review_status_xml
-        content << xml_review_status
+        review_status_content = generate_review_status_xml
+        content << review_status_content
       end
-      File.open(tmp_filename, "w+") do |f|
+      File.open(tmp_filename, 'w+') do |f|
         f << $xml_header unless content.start_with?($xml_header)
         f << content
         f << $xml_footer unless content.end_with?($xml_footer)
       end
-      File.rename(tmp_filename, full_filename)
+      File.rename(tmp_filename, working_file)
     end
 
     def _manage_canonical_identifier(xml_content)
@@ -598,7 +593,7 @@ class MetadataSource < ActiveRecord::Base
     def _fetch_write_save_preservation_xml(file_path = "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}", xml_content)
       file_path = _working_path_check($working_path, file_path)
       self.metadata_builder.repo.version_control_agent.unlock(file_path) if File.exists?(file_path)
-      _build_preservation_xml(file_path,xml_content)
+      _build_preservation_xml(file_path, xml_content)
       self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_preservation_xml', :metadata_source_path => self.path, :xml_path => file_path))
       self.metadata_builder.repo.version_control_agent.push
       self.metadata_builder.save!
@@ -613,7 +608,7 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def _strip_headers(xml)
-      xml.gsub!($xml_header, "") && xml.gsub!($xml_footer, "")
+      xml.gsub!($xml_header, '') && xml.gsub!($xml_footer, '')
     end
 
     def self.sheet_types

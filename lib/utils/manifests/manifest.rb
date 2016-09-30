@@ -21,7 +21,7 @@ module Utils
         unless File.exist?(File.dirname(@temp_path))
           FileUtils.mkdir_p(File.dirname(@temp_path))
         end
-        File.open(@temp_path, "w+") do |f|
+        File.open(@temp_path, 'w+') do |f|
           f.write(@content)
         end
       end

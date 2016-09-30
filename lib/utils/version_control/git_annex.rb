@@ -14,7 +14,7 @@ module Utils
       end
 
       def repo
-        @repo || ''
+        @repo ||= ''
       end
 
       def initialize_bare_remote
@@ -29,7 +29,7 @@ module Utils
         rescue => exception
           raise Utils::Error::VersionControl.new(error_message(exception.message))
         end
-        return destination
+        destination
       end
 
       def reset_hard
@@ -37,7 +37,7 @@ module Utils
         working_repo.reset_hard
       end
 
-      def sync(options = "")
+      def sync(options = '')
         begin
           `git annex sync #{options}`
         rescue
@@ -57,7 +57,7 @@ module Utils
       end
 
       def add(dir = @working_repo_path)
-        _get_drop_calls(dir, "add")
+        _get_drop_calls(dir, 'add')
       end
 
       def commit(commit_message)
@@ -131,13 +131,14 @@ module Utils
           error_message = I18n.t('colenda.utils.version_control.git_annex.errors.does_not_exist')
         when /already exists and is not an empty directory/
           error_message = I18n.t('colenda.utils.version_control.git_annex.errors.leftover_clone', :directory => @working_repo_path)
+        else
+          error_message = I18n.t('colenda.utils.version_control.git_annex.errors.generic', :error_message => message)
         end
-        return error_message
+        error_message
       end
 
       def _sanitize(file_string)
-        sanitized_file_string = Shellwords.escape(file_string)
-        return sanitized_file_string
+        Shellwords.escape(file_string)
       end
 
     end

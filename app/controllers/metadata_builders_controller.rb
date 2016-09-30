@@ -29,7 +29,7 @@ class MetadataBuildersController < ApplicationController
 
   def refresh_metadata
     @job = MetadataExtractionJob.perform_later(@metadata_builder, root_url, current_user.email)
-    initialize_job_activity("metadata_extraction")
+    initialize_job_activity('metadata_extraction')
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata"
   end
 
@@ -40,14 +40,14 @@ class MetadataBuildersController < ApplicationController
 
   def generate_preview_xml
     @job = GenerateXmlJob.perform_later(@metadata_builder, root_url, current_user.email)
-    initialize_job_activity("generate_xml")
+    initialize_job_activity('generate_xml')
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml"
   end
 
   def ingest
     if params[:to_ingest].present?
       @job = IngestJob.perform_later(@metadata_builder, params[:to_ingest], root_url, current_user.email)
-      initialize_job_activity("ingest")
+      initialize_job_activity('ingest')
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest"
     else
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :error => t('colenda.controllers.metadata_builders.ingest.error')}
@@ -87,14 +87,14 @@ class MetadataBuildersController < ApplicationController
       metadata_source = MetadataSource.find(hash_params[:id])
       metadata_source.update(hash_params)
       metadata_source.update_last_used_settings if (hash_params.keys & MetadataSource.settings_fields).present?
-      metadata_source.errors.messages.each do |key, message|
-        @metadata_builder.errors[:base] << message
+      metadata_source.errors.messages.each do |error|
+        @metadata_builder.errors[:base] << error.last
       end
     end
   end
 
   def _return_location
-    return_location = params[:metadata_builder][:metadata_source_attributes].any?{ |h| h.last.keys.any? { |i| ["user_defined_mappings", "root_element"].index i } } ? "generate_metadata" : "preserve"
+    return_location = params[:metadata_builder][:metadata_source_attributes].any?{ |h| h.last.keys.any? { |i| ['user_defined_mappings', 'root_element'].index i } } ? 'generate_metadata' : 'preserve'
   end
 
 end

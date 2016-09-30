@@ -1,7 +1,7 @@
 class MetadataBuilder < ActiveRecord::Base
   include ActionView::Helpers::UrlHelper
 
-  belongs_to :repo, :foreign_key => "repo_id"
+  belongs_to :repo, :foreign_key => 'repo_id'
   has_many :metadata_source, dependent: :destroy
   accepts_nested_attributes_for :metadata_source, allow_destroy: true
   validates_associated :metadata_source
@@ -57,29 +57,26 @@ class MetadataBuilder < ActiveRecord::Base
   def build_xml_files
     self.metadata_source.first.build_xml
     self.store_xml_preview
-    self.last_xml_generated = DateTime.now()
+    self.last_xml_generated = DateTime.now
     self.save!
   end
 
   def transform_and_ingest(array)
     working_path = self.repo.version_control_agent.clone
-    array.each do |p|
-      key, val = p
-      val = "#{working_path}#{val}"
-      self.repo.version_control_agent.get(:get_location => val)
-      self.repo.version_control_agent.unlock(val)
-      unless canonical_identifier_check(val)
+    array.each do |file|
+      file_path = "#{working_path}#{file.last}"
+      self.repo.version_control_agent.get(:get_location => file_path)
+      self.repo.version_control_agent.unlock(file_path)
+      unless canonical_identifier_check(file_path)
         next
       end
-
       xslt_file = self.metadata_source.any?{|ms| ms.source_type == 'bibphilly'} ? 'bibphilly' : 'sv'
       Dir.chdir(working_path)
       transformed_file_path = "#{working_path}/#{self.repo.unique_identifier}.xml"
       self.repo.version_control_agent.get(:get_location => transformed_file_path)
       self.repo.version_control_agent.unlock(transformed_file_path)
-
       FileUtils.rm(transformed_file_path) if File.exist?(transformed_file_path)
-      `xsltproc #{Rails.root}/lib/tasks/#{xslt_file}.xslt #{val}`
+      `xsltproc #{Rails.root}/lib/tasks/#{xslt_file}.xslt #{file_path}`
       self.repo.ingest(transformed_file_path, working_path)
     end
     self.repo.version_control_agent.reset_hard
@@ -102,25 +99,25 @@ class MetadataBuilder < ActiveRecord::Base
     working_path = self.repo.version_control_agent.clone
     get_location = "#{working_path}/#{self.repo.metadata_subdirectory}"
     self.repo.version_control_agent.get(:get_location => get_location)
-    @sample_xml_docs = ""
+    @sample_xml_docs = ''
     @file_links = Array.new
     Dir.glob("#{get_location}/*.xml") do |file|
       if File.exist?(file)
-        pretty_file = file.gsub(working_path,"")
+        pretty_file = file.gsub(working_path,'')
         self.preserve.add(pretty_file) if File.basename(file) == self.repo.preservation_filename
         @file_links << link_to(pretty_file, "##{file}")
-        anchor_tag = content_tag(:a, "", :name=> file)
-        sample_xml_content = File.open(file, "r"){|io| io.read}
+        anchor_tag = content_tag(:a, '', :name=> file)
+        sample_xml_content = File.open(file, 'r'){|io| io.read}
         sample_xml_doc = REXML::Document.new sample_xml_content
-        sample_xml = ""
+        sample_xml = ''
         sample_xml_doc.write(sample_xml, 1)
         header = content_tag(:h2, I18n.t('colenda.metadata_builders.xml_preview_header', :file => pretty_file))
         xml_code = content_tag(:pre, "#{sample_xml}")
-        @sample_xml_docs << content_tag(:div, anchor_tag << header << xml_code, :class => "doc")
+        @sample_xml_docs << content_tag(:div, anchor_tag << header << xml_code, :class => 'doc')
       end
     end
     self.repo.version_control_agent.delete_clone
-    @file_links_html = ""
+    @file_links_html = ''
     @file_links.each do |file_link|
       @file_links_html << content_tag(:li, file_link.html_safe)
     end
@@ -134,7 +131,7 @@ class MetadataBuilder < ActiveRecord::Base
     available_files = Array.new
     working_path = self.repo.version_control_agent.clone
     Dir.glob("#{working_path}/#{self.repo.metadata_subdirectory}/#{self.repo.format_types(self.repo.metadata_source_extensions)}") do |file|
-      available_files << file.gsub(working_path,"")
+      available_files << file.gsub(working_path,'')
     end
     self.repo.version_control_agent.delete_clone
     available_files

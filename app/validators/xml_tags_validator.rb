@@ -12,7 +12,7 @@ class XmlTagsValidator < ActiveModel::EachValidator
   String.class_eval do
 
     def starts_with_xml?
-      self.first_three.downcase == "xml" ? true : false
+      self.first_three.downcase == 'xml' ? true : false
     end
 
     def starts_with_number?

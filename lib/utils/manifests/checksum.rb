@@ -32,33 +32,33 @@ module Utils
       private
         def set_digest(hash_type)
           case hash_type.downcase
-            when "sha256"
+            when 'sha256'
               digest = Digest::SHA256
-            when "sha1"
+            when 'sha1'
               digest = Digest::SHA1
-            when "sha2"
+            when 'sha2'
               digest = Digest::SHA2
-            when "md5"
+            when 'md5'
               digest = Digest::MD5
-            when "rmd160"
+            when 'rmd160'
               digest = Digest::RMD160
             else
               raise "#{@hash_type} is not a valid hash type."
           end
-          return digest
+          digest
         end
 
         def format_content(file_list)
-          hash_separated = ""
+          hash_separated = ''
           @checksums_hash.each do |v|
-            arr = v.flatten.join("\t")
+            arr = v.flatten.join('\t')
             hash_separated += arr
-            hash_separated += "\n"
+            hash_separated += '\n'
           end
           file_list.each do |item|
             item.gsub!(@fs_config['development']['federated_fs_path'], @fs_config['development']['assets_path'])
           end
-          return hash_separated
+          hash_separated
         end
 
     end

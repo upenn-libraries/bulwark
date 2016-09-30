@@ -3,8 +3,7 @@ module Utils
     module Access
       extend self
       def generate_copy(file, destination)
-        file_path = Utils::Derivatives.generate_copy(file, destination, :type => "access")
-        return file_path
+        Utils::Derivatives.generate_copy(file, destination, :type => 'access')
       end
     end
   end

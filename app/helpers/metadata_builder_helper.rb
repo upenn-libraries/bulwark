@@ -2,17 +2,17 @@ module MetadataBuilderHelper
 
   def render_preview_xml
     if mappings_present?(:user_defined_mappings)
-      render :partial => "metadata_builders/preview_xml"
+      render :partial => 'metadata_builders/preview_xml'
     else
-      render :partial => "metadata_builders/no_mappings"
+      render :partial => 'metadata_builders/no_mappings'
     end
   end
 
   def render_source_select_form
     if @object.metadata_builder.qualified_metadata_files.present?
-      render :partial => "metadata_builders/source_select"
+      render :partial => 'metadata_builders/source_select'
     else
-      render :partial => "metadata_builders/no_qualified_metadata_files"
+      render :partial => 'metadata_builders/no_qualified_metadata_files'
     end
   end
 
@@ -47,7 +47,7 @@ module MetadataBuilderHelper
   private
 
   def _prettified_working_file(file_path)
-    file_array = file_path.split("/").reverse
+    file_array = file_path.split('/').reverse
     "#{Utils.config[:object_data_path]}/#{file_array.second}/#{file_array.first}"
   end
 

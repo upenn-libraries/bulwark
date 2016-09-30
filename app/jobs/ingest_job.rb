@@ -8,7 +8,7 @@ class IngestJob < ActiveJobStatus::TrackableJob
     @metadata_builder = metadata_builder
     @root_url = root_url
     @user_email = user_email
-    metadata_builder.transform_and_ingest(ingest_params)
+    @metadata_builder.transform_and_ingest(ingest_params)
   end
 
   private

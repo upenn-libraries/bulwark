@@ -23,6 +23,6 @@ class Messenger
     end
 
     def exchange
-      @exchange ||= channel.fanout("colenda", durable: true)
+      @exchange ||= channel.fanout('colenda', durable: true)
     end
 end

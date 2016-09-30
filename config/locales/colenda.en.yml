@@ -191,6 +191,7 @@ en:
             leftover_clone: 'Leftover Git remote clone in working directory - %{directory}.'
             does_not_exist: 'Git remote does not exist.  Could not clone to perform tasks.'
             no_changes: 'Nothing staged for commit.'
+            generic: 'Error from Git: %{error_message}'
       preprocess:
         warnings:
           no_filesystem_manifest: 'WARNING: No filesystem manifest found at %{manifest_path}, skipping...'

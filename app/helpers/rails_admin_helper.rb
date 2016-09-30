@@ -1,4 +1,4 @@
-require "rexml/document"
+require 'rexml/document'
 
 module RailsAdminHelper
 
@@ -20,7 +20,7 @@ module RailsAdminHelper
   end
 
   def render_review_box
-    repo = Repo.where("ingested = ?", [@document.id].to_yaml).first!
+    repo = Repo.where('ingested = ?', [@document.id].to_yaml).first!
     render_review_status(repo)
   end
 
@@ -109,7 +109,7 @@ module RailsAdminHelper
 
   def job_based_partial(unique_identifier, process)
     job_id = get_job_id_by_process(unique_identifier, process)
-    (ActiveJobStatus::JobStatus.get_status(job_id: job_id) == :queued) || (ActiveJobStatus::JobStatus.get_status(job_id: job_id) == :working) ? "shared/waiting" : ready_partial(process)
+    (ActiveJobStatus::JobStatus.get_status(job_id: job_id) == :queued) || (ActiveJobStatus::JobStatus.get_status(job_id: job_id) == :working) ? 'shared/waiting' : ready_partial(process)
   end
 
   def ready_partial(process)
@@ -128,6 +128,7 @@ module RailsAdminHelper
   end
 
   def collect_job_status(unique_identifier, process)
+    job_status_message ||= ''
     job_id = get_job_id_by_process(unique_identifier, process)
     job_info = current_user.job_activity[job_id]
     job_status_message = job_status(job_id, job_info) if job_id.present?
@@ -150,7 +151,7 @@ module RailsAdminHelper
   end
 
   def get_job_id_by_process(unique_identifier, process)
-    job_id = current_user.job_activity.find{|key,value| value[:unique_identifier] == unique_identifier && value[:process] == process}.try(:first)
+    current_user.job_activity.find{|key,value| value[:unique_identifier] == unique_identifier && value[:process] == process}.try(:first)
   end
 
   def identifier_selection(attributes)

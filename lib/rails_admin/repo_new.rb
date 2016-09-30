@@ -20,7 +20,7 @@ module RailsAdmin
               @authorization_adapter && @authorization_adapter.attributes_for(:new, @abstract_model).each do |name, value|
                 @object.send("#{name}=", value)
               end
-              if object_params = params[@abstract_model.to_param]
+              if object_params == params[@abstract_model.to_param]
                 sanitize_params_for!(request.xhr? ? :modal : :create)
                 @object.set_attributes(@object.attributes.merge(object_params.to_h))
               end
@@ -43,7 +43,7 @@ module RailsAdmin
               if @object.save
                 @auditing_adapter && @auditing_adapter.create_object(@object, @abstract_model, _current_user)
                 params[:return_to]
-                if @abstract_model.model_name == "Repo"
+                if @abstract_model.model_name == 'Repo'
                   memo = @object.metadata_subdirectory == @object.assets_subdirectory ? { :warning => I18n.t('admin.flash.warning', name: @model_config.label, action: I18n.t("admin.actions.#{@action.key}.done"), reason: I18n.t("admin.actions.#{@action.key}.warning_reason")) } : { :success => I18n.t('admin.flash.successful', name: @model_config.label, action: I18n.t("admin.actions.#{@action.key}.done"))}
                   redirect_to "#{main_app.root_path}admin_repo/#{@abstract_model.model_name.downcase}/#{@object.id}/git_actions",  flash: memo
                 else
