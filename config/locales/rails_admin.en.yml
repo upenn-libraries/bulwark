@@ -2,30 +2,30 @@ en:
   admin:
     actions:
       repo_new:
-        title: "Add a New Repo"
-        menu: "Add a New Repo"
-        breadcrumb: "Add a New Repo"
-        done: "created"
-        warning_reason: "Metadata subdirectory and assets subdirectory are the same."
+        title: 'Add a New Repo'
+        menu: 'Add a New Repo'
+        breadcrumb: 'Add a New Repo'
+        done: 'created'
+        warning_reason: 'Metadata subdirectory and assets subdirectory are the same.'
       git_actions:
-        title: "Repo Information"
-        menu: "1. Repo Information"
-        breadcrumb: "Repo Information"
+        title: 'Repo Information'
+        menu: '1. Repo Information'
+        breadcrumb: 'Repo Information'
       ingest:
-        title: "Publish Preview"
-        menu: "5. Publish Preview"
-        breadcrumb: "Publish Preview"
+        title: 'Publish Preview'
+        menu: '5. Publish Preview'
+        breadcrumb: 'Publish Preview'
       generate_metadata:
-        title: "Extract Metadata"
-        menu: "3. Extract and Map Metadata"
-        breadcrumb: "Extract and Map Metadata"
+        title: 'Extract Metadata'
+        menu: '3. Extract and Map Metadata'
+        breadcrumb: 'Extract and Map Metadata'
       preview_xml:
-        title: "Create Preservation XML"
-        menu: "4. Create Preservation XML"
-        breadcrumb: "Create Preservation XML"
+        title: 'Create Preservation XML'
+        menu: '4. Create Preservation XML'
+        breadcrumb: 'Create Preservation XML'
       preserve:
-        title: "Select Metadata Sources"
-        menu: "2. Select Metadata Sources"
-        breadcrumb: "Select Metadata Sources"
+        title: 'Select Metadata Sources'
+        menu: '2. Select Metadata Sources'
+        breadcrumb: 'Select Metadata Sources'
     flash:
-      warning: "%{name} %{action} with the following warning(s): %{reason}"
+      warning: '%{name} %{action} with the following warning(s): %{reason}'

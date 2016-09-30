@@ -9,7 +9,7 @@ require Rails.root.join('lib', 'rails_admin', 'preserve.rb')
 require Rails.root.join('lib', 'rails_admin', 'repo_new.rb')
 
 RailsAdmin.config do |config|
-  config.main_app_name = ["Review", "Admin Dashboard"]
+  config.main_app_name = ['Review', 'Admin Dashboard']
 
   config.authenticate_with do
     warden.authenticate! scope: :user
@@ -17,41 +17,41 @@ RailsAdmin.config do |config|
   config.current_user_method(&:current_user)
 
   config.navigation_static_links = {
-    "Front End" => "/"
+    'Front End' => '/'
   }
 
-  config.included_models = ["Repo"]
+  config.included_models = ['Repo']
 
   config.actions do
     dashboard                     # mandatory
     index
     repo_new do
-      only ["Repo"]
+      only ['Repo']
     end
     git_actions do
-      only ["Repo"]
+      only ['Repo']
     end
     preserve do
-      only ["Repo"]
+      only ['Repo']
     end
     generate_metadata
     preview_xml
     create_remote do
-      only ["Repo"]
+      only ['Repo']
     end
     ingest do
-      only ["Repo"]
+      only ['Repo']
     end
   end
 
   config.model Repo do
     field :human_readable_name do
-      label "Name"
+      label 'Name'
       required(true)
     end
     field :directory_link do
       visible false
-      label "Directory"
+      label 'Directory'
       pretty_value do
         %{#{value}}.html_safe
       end

@@ -207,12 +207,11 @@ class Repo < ActiveRecord::Base
 private
 
   def _build_and_populate_directories(working_path)
-    admin_directory = "#{Utils.config[:object_admin_path]}"
-    data_directory = "#{Utils.config[:object_data_path]}"
-    metadata_subdirectory = "#{self.metadata_subdirectory}"
-    assets_subdirectory = "#{self.assets_subdirectory}"
-    derivatives_subdirectory = "#{self.derivatives_subdirectory}"
-    Dir.chdir("#{working_path}")
+    admin_directory = "#{working_path}/#{Utils.config[:object_admin_path]}"
+    data_directory = "#{working_path}/#{Utils.config[:object_data_path]}"
+    metadata_subdirectory = "#{working_path}/#{self.metadata_subdirectory}"
+    assets_subdirectory = "#{working_path}/#{self.assets_subdirectory}"
+    derivatives_subdirectory = "#{working_path}/#{self.derivatives_subdirectory}"
     _make_and_keep(admin_directory)
     _make_and_keep(data_directory)
     _make_and_keep(metadata_subdirectory, :keep => true)
@@ -223,7 +222,7 @@ private
 
   def _make_and_keep(directory, options = {})
     FileUtils.mkdir_p(directory)
-    FileUtils.touch("#{assets_subdirectory}/.keep") if options[:keep]
+    FileUtils.touch("#{directory}/.keep") if options[:keep]
   end
 
   def _populate_admin_manifest(admin_path)
