@@ -138,7 +138,7 @@ class MetadataSource < ActiveRecord::Base
       self.metadata_builder.repo.version_control_agent.unlock(f)
       self.metadata_builder.repo.version_control_agent.drop(:drop_location => f) && `rm -rf #{f}`
     end
-    self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.jettison_files'))
+    self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.jettison_metadata'))
     self.metadata_builder.repo.version_control_agent.push
     $jettison_files = Set.new
   end

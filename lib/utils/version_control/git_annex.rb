@@ -68,7 +68,7 @@ module Utils
         begin
           working_repo.commit(commit_message)
         rescue => exception
-          if exception.message.include?("nothing to commit, working directory clean")
+          if exception.message.include?('nothing to commit, working directory clean')
             return
           else
             raise Utils::Error::VersionControl.new(error_message(exception.message))
@@ -89,11 +89,11 @@ module Utils
       end
 
       def get(dir = @working_repo_path)
-        _get_drop_calls(dir, "get")
+        _get_drop_calls(dir, 'get')
       end
 
       def drop(dir = @working_repo_path)
-        _get_drop_calls(dir, "drop")
+        _get_drop_calls(dir, 'drop')
       end
 
       def unlock(file)

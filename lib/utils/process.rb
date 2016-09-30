@@ -14,14 +14,14 @@ module Utils
       @@derivatives_working_destination = "#{@@working_path}/#{repo.derivatives_subdirectory}"
       @@status_type = :error
       delete_duplicate(@oid)
-      @command = _build_command("import", :file => file)
+      @command = _build_command('import', :file => file)
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : _execute_curl
       repo.problem_files = {}
       attach_files(@oid, repo, Manuscript, Page)
       thumbnail = generate_thumbnail(repo)
       if thumbnail.present?
         repo.has_thumbnail = true
-        @command = _build_command("file_attach", :file => thumbnail, :fid => repo.unique_identifier, :child_container => "thumbnail")
+        @command = _build_command('file_attach', :file => thumbnail, :fid => repo.unique_identifier, :child_container => 'thumbnail')
         _execute_curl
       else
         repo.has_thumbnail = false
@@ -33,14 +33,14 @@ module Utils
       repo.version_control_agent.push
       @@status_type = :success
       @@status_message = I18n.t('colenda.utils.process.success.ingest_complete')
-      return {@@status_type => @@status_message}
+      {@@status_type => @@status_message}
     end
 
     def delete_duplicate(object_id)
       obj = ActiveFedora::Base.where(:id => object_id).first
       if obj.present?
-        object_and_descendants_action(object_id, "delete")
-        @command = _build_command("delete_tombstone", :object_uri => obj.translate_id_to_uri.call(obj.id))
+        object_and_descendants_action(object_id, 'delete')
+        @command = _build_command('delete_tombstone', :object_uri => obj.translate_id_to_uri.call(obj.id))
         _execute_curl
       end
     end
@@ -61,7 +61,6 @@ module Utils
       end
       children_sorted = children.sort_by! { |c| c.page_number }
       children_sorted.each do |child_sorted|
-        display_values = {}
         file_print = child_sorted.pageImage.uri
         repo.images_to_render[file_print.to_s.html_safe] = child_sorted.serialized_attributes
       end
@@ -90,16 +89,17 @@ module Utils
     end
 
     def generate_thumbnail(repo)
+      thumbnail_link ||= nil
       object = ActiveFedora::Base.where(:id => repo.unique_identifier).first
       if object.cover.present?
         unencrypted_thumbnail_path = "#{@@working_path}/#{repo.assets_subdirectory}/#{object.cover.file_name}"
         thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ""
       end
-      return thumbnail_link
+      thumbnail_link
     end
 
     def refresh_assets(repo)
-      jettison_originals(repo) if repo.metadata_builder.metadata_source.any?{ |ms| ms.source_type == 'bibphilly'}
+      #jettison_originals(repo, I18n.t('colenda.version_control_agents.commit_messages.jettison_assets')) if repo.metadata_builder.metadata_source.any?{ |ms| ms.source_type == 'bibphilly'}
       display_path = "#{Utils.config[:assets_display_path]}/#{repo.directory}"
       if File.directory?("#{Utils.config[:assets_display_path]}/#{repo.directory}")
         Dir.chdir(display_path)
@@ -110,13 +110,17 @@ module Utils
       end
     end
 
-    def jettison_originals(repo)
-      binding.pry
+    def jettison_originals(repo, commit_message)
+      Dir.glob("#{@@working_path}/#{repo.assets_subdirectory}/*").each do |original|
+        repo.version_control_agent.unlock(original)
+        FileUtils.rm(original)
+      end
+      repo.version_control_agent.commit(commit_message)
     end
 
     def update_index(object_id)
       if check_persisted(object_id)
-        object_and_descendants_action(object_id, "update_index")
+        object_and_descendants_action(object_id, 'update_index')
       end
     end
 
@@ -133,7 +137,7 @@ module Utils
 
     def contains_blanks(file)
       status = File.read(file) =~ /<sv:node sv:name="">/
-      return status.nil? ? false : true
+      status.nil? ? false : true
     end
 
     def object_and_descendants_action(parent_id, action)
@@ -163,31 +167,29 @@ module Utils
     private
 
     def _build_command(type, options = {})
-
       @fedora_yml = "#{Rails.root}/config/fedora.yml"
       fedora_config = YAML.load_file(File.expand_path(@fedora_yml, __FILE__))
       @fedora_user = fedora_config['development']['user']
       @fedora_password = fedora_config['development']['password']
       @fedora_link = "#{fedora_config['development']['url']}#{fedora_config['development']['base_path']}"
-
       child_container = options[:child_container]
       file = options[:file]
       fid = options[:fid]
       object_uri = options[:object_uri]
       case type
-      when "import"
+      when 'import'
         command = "curl -u #{@fedora_user}:#{@fedora_password} -X POST --data-binary \"@#{file}\" \"#{@fedora_link}/fcr:import?format=jcr/xml\""
-      when "file_attach"
+      when 'file_attach'
         fedora_full_path = "#{@fedora_link}/#{fid}/#{child_container}"
         command = "curl -u #{@fedora_user}:#{@fedora_password}  -X PUT -H \"Content-Type: message/external-body; access-type=URL; URL=\\\"#{file}\\\"\" \"#{fedora_full_path}\""
-      when "delete"
+      when 'delete'
         command = "curl -u #{@fedora_user}:#{@fedora_password} -X DELETE \"#{object_uri}\""
-      when "delete_tombstone"
+      when 'delete_tombstone'
         command = "curl -u #{@fedora_user}:#{@fedora_password} -X DELETE \"#{object_uri}/fcr:tombstone\""
       else
         raise I18n.t('colenda.utils.process.warnings.invalid_curl_command')
       end
-      return command
+      command
     end
 
     def _execute_curl
