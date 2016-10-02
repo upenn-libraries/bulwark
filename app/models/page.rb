@@ -1,7 +1,7 @@
 class Page < ActiveFedora::Base
   include Hydra::Works::FileSetBehavior
 
-  contains "pageImage"
+  contains 'pageImage'
 
   property :serial_num, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/serialNum'), multiple: true do |index|
     index.as :stored_searchable
@@ -77,7 +77,7 @@ class Page < ActiveFedora::Base
   belongs_to :manuscript, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
 
   def serialized_attributes
-    self.attribute_names.each_with_object("id" => id) { |key, hash| hash[key] = eval(self[key].inspect) }
+    self.attribute_names.each_with_object('id' => id) { |key, hash| hash[key] = eval(self[key].inspect) }
   end
 
 end

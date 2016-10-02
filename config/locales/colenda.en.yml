@@ -175,7 +175,8 @@ en:
         voyager_derivative_spreadsheet: 'Created derivative spreadsheet of Voyager metadata'
         generated_derivative: 'Generated derivative for %{file_name}'
         generated_all_derivatives: 'Generated all derivatives for %{object_id}'
-        jettison_files: 'Removed files not identified as metadata source and/or for long-term preservation'
+        jettison_metadata: 'Removed files not identified as metadata source and/or for long-term preservation'
+        jettison_assets: 'Removed original asset files per metadata source type directive'
         write_preservation_xml: 'Generated unified XML for %{metadata_source_path} at %{xml_path}'
       packaging_info: 'Source information for %{source_path}\npath: %{source_path}\nid (use to correlate children): %{source_id}\nsource_type: %{source_type}\nview_type: %{source_view_type}\nnum_objects: %{source_num_objects}\nx_start: %{source_x_start}\nx_stop: %{source_x_stop}\ny_start: %{source_y_start}\ny_stop: %{source_y_stop}\nchildren: %{source_children}\n\n'
     utils:
@@ -190,6 +191,7 @@ en:
             leftover_clone: 'Leftover Git remote clone in working directory - %{directory}.'
             does_not_exist: 'Git remote does not exist.  Could not clone to perform tasks.'
             no_changes: 'Nothing staged for commit.'
+            generic: 'Error from Git: %{error_message}'
       preprocess:
         warnings:
           no_filesystem_manifest: 'WARNING: No filesystem manifest found at %{manifest_path}, skipping...'

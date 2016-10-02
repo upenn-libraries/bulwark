@@ -1,6 +1,5 @@
 class VersionControlAgent < ActiveRecord::Base
 
-
   belongs_to :repo
 
   after_create :set_worker_attributes
@@ -70,7 +69,7 @@ class VersionControlAgent < ActiveRecord::Base
 
   def sync_content
     _initialize_worker
-    $worker.sync("--content")
+    $worker.sync('--content')
   end
 
   def drop(options = {})
@@ -93,6 +92,8 @@ class VersionControlAgent < ActiveRecord::Base
     options[:drop_location].nil? ? $worker.drop : $worker.drop(options[:drop_location])
     $worker.remove_working_directory
   end
+
+  private
 
   def _initialize_worker
     $worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo) unless (defined?($worker) && $worker.repo == repo)
