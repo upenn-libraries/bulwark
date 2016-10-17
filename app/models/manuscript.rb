@@ -12,11 +12,11 @@ class Manuscript < ActiveFedora::Base
   end
 
   property :contributor, predicate: ::RDF::Vocab::DC.contributor, multiple: true do |index|
-    index.as :stored_searchable
+    index.as :stored_searchable, :facetable
   end
 
   property :coverage, predicate: ::RDF::Vocab::DC.coverage, multiple: true do |index|
-    index.as :stored_searchable
+    index.as :stored_searchable, :facetable
   end
 
   property :creator, predicate: ::RDF::Vocab::DC.creator, multiple: true do |index|
@@ -32,7 +32,7 @@ class Manuscript < ActiveFedora::Base
   end
 
   property :format, predicate: ::RDF::Vocab::DC.format, multiple: true do |index|
-    index.as :stored_searchable
+    index.as :stored_searchable, :facetable
   end
 
   property :identifier, predicate: ::RDF::Vocab::DC.identifier, multiple: true do |index|
@@ -56,11 +56,11 @@ class Manuscript < ActiveFedora::Base
   end
 
   property :relation, predicate: ::RDF::Vocab::DC.relation, multiple: true do |index|
-    index.as :stored_searchable
+    index.as :stored_searchable, :facetable
   end
 
   property :rights, predicate: ::RDF::Vocab::DC.rights, multiple: true do |index|
-    index.as :displayable
+    index.as :displayable, :facetable
   end
 
   property :source, predicate: ::RDF::Vocab::DC.source, multiple: true do |index|
@@ -72,7 +72,7 @@ class Manuscript < ActiveFedora::Base
   end
 
   property :title, predicate: ::RDF::Vocab::DC.title, multiple: true do |index|
-    index.as :stored_searchable
+    index.as :stored_searchable, :facetable
   end
 
 
