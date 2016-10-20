@@ -22,8 +22,9 @@
             xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
             xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
             xmlns:ns001="info:fedora/fedora-system:def/model#"
-            xmlns:ns002="http://library.upenn.edu/pqc/ns/"
+            xmlns:ns002="http://purl.org/dc/terms/"
             xmlns:ns003="http://pcdm.org/models#"
+            xmlns:ns004="http://library.upenn.edu/pqc/ns/"
             xmlns:space="preserve"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:mode="http://www.modeshape.org/1.0"
@@ -78,7 +79,7 @@
           <sv:property sv:name="ns002:type" sv:type="String" sv:multiple="false">
             <sv:value>Manuscript</sv:value>
           </sv:property>
-          <sv:property sv:name="ns002:title" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns004:title" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="title" />
           </sv:property>
           <sv:property sv:name="ns002:date" sv:type="String" sv:multiple="false">

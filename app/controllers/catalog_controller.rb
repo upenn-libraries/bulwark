@@ -47,6 +47,20 @@ class CatalogController < ApplicationController
     #
     # :show may be set to false if you don't want the facet to be drawn in the
     # facet bar
+
+    # PQC
+    config.add_facet_field solr_name('subject', :facetable), :label => 'Subject'
+    config.add_facet_field solr_name('language', :facetable), :label => 'Language'
+    config.add_facet_field solr_name('contributor', :facetable), :label => 'Contributor'
+    config.add_facet_field solr_name('creator', :facetable), :label => 'Creator'
+    config.add_facet_field solr_name('publisher', :facetable), :label => 'Publisher'
+    config.add_facet_field solr_name('coverage', :facetable), :label => 'Coverage'
+    config.add_facet_field solr_name('date', :facetable), :label => 'Date'
+    config.add_facet_field solr_name('format', :facetable), :label => 'Format'
+    config.add_facet_field solr_name('relation', :facetable), :label => 'Relation'
+    config.add_facet_field solr_name('source', :facetable), :label => 'Source'
+
+    # BibPhilly
     config.add_facet_field solr_name('holding_institution', :facetable), :label => 'Holding Institution'
     config.add_facet_field solr_name('repository_name', :facetable), :label => 'Repository Name'
     config.add_facet_field solr_name('source_collection', :facetable), :label => 'Source Collection'
@@ -54,7 +68,6 @@ class CatalogController < ApplicationController
     config.add_facet_field solr_name('date_narrative', :facetable), :label => 'Date Narrative'
     config.add_facet_field solr_name('place_of_origin', :facetable), :label => 'Place of Origin'
     config.add_facet_field solr_name('origin_details', :facetable), :label => 'Origin Details'
-    config.add_facet_field solr_name('language', :facetable), :label => 'Language'
     config.add_facet_field solr_name('support_material', :facetable), :label => 'Support Material'
     config.add_facet_field solr_name('subject_names', :facetable), :label => 'Subject Names'
     config.add_facet_field solr_name('subject_topical', :facetable), :label => 'Subject Topical'
@@ -72,6 +85,17 @@ class CatalogController < ApplicationController
 
     # solr fields to be displayed in the index (search results) view
     #   The ordering of the field names is the order of the display
+
+    # PQC
+    config.add_index_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject'
+    config.add_index_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
+    config.add_index_field solr_name('language', :stored_searchable, type: :string), :label => 'Language'
+    config.add_index_field solr_name('creator', :stored_searchable, type: :string), :label => 'Creator'
+    config.add_index_field solr_name('publisher', :stored_searchable, type: :string), :label => 'Publisher'
+    config.add_index_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
+    config.add_index_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
+
+    # BibPhilly
     config.add_index_field solr_name('manuscript_name', :stored_searchable, type: :string), :label => 'Manuscript Name'
     config.add_index_field solr_name('administrative_contact', :stored_searchable, type: :string), :label => 'Administrative Contact'
     config.add_index_field solr_name('metadata_creator', :stored_searchable, type: :string), :label => 'Metadata Creator'
@@ -88,8 +112,6 @@ class CatalogController < ApplicationController
     config.add_index_field solr_name('date_narrative', :stored_searchable, type: :string), :label => 'Date Narrative'
     config.add_index_field solr_name('place_of_origin', :stored_searchable, type: :string), :label => 'Place of Origin'
     config.add_index_field solr_name('origin_details', :stored_searchable, type: :string), :label => 'Origin Details'
-    config.add_index_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
-    config.add_index_field solr_name('language', :stored_searchable, type: :string), :label => 'Language'
     config.add_index_field solr_name('notes', :stored_searchable, type: :string), :label => 'Notes'
     config.add_index_field solr_name('support_material', :stored_searchable, type: :string), :label => 'Support Material'
     config.add_index_field solr_name('page_dimensions', :stored_searchable, type: :string), :label => 'Page Dimensions'
@@ -101,6 +123,25 @@ class CatalogController < ApplicationController
 
     # solr fields to be displayed in the show (single result) view
     #   The ordering of the field names is the order of the display
+
+    # PQC
+    config.add_show_field solr_name('abstract', :stored_searchable, type: :string), :label => 'Abstract'
+    config.add_show_field solr_name('contributor', :stored_searchable, type: :string), :label => 'Contributor'
+    config.add_show_field solr_name('coverage', :stored_searchable, type: :string), :label => 'Coverage'
+    config.add_show_field solr_name('creator', :stored_searchable, type: :string), :label => 'Creator'
+    config.add_show_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
+    config.add_show_field solr_name('date', :stored_searchable, type: :string), :label => 'Date'
+    config.add_show_field solr_name('format', :stored_searchable, type: :string), :label => 'Format'
+    config.add_show_field solr_name('identifier', :stored_searchable, type: :string), :label => 'Identifier'
+    config.add_show_field solr_name('language', :stored_searchable, type: :string), :label => 'Language'
+    config.add_show_field solr_name('publisher', :stored_searchable, type: :string), :label => 'Publisher'
+    config.add_show_field solr_name('relation', :stored_searchable, type: :string), :label => 'Relation'
+    config.add_show_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
+    config.add_show_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
+    config.add_show_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject'
+    config.add_show_field solr_name('title', :stored_searchable, type: :string), :label => 'Title'
+
+    # BibPhilly
     config.add_show_field solr_name('administrative_contact', :stored_searchable, type: :string), :label => 'Administrative Contact'
     config.add_show_field solr_name('administrative_contact_email', :stored_searchable, type: :string), :label => 'Administrative Contact Email'
     config.add_show_field solr_name('metadata_creator', :stored_searchable, type: :string), :label => 'Metadata Creator'
@@ -130,8 +171,6 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('date_narrative', :stored_searchable, type: :string), :label => 'Date Narrative'
     config.add_show_field solr_name('place_of_origin', :stored_searchable, type: :string), :label => 'Place of Origin'
     config.add_show_field solr_name('origin_details', :stored_searchable, type: :string), :label => 'Origin Details'
-    config.add_show_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
-    config.add_show_field solr_name('language', :stored_searchable, type: :string), :label => 'Language'
     config.add_show_field solr_name('foliation_pagination', :stored_searchable, type: :string), :label => 'Foliation/Pagination'
     config.add_show_field solr_name('flyleaves_and_leaves', :stored_searchable, type: :string), :label => 'Flyleaves &amp; Leaves'
     config.add_show_field solr_name('layout', :stored_searchable, type: :string), :label => 'Layout'
