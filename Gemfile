@@ -22,11 +22,11 @@ gem 'hydra-pcdm'
 
 gem 'qa'
 gem 'blacklight_range_limit'
-
-gem 'rails_admin_colenda', :path => 'rails_admin_colenda'
-gem 'rails_admin', git: 'https://github.com/kelynch/rails_admin.git', branch: 'js_loading_in_custom_theme'
+gem 'ezid-client'
 
 gem 'string_exts', :path => 'string_exts'
+gem 'rails_admin_colenda', :path => 'rails_admin_colenda'
+gem 'rails_admin', git: 'https://github.com/kelynch/rails_admin.git', branch: 'js_loading_in_custom_theme'
 
 gem 'colorize'
 gem 'git'
@@ -36,7 +36,7 @@ gem 'sanitize'
 
 gem 'bunny'
 gem 'sidekiq'
-gem 'active_job_status'
+gem 'active_job_status', '1.1.0'
 gem 'redis-rails'
 gem 'sinatra', :require => false
 
@@ -50,9 +50,6 @@ gem 'turbolinks'
 gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0',          group: :doc
-
-# Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-gem 'spring',        group: :development
 
 gem 'rsolr', '~> 1.0.6'
 gem 'devise'
