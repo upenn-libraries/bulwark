@@ -26,6 +26,8 @@ gem 'blacklight_range_limit'
 gem 'rails_admin_colenda', :path => 'rails_admin_colenda'
 gem 'rails_admin', git: 'https://github.com/kelynch/rails_admin.git', branch: 'js_loading_in_custom_theme'
 
+gem 'string_exts', :path => 'string_exts'
+
 gem 'colorize'
 gem 'git'
 gem 'rubyXL'

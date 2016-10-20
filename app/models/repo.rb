@@ -64,7 +64,7 @@ class Repo < ActiveRecord::Base
   end
 
   def preservation_filename=(preservation_filename)
-    self[:preservation_filename] = preservation_filename.concat('.xml') unless preservation_filename.ends_with?('.xml')
+    self[:preservation_filename] = preservation_filename.xmlify
   end
 
   def review_status=(review_status)
@@ -197,9 +197,11 @@ class Repo < ActiveRecord::Base
   def format_types(extensions_array)
     formatted_types = ''
     if extensions_array.length > 1
-      formatted_types = _format_multiple(extensions_array)
+      ft = extensions_array.map { |f| ".#{f}"}
+      file_extensions = ft.join(',')
+      formatted_types = file_extensions.manifest_multiple
     else
-      formatted_types = _format_singular(extensions_array)
+      formatted_types = extensions_array.first.manifest_singular
     end
     formatted_types
   end
@@ -234,16 +236,6 @@ private
     File.open(filesystem_semantics_path, "w+") do |file|
       file.puts("#{metadata_line}\n#{assets_line}")
     end
-  end
-
-  def _format_singular(extension)
-    "*.#{extension.first}"
-  end
-
-  def _format_multiple(extensions)
-    ft = extensions.map { |f| ".#{f}"}
-    formatted_ft = ft.join(',')
-    "*{#{formatted_ft}}"
   end
 
   def _initialize_steps
@@ -283,18 +275,11 @@ private
   #TODO: Replace with test EZID minting when in place
   def _mint_and_format_ezid
     minted_id = SecureRandom.hex(10)
-    while Repo.where(directory: "#{Utils.config[:repository_prefix]}_#{self.human_readable_name}_#{minted_id}.git").pluck(:directory).present?
+    while Repo.where(directory: "#{Utils.config[:repository_prefix]}_#{self.human_readable_name.directorify}_#{minted_id}.git").pluck(:directory).present?
       minted_id = SecureRandom.hex(10)
     end
     self[:unique_identifier] = "#{Utils.config[:repository_prefix]}_#{minted_id}"
-    self[:directory] = "#{Utils.config[:repository_prefix]}_#{self.human_readable_name}_#{minted_id}"
-    _concatenate_git
+    self[:directory] = "#{Utils.config[:repository_prefix]}_#{self.human_readable_name.directorify}_#{minted_id}".gitify
   end
-
-  # TODO: Determine if this is really the best place to put this because we're dealing with Git bare repo best practices
-  def _concatenate_git
-    self.directory.concat('.git') unless self.directory =~ /.git$/ || self.directory.nil?
-  end
-
 
 end
