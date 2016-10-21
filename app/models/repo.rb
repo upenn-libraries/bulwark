@@ -272,13 +272,10 @@ private
     exist_status
   end
 
-  #TODO: Replace with test EZID minting when in place
-  def _mint_and_format_ezid
-    minted_id = SecureRandom.hex(10)
-    while Repo.where(directory: "#{Utils.config[:repository_prefix]}_#{self.human_readable_name.directorify}_#{minted_id}.git").pluck(:directory).present?
-      minted_id = SecureRandom.hex(10)
-    end
-    self[:unique_identifier] = "#{Utils.config[:repository_prefix]}_#{minted_id}"
+  def mint_mock_identifier
+    # TODO : Mint ARK ID
+    minted = Ezid::MockIdentifier.mint
+    self[:unique_identifier] = "#{Utils.config[:repository_prefix]}_#{minted.id}"
     self[:directory] = "#{Utils.config[:repository_prefix]}_#{self.human_readable_name.directorify}_#{minted_id}".gitify
   end
 
