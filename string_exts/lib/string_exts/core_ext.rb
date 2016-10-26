@@ -38,13 +38,13 @@ String.class_eval do
   # Bare git repos
 
   def gitify
-    self.end_with?('.git') ? self : self.concat('.git')
+    self.directorify.end_with?('.git') ? self.directorify : "#{self.directorify}.git"
   end
 
   # XML files
 
   def xmlify
-    self.end_with?('.xml') ? self : self.concat('.xml')
+    self.end_with?('.xml') ? self : "#{self}.xml"
   end
 
   # Manifests for file extensions

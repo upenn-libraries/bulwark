@@ -2,6 +2,8 @@ require 'sanitize'
 
 class Repo < ActiveRecord::Base
 
+  include ModelNamingExtensions::Naming
+
   has_one :metadata_builder, dependent: :destroy, :validate => false
   has_one :version_control_agent, dependent: :destroy, :validate => false
 
@@ -13,7 +15,6 @@ class Repo < ActiveRecord::Base
   validates :file_extensions, presence: true
   validates :preservation_filename, presence: true
 
-  validates :human_readable_name, multiple: false
   validates :directory, multiple: false
 
   serialize :file_extensions, Array
@@ -186,7 +187,7 @@ class Repo < ActiveRecord::Base
   end
 
   def mint_ezid
-    _mint_and_format_ezid
+    #mint_ark
   end
 
   #TODO: Add a field that indicates repo ownership candidacy
@@ -272,11 +273,12 @@ private
     exist_status
   end
 
-  def mint_mock_identifier
+  def mint_ark
     # TODO : Mint ARK ID
-    minted = Ezid::MockIdentifier.mint
-    self[:unique_identifier] = "#{Utils.config[:repository_prefix]}_#{minted.id}"
-    self[:directory] = "#{Utils.config[:repository_prefix]}_#{self.human_readable_name.directorify}_#{minted_id}".gitify
+    binding.pry
+    minted_id = Ezid::MockIdentifier.mint
+    self[:unique_identifier] = "#{Utils.config[:repository_prefix]}_#{minted_id.id}"
+    self[:directory] = self.names.directory
   end
 
 end
