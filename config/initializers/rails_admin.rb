@@ -46,12 +46,12 @@ RailsAdmin.config do |config|
 
   config.model Repo do
     field :human_readable_name do
-      label 'Name'
+      label I18n.t('colenda.rails_admin.new_repo.labels.human_readable_name')
       required(true)
     end
     field :directory_link do
       visible false
-      label 'Directory'
+      label I18n.t('colenda.rails_admin.new_repo.labels.directory')
       pretty_value do
         %{#{value}}.html_safe
       end

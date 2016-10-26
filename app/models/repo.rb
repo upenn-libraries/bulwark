@@ -37,7 +37,8 @@ class Repo < ActiveRecord::Base
 
   def set_defaults
     self[:owner] = User.current
-    mint_ezid
+    self[:unique_identifier] = mint_ezid
+    self[:directory] = self.names.directory
     self[:derivatives_subdirectory] = "#{Utils.config[:object_derivatives_path]}"
     self[:admin_subdirectory] = "#{Utils.config[:object_admin_path]}"
     self[:has_thumbnail] = false
@@ -187,7 +188,7 @@ class Repo < ActiveRecord::Base
   end
 
   def mint_ezid
-    #mint_ark
+    mint_initial_ark
   end
 
   #TODO: Add a field that indicates repo ownership candidacy
@@ -273,12 +274,8 @@ private
     exist_status
   end
 
-  def mint_ark
-    # TODO : Mint ARK ID
-    binding.pry
-    minted_id = Ezid::MockIdentifier.mint
-    self[:unique_identifier] = "#{Utils.config[:repository_prefix]}_#{minted_id.id}"
-    self[:directory] = self.names.directory
+  def mint_initial_ark
+    Ezid::Identifier.mint
   end
 
 end

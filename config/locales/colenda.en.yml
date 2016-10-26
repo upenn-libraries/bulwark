@@ -38,6 +38,9 @@ en:
         invalid_characters: 'Invalid tag "%{value}" specified for "%{key}" - valid XML tags can only contain letters, numbers, underscores, hyphens, and periods'
     rails_admin:
       new_repo:
+        labels:
+          human_readable_name: 'Name'
+          directory: 'Directory'
         metadata_subdirectory:
           help: 'Required - subdirectory within the directory specified above that will serve as the location for the metadata to be processed by the application.'
         assets_subdirectory:
@@ -49,6 +52,8 @@ en:
         preservation_filename:
           help: 'Required - Filename for long-term preservation XML file'
       dashboard_link_text: 'Admin Dashboard'
+      links:
+        front_end: 'Front End'
       processing_job_message: 'Processing your job in the background.  You will receive an email when it is complete.'
       jobs:
         queued: 'Your %{process} job for %{unique_identifier}, started on %{started}, is in the queue'
