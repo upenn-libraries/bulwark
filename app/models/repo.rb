@@ -15,8 +15,6 @@ class Repo < ActiveRecord::Base
   validates :file_extensions, presence: true
   validates :preservation_filename, presence: true
 
-  validates :directory, multiple: false
-
   serialize :file_extensions, Array
   serialize :metadata_source_extensions, Array
   serialize :metadata_sources, Array
@@ -38,7 +36,6 @@ class Repo < ActiveRecord::Base
   def set_defaults
     self[:owner] = User.current
     self[:unique_identifier] = mint_ezid
-    self[:directory] = self.names.directory
     self[:derivatives_subdirectory] = "#{Utils.config[:object_derivatives_path]}"
     self[:admin_subdirectory] = "#{Utils.config[:object_admin_path]}"
     self[:has_thumbnail] = false
@@ -79,10 +76,6 @@ class Repo < ActiveRecord::Base
 
   def human_readable_name
     read_attribute(:human_readable_name) || ''
-  end
-
-  def directory
-    read_attribute(:directory) || ''
   end
 
   def description
@@ -129,7 +122,7 @@ class Repo < ActiveRecord::Base
   def create_remote
     # Function weirdness forcing update_steps to the top
     self.update_steps(:git_remote_initialized)
-    unless Dir.exists?("#{Utils.config[:assets_path]}/#{self.directory}")
+    unless Dir.exists?("#{Utils.config[:assets_path]}/#{self.names.directory}")
       self.version_control_agent.init_bare
       working_path = self.version_control_agent.clone
       _build_and_populate_directories(working_path)
@@ -169,11 +162,11 @@ class Repo < ActiveRecord::Base
 
   def directory_link
     url = "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{self.id}/git_actions"
-    "<a href=\"#{url}\">#{self.directory}</a>"
+    "<a href=\"#{url}\">#{self.names.directory}</a>"
   end
 
   def package_metadata_info(working_path)
-    File.open("#{working_path}/#{self.admin_subdirectory}/#{self.directory.gsub(/\.git$/, '')}", 'w+') do |f|
+    File.open("#{working_path}/#{self.admin_subdirectory}/#{self.names.directory}", 'w+') do |f|
       self.metadata_builder.metadata_source.each do |source|
         f.puts I18n.t('colenda.version_control_agents.packaging_info', :source_path => source.path, :source_id => source.id, :source_type => source.source_type, :source_view_type => source.view_type, :source_num_objects => source.num_objects, :source_x_start => source.x_start, :source_x_stop => source.x_stop, :source_y_start => source.y_start, :source_y_stop => source.y_stop, :source_children => source.children)
       end
@@ -216,15 +209,15 @@ private
     metadata_subdirectory = "#{working_path}/#{self.metadata_subdirectory}"
     assets_subdirectory = "#{working_path}/#{self.assets_subdirectory}"
     derivatives_subdirectory = "#{working_path}/#{self.derivatives_subdirectory}"
-    _make_and_keep(admin_directory)
-    _make_and_keep(data_directory)
-    _make_and_keep(metadata_subdirectory, :keep => true)
-    _make_and_keep(assets_subdirectory, :keep => true)
-    _make_and_keep(derivatives_subdirectory, :keep => true)
+    _make_subdir(admin_directory)
+    _make_subdir(data_directory)
+    _make_subdir(metadata_subdirectory, :keep => true)
+    _make_subdir(assets_subdirectory, :keep => true)
+    _make_subdir(derivatives_subdirectory, :keep => true)
     _populate_admin_manifest("#{admin_directory}")
   end
 
-  def _make_and_keep(directory, options = {})
+  def _make_subdir(directory, options = {})
     FileUtils.mkdir_p(directory)
     FileUtils.touch("#{directory}/.keep") if options[:keep]
   end

@@ -14,7 +14,7 @@
   <xsl:preserve-space elements="sv:node sv:property sv:value"/>
     <xsl:template match="/root/record">
       <xsl:copy>
-        <exsl:document method="xml" href="{uuid}.xml">
+        <exsl:document method="xml" href="fedora.xml">
           <sv:node xmlns:premis="http://www.loc.gov/premis/rdf/v1#"
             xmlns:image="http://www.modeshape.org/images/1.0"
             xmlns:sv="http://www.jcp.org/jcr/sv/1.0"

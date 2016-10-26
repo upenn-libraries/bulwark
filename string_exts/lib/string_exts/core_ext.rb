@@ -1,5 +1,6 @@
 String.class_eval do
 
+
   # Grabbing for XML checks (mostly for readability)
 
   def initial
@@ -9,6 +10,7 @@ String.class_eval do
   def first_three
     self[0,3]
   end
+
 
   # XML checks
 
@@ -29,11 +31,20 @@ String.class_eval do
     self.downcase.gsub(' ','_').gsub(/[^a-zA-Z0-9_.-]/, '')
   end
 
-  # Making user-submitted strings directory-able
+
+  # Sanitizing user-submitted strings as filenames
+
+  def filename_sanitize
+    self.downcase.gsub(/[^0-9A-Za-z.\-]/, '_')
+  end
+
+
+  # User-submitted strings as directory names
 
   def directorify
     self.gsub(' ','_').gsub(/[\/:]/,'')
   end
+
 
   # Bare git repos
 
@@ -50,7 +61,7 @@ String.class_eval do
   # Manifests for file extensions
 
   def manifest_singular
-    "*.#{self.first}"
+    "*.#{self}"
   end
 
   def manifest_multiple

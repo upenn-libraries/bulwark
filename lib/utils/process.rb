@@ -10,12 +10,16 @@ module Utils
 
     def import(file, repo, working_path)
       @@working_path = working_path
-      @oid = File.basename(repo.unique_identifier)
+
+
+      @oid = File.basename(repo.names.filename)
       @@derivatives_working_destination = "#{@@working_path}/#{repo.derivatives_subdirectory}"
       @@status_type = :error
       delete_duplicate(@oid)
       @command = _build_command('import', :file => file)
+      binding.pry
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : _execute_curl
+
       repo.problem_files = {}
       attach_files(@oid, repo, Manuscript, Page)
       thumbnail = generate_thumbnail(repo)
@@ -73,7 +77,7 @@ module Utils
       repo.version_control_agent.unlock(file_link)
       validated =  File.exist?(file_link) ? validate_file(file_link) : false
       if validated
-        derivative_link = "#{Utils.config[:federated_fs_path]}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
+        derivative_link = "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
         @command = _build_command('file_attach', :file => derivative_link, :fid => parent.id, :child_container => child_container)
         _execute_curl
         repo.version_control_agent.add(:add_location => "#{@@derivatives_working_destination}")
@@ -93,15 +97,14 @@ module Utils
       object = ActiveFedora::Base.where(:id => repo.unique_identifier).first
       if object.cover.present?
         unencrypted_thumbnail_path = "#{@@working_path}/#{repo.assets_subdirectory}/#{object.cover.file_name}"
-        thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ""
+        thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ""
       end
       thumbnail_link
     end
 
     def refresh_assets(repo)
-      #jettison_originals(repo, I18n.t('colenda.version_control_agents.commit_messages.jettison_assets')) if repo.metadata_builder.metadata_source.any?{ |ms| ms.source_type == 'bibphilly'}
-      display_path = "#{Utils.config[:assets_display_path]}/#{repo.directory}"
-      if File.directory?("#{Utils.config[:assets_display_path]}/#{repo.directory}")
+      display_path = "#{Utils.config[:assets_display_path]}/#{repo.names.directory}"
+      if File.directory?("#{Utils.config[:assets_display_path]}/#{repo.names.directory}")
         Dir.chdir(display_path)
         repo.version_control_agent.sync_content
       else

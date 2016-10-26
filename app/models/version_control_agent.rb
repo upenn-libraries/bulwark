@@ -17,7 +17,7 @@ class VersionControlAgent < ActiveRecord::Base
   end
 
   def set_worker_attributes
-    remote_repo_path = "#{Utils.config[:assets_path]}/#{self.repo.directory}"
+    remote_repo_path = "#{Utils.config[:assets_path]}/#{self.repo.names.git}"
     self.remote_path = remote_repo_path
     self.save!
   end

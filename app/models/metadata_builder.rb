@@ -63,6 +63,8 @@ class MetadataBuilder < ActiveRecord::Base
 
   def transform_and_ingest(array)
     working_path = self.repo.version_control_agent.clone
+    tmp_path = "#{working_path}/tmp"
+    Dir.mkdir(tmp_path)
     array.each do |file|
       file_path = "#{working_path}#{file.last}"
       self.repo.version_control_agent.get(:get_location => file_path)
@@ -71,13 +73,11 @@ class MetadataBuilder < ActiveRecord::Base
         next
       end
       xslt_file = self.metadata_source.any?{|ms| ms.source_type == 'bibphilly'} ? 'bibphilly' : 'sv'
-      Dir.chdir(working_path)
-      transformed_file_path = "#{working_path}/#{self.repo.unique_identifier}.xml"
-      self.repo.version_control_agent.get(:get_location => transformed_file_path)
-      self.repo.version_control_agent.unlock(transformed_file_path)
-      FileUtils.rm(transformed_file_path) if File.exist?(transformed_file_path)
+      Dir.chdir(tmp_path)
       `xsltproc #{Rails.root}/lib/tasks/#{xslt_file}.xslt #{file_path}`
-      self.repo.ingest(transformed_file_path, working_path)
+      transformed_xml = Dir.glob("#{tmp_path}/*.xml").first
+      self.repo.ingest(transformed_xml, working_path)
+      FileUtils.rm_r(tmp_path, :secure => true)
     end
     self.repo.version_control_agent.reset_hard
     self.repo.version_control_agent.delete_clone

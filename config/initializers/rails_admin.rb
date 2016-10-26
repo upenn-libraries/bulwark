@@ -92,9 +92,6 @@ RailsAdmin.config do |config|
       help I18n.t('colenda.rails_admin.new_repo.preservation_filename.help')
     end
     list do
-      field :directory do
-        visible false
-      end
       field :metadata_subdirectory do
         visible false
       end
