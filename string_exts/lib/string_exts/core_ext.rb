@@ -32,7 +32,7 @@ String.class_eval do
   # Making user-submitted strings directory-able
 
   def directorify
-    self.gsub(' ','_')
+    self.gsub(' ','_').gsub(/[\/:]/,'')
   end
 
   # Bare git repos

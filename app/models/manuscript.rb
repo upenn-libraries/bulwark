@@ -1,9 +1,4 @@
-class Manuscript < ActiveFedora::Base
-  include Hydra::Works::WorkBehavior
-
-  has_many :pages
-
-  contains 'thumbnail'
+class Manuscript < MultipageItem
 
   # PQC manuscript fields
 
@@ -16,14 +11,6 @@ class Manuscript < ActiveFedora::Base
   end
 
   property :coverage, predicate: ::RDF::Vocab::DC.coverage, multiple: true do |index|
-    index.as :stored_searchable, :facetable
-  end
-
-  property :creator, predicate: ::RDF::Vocab::DC.creator, multiple: true do |index|
-    index.as :stored_searchable, :facetable
-  end
-
-  property :date, predicate: ::RDF::Vocab::DC.date, multiple: true do |index|
     index.as :stored_searchable, :facetable
   end
 
@@ -43,7 +30,7 @@ class Manuscript < ActiveFedora::Base
     index.as :stored_searchable
   end
 
-  property :includesComponent, predicate: ::RDF::URI.new("http://library.upenn.edu/pqc/ns/includesComponent"), multiple: true do |index|
+  property :includesComponent, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/includesComponent'), multiple: true do |index|
     index.as :stored_searchable
   end
 
@@ -298,25 +285,10 @@ class Manuscript < ActiveFedora::Base
 
   # required
 
-  property :title, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/title'), multiple: true do |index|
-    index.as :stored_searchable, :facetable
-  end
-
-  property :item_type, predicate: ::RDF::Vocab::DC.type, multiple: true do |index|
-    index.as :stored_searchable
-  end
-
   def init
     self.item_type ||= 'Manuscript'
   end
 
-  def thumbnail_link
-    self.thumbnail.ldp_source.subject
-  end
-
-  def cover
-    Page.where(:parent_manuscript => self.id).sort_by {|obj| obj.page_number}.first
-  end
 
 
 end
