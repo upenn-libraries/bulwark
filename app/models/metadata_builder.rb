@@ -76,6 +76,9 @@ class MetadataBuilder < ActiveRecord::Base
       Dir.chdir(tmp_path)
       `xsltproc #{Rails.root}/lib/tasks/#{xslt_file}.xslt #{file_path}`
       transformed_xml = Dir.glob("#{tmp_path}/*.xml").first
+      binding.pry
+      fedora_xml = File.read(transformed_xml).gsub(repo.unique_identifier, repo.names.fedora)
+      File.open(transformed_xml, 'w') {|file| file.puts fedora_xml }
       self.repo.ingest(transformed_xml, working_path)
       FileUtils.rm_r(tmp_path, :secure => true)
     end

@@ -10,16 +10,13 @@ module Utils
 
     def import(file, repo, working_path)
       @@working_path = working_path
-
-
-      @oid = File.basename(repo.names.filename)
+      @oid = File.basename(repo.names.fedora)
       @@derivatives_working_destination = "#{@@working_path}/#{repo.derivatives_subdirectory}"
       @@status_type = :error
       delete_duplicate(@oid)
       @command = _build_command('import', :file => file)
       binding.pry
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : _execute_curl
-
       repo.problem_files = {}
       attach_files(@oid, repo, Manuscript, Page)
       thumbnail = generate_thumbnail(repo)

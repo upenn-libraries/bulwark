@@ -10,7 +10,7 @@ module Utils
       def initialize(repo)
         @repo = repo
         @remote_repo_path = "#{Utils.config[:assets_path]}/#{@repo.names.git}"
-        @working_repo_path = "#{Dir.mktmpdir}/#{@repo.names.directory}"
+        @working_repo_path = "#{Dir.mktmpdir}/#{@repo.names.git}"
       end
 
       def repo
@@ -77,7 +77,6 @@ module Utils
       end
 
       def commit_bare(commit_message)
-        binding.pry
         working_repo = Git.open(@working_repo_path)
         working_repo.add(:all => true)
         working_repo.commit(commit_message)

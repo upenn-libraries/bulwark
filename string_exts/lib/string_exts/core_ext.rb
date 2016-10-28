@@ -1,6 +1,5 @@
 String.class_eval do
 
-
   # Grabbing for XML checks (mostly for readability)
 
   def initial
@@ -10,7 +9,6 @@ String.class_eval do
   def first_three
     self[0,3]
   end
-
 
   # XML checks
 
@@ -31,13 +29,11 @@ String.class_eval do
     self.downcase.gsub(' ','_').gsub(/[^a-zA-Z0-9_.-]/, '')
   end
 
-
   # Sanitizing user-submitted strings as filenames
 
   def filename_sanitize
     self.downcase.gsub(/[^0-9A-Za-z.\-]/, '_')
   end
-
 
   # User-submitted strings as directory names
 
@@ -45,11 +41,16 @@ String.class_eval do
     self.gsub(' ','_').gsub(/[\/:]/,'')
   end
 
-
   # Bare git repos
 
   def gitify
     self.directorify.end_with?('.git') ? self.directorify : "#{self.directorify}.git"
+  end
+
+  # Fedora names
+
+  def fedorafy
+    self.gsub('ark:/', '').gsub('/','-')
   end
 
   # XML files
