@@ -10,7 +10,7 @@ module Utils
 
     def import(file, repo, working_path)
       @@working_path = working_path
-      @oid = File.basename(repo.names.fedora)
+      @oid = repo.names.fedora
       @@derivatives_working_destination = "#{@@working_path}/#{repo.derivatives_subdirectory}"
       @@status_type = :error
       delete_duplicate(@oid)
@@ -59,7 +59,6 @@ module Utils
           parent.members << child
         end
       end
-
       children_sorted = children.sort_by! { |c| c.page_number }
       children_sorted.each do |child_sorted|
         file_print = child_sorted.pageImage.uri
@@ -93,7 +92,7 @@ module Utils
       object = ActiveFedora::Base.where(:id => repo.names.fedora).first
       if object.cover.present?
         unencrypted_thumbnail_path = "#{@@working_path}/#{repo.assets_subdirectory}/#{object.cover.file_name}"
-        thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ""
+        thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ''
       end
       thumbnail_link
     end
