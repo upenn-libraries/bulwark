@@ -63,8 +63,6 @@ class MetadataBuilder < ActiveRecord::Base
 
   def transform_and_ingest(array)
     working_path = self.repo.version_control_agent.clone
-    tmp_path = "#{working_path}/tmp"
-    Dir.mkdir(tmp_path)
     array.each do |file|
       file_path = "#{working_path}#{file.last}"
       self.repo.version_control_agent.get(:get_location => file_path)
@@ -73,14 +71,12 @@ class MetadataBuilder < ActiveRecord::Base
         next
       end
       xslt_file = self.metadata_source.any?{|ms| ms.source_type == 'bibphilly'} ? 'bibphilly' : 'sv'
-      Dir.chdir(tmp_path)
+      Dir.chdir(working_path)
       `xsltproc #{Rails.root}/lib/tasks/#{xslt_file}.xslt #{file_path}`
-      transformed_xml = Dir.glob("#{tmp_path}/*.xml").first
-      binding.pry
+      transformed_xml = "#{working_path}/#{Utils.config[:fedora_xml_derivative]}"
       fedora_xml = File.read(transformed_xml).gsub(repo.unique_identifier, repo.names.fedora)
-      File.open(transformed_xml, 'w') {|file| file.puts fedora_xml }
+      File.open(transformed_xml, 'w') {|f| f.puts fedora_xml }
       self.repo.ingest(transformed_xml, working_path)
-      FileUtils.rm_r(tmp_path, :secure => true)
     end
     self.repo.version_control_agent.reset_hard
     self.repo.version_control_agent.delete_clone

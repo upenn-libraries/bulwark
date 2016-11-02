@@ -216,6 +216,7 @@ en:
       i_broke: 'Something went wrong. Please contact the site administrator.'
     errors:
       repos:
+        tmp_dir: 'Repo tmp directory not properly deleted; may now be in git commit history'
         ingest_error: 'Ingest and index failed due to the following error(s): %{backtrace}'
       metadata_sources:
         illegal_view_type: 'Illegal view type %{view_type} for %{source}'

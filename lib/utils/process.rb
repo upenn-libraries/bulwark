@@ -15,20 +15,20 @@ module Utils
       @@status_type = :error
       delete_duplicate(@oid)
       @command = _build_command('import', :file => file)
-      binding.pry
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : _execute_curl
       repo.problem_files = {}
       attach_files(@oid, repo, Manuscript, Page)
       thumbnail = generate_thumbnail(repo)
       if thumbnail.present?
         repo.has_thumbnail = true
-        @command = _build_command('file_attach', :file => thumbnail, :fid => repo.unique_identifier, :child_container => 'thumbnail')
+        @command = _build_command('file_attach', :file => thumbnail, :fid => repo.names.fedora, :child_container => 'thumbnail')
         _execute_curl
       else
         repo.has_thumbnail = false
       end
       update_index(@oid)
       repo.save!
+      repo.version_control_agent.drop(:drop_location => file)
       repo.version_control_agent.add(:add_location => "#{@@derivatives_working_destination}")
       repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives', :object_id => @oid))
       repo.version_control_agent.push
@@ -60,6 +60,7 @@ module Utils
           parent.members << child
         end
       end
+      
       children_sorted = children.sort_by! { |c| c.page_number }
       children_sorted.each do |child_sorted|
         file_print = child_sorted.pageImage.uri
@@ -91,7 +92,8 @@ module Utils
 
     def generate_thumbnail(repo)
       thumbnail_link ||= nil
-      object = ActiveFedora::Base.where(:id => repo.unique_identifier).first
+
+      object = ActiveFedora::Base.where(:id => repo.names.fedora).first
       if object.cover.present?
         unencrypted_thumbnail_path = "#{@@working_path}/#{repo.assets_subdirectory}/#{object.cover.file_name}"
         thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ""
