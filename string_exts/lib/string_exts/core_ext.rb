@@ -53,6 +53,12 @@ String.class_eval do
     self.gsub('ark:/', '').gsub('/','-')
   end
 
+  # For lookup against Repo objects
+
+  def reverse_fedorafy
+    "ark:/#{self.gsub('-','/')}"
+  end
+
   # XML files
 
   def xmlify

@@ -136,6 +136,7 @@ class Repo < ActiveRecord::Base
     begin
       ingest_array = Array.new
       @status = Utils::Process.import(file, self, working_path)
+      
       ingest_array << File.basename(file, File.extname(file))
       self.ingested = ingest_array
       Utils::Process.refresh_assets(self)
@@ -171,8 +172,12 @@ class Repo < ActiveRecord::Base
         f.puts I18n.t('colenda.version_control_agents.packaging_info', :source_path => source.path, :source_id => source.id, :source_type => source.source_type, :source_view_type => source.view_type, :source_num_objects => source.num_objects, :source_x_start => source.x_start, :source_x_stop => source.x_stop, :source_y_start => source.y_start, :source_y_stop => source.y_stop, :source_children => source.children)
       end
     end
-    self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.package_metadata_info'))
-    self.version_control_agent.push
+    begin
+      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.package_metadata_info'))
+      self.version_control_agent.push
+    rescue
+      self.version_control_agent.push
+    end
   end
 
   def update_steps(task)

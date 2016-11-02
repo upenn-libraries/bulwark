@@ -62,13 +62,13 @@ module Utils
 
       def commit(commit_message)
         _change_dir_working
-        add
         working_repo = Git.open(@working_repo_path)
+        #TODO: Consider removing -- make adds explicit always?
         working_repo.add(:all => true)
         begin
           working_repo.commit(commit_message)
         rescue => exception
-          if exception.message.include?('nothing to commit, working directory clean')
+          if exception.message =~ /nothing to commit, working \w* clean/
             return
           else
             raise Utils::Error::VersionControl.new(error_message(exception.message))

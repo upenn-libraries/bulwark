@@ -3,7 +3,7 @@ module ApplicationHelper
   include RailsAdmin::ApplicationHelper
 
   def render_image_list
-    repo = Repo.where(:unique_identifier => @document.id).first
+    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
     images_to_render = repo.images_to_render
     content_tag(:div, '', id: 'pages', data: images_to_render.keys.to_json )
   end

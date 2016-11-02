@@ -1,4 +1,4 @@
-<% @document = ActiveFedora::Base.find(@object.unique_identifier) %>
+<% @document = ActiveFedora::Base.find(@object.unique_identifier.fedorafy) %>
 
 <%= render :partial => "repos/review_descriptive_metadata" %>
 
