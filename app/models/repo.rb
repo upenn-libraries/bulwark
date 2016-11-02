@@ -136,8 +136,7 @@ class Repo < ActiveRecord::Base
     begin
       ingest_array = Array.new
       @status = Utils::Process.import(file, self, working_path)
-      
-      ingest_array << File.basename(file, File.extname(file))
+      ingest_array << self.names.fedora
       self.ingested = ingest_array
       Utils::Process.refresh_assets(self)
       self.save!
