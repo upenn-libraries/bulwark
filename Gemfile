@@ -55,6 +55,7 @@ gem 'devise'
 gem 'devise-guests', '~> 0.3'
 
 group :development, :test do
+  gem 'rb-readline'
   gem 'pry-rails', '~> 0.3.4'
   gem 'jettywrapper'
   gem 'letter_opener'
