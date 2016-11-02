@@ -179,6 +179,7 @@ en:
         package_metadata_info: 'Added packaging info about metadata sources to admin directory'
         voyager_derivative_spreadsheet: 'Created derivative spreadsheet of Voyager metadata'
         generated_derivative: 'Generated derivative for %{file_name}'
+        generated_thumbnail: 'Generated thumbnail for %{object_id}'
         generated_all_derivatives: 'Generated all derivatives for %{object_id}'
         jettison_metadata: 'Removed files not identified as metadata source and/or for long-term preservation'
         jettison_assets: 'Removed original asset files per metadata source type directive'

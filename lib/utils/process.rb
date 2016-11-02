@@ -29,6 +29,7 @@ module Utils
       end
       update_index(@oid)
       repo.save!
+      repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_thumbnail', :object_id => repo.names.fedora))
       repo.version_control_agent.push
       @@status_type = :success
       @@status_message = I18n.t('colenda.utils.process.success.ingest_complete')
