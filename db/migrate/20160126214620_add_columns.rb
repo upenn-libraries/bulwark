@@ -5,7 +5,7 @@ class AddColumns < ActiveRecord::Migration
     add_column :repos, :derivatives_subdirectory, :string
     add_column :repos, :file_extensions, :string
     add_column :repos, :metadata_source_extensions, :string
-    add_column :repos, :ingested, :string
+    add_column :repos, :ingested, :boolean
     add_column :repos, :preservation_filename, :string
     add_column :repos, :review_status, :string
   end

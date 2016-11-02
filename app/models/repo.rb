@@ -19,7 +19,6 @@ class Repo < ActiveRecord::Base
   serialize :metadata_source_extensions, Array
   serialize :metadata_sources, Array
   serialize :metadata_builder_id, Array
-  serialize :ingested, Array
   serialize :review_status, Array
   serialize :steps, Hash
   serialize :problem_files, Hash
@@ -39,6 +38,7 @@ class Repo < ActiveRecord::Base
     self[:derivatives_subdirectory] = "#{Utils.config[:object_derivatives_path]}"
     self[:admin_subdirectory] = "#{Utils.config[:object_admin_path]}"
     self[:has_thumbnail] = false
+    self[:ingested] = false
   end
 
   def metadata_subdirectory=(metadata_subdirectory)
@@ -94,10 +94,6 @@ class Repo < ActiveRecord::Base
     read_attribute(:file_extensions) || ''
   end
 
-  def ingested
-    read_attribute(:ingested) || ''
-  end
-
   def metadata_source_extensions
     read_attribute(:metadata_source_extensions) || ''
   end
@@ -134,16 +130,16 @@ class Repo < ActiveRecord::Base
 
   def ingest(file, working_path)
     begin
-      ingest_array = Array.new
       @status = Utils::Process.import(file, self, working_path)
-      ingest_array << self.names.fedora
-      self.ingested = ingest_array
       Utils::Process.refresh_assets(self)
+      self.ingested = true
       self.save!
       self.package_metadata_info(working_path)
       self.update_steps(:published_preview)
       @status
     rescue
+      self.ingested = false
+      self.save!
       raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => $!.backtrace)
     end
   end

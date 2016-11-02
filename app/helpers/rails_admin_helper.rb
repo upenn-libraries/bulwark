@@ -20,7 +20,7 @@ module RailsAdminHelper
   end
 
   def render_review_box
-    repo = Repo.where('ingested = ?', [@document.id].to_yaml).first!
+    repo = Repo.where('unique_identifier = ?', @document.id.reverse_fedorafy).first
     render_review_status(repo)
   end
 
