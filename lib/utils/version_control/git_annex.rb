@@ -134,10 +134,8 @@ module Utils
 
         output_array = version_string.split("\n")
 
-        supported_line = output_array[output_array.index{|s| s.start_with?('supported repository versions:')}]
-        supported_version_numbers = supported_line.split(":").last.lstrip.split(' ').map(&:to_i)
-        upgrade_supported_line = output_array[output_array.index{|s| s.start_with?('upgrade supported from repository versions:')}]
-        upgradable_version_numbers = upgrade_supported_line.split(":").last.lstrip.split(' ').map(&:to_i)
+        supported_version_numbers = _version_numbers(output_array, ':', 'supported repository versions:')
+        upgradable_version_numbers = _version_numbers(output_array, ':', 'upgrade supported from repository versions:')
 
         supported_version_numbers.include?(Utils.config[:supported_vca_version]) && upgradable_version_numbers.include?(local_version)
       end
@@ -158,6 +156,11 @@ module Utils
 
       def _sanitize(file_string)
         Shellwords.escape(file_string)
+      end
+
+      def _version_numbers(output_array, split_char, string_to_search)
+        versions_line = output_array[output_array.index{|s| s.start_with?(string_to_search)}]
+        versions_line.split("#{split_char}").last.lstrip.split(' ').map(&:to_i)
       end
 
     end
