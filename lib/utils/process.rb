@@ -44,17 +44,17 @@ module Utils
     end
 
     def delete_duplicate(af_object)
-      @command = _build_command('delete', :object_uri => af_object.translate_id_to_uri.call(af_object.id))
+      object_id = af_object.id
+      @command = _build_command('delete', :object_uri => af_object.translate_id_to_uri.call(object_id))
       _execute_curl
-      @command = _build_command('delete_tombstone', :object_uri => af_object.translate_id_to_uri.call(af_object.id))
+      @command = _build_command('delete_tombstone', :object_uri => af_object.translate_id_to_uri.call(object_id))
       _execute_curl
+      clear_af_cache(object_id)
     end
 
     def attach_files(oid = @oid, repo, parent_model, child_model)
       children = []
-      parent = ActiveFedora::Base.find(@oid)
-      #Line 57 is breaking.  Also why @oid and oid?
-      binding.pry
+      parent = ActiveFedora::Base.find(oid)
       object_uri = ActiveFedora::Base.id_to_uri(oid)
       children_uris = ActiveFedora::Base.descendant_uris(object_uri)
       children_uris.delete_if { |c| c == object_uri }
@@ -167,6 +167,12 @@ module Utils
       orm = Ldp::Orm.new(resource)
       orm.graph.delete
       orm.save
+    end
+
+    def clear_af_cache(object_id)
+      uri = ActiveFedora::Base.id_to_uri(object_id)
+      resource = Ldp::Resource::RdfSource.new(ActiveFedora.fedora.connection, uri)
+      resource.client.clear_cache
     end
 
     private
