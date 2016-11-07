@@ -9,45 +9,52 @@ module Utils
     extend self
 
     def import(file, repo, working_path)
+      Repo.update(repo.id, :ingested => false)
       @@working_path = working_path
-      @oid = File.basename(repo.unique_identifier)
+      @oid = repo.names.fedora
       @@derivatives_working_destination = "#{@@working_path}/#{repo.derivatives_subdirectory}"
       @@status_type = :error
-      delete_duplicate(@oid)
+      begin
+        af_object = ActiveFedora::Base.find(@oid)
+      rescue
+        af_object = nil
+      end
+      delete_duplicate(af_object) if af_object.present?
       @command = _build_command('import', :file => file)
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : _execute_curl
+      FileUtils.rm(file)
       repo.problem_files = {}
       attach_files(@oid, repo, Manuscript, Page)
       thumbnail = generate_thumbnail(repo)
       if thumbnail.present?
         repo.has_thumbnail = true
-        @command = _build_command('file_attach', :file => thumbnail, :fid => repo.unique_identifier, :child_container => 'thumbnail')
+        @command = _build_command('file_attach', :file => thumbnail, :fid => repo.names.fedora, :child_container => 'thumbnail')
         _execute_curl
       else
         repo.has_thumbnail = false
       end
       update_index(@oid)
       repo.save!
-      repo.version_control_agent.add(:add_location => "#{@@derivatives_working_destination}")
-      repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives', :object_id => @oid))
+      repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_thumbnail', :object_id => repo.names.fedora))
       repo.version_control_agent.push
       @@status_type = :success
       @@status_message = I18n.t('colenda.utils.process.success.ingest_complete')
+      Repo.update(repo.id, :ingested => true)
       {@@status_type => @@status_message}
     end
 
-    def delete_duplicate(object_id)
-      obj = ActiveFedora::Base.where(:id => object_id).first
-      if obj.present?
-        object_and_descendants_action(object_id, 'delete')
-        @command = _build_command('delete_tombstone', :object_uri => obj.translate_id_to_uri.call(obj.id))
-        _execute_curl
-      end
+    def delete_duplicate(af_object)
+      object_id = af_object.id
+      @command = _build_command('delete', :object_uri => af_object.translate_id_to_uri.call(object_id))
+      _execute_curl
+      @command = _build_command('delete_tombstone', :object_uri => af_object.translate_id_to_uri.call(object_id))
+      _execute_curl
+      clear_af_cache(object_id)
     end
 
     def attach_files(oid = @oid, repo, parent_model, child_model)
       children = []
-      parent = ActiveFedora::Base.find(@oid)
+      parent = ActiveFedora::Base.find(oid)
       object_uri = ActiveFedora::Base.id_to_uri(oid)
       children_uris = ActiveFedora::Base.descendant_uris(object_uri)
       children_uris.delete_if { |c| c == object_uri }
@@ -73,10 +80,9 @@ module Utils
       repo.version_control_agent.unlock(file_link)
       validated =  File.exist?(file_link) ? validate_file(file_link) : false
       if validated
-        derivative_link = "#{Utils.config[:federated_fs_path]}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
+        derivative_link = "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
         @command = _build_command('file_attach', :file => derivative_link, :fid => parent.id, :child_container => child_container)
         _execute_curl
-        repo.version_control_agent.add(:add_location => "#{@@derivatives_working_destination}")
         repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_derivative', :file_name => parent.file_name))
       else
         @@status_type = :warning
@@ -90,18 +96,17 @@ module Utils
 
     def generate_thumbnail(repo)
       thumbnail_link ||= nil
-      object = ActiveFedora::Base.where(:id => repo.unique_identifier).first
+      object = ActiveFedora::Base.where(:id => repo.names.fedora).first
       if object.cover.present?
         unencrypted_thumbnail_path = "#{@@working_path}/#{repo.assets_subdirectory}/#{object.cover.file_name}"
-        thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ""
+        thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ''
       end
       thumbnail_link
     end
 
     def refresh_assets(repo)
-      #jettison_originals(repo, I18n.t('colenda.version_control_agents.commit_messages.jettison_assets')) if repo.metadata_builder.metadata_source.any?{ |ms| ms.source_type == 'bibphilly'}
-      display_path = "#{Utils.config[:assets_display_path]}/#{repo.directory}"
-      if File.directory?("#{Utils.config[:assets_display_path]}/#{repo.directory}")
+      display_path = "#{Utils.config[:assets_display_path]}/#{repo.names.directory}"
+      if File.directory?("#{Utils.config[:assets_display_path]}/#{repo.names.directory}")
         Dir.chdir(display_path)
         repo.version_control_agent.sync_content
       else
@@ -162,6 +167,12 @@ module Utils
       orm = Ldp::Orm.new(resource)
       orm.graph.delete
       orm.save
+    end
+
+    def clear_af_cache(object_id)
+      uri = ActiveFedora::Base.id_to_uri(object_id)
+      resource = Ldp::Resource::RdfSource.new(ActiveFedora.fedora.connection, uri)
+      resource.client.clear_cache
     end
 
     private

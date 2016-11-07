@@ -72,12 +72,11 @@ class MetadataBuilder < ActiveRecord::Base
       end
       xslt_file = self.metadata_source.any?{|ms| ms.source_type == 'bibphilly'} ? 'bibphilly' : 'sv'
       Dir.chdir(working_path)
-      transformed_file_path = "#{working_path}/#{self.repo.unique_identifier}.xml"
-      self.repo.version_control_agent.get(:get_location => transformed_file_path)
-      self.repo.version_control_agent.unlock(transformed_file_path)
-      FileUtils.rm(transformed_file_path) if File.exist?(transformed_file_path)
       `xsltproc #{Rails.root}/lib/tasks/#{xslt_file}.xslt #{file_path}`
-      self.repo.ingest(transformed_file_path, working_path)
+      transformed_xml = "#{working_path}/#{Utils.config[:fedora_xml_derivative]}"
+      fedora_xml = File.read(transformed_xml).gsub(repo.unique_identifier, repo.names.fedora)
+      File.open(transformed_xml, 'w') {|f| f.puts fedora_xml }
+      self.repo.ingest(transformed_xml, working_path)
     end
     self.repo.version_control_agent.reset_hard
     self.repo.version_control_agent.delete_clone

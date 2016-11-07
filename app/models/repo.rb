@@ -2,6 +2,8 @@ require 'sanitize'
 
 class Repo < ActiveRecord::Base
 
+  include ModelNamingExtensions::Naming
+
   has_one :metadata_builder, dependent: :destroy, :validate => false
   has_one :version_control_agent, dependent: :destroy, :validate => false
 
@@ -13,14 +15,10 @@ class Repo < ActiveRecord::Base
   validates :file_extensions, presence: true
   validates :preservation_filename, presence: true
 
-  validates :human_readable_name, multiple: false
-  validates :directory, multiple: false
-
   serialize :file_extensions, Array
   serialize :metadata_source_extensions, Array
   serialize :metadata_sources, Array
   serialize :metadata_builder_id, Array
-  serialize :ingested, Array
   serialize :review_status, Array
   serialize :steps, Hash
   serialize :problem_files, Hash
@@ -36,10 +34,11 @@ class Repo < ActiveRecord::Base
 
   def set_defaults
     self[:owner] = User.current
-    mint_ezid
+    self[:unique_identifier] = mint_ezid
     self[:derivatives_subdirectory] = "#{Utils.config[:object_derivatives_path]}"
     self[:admin_subdirectory] = "#{Utils.config[:object_admin_path]}"
     self[:has_thumbnail] = false
+    self[:ingested] = false
   end
 
   def metadata_subdirectory=(metadata_subdirectory)
@@ -64,7 +63,7 @@ class Repo < ActiveRecord::Base
   end
 
   def preservation_filename=(preservation_filename)
-    self[:preservation_filename] = preservation_filename.concat('.xml') unless preservation_filename.ends_with?('.xml')
+    self[:preservation_filename] = preservation_filename.xmlify
   end
 
   def review_status=(review_status)
@@ -77,10 +76,6 @@ class Repo < ActiveRecord::Base
 
   def human_readable_name
     read_attribute(:human_readable_name) || ''
-  end
-
-  def directory
-    read_attribute(:directory) || ''
   end
 
   def description
@@ -97,10 +92,6 @@ class Repo < ActiveRecord::Base
 
   def file_extensions
     read_attribute(:file_extensions) || ''
-  end
-
-  def ingested
-    read_attribute(:ingested) || ''
   end
 
   def metadata_source_extensions
@@ -127,7 +118,7 @@ class Repo < ActiveRecord::Base
   def create_remote
     # Function weirdness forcing update_steps to the top
     self.update_steps(:git_remote_initialized)
-    unless Dir.exists?("#{Utils.config[:assets_path]}/#{self.directory}")
+    unless Dir.exists?("#{Utils.config[:assets_path]}/#{self.names.directory}")
       self.version_control_agent.init_bare
       working_path = self.version_control_agent.clone
       _build_and_populate_directories(working_path)
@@ -139,16 +130,13 @@ class Repo < ActiveRecord::Base
 
   def ingest(file, working_path)
     begin
-      ingest_array = Array.new
       @status = Utils::Process.import(file, self, working_path)
-      ingest_array << File.basename(file, File.extname(file))
-      self.ingested = ingest_array
       Utils::Process.refresh_assets(self)
-      self.save!
       self.package_metadata_info(working_path)
       self.update_steps(:published_preview)
       @status
     rescue
+      self.save!
       raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => $!.backtrace)
     end
   end
@@ -167,17 +155,21 @@ class Repo < ActiveRecord::Base
 
   def directory_link
     url = "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{self.id}/git_actions"
-    "<a href=\"#{url}\">#{self.directory}</a>"
+    "<a href=\"#{url}\">#{self.names.directory}</a>"
   end
 
   def package_metadata_info(working_path)
-    File.open("#{working_path}/#{self.admin_subdirectory}/#{self.directory.gsub(/\.git$/, '')}", 'w+') do |f|
+    File.open("#{working_path}/#{self.admin_subdirectory}/#{self.names.directory}", 'w+') do |f|
       self.metadata_builder.metadata_source.each do |source|
         f.puts I18n.t('colenda.version_control_agents.packaging_info', :source_path => source.path, :source_id => source.id, :source_type => source.source_type, :source_view_type => source.view_type, :source_num_objects => source.num_objects, :source_x_start => source.x_start, :source_x_stop => source.x_stop, :source_y_start => source.y_start, :source_y_stop => source.y_stop, :source_children => source.children)
       end
     end
-    self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.package_metadata_info'))
-    self.version_control_agent.push
+    begin
+      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.package_metadata_info'))
+      self.version_control_agent.push
+    rescue
+      self.version_control_agent.push
+    end
   end
 
   def update_steps(task)
@@ -186,7 +178,7 @@ class Repo < ActiveRecord::Base
   end
 
   def mint_ezid
-    _mint_and_format_ezid
+    mint_initial_ark
   end
 
   #TODO: Add a field that indicates repo ownership candidacy
@@ -197,9 +189,11 @@ class Repo < ActiveRecord::Base
   def format_types(extensions_array)
     formatted_types = ''
     if extensions_array.length > 1
-      formatted_types = _format_multiple(extensions_array)
+      ft = extensions_array.map { |f| ".#{f}"}
+      file_extensions = ft.join(',')
+      formatted_types = file_extensions.manifest_multiple
     else
-      formatted_types = _format_singular(extensions_array)
+      formatted_types = extensions_array.first.manifest_singular
     end
     formatted_types
   end
@@ -212,15 +206,15 @@ private
     metadata_subdirectory = "#{working_path}/#{self.metadata_subdirectory}"
     assets_subdirectory = "#{working_path}/#{self.assets_subdirectory}"
     derivatives_subdirectory = "#{working_path}/#{self.derivatives_subdirectory}"
-    _make_and_keep(admin_directory)
-    _make_and_keep(data_directory)
-    _make_and_keep(metadata_subdirectory, :keep => true)
-    _make_and_keep(assets_subdirectory, :keep => true)
-    _make_and_keep(derivatives_subdirectory, :keep => true)
+    _make_subdir(admin_directory)
+    _make_subdir(data_directory)
+    _make_subdir(metadata_subdirectory, :keep => true)
+    _make_subdir(assets_subdirectory, :keep => true)
+    _make_subdir(derivatives_subdirectory, :keep => true)
     _populate_admin_manifest("#{admin_directory}")
   end
 
-  def _make_and_keep(directory, options = {})
+  def _make_subdir(directory, options = {})
     FileUtils.mkdir_p(directory)
     FileUtils.touch("#{directory}/.keep") if options[:keep]
   end
@@ -234,16 +228,6 @@ private
     File.open(filesystem_semantics_path, "w+") do |file|
       file.puts("#{metadata_line}\n#{assets_line}")
     end
-  end
-
-  def _format_singular(extension)
-    "*.#{extension.first}"
-  end
-
-  def _format_multiple(extensions)
-    ft = extensions.map { |f| ".#{f}"}
-    formatted_ft = ft.join(',')
-    "*{#{formatted_ft}}"
   end
 
   def _initialize_steps
@@ -280,21 +264,8 @@ private
     exist_status
   end
 
-  #TODO: Replace with test EZID minting when in place
-  def _mint_and_format_ezid
-    minted_id = SecureRandom.hex(10)
-    while Repo.where(directory: "#{Utils.config[:repository_prefix]}_#{self.human_readable_name}_#{minted_id}.git").pluck(:directory).present?
-      minted_id = SecureRandom.hex(10)
-    end
-    self[:unique_identifier] = "#{Utils.config[:repository_prefix]}_#{minted_id}"
-    self[:directory] = "#{Utils.config[:repository_prefix]}_#{self.human_readable_name}_#{minted_id}"
-    _concatenate_git
+  def mint_initial_ark
+    Ezid::Identifier.mint
   end
-
-  # TODO: Determine if this is really the best place to put this because we're dealing with Git bare repo best practices
-  def _concatenate_git
-    self.directory.concat('.git') unless self.directory =~ /.git$/ || self.directory.nil?
-  end
-
 
 end

@@ -18,7 +18,7 @@
     "externalSources" : {
       "fileSystem" : {
         "classname" : "org.fcrepo.connector.file.FedoraFileSystemConnector",
-        "directoryPath" : "/fs/pub/display",
+        "directoryPath" : "/Users/kate/Documents/colenda_dirs/fs/pub/display",
         "readonly" : true,
         "extraPropertiesStorage": "json",
         "cacheTtlSeconds" : 5,

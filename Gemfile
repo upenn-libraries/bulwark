@@ -22,7 +22,9 @@ gem 'hydra-pcdm'
 
 gem 'qa'
 gem 'blacklight_range_limit'
+gem 'ezid-client'
 
+gem 'string_exts', :path => 'string_exts'
 gem 'rails_admin_colenda', :path => 'rails_admin_colenda'
 gem 'rails_admin', git: 'https://github.com/kelynch/rails_admin.git', branch: 'js_loading_in_custom_theme'
 
@@ -34,7 +36,7 @@ gem 'sanitize'
 
 gem 'bunny'
 gem 'sidekiq'
-gem 'active_job_status'
+gem 'active_job_status', '1.1.0'
 gem 'redis-rails'
 gem 'sinatra', :require => false
 
@@ -42,21 +44,18 @@ gem 'roo'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
-# Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
-gem 'turbolinks'
+
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0',          group: :doc
-
-# Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-gem 'spring',        group: :development
 
 gem 'rsolr', '~> 1.0.6'
 gem 'devise'
 gem 'devise-guests', '~> 0.3'
 
 group :development, :test do
+  gem 'rb-readline'
   gem 'pry-rails', '~> 0.3.4'
   gem 'jettywrapper'
   gem 'letter_opener'

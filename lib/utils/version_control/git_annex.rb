@@ -9,8 +9,8 @@ module Utils
 
       def initialize(repo)
         @repo = repo
-        @remote_repo_path = "#{Utils.config[:assets_path]}/#{@repo.directory}"
-        @working_repo_path = "#{Dir.mktmpdir}/#{@repo.directory}"
+        @remote_repo_path = "#{Utils.config[:assets_path]}/#{@repo.names.git}"
+        @working_repo_path = "#{Dir.mktmpdir}/#{@repo.names.git}"
       end
 
       def repo
@@ -21,6 +21,10 @@ module Utils
         `git init --bare #{@remote_repo_path}`
         Dir.chdir(@remote_repo_path)
         `git annex init origin`
+        version_string = `git annex version`
+        unless version_string.include?("local repository version: #{Utils.config[:supported_vca_version]}")
+          `git annex upgrade` if git_annex_upgrade_supported(version_string)
+        end
       end
 
       def clone(destination = @working_repo_path)
@@ -62,13 +66,13 @@ module Utils
 
       def commit(commit_message)
         _change_dir_working
-        add
         working_repo = Git.open(@working_repo_path)
+        #TODO: Consider removing -- make adds explicit always?
         working_repo.add(:all => true)
         begin
           working_repo.commit(commit_message)
         rescue => exception
-          if exception.message.include?('nothing to commit, working directory clean')
+          if exception.message =~ /nothing to commit, working \w* clean/
             return
           else
             raise Utils::Error::VersionControl.new(error_message(exception.message))
@@ -121,6 +125,21 @@ module Utils
           Dir.chdir(File.dirname(dir))
           `git annex #{action} #{File.basename(dir)}`
         end
+      end
+
+      def git_annex_upgrade_supported(version_string)
+        local_version_index = version_string.index /local repository version: [0-9]/
+        sample_local_version = 'local repository version: x'
+        local_version = version_string[local_version_index..(local_version_index + sample_local_version.length-1)].last.to_i
+
+        output_array = version_string.split("\n")
+
+        supported_line = output_array[output_array.index{|s| s.start_with?('supported repository versions:')}]
+        supported_version_numbers = supported_line.split(":").last.lstrip.split(' ').map(&:to_i)
+        upgrade_supported_line = output_array[output_array.index{|s| s.start_with?('upgrade supported from repository versions:')}]
+        upgradable_version_numbers = upgrade_supported_line.split(":").last.lstrip.split(' ').map(&:to_i)
+
+        supported_version_numbers.include?(Utils.config[:supported_vca_version]) && upgradable_version_numbers.include?(local_version)
       end
 
       def error_message(message)

@@ -14,7 +14,7 @@
   <xsl:preserve-space elements="sv:node sv:property sv:value"/>
     <xsl:template match="/root/record">
       <xsl:copy>
-        <exsl:document method="xml" href="{uuid}.xml">
+        <exsl:document method="xml" href="fedora.xml">
           <sv:node xmlns:premis="http://www.loc.gov/premis/rdf/v1#"
             xmlns:image="http://www.modeshape.org/images/1.0"
             xmlns:sv="http://www.jcp.org/jcr/sv/1.0"
@@ -73,13 +73,10 @@
           <sv:property sv:name="ns002:description" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="description" />
           </sv:property>
-          <sv:property sv:name="ns002:file_list" sv:type="String" sv:multiple="false">
-            <xsl:apply-templates select="file_list/file" />
-          </sv:property>
           <sv:property sv:name="ns002:type" sv:type="String" sv:multiple="false">
             <sv:value>Manuscript</sv:value>
           </sv:property>
-          <sv:property sv:name="ns004:title" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:title" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="title" />
           </sv:property>
           <sv:property sv:name="ns002:date" sv:type="String" sv:multiple="false">
@@ -142,19 +139,19 @@
       <sv:property sv:name="jcr:createdBy" sv:type="String">
         <sv:value>bypassAdmin</sv:value>
       </sv:property>
-      <sv:property sv:name="ns002:parentManuscript" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns004:parentManuscript" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="$uuid" /></sv:value>
       </sv:property>
       <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="identifier" /></sv:value>
       </sv:property>
-      <sv:property sv:name="ns002:fileName" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns004:fileName" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="file_name" /></sv:value>
       </sv:property>
-      <sv:property sv:name="ns002:pageNumber" sv:type="Long" sv:multiple="false">
+      <sv:property sv:name="ns004:pageNumber" sv:type="Long" sv:multiple="false">
         <sv:value><xsl:value-of select="page_number" /></sv:value>
       </sv:property>
-      <sv:property sv:name="ns002:pageText" sv:type="String" sv:multiple="false">
+      <sv:property sv:name="ns004:pageText" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="ocr_text" /></sv:value>
       </sv:property>
       <sv:property sv:name="ns002:type" sv:type="String" sv:multiple="false">

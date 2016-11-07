@@ -10,9 +10,6 @@ RSpec.describe Repo, type: :model do
   it "is invalid without a title" do
     expect(FactoryGirl.build(:repo, :title => nil)).not_to be_valid
   end
-  it "is invalid without a directory" do
-    expect(FactoryGirl.build(:repo, :directory => nil)).not_to be_valid
-  end
   it "is invalid without a metadata subdirectory" do
     expect(FactoryGirl.build(:repo, :metadata_subdirectory => nil)).not_to be_valid
   end

@@ -38,6 +38,9 @@ en:
         invalid_characters: 'Invalid tag "%{value}" specified for "%{key}" - valid XML tags can only contain letters, numbers, underscores, hyphens, and periods'
     rails_admin:
       new_repo:
+        labels:
+          human_readable_name: 'Name'
+          directory: 'Directory'
         metadata_subdirectory:
           help: 'Required - subdirectory within the directory specified above that will serve as the location for the metadata to be processed by the application.'
         assets_subdirectory:
@@ -49,6 +52,8 @@ en:
         preservation_filename:
           help: 'Required - Filename for long-term preservation XML file'
       dashboard_link_text: 'Admin Dashboard'
+      links:
+        front_end: 'Front End'
       processing_job_message: 'Processing your job in the background.  You will receive an email when it is complete.'
       jobs:
         queued: 'Your %{process} job for %{unique_identifier}, started on %{started}, is in the queue'
@@ -174,6 +179,7 @@ en:
         package_metadata_info: 'Added packaging info about metadata sources to admin directory'
         voyager_derivative_spreadsheet: 'Created derivative spreadsheet of Voyager metadata'
         generated_derivative: 'Generated derivative for %{file_name}'
+        generated_thumbnail: 'Generated thumbnail for %{object_id}'
         generated_all_derivatives: 'Generated all derivatives for %{object_id}'
         jettison_metadata: 'Removed files not identified as metadata source and/or for long-term preservation'
         jettison_assets: 'Removed original asset files per metadata source type directive'
@@ -211,6 +217,7 @@ en:
       i_broke: 'Something went wrong. Please contact the site administrator.'
     errors:
       repos:
+        tmp_dir: 'Repo tmp directory not properly deleted; may now be in git commit history'
         ingest_error: 'Ingest and index failed due to the following error(s): %{backtrace}'
       metadata_sources:
         illegal_view_type: 'Illegal view type %{view_type} for %{source}'

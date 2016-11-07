@@ -1,8 +1,6 @@
 <div class="ingested-links">
   <h2><%= t('colenda.repos.ingest.review.heading') %></h2>
   <ul>
-    <% @object.ingested.each do |identifier| -%>
-      <li><%= t('colenda.repos.ingest.review.link_text', :href => generate_ingest_link(identifier)).html_safe %></li>
-    <% end -%>
+    <li><%= t('colenda.repos.ingest.review.link_text', :href => generate_ingest_link(@object.names.fedora)).html_safe %></li>
   </ul>
 </div>

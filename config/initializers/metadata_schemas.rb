@@ -6,7 +6,7 @@ module MetadataSchema
   private
 
     def config_yaml
-      config_file = Rails.root.join("config", 'metadata_schema.yml')
+      config_file = Rails.root.join('config', 'metadata_schema.yml')
       fail "Missing configuration file at: #{config_file}." unless File.exist?(config_file)
       YAML.load(ERB.new(File.read(config_file)).result)[Rails.env]
     end
