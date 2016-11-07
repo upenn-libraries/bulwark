@@ -5,6 +5,8 @@ class MultipageItem < ActiveFedora::Base
 
   contains 'thumbnail'
 
+  #TODO: Add unique identifier representation in properties
+
   property :title, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/title'), multiple: true do |index|
     index.as :stored_searchable, :facetable
   end

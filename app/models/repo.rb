@@ -132,13 +132,10 @@ class Repo < ActiveRecord::Base
     begin
       @status = Utils::Process.import(file, self, working_path)
       Utils::Process.refresh_assets(self)
-      self.ingested = true
-      self.save!
       self.package_metadata_info(working_path)
       self.update_steps(:published_preview)
       @status
     rescue
-      self.ingested = false
       self.save!
       raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => $!.backtrace)
     end

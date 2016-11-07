@@ -9,11 +9,17 @@ module Utils
     extend self
 
     def import(file, repo, working_path)
+      Repo.update(repo.id, :ingested => false)
       @@working_path = working_path
       @oid = repo.names.fedora
       @@derivatives_working_destination = "#{@@working_path}/#{repo.derivatives_subdirectory}"
       @@status_type = :error
-      delete_duplicate(@oid)
+      begin
+        af_object = ActiveFedora::Base.find(@oid)
+      rescue
+        af_object = nil
+      end
+      delete_duplicate(af_object) if af_object.present?
       @command = _build_command('import', :file => file)
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : _execute_curl
       FileUtils.rm(file)
@@ -33,21 +39,22 @@ module Utils
       repo.version_control_agent.push
       @@status_type = :success
       @@status_message = I18n.t('colenda.utils.process.success.ingest_complete')
+      Repo.update(repo.id, :ingested => true)
       {@@status_type => @@status_message}
     end
 
-    def delete_duplicate(object_id)
-      obj = ActiveFedora::Base.where(:id => object_id).first
-      if obj.present?
-        object_and_descendants_action(object_id, 'delete')
-        @command = _build_command('delete_tombstone', :object_uri => obj.translate_id_to_uri.call(obj.id))
-        _execute_curl
-      end
+    def delete_duplicate(af_object)
+      @command = _build_command('delete', :object_uri => af_object.translate_id_to_uri.call(af_object.id))
+      _execute_curl
+      @command = _build_command('delete_tombstone', :object_uri => af_object.translate_id_to_uri.call(af_object.id))
+      _execute_curl
     end
 
     def attach_files(oid = @oid, repo, parent_model, child_model)
       children = []
       parent = ActiveFedora::Base.find(@oid)
+      #Line 57 is breaking.  Also why @oid and oid?
+      binding.pry
       object_uri = ActiveFedora::Base.id_to_uri(oid)
       children_uris = ActiveFedora::Base.descendant_uris(object_uri)
       children_uris.delete_if { |c| c == object_uri }
