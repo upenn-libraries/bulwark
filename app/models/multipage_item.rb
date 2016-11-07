@@ -29,7 +29,7 @@ class MultipageItem < ActiveFedora::Base
   end
 
   def cover
-    Page.where(:parent_manuscript => self.id).sort_by {|obj| obj.page_number}.first
+    nil
   end
 
   def mint_public_identifier

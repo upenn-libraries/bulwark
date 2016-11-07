@@ -59,7 +59,7 @@
             <xsl:apply-templates select="file_list/file" />
           </sv:property>
 
-          <sv:property sv:name="ns004:title" sv:type="String" sv:multiple="false">
+          <sv:property sv:name="ns002:title" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="manuscript_name" />
           </sv:property>
 
