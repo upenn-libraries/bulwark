@@ -60,7 +60,7 @@ class CatalogController < ApplicationController
     config.add_facet_field solr_name('relation', :facetable), :label => 'Relation'
     config.add_facet_field solr_name('source', :facetable), :label => 'Source'
 
-    # BibPhilly
+    # BiblioPhilly
     config.add_facet_field solr_name('holding_institution', :facetable), :label => 'Holding Institution'
     config.add_facet_field solr_name('repository_name', :facetable), :label => 'Repository Name'
     config.add_facet_field solr_name('source_collection', :facetable), :label => 'Source Collection'
@@ -95,7 +95,7 @@ class CatalogController < ApplicationController
     config.add_index_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
     config.add_index_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
 
-    # BibPhilly
+    # BiblioPhilly
     config.add_index_field solr_name('manuscript_name', :stored_searchable, type: :string), :label => 'Manuscript Name'
     config.add_index_field solr_name('administrative_contact', :stored_searchable, type: :string), :label => 'Administrative Contact'
     config.add_index_field solr_name('metadata_creator', :stored_searchable, type: :string), :label => 'Metadata Creator'
@@ -141,7 +141,7 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject'
     config.add_show_field solr_name('title', :stored_searchable, type: :string), :label => 'Title'
 
-    # BibPhilly
+    # BiblioPhilly
     config.add_show_field solr_name('administrative_contact', :stored_searchable, type: :string), :label => 'Administrative Contact'
     config.add_show_field solr_name('administrative_contact_email', :stored_searchable, type: :string), :label => 'Administrative Contact Email'
     config.add_show_field solr_name('metadata_creator', :stored_searchable, type: :string), :label => 'Metadata Creator'

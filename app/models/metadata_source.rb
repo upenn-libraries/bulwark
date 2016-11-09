@@ -112,8 +112,8 @@ class MetadataSource < ActiveRecord::Base
       when 'voyager'
         self.root_element = MetadataSchema.config[:voyager][:root_element] || 'voyager_object'
         self.user_defined_mappings = _set_voyager_data(working_path)
-      when 'bibphilly'
-        self.set_bibphilly_data(working_path)
+      when 'bibliophilly'
+        self.set_bibliophilly_data(working_path)
       end
     end
     self.metadata_builder.repo.update_steps(:metadata_extracted)
@@ -125,7 +125,7 @@ class MetadataSource < ActiveRecord::Base
     self.generate_and_build_individual_xml
     self.children.each do |child|
       source = MetadataSource.find(child)
-      source.generate_and_build_individual_xml(source.path) unless source.source_type == 'bibphilly_structural'
+      source.generate_and_build_individual_xml(source.path) unless source.source_type == 'bibliophilly_structural'
     end
     self.generate_preservation_xml
     self.jettison_metadata($jettison_files)
@@ -153,8 +153,8 @@ class MetadataSource < ActiveRecord::Base
         @xml_content_final_copy = xml_from_voyager
       when 'structural_bibid'
         @xml_content_final_copy = xml_from_structural_bibid
-      when 'bibphilly'
-        @xml_content_final_copy = xml_from_bibphilly
+      when 'bibliophilly'
+        @xml_content_final_copy = xml_from_bibliophilly
       end
       $jettison_files.add(xml_fname)
       _fetch_write_save_preservation_xml(xml_fname, @xml_content_final_copy)
@@ -162,7 +162,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def generate_preservation_xml
-    if self.children.present? && self.source_type != 'bibphilly'
+    if self.children.present? && self.source_type != 'bibliophilly'
       @xml_content_final = self.generate_parent_child_xml
     else
       file = File.new(_working_path_check($working_path, "#{self.path}.xml"))
@@ -227,7 +227,7 @@ class MetadataSource < ActiveRecord::Base
     wrapped_content
   end
 
-  def xml_from_bibphilly
+  def xml_from_bibliophilly
     parent_content = ''
     child_content = ''
     self.user_defined_mappings.each do |mapping|
@@ -287,20 +287,20 @@ class MetadataSource < ActiveRecord::Base
     self.save!
   end
 
-  def set_bibphilly_data(working_path = $working_path)
+  def set_bibliophilly_data(working_path = $working_path)
     self.root_element = 'record'
     self.view_type = 'vertical'
     self.y_start = 6
     self.y_stop = 72
     self.x_start = 2
-    structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'bibphilly_structural'} ? MetadataSource.find(self.children.first) : initialize_bibphilly_structural(self)
+    structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'bibliophilly_structural'} ? MetadataSource.find(self.children.first) : initialize_bibliophilly_structural(self)
     full_path = "#{working_path}#{self.path}"
     self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
-    self.generate_bibphilly_descrip_md(full_path)
-    structural.generate_bibphilly_struct_md(full_path)
+    self.generate_bibliophilly_descrip_md(full_path)
+    structural.generate_bibliophilly_struct_md(full_path)
   end
 
-  def generate_bibphilly_descrip_md(full_path)
+  def generate_bibliophilly_descrip_md(full_path)
     mappings = {}
     iterator = 0
     x_start, y_start, x_stop, y_stop, z = _offset
@@ -323,7 +323,7 @@ class MetadataSource < ActiveRecord::Base
     self.save!
   end
 
-  def generate_bibphilly_struct_md(full_path)
+  def generate_bibliophilly_struct_md(full_path)
     mappings = {}
     headers = []
     x_start, y_start, x_stop, y_stop, z = _offset
@@ -348,10 +348,10 @@ class MetadataSource < ActiveRecord::Base
   end
 
 
-  def initialize_bibphilly_structural(parent)
+  def initialize_bibliophilly_structural(parent)
     struct = MetadataSource.create({
         :metadata_builder => self.metadata_builder,
-        :source_type => 'bibphilly_structural',
+        :source_type => 'bibliophilly_structural',
         :root_element => 'pages',
         :parent_element => 'page',
         :view_type => 'horizontal',
@@ -616,7 +616,7 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def self.source_types
-      source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.voyager_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.bibphilly'), 'bibphilly'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
+      source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.voyager_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.bibliophilly'), 'bibliophilly'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
     end
 
     def self.settings_fields

@@ -174,7 +174,7 @@ class Repo < ActiveRecord::Base
   end
 
   def save_input_format(source_path)
-    
+
   end
 
   def update_steps(task)

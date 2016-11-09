@@ -20,7 +20,7 @@ class Page < ActiveFedora::Base
   end
 
 
-  # BibPhilly fields
+  # BiblioPhilly fields
 
   property :serial_num, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/serialNum'), multiple: true do |index|
     index.as :stored_searchable
