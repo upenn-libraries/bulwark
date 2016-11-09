@@ -193,6 +193,7 @@ en:
       version_control:
         git_annex:
           errors:
+            missing_directory: 'Directory %{directory} missing.'
             sync: 'Trying to perform git annex sync outside of an annexed repository.'
             leftover_clone: 'Leftover Git remote clone in working directory - %{directory}.'
             does_not_exist: 'Git remote does not exist.  Could not clone to perform tasks.'

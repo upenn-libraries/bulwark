@@ -349,20 +349,19 @@ class MetadataSource < ActiveRecord::Base
 
 
   def initialize_bibphilly_structural(parent)
-    struct = MetadataSource.create
-    struct.metadata_builder = self.metadata_builder
-    struct.source_type = 'bibphilly_structural'
-    struct.root_element= 'pages'
-    struct.parent_element= 'page'
-    struct.view_type = 'horizontal'
-    struct.path = "#{parent.path} Page 2 (Structural)"
-    struct.z = 2
-    struct.y_start = 3
-    struct.y_stop = 3
-    struct.x_start = 1
-    struct.x_stop = 3
+    struct = MetadataSource.create({
+        :metadata_builder => self.metadata_builder,
+        :source_type => 'bibphilly_structural',
+        :root_element => 'pages',
+        :parent_element => 'page',
+        :view_type => 'horizontal',
+        :path => "#{parent.path} Page 2 (Structural)",
+        :z => 2,
+        :y_start => 3,
+        :y_stop => 3,
+        :x_start => 1,
+        :x_stop => 3 })
     parent.children << struct
-    struct.save!
     parent.save!
     struct
   end
@@ -411,6 +410,7 @@ class MetadataSource < ActiveRecord::Base
       mapped_values['description'] = []
       _refresh_bibid(working_path)
       voyager_source = open("#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}")
+      self.metadata_builder.repo.save_input_format(voyager_source)
       data = Nokogiri::XML(voyager_source)
       data.xpath('//xml/page').each do |page|
         mapped_values['page_number'] << page['number']

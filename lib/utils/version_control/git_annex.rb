@@ -21,10 +21,7 @@ module Utils
         `git init --bare #{@remote_repo_path}`
         Dir.chdir(@remote_repo_path)
         `git annex init origin`
-        version_string = `git annex version`
-        unless version_string.include?("local repository version: #{Utils.config[:supported_vca_version]}")
-          `git annex upgrade` if git_annex_upgrade_supported(version_string)
-        end
+        rolling_upgrade(@remote_repo_path)
       end
 
       def clone(destination = @working_repo_path)
@@ -50,12 +47,12 @@ module Utils
       end
 
       def push_bare
-        _change_dir_working
+        change_dir_working(@working_repo_path)
         `git push origin master`
       end
 
       def push
-        _change_dir_working
+        change_dir_working(@working_repo_path)
         `git push origin master git-annex`
         `git annex sync --content`
       end
@@ -65,7 +62,7 @@ module Utils
       end
 
       def commit(commit_message)
-        _change_dir_working
+        change_dir_working(@working_repo_path)
         working_repo = Git.open(@working_repo_path)
         #TODO: Consider removing -- make adds explicit always?
         working_repo.add(:all => true)
@@ -101,43 +98,59 @@ module Utils
       end
 
       def unlock(file)
-        _change_dir_working
+        change_dir_working(@working_repo_path)
         `git annex unlock #{_sanitize(file)}`
       end
 
       def lock(file)
-        _change_dir_working
+        change_dir_working(@working_repo_path)
         `git annex lock #{_sanitize(file)}`
+      end
+
+      def rolling_upgrade(dir = @working_repo_path)
+        change_dir_working(dir) unless Dir.pwd == dir
+        version_string = `git annex version`
+        unless version_string.include?("local repository version: #{Utils.config[:supported_vca_version]}")
+          `git annex upgrade` if git_annex_upgrade_supported(version_string)
+        end
       end
 
       private
 
-      def _change_dir_working
-        Dir.chdir(@working_repo_path) if File.directory?(@working_repo_path)
+      def change_dir_working(dir = @working_repo_path)
+        directory = get_directory(dir)
+        begin
+          Dir.chdir(directory)
+        rescue
+          raise I18n.t('colenda.utils.version_control.git_annex.errors.missing_directory', :directory => directory)
+        end
+      end
+
+      def get_directory(directory_string)
+        File.directory?(directory_string) ? directory_string : File.dirname(directory_string)
       end
 
       def _get_drop_calls(dir, action)
         dir = _sanitize(dir)
         if File.directory?(dir)
           Dir.chdir(dir)
+          rolling_upgrade(dir)
           `git annex #{action} .`
         else
           Dir.chdir(File.dirname(dir))
+          rolling_upgrade(dir)
           `git annex #{action} #{File.basename(dir)}`
         end
       end
 
       def git_annex_upgrade_supported(version_string)
-        local_version_index = version_string.index /local repository version: [0-9]/
         sample_local_version = 'local repository version: x'
-        local_version = version_string[local_version_index..(local_version_index + sample_local_version.length-1)].last.to_i
-
+        local_version_index = version_string.index /local repository version: [aA-z0-9]/
+        local_version_number = version_string[local_version_index..(local_version_index + sample_local_version.length-1)].last.to_i
         output_array = version_string.split("\n")
-
         supported_version_numbers = _version_numbers(output_array, ':', 'supported repository versions:')
         upgradable_version_numbers = _version_numbers(output_array, ':', 'upgrade supported from repository versions:')
-
-        supported_version_numbers.include?(Utils.config[:supported_vca_version]) && upgradable_version_numbers.include?(local_version)
+        supported_version_numbers.include?(Utils.config[:supported_vca_version]) && upgradable_version_numbers.include?(local_version_number)
       end
 
       def error_message(message)
