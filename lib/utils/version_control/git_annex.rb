@@ -38,8 +38,9 @@ module Utils
         working_repo.reset_hard
       end
 
-      def sync(options = '')
+      def sync(dir = @working_repo_path, options = '')
         begin
+          rolling_upgrade(dir)
           `git annex sync #{options}`
         rescue
           raise I18n.t('colenda.utils.version_control.git_annex.errors.sync')

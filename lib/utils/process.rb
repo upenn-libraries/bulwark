@@ -103,7 +103,7 @@ module Utils
       display_path = "#{Utils.config[:assets_display_path]}/#{repo.names.directory}"
       if File.directory?("#{Utils.config[:assets_display_path]}/#{repo.names.directory}")
         Dir.chdir(display_path)
-        repo.version_control_agent.sync_content
+        repo.version_control_agent.sync_content(:directory => display_path)
       else
         repo.version_control_agent.clone(:destination => display_path)
         refresh_assets(repo)
