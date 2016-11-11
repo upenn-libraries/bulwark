@@ -134,7 +134,6 @@ class MetadataSource < ActiveRecord::Base
         self.user_defined_mappings = _set_voyager_data(working_path)
       when 'bibliophilly'
         self.set_bibliophilly_data(working_path)
-        self.fetch_input_artifact('Xml')
       end
     end
     save_input_source(working_path)
@@ -145,9 +144,9 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def save_input_source(destination_path)
-    filename = self.fetch_input_artifact('Xml')
+    temp_location, filename = self.fetch_input_artifact('Xml')
     destination = "#{destination_path}/#{Utils.config[:object_admin_path]}/#{filename}"
-    FileUtils.mv(filename, destination)
+    FileUtils.mv(temp_location, destination)
   end
 
   def build_xml
