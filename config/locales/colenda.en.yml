@@ -177,6 +177,7 @@ en:
       commit_messages:
         commit_bare: 'Added subdirectories according to the configuration specified in the repo configuration'
         package_metadata_info: 'Added packaging info about metadata sources to admin directory'
+        write_input_source: 'Saved source in original format'
         voyager_derivative_spreadsheet: 'Created derivative spreadsheet of Voyager metadata'
         generated_derivative: 'Generated derivative for %{file_name}'
         generated_thumbnail: 'Generated thumbnail for %{object_id}'
@@ -190,6 +191,9 @@ en:
         no_files: 'No files detected'
       success:
         checksum_log_generated: 'Checksum log generated'
+      metadata_source:
+        errors:
+         invalid_input_format: 'Invalid input format specified: %{input_format}'
       version_control:
         git_annex:
           errors:

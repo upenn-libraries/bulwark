@@ -3,7 +3,6 @@ require 'sanitize'
 class Repo < ActiveRecord::Base
 
   include ModelNamingExtensions::Naming
-  include Utils::Artifacts::InputFormats
 
   has_one :metadata_builder, dependent: :destroy, :validate => false
   has_one :version_control_agent, dependent: :destroy, :validate => false

@@ -70,11 +70,8 @@ module Utils
         begin
           working_repo.commit(commit_message)
         rescue => exception
-          if exception.message =~ /nothing to commit, working \w* clean/
-            return
-          else
-            raise Utils::Error::VersionControl.new(error_message(exception.message))
-          end
+          return if exception.message =~ /nothing to commit, working \w* clean/
+          raise Utils::Error::VersionControl.new(error_message(exception.message))
         end
       end
 

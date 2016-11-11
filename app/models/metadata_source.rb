@@ -2,6 +2,8 @@ require 'open-uri'
 
 class MetadataSource < ActiveRecord::Base
 
+  include Utils::Artifacts::InputFormats
+
   attr_accessor :xml_header, :xml_footer
   attr_accessor :user_defined_mappings
 
@@ -91,9 +93,27 @@ class MetadataSource < ActiveRecord::Base
     self.metadata_builder.repo.update_steps(:metadata_source_additional_info_set)
   end
 
+  def original_mappings=(original_mappings)
+    self[:original_mappings] = original_mappings
+    self[:input_source] = input_source_path(self[:source_type])
+  end
+
   def user_defined_mappings=(user_defined_mappings)
     self[:user_defined_mappings] = user_defined_mappings
     self.metadata_builder.repo.update_steps(:metadata_mappings_generated) if user_defined_mappings.present?
+  end
+
+  def input_source_path(source_type)
+    case source_type
+      when 'custom', 'bibliophilly'
+        self.path
+      when 'voyager'
+        "#{MetadataSchema.config[:voyager][:http_lookup]}/#{self.original_mappings['bibid']}.xml"
+      when 'structural_bibid'
+        "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}"
+      else
+        nil
+    end
   end
 
   def set_metadata_mappings(working_path = $working_path)
@@ -114,10 +134,20 @@ class MetadataSource < ActiveRecord::Base
         self.user_defined_mappings = _set_voyager_data(working_path)
       when 'bibliophilly'
         self.set_bibliophilly_data(working_path)
+        self.fetch_input_artifact('Xml')
       end
     end
+    save_input_source(working_path)
+    self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_input_source'))
+    self.metadata_builder.repo.version_control_agent.push
     self.metadata_builder.repo.update_steps(:metadata_extracted)
     self.save!
+  end
+
+  def save_input_source(destination_path)
+    filename = self.fetch_input_artifact('Xml')
+    destination = "#{destination_path}/#{Utils.config[:object_admin_path]}/#{filename}"
+    FileUtils.mv(filename, destination)
   end
 
   def build_xml
