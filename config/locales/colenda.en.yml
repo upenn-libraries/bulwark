@@ -130,7 +130,7 @@ en:
           list:
             voyager_bibid: 'Voyager BibID Lookup Spreadsheet (XLSX)'
             structural_bibid: 'Structural Metadata from BibID Lookup Spreadsheet (XLSX)'
-            bibphilly: 'BibPhilly (XLSX)'
+            bibliophilly: 'BiblioPhilly (XLSX)'
             custom: 'Custom Structural Metadata Spreadsheet (XLSX)'
         orientation:
           vertical: 'Vertical'
@@ -159,11 +159,11 @@ en:
         structural_bibid:
           heading: 'Sample of structural metadata fetched from Voyager (first 10 entries or fewer)'
           field_separator: ':'
-        bibphilly:
-          heading: 'Sample metadata fetched from BibPhilly spreadsheet'
+        bibliophilly:
+          heading: 'Sample metadata fetched from BiblioPhilly spreadsheet'
           field_separator: ':'
-        bibphilly_structural:
-          heading: 'Sample structural metadata fetched from Page 2 of BibPhilly spreadsheet'
+        bibliophilly_structural:
+          heading: 'Sample structural metadata fetched from Page 2 of BiblioPhilly spreadsheet'
           field_separator: ':'
         custom:
           field:
@@ -176,7 +176,8 @@ en:
     version_control_agents:
       commit_messages:
         commit_bare: 'Added subdirectories according to the configuration specified in the repo configuration'
-        package_metadata_info: 'Added packaging info about metadata sources to admin directory'
+        post_ingest_artifacts: 'Added post-ingest artifacts'
+        write_input_source: 'Saved source in original format'
         voyager_derivative_spreadsheet: 'Created derivative spreadsheet of Voyager metadata'
         generated_derivative: 'Generated derivative for %{file_name}'
         generated_thumbnail: 'Generated thumbnail for %{object_id}'
@@ -190,9 +191,13 @@ en:
         no_files: 'No files detected'
       success:
         checksum_log_generated: 'Checksum log generated'
+      metadata_source:
+        errors:
+         invalid_input_format: 'Invalid input format specified: %{input_format}'
       version_control:
         git_annex:
           errors:
+            missing_directory: 'Directory %{directory} missing.'
             sync: 'Trying to perform git annex sync outside of an annexed repository.'
             leftover_clone: 'Leftover Git remote clone in working directory - %{directory}.'
             does_not_exist: 'Git remote does not exist.  Could not clone to perform tasks.'

@@ -20,16 +20,14 @@ module Utils
         af_object = nil
       end
       delete_duplicate(af_object) if af_object.present?
-      @command = _build_command('import', :file => file)
-      @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : _execute_curl
+      @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
       FileUtils.rm(file)
       repo.problem_files = {}
       attach_files(@oid, repo, Manuscript, Page)
       thumbnail = generate_thumbnail(repo)
       if thumbnail.present?
         repo.has_thumbnail = true
-        @command = _build_command('file_attach', :file => thumbnail, :fid => repo.names.fedora, :child_container => 'thumbnail')
-        _execute_curl
+        execute_curl(_build_command('file_attach', :file => thumbnail, :fid => repo.names.fedora, :child_container => 'thumbnail'))
       else
         repo.has_thumbnail = false
       end
@@ -45,10 +43,8 @@ module Utils
 
     def delete_duplicate(af_object)
       object_id = af_object.id
-      @command = _build_command('delete', :object_uri => af_object.translate_id_to_uri.call(object_id))
-      _execute_curl
-      @command = _build_command('delete_tombstone', :object_uri => af_object.translate_id_to_uri.call(object_id))
-      _execute_curl
+      execute_curl(_build_command('delete', :object_uri => af_object.translate_id_to_uri.call(object_id)))
+      execute_curl(_build_command('delete_tombstone', :object_uri => af_object.translate_id_to_uri.call(object_id)))
       clear_af_cache(object_id)
     end
 
@@ -81,8 +77,7 @@ module Utils
       validated =  File.exist?(file_link) ? validate_file(file_link) : false
       if validated
         derivative_link = "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
-        @command = _build_command('file_attach', :file => derivative_link, :fid => parent.id, :child_container => child_container)
-        _execute_curl
+        execute_curl(_build_command('file_attach', :file => derivative_link, :fid => parent.id, :child_container => child_container))
         repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_derivative', :file_name => parent.file_name))
       else
         @@status_type = :warning
@@ -108,7 +103,7 @@ module Utils
       display_path = "#{Utils.config[:assets_display_path]}/#{repo.names.directory}"
       if File.directory?("#{Utils.config[:assets_display_path]}/#{repo.names.directory}")
         Dir.chdir(display_path)
-        repo.version_control_agent.sync_content
+        repo.version_control_agent.sync_content(:directory => display_path)
       else
         repo.version_control_agent.clone(:destination => display_path)
         refresh_assets(repo)
@@ -127,6 +122,10 @@ module Utils
       if check_persisted(object_id)
         object_and_descendants_action(object_id, 'update_index')
       end
+    end
+
+    def execute_curl(command)
+      `#{command}`
     end
 
     protected
@@ -201,10 +200,6 @@ module Utils
         raise I18n.t('colenda.utils.process.warnings.invalid_curl_command')
       end
       command
-    end
-
-    def _execute_curl
-      `#{@command}`
     end
 
   end

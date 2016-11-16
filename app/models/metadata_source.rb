@@ -2,6 +2,8 @@ require 'open-uri'
 
 class MetadataSource < ActiveRecord::Base
 
+  include Utils::Artifacts::InputFormats
+
   attr_accessor :xml_header, :xml_footer
   attr_accessor :user_defined_mappings
 
@@ -91,9 +93,34 @@ class MetadataSource < ActiveRecord::Base
     self.metadata_builder.repo.update_steps(:metadata_source_additional_info_set)
   end
 
+  def original_mappings=(original_mappings)
+    self[:original_mappings] = original_mappings
+    self[:input_source] = input_source_path(self[:source_type])
+  end
+
   def user_defined_mappings=(user_defined_mappings)
     self[:user_defined_mappings] = user_defined_mappings
     self.metadata_builder.repo.update_steps(:metadata_mappings_generated) if user_defined_mappings.present?
+  end
+
+  def check_parentage
+    sibling_ids = MetadataSource.where('metadata_builder_id = ? AND id != ?', self.metadata_builder, self.id).pluck(:id)
+    sibling_ids.each do |sid|
+      return MetadataSource.find(sid).children.any?{|child| child == "#{self.id}"} ? sid : nil
+    end
+  end
+
+  def input_source_path(source_type)
+    case source_type
+      when 'custom', 'bibliophilly'
+        self.path
+      when 'voyager'
+        "#{MetadataSchema.config[:voyager][:http_lookup]}/#{self.original_mappings['bibid']}.xml"
+      when 'structural_bibid'
+        "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}"
+      else
+        nil
+    end
   end
 
   def set_metadata_mappings(working_path = $working_path)
@@ -105,19 +132,32 @@ class MetadataSource < ActiveRecord::Base
           self.parent_element = 'page'
         end
         self.original_mappings = _convert_metadata(working_path)
+        self.identifier = self.path.filename_sanitize
       when 'structural_bibid'
         self.root_element = 'pages'
         self.parent_element = 'page'
         self.user_defined_mappings = _set_voyager_structural_metadata(working_path)
+        self.identifier = self.original_mappings['bibid']
       when 'voyager'
-        self.root_element = MetadataSchema.config[:voyager][:root_element] || 'voyager_object'
+        self.root_element = MetadataSchema.config[:voyager][:root_element] || 'record'
         self.user_defined_mappings = _set_voyager_data(working_path)
-      when 'bibphilly'
-        self.set_bibphilly_data(working_path)
+        self.identifier = self.original_mappings['bibid']
+      when 'bibliophilly'
+        self.set_bibliophilly_data(working_path)
+        self.identifier = self.original_mappings['Call Number/ID'].first
       end
     end
+    save_input_source(working_path) if self.input_source.present? && self.input_source.downcase.start_with?('http')
+    self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_input_source'))
+    self.metadata_builder.repo.version_control_agent.push
     self.metadata_builder.repo.update_steps(:metadata_extracted)
     self.save!
+  end
+
+  def save_input_source(destination_path)
+    temp_location, filename = self.fetch_input_artifact('Xml')
+    destination = "#{destination_path}/#{Utils.config[:object_admin_path]}/#{filename}"
+    FileUtils.mv(temp_location, destination)
   end
 
   def build_xml
@@ -125,7 +165,7 @@ class MetadataSource < ActiveRecord::Base
     self.generate_and_build_individual_xml
     self.children.each do |child|
       source = MetadataSource.find(child)
-      source.generate_and_build_individual_xml(source.path) unless source.source_type == 'bibphilly_structural'
+      source.generate_and_build_individual_xml(source.path) unless source.source_type == 'bibliophilly_structural'
     end
     self.generate_preservation_xml
     self.jettison_metadata($jettison_files)
@@ -134,7 +174,7 @@ class MetadataSource < ActiveRecord::Base
 
   def jettison_metadata(files_to_jettison)
     files_to_jettison.each do |f|
-      f = _working_path_check($working_path, f)
+      f = _reconcile_working_path_slashes($working_path, f)
       self.metadata_builder.repo.version_control_agent.unlock(f)
       self.metadata_builder.repo.version_control_agent.drop(:drop_location => f) && `rm -rf #{f}`
     end
@@ -145,16 +185,16 @@ class MetadataSource < ActiveRecord::Base
 
   def generate_and_build_individual_xml(fname = self.path)
     xml_fname = "#{fname}.xml"
-    if self.user_defined_mappings.present?
+    if self.user_defined_mappings.present? && self.root_element.present?
       case self.source_type
       when 'custom'
         @xml_content_final_copy = xml_from_custom(fname)
-      when 'voyager'
+        when 'voyager'
         @xml_content_final_copy = xml_from_voyager
       when 'structural_bibid'
         @xml_content_final_copy = xml_from_structural_bibid
-      when 'bibphilly'
-        @xml_content_final_copy = xml_from_bibphilly
+      when 'bibliophilly'
+        @xml_content_final_copy = xml_from_bibliophilly
       end
       $jettison_files.add(xml_fname)
       _fetch_write_save_preservation_xml(xml_fname, @xml_content_final_copy)
@@ -162,10 +202,10 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def generate_preservation_xml
-    if self.children.present? && self.source_type != 'bibphilly'
-      @xml_content_final = self.generate_parent_child_xml
+    if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'bibliophilly'
+      @xml_content_final = parent_id.present? ? MetadataSource.find(parent_id).generate_parent_child_xml : self.generate_parent_child_xml
     else
-      file = File.new(_working_path_check($working_path, "#{self.path}.xml"))
+      file = File.new(_reconcile_working_path_slashes($working_path, "#{self.path}.xml"))
       @xml_content_final = file.readline
     end
     _fetch_write_save_preservation_xml(@xml_content_final)
@@ -227,7 +267,7 @@ class MetadataSource < ActiveRecord::Base
     wrapped_content
   end
 
-  def xml_from_bibphilly
+  def xml_from_bibliophilly
     parent_content = ''
     child_content = ''
     self.user_defined_mappings.each do |mapping|
@@ -249,10 +289,11 @@ class MetadataSource < ActiveRecord::Base
 
   def generate_parent_child_xml
     content = ''
+    key_path = _reconcile_working_path_slashes($working_path, "#{self.path}.xml")
+    self.generate_and_build_individual_xml
     self.children.each do |child|
       child_path = MetadataSource.where(:id => child).pluck(:path).first
-      key_path = _working_path_check($working_path, "#{self.path}.xml")
-      child_content_path = _working_path_check($working_path, "#{child_path}.xml")
+      child_content_path = _reconcile_working_path_slashes($working_path, "#{child_path}.xml")
       self.metadata_builder.repo.version_control_agent.get(:get_location => key_path)
       self.metadata_builder.repo.version_control_agent.get(:get_location => child_content_path)
       content = File.open(key_path, 'r'){|io| io.read}
@@ -287,20 +328,20 @@ class MetadataSource < ActiveRecord::Base
     self.save!
   end
 
-  def set_bibphilly_data(working_path = $working_path)
+  def set_bibliophilly_data(working_path = $working_path)
     self.root_element = 'record'
     self.view_type = 'vertical'
     self.y_start = 6
     self.y_stop = 72
     self.x_start = 2
-    structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'bibphilly_structural'} ? MetadataSource.find(self.children.first) : initialize_bibphilly_structural(self)
+    structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'bibliophilly_structural'} ? MetadataSource.find(self.children.first) : initialize_bibliophilly_structural(self)
     full_path = "#{working_path}#{self.path}"
     self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
-    self.generate_bibphilly_descrip_md(full_path)
-    structural.generate_bibphilly_struct_md(full_path)
+    self.generate_bibliophilly_descrip_md(full_path)
+    structural.generate_bibliophilly_struct_md(full_path)
   end
 
-  def generate_bibphilly_descrip_md(full_path)
+  def generate_bibliophilly_descrip_md(full_path)
     mappings = {}
     iterator = 0
     x_start, y_start, x_stop, y_stop, z = _offset
@@ -323,7 +364,7 @@ class MetadataSource < ActiveRecord::Base
     self.save!
   end
 
-  def generate_bibphilly_struct_md(full_path)
+  def generate_bibliophilly_struct_md(full_path)
     mappings = {}
     headers = []
     x_start, y_start, x_stop, y_stop, z = _offset
@@ -348,23 +389,27 @@ class MetadataSource < ActiveRecord::Base
   end
 
 
-  def initialize_bibphilly_structural(parent)
-    struct = MetadataSource.create
-    struct.metadata_builder = self.metadata_builder
-    struct.source_type = 'bibphilly_structural'
-    struct.root_element= 'pages'
-    struct.parent_element= 'page'
-    struct.view_type = 'horizontal'
-    struct.path = "#{parent.path} Page 2 (Structural)"
-    struct.z = 2
-    struct.y_start = 3
-    struct.y_stop = 3
-    struct.x_start = 1
-    struct.x_stop = 3
+  def initialize_bibliophilly_structural(parent)
+    struct = MetadataSource.create({
+        :metadata_builder => self.metadata_builder,
+        :source_type => 'bibliophilly_structural',
+        :root_element => 'pages',
+        :parent_element => 'page',
+        :view_type => 'horizontal',
+        :path => "#{parent.path} Page 2 (Structural)",
+        :z => 2,
+        :y_start => 3,
+        :y_stop => 3,
+        :x_start => 1,
+        :x_stop => 3 })
     parent.children << struct
-    struct.save!
     parent.save!
     struct
+  end
+
+  def true_root_element(metadata_source)
+    parent_id = metadata_source.check_parentage
+    parent_id.present? ? MetadataSource.find(parent_id).root_element : metadata_source.root_element
   end
 
   private
@@ -422,7 +467,7 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def _refresh_bibid(working_path = $working_path)
-      full_path = _working_path_check(working_path, "#{self.path}")
+      full_path = _reconcile_working_path_slashes(working_path, "#{self.path}")
       self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
       worksheet = RubyXL::Parser.parse(full_path)
       case self.source_type
@@ -454,7 +499,7 @@ class MetadataSource < ActiveRecord::Base
         ext = pathname.extname.to_s[1..-1]
         case ext
         when 'xlsx'
-          full_path = _working_path_check(working_path,"#{self.path}")
+          full_path = _reconcile_working_path_slashes(working_path, "#{self.path}")
           self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
           @mappings = _generate_mapping_options_xlsx(full_path)
         else
@@ -568,8 +613,8 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def _build_preservation_xml(metadata_path_and_filename, content)
-      working_file = _working_path_check($working_path,"#{metadata_path_and_filename}")
-      preservation_file = _working_path_check($working_path, "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}")
+      working_file = _reconcile_working_path_slashes($working_path, "#{metadata_path_and_filename}")
+      preservation_file = _reconcile_working_path_slashes($working_path, "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}")
       _manage_canonical_identifier(content) if working_file == preservation_file
       tmp_filename = "#{working_file}.tmp"
       if File.basename(metadata_path_and_filename) == self.metadata_builder.repo.preservation_filename
@@ -586,12 +631,12 @@ class MetadataSource < ActiveRecord::Base
 
     def _manage_canonical_identifier(xml_content)
       minted_identifier = "<#{MetadataSchema.config[:unique_identifier_field]}>#{self.metadata_builder.repo.unique_identifier}</#{MetadataSchema.config[:unique_identifier_field]}>"
-      root_element_check = "<#{self.root_element}>"
-      xml_content.insert((xml_content.index(root_element_check)+root_element_check.length), minted_identifier)
+      root_element = "<#{true_root_element(self)}>"
+      xml_content.insert((xml_content.index(root_element)+root_element.length), minted_identifier)
     end
 
     def _fetch_write_save_preservation_xml(file_path = "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}", xml_content)
-      file_path = _working_path_check($working_path, file_path)
+      file_path = _reconcile_working_path_slashes($working_path, file_path)
       self.metadata_builder.repo.version_control_agent.unlock(file_path) if File.exists?(file_path)
       _build_preservation_xml(file_path, xml_content)
       self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_preservation_xml', :metadata_source_path => self.path, :xml_path => file_path))
@@ -616,14 +661,14 @@ class MetadataSource < ActiveRecord::Base
     end
 
     def self.source_types
-      source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.voyager_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.bibphilly'), 'bibphilly'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
+      source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.voyager_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.bibliophilly'), 'bibliophilly'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
     end
 
     def self.settings_fields
       settings_fields = [:view_type, :num_objects, :x_start, :y_start, :x_stop, :y_stop]
     end
 
-    def _working_path_check(working_path, file_path)
+    def _reconcile_working_path_slashes(working_path, file_path)
       file_path.start_with?(working_path) ? file_path : "#{working_path}/#{file_path}".gsub("//","/")
     end
 

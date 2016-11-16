@@ -63,7 +63,7 @@ class Manuscript < MultipageItem
   end
 
 
-  # BibPhilly fields
+  # BiblioPhilly fields
 
   property :administrative_contact, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/administrativeContact'), multiple: true do |index|
     index.as :stored_searchable, :facetable

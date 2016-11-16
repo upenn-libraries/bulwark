@@ -70,7 +70,7 @@ class MetadataBuilder < ActiveRecord::Base
       unless canonical_identifier_check(file_path)
         next
       end
-      xslt_file = self.metadata_source.any?{|ms| ms.source_type == 'bibphilly'} ? 'bibphilly' : 'sv'
+      xslt_file = self.metadata_source.any?{|ms| ms.source_type == 'bibliophilly'} ? 'bibliophilly' : 'sv'
       Dir.chdir(working_path)
       `xsltproc #{Rails.root}/lib/tasks/#{xslt_file}.xslt #{file_path}`
       transformed_xml = "#{working_path}/#{Utils.config[:fedora_xml_derivative]}"

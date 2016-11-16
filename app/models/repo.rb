@@ -3,6 +3,7 @@ require 'sanitize'
 class Repo < ActiveRecord::Base
 
   include ModelNamingExtensions::Naming
+  include Utils::Artifacts::ProblemsLog
 
   has_one :metadata_builder, dependent: :destroy, :validate => false
   has_one :version_control_agent, dependent: :destroy, :validate => false
@@ -133,11 +134,40 @@ class Repo < ActiveRecord::Base
       @status = Utils::Process.import(file, self, working_path)
       Utils::Process.refresh_assets(self)
       self.package_metadata_info(working_path)
-      self.update_steps(:published_preview)
-      @status
+      self.generate_logs(working_path)
+      self.push_artifacts
     rescue
       self.save!
       raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => $!.backtrace)
+    end
+  end
+
+  def package_metadata_info(destination)
+    File.open("#{destination}/#{self.admin_subdirectory}/#{self.names.directory}", 'w+') do |f|
+      self.metadata_builder.metadata_source.each do |source|
+        f.puts I18n.t('colenda.version_control_agents.packaging_info', :source_path => source.path, :source_id => source.id, :source_type => source.source_type, :source_view_type => source.view_type, :source_num_objects => source.num_objects, :source_x_start => source.x_start, :source_x_stop => source.x_stop, :source_y_start => source.y_start, :source_y_stop => source.y_stop, :source_children => source.children)
+      end
+    end
+  end
+
+  def generate_logs(destination_path)
+    begin
+      temp_location = self.problems_log
+      destination = "#{destination_path}/#{Utils.config[:object_admin_path]}/#{Utils.config[:problem_log]}"
+      FileUtils.mv(temp_location, destination)
+    rescue => exception
+      return unless self.problem_files.present?
+      raise Utils::Error::Artifacts.new(error_message(exception.message))
+    end
+
+  end
+
+  def push_artifacts
+    begin
+      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.post_ingest_artifacts'))
+      self.version_control_agent.push
+    rescue
+      self.version_control_agent.push
     end
   end
 
@@ -156,20 +186,6 @@ class Repo < ActiveRecord::Base
   def directory_link
     url = "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{self.id}/git_actions"
     "<a href=\"#{url}\">#{self.names.directory}</a>"
-  end
-
-  def package_metadata_info(working_path)
-    File.open("#{working_path}/#{self.admin_subdirectory}/#{self.names.directory}", 'w+') do |f|
-      self.metadata_builder.metadata_source.each do |source|
-        f.puts I18n.t('colenda.version_control_agents.packaging_info', :source_path => source.path, :source_id => source.id, :source_type => source.source_type, :source_view_type => source.view_type, :source_num_objects => source.num_objects, :source_x_start => source.x_start, :source_x_stop => source.x_stop, :source_y_start => source.y_start, :source_y_stop => source.y_stop, :source_children => source.children)
-      end
-    end
-    begin
-      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.package_metadata_info'))
-      self.version_control_agent.push
-    rescue
-      self.version_control_agent.push
-    end
   end
 
   def update_steps(task)

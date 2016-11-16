@@ -67,9 +67,9 @@ class VersionControlAgent < ActiveRecord::Base
     options[:get_location].nil? ? $worker.get : $worker.get(options[:get_location])
   end
 
-  def sync_content
+  def sync_content(options = {})
     _initialize_worker
-    $worker.sync('--content')
+    options[:directory].nil? ? $worker.sync('--content') : $worker.sync(options[:directory], '--content')
   end
 
   def drop(options = {})
