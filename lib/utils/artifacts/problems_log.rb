@@ -30,8 +30,7 @@ module Utils
 
       def problems_log
         log = FileProblems.new(self)
-        location = write_log(log.temp_location, log.problems)
-        location
+        write_log(log.temp_location, log.problems)
       end
 
       def write_log(location, contents)

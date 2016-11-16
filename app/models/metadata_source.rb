@@ -456,7 +456,6 @@ class MetadataSource < ActiveRecord::Base
       mapped_values['description'] = []
       _refresh_bibid(working_path)
       voyager_source = open("#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}")
-      self.metadata_builder.repo.save_input_format(voyager_source)
       data = Nokogiri::XML(voyager_source)
       data.xpath('//xml/page').each do |page|
         mapped_values['page_number'] << page['number']

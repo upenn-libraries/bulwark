@@ -9,7 +9,7 @@ module Utils
 
       def initialize(metadata_source)
         input_source_prefix = Utils.config[:input_source_prefix].present? ? Utils.config[:input_source_prefix] : 'input_source'
-        @file_name = "#{input_source_prefix}_#{metadata_source.source_type}_#{metadata_source.id}".xmlify
+        @file_name = "#{input_source_prefix}_#{metadata_source.source_type}_#{metadata_source.identifier.filename_sanitize}".xmlify
       end
 
       def temp_location=(value)
@@ -29,7 +29,7 @@ module Utils
 
       def fetch_input_artifact(artifact_type)
         klass_string = "Utils::Artifacts::#{artifact_type}"
-        raise Utils::Error::InputFormats.new(I18n.t('colenda.utils.metadata_source.errors.invalid_input_format', :input_format => artifact_type)) unless Object.const_defined?(klass_string)
+        raise Utils::Error::Artifacts.new(I18n.t('colenda.utils.metadata_source.errors.invalid_input_format', :input_format => artifact_type)) unless Object.const_defined?(klass_string)
         klass = Object.const_get klass_string
         artifact = klass.new(self)
         artifact.temp_location = artifact.fetch_from_endpoint(self.input_source)

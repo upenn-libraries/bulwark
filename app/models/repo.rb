@@ -151,9 +151,15 @@ class Repo < ActiveRecord::Base
   end
 
   def generate_logs(destination_path)
-    temp_location = self.problems_log if self.problem_files.present?
-    destination = "#{destination_path}/#{Utils.config[:object_admin_path]}/#{Utils.config[:problem_log]}"
-    FileUtils.mv(temp_location, destination)
+    begin
+      temp_location = self.problems_log
+      destination = "#{destination_path}/#{Utils.config[:object_admin_path]}/#{Utils.config[:problem_log]}"
+      FileUtils.mv(temp_location, destination)
+    rescue => exception
+      return unless self.problem_files.present?
+      raise Utils::Error::Artifacts.new(error_message(exception.message))
+    end
+
   end
 
   def push_artifacts
