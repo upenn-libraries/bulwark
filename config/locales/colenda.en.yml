@@ -176,7 +176,7 @@ en:
     version_control_agents:
       commit_messages:
         commit_bare: 'Added subdirectories according to the configuration specified in the repo configuration'
-        package_metadata_info: 'Added packaging info about metadata sources to admin directory'
+        post_ingest_artifacts: 'Added post-ingest artifacts'
         write_input_source: 'Saved source in original format'
         voyager_derivative_spreadsheet: 'Created derivative spreadsheet of Voyager metadata'
         generated_derivative: 'Generated derivative for %{file_name}'
