@@ -3,10 +3,6 @@ module Utils
 
     extend self
 
-    def preserve_artifact
-
-    end
-
   end
 
 end
