@@ -132,18 +132,22 @@ class MetadataSource < ActiveRecord::Base
           self.parent_element = 'page'
         end
         self.original_mappings = _convert_metadata(working_path)
+        self.identifier = self.path.filename_sanitize
       when 'structural_bibid'
         self.root_element = 'pages'
         self.parent_element = 'page'
         self.user_defined_mappings = _set_voyager_structural_metadata(working_path)
+        self.identifier = self.original_mappings['bibid']
       when 'voyager'
         self.root_element = MetadataSchema.config[:voyager][:root_element] || 'record'
         self.user_defined_mappings = _set_voyager_data(working_path)
+        self.identifier = self.original_mappings['bibid']
       when 'bibliophilly'
         self.set_bibliophilly_data(working_path)
+        self.identifier = self.original_mappings['Call Number/ID'].first
       end
     end
-    save_input_source(working_path)
+    save_input_source(working_path) if self.input_source.present? && self.input_source.downcase.start_with?('http')
     self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_input_source'))
     self.metadata_builder.repo.version_control_agent.push
     self.metadata_builder.repo.update_steps(:metadata_extracted)
