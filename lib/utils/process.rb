@@ -24,16 +24,9 @@ module Utils
       FileUtils.rm(file)
       repo.problem_files = {}
       attach_files(@oid, repo, Manuscript, Page)
-      thumbnail = generate_thumbnail(repo)
-      if thumbnail.present?
-        repo.has_thumbnail = true
-        execute_curl(_build_command('file_attach', :file => thumbnail, :fid => repo.names.fedora, :child_container => 'thumbnail'))
-      else
-        repo.has_thumbnail = false
-      end
       update_index(@oid)
       repo.save!
-      repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_thumbnail', :object_id => repo.names.fedora))
+      repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives', :object_id => repo.names.fedora))
       repo.version_control_agent.push
       @@status_type = :success
       @@status_message = I18n.t('colenda.utils.process.success.ingest_complete')
@@ -90,13 +83,12 @@ module Utils
     end
 
     def generate_thumbnail(repo)
-      thumbnail_link ||= nil
-      object = ActiveFedora::Base.where(:id => repo.names.fedora).first
-      if object.cover.present?
-        unencrypted_thumbnail_path = "#{@@working_path}/#{repo.assets_subdirectory}/#{object.cover.file_name}"
-        thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ''
-      end
-      thumbnail_link
+      unencrypted_thumbnail_path = "#{@@working_path}/#{repo.assets_subdirectory}/#{repo.thumbnail}"
+      thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ''
+      repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_thumbnail', :object_id => repo.names.fedora))
+      repo.version_control_agent.push
+      execute_curl(_build_command('file_attach', :file => thumbnail_link, :fid => repo.names.fedora, :child_container => 'thumbnail'))
+      refresh_assets(repo)
     end
 
     def refresh_assets(repo)

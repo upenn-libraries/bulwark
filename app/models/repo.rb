@@ -38,7 +38,6 @@ class Repo < ActiveRecord::Base
     self[:unique_identifier] = mint_ezid
     self[:derivatives_subdirectory] = "#{Utils.config[:object_derivatives_path]}"
     self[:admin_subdirectory] = "#{Utils.config[:object_admin_path]}"
-    self[:has_thumbnail] = false
     self[:ingested] = false
   end
 
@@ -65,6 +64,10 @@ class Repo < ActiveRecord::Base
 
   def preservation_filename=(preservation_filename)
     self[:preservation_filename] = preservation_filename.xmlify
+  end
+
+  def thumbnail=(thumbnail)
+    self[:thumbnail] = thumbnail
   end
 
   def review_status=(review_status)
@@ -111,10 +114,9 @@ class Repo < ActiveRecord::Base
     read_attribute(:images_to_render) || ''
   end
 
-  def has_thumbnail
-    read_attribute(:has_thumbnail) || ''
+  def thumbnail
+    read_attribute(:thumbnail) || ''
   end
-  alias_method :has_thumbnail?, :has_thumbnail
 
   def create_remote
     # Function weirdness forcing update_steps to the top
@@ -133,6 +135,8 @@ class Repo < ActiveRecord::Base
     begin
       @status = Utils::Process.import(file, self, working_path)
       Utils::Process.refresh_assets(self)
+      Repo.update(self.id, :thumbnail => default_thumbnail)
+      Utils::Process.generate_thumbnail(self) if self.thumbnail.present?
       self.package_metadata_info(working_path)
       self.generate_logs(working_path)
       self.push_artifacts
@@ -169,6 +173,13 @@ class Repo < ActiveRecord::Base
     rescue
       self.version_control_agent.push
     end
+  end
+
+  #TODO: Eventually offload to metadata source subclasses
+  def default_thumbnail
+    structural_types = %w[structural_bibid custom bibliophilly_structural]
+    single_structural_source = MetadataSource.where('metadata_builder_id = ? AND source_type IN (?)', self.metadata_builder, structural_types).pluck(:id)
+    single_structural_source.length == 1 ? MetadataSource.find(single_structural_source.first).thumbnail : nil
   end
 
   def load_file_extensions
