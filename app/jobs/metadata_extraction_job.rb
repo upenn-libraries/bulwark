@@ -2,9 +2,7 @@ class MetadataExtractionJob < ActiveJobStatus::TrackableJob
 
   queue_as :metadata_extraction
 
-  after_perform do
-    relay_message
-  end
+  after_perform :relay_message
 
   def perform(metadata_builder, root_url, user_email)
     @metadata_builder = metadata_builder

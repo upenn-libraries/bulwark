@@ -135,7 +135,8 @@ class Repo < ActiveRecord::Base
     begin
       @status = Utils::Process.import(file, self, working_path)
       Utils::Process.refresh_assets(self)
-      Repo.update(self.id, :thumbnail => default_thumbnail)
+      self.thumbnail = default_thumbnail
+      self.save!
       Utils::Process.generate_thumbnail(self) if self.thumbnail.present?
       self.package_metadata_info(working_path)
       self.generate_logs(working_path)
