@@ -642,7 +642,7 @@ class MetadataSource < ActiveRecord::Base
       File.rename(tmp_filename, working_file)
     end
 
-    def _manage_canonical_identifier(xml_content)
+    def     _manage_canonical_identifier(xml_content)
       minted_identifier = "<#{MetadataSchema.config[:unique_identifier_field]}>#{self.metadata_builder.repo.unique_identifier}</#{MetadataSchema.config[:unique_identifier_field]}>"
       root_element = "<#{true_root_element(self)}>"
       xml_content.insert((xml_content.index(root_element)+root_element.length), minted_identifier)
