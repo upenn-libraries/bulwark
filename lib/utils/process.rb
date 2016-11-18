@@ -1,6 +1,8 @@
 module Utils
   module Process
 
+    include Finder
+
     @@status_message
     @@status_type
     @@derivatives_working_destination
@@ -14,26 +16,15 @@ module Utils
       @oid = repo.names.fedora
       @@derivatives_working_destination = "#{@@working_path}/#{repo.derivatives_subdirectory}"
       @@status_type = :error
-      begin
-        af_object = ActiveFedora::Base.find(@oid)
-      rescue
-        af_object = nil
-      end
+      af_object = Finder.fedora_find(@oid)
       delete_duplicate(af_object) if af_object.present?
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
       FileUtils.rm(file)
       repo.problem_files = {}
       attach_files(@oid, repo, Manuscript, Page)
-      thumbnail = generate_thumbnail(repo)
-      if thumbnail.present?
-        repo.has_thumbnail = true
-        execute_curl(_build_command('file_attach', :file => thumbnail, :fid => repo.names.fedora, :child_container => 'thumbnail'))
-      else
-        repo.has_thumbnail = false
-      end
       update_index(@oid)
       repo.save!
-      repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_thumbnail', :object_id => repo.names.fedora))
+      repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives', :object_id => repo.names.fedora))
       repo.version_control_agent.push
       @@status_type = :success
       @@status_message = I18n.t('colenda.utils.process.success.ingest_complete')
@@ -50,12 +41,12 @@ module Utils
 
     def attach_files(oid = @oid, repo, parent_model, child_model)
       children = []
-      parent = ActiveFedora::Base.find(oid)
+      parent = Finder.fedora_find(oid)
       object_uri = ActiveFedora::Base.id_to_uri(oid)
       children_uris = ActiveFedora::Base.descendant_uris(object_uri)
       children_uris.delete_if { |c| c == object_uri }
       children_uris.each do |child_uri|
-        child = ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(child_uri))
+        child = Finder.fedora_find(ActiveFedora::Base.uri_to_id(child_uri))
         children << child
         if child.file_name.present?
           attach_file(repo, child, child.file_name, 'pageImage')
@@ -90,13 +81,12 @@ module Utils
     end
 
     def generate_thumbnail(repo)
-      thumbnail_link ||= nil
-      object = ActiveFedora::Base.where(:id => repo.names.fedora).first
-      if object.cover.present?
-        unencrypted_thumbnail_path = "#{@@working_path}/#{repo.assets_subdirectory}/#{object.cover.file_name}"
-        thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ''
-      end
-      thumbnail_link
+      unencrypted_thumbnail_path = "#{@@working_path}/#{repo.assets_subdirectory}/#{repo.thumbnail}"
+      thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ''
+      repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_thumbnail', :object_id => repo.names.fedora))
+      repo.version_control_agent.push
+      execute_curl(_build_command('file_attach', :file => thumbnail_link, :fid => repo.names.fedora, :child_container => 'thumbnail'))
+      refresh_assets(repo)
     end
 
     def refresh_assets(repo)
@@ -150,7 +140,7 @@ module Utils
       descs = ActiveFedora::Base.descendant_uris(uri)
       descs.each do |desc|
         begin
-          ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(desc)).send(action)
+          Finder.fedora_find(ActiveFedora::Base.uri_to_id(desc)).send(action)
         rescue
           next
         end

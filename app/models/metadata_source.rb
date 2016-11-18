@@ -412,6 +412,19 @@ class MetadataSource < ActiveRecord::Base
     parent_id.present? ? MetadataSource.find(parent_id).root_element : metadata_source.root_element
   end
 
+  def thumbnail
+    case self.source_type
+      when 'structural_bibid'
+        self.user_defined_mappings['file_name'].present? ? self.user_defined_mappings['file_name'].first : nil
+      when 'custom'
+        self.original_mappings['file_name'].present? ? self.original_mappings['file_name'].first : nil
+      when 'bibliophilly_structural'
+        pages_with_files = []
+        self.user_defined_mappings.select {|key, map| pages_with_files << map if map['file_name'].present?}
+        pages_with_files.present? ? pages_with_files.sort_by.first {|p| p['serial_num']}['file_name'] : nil
+    end
+  end
+
   private
 
     def _set_voyager_data(working_path = $working_path)

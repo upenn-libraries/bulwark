@@ -1,5 +1,6 @@
 module RepoHelper
   include BlacklightHelper
+  include Finder
 
   def render_git_directions_or_actions
     full_path = "#{Utils.config[:assets_path]}/#{@object.names.git}"
@@ -38,9 +39,13 @@ module RepoHelper
 
   def generate_ingest_link(ingested_id)
     if @object.ingested
-    obj = ActiveFedora::Base.find(ingested_id)
-    truncated_title = "#{obj.title.first[0..100]}..."
-    return link_to(truncated_title, Rails.application.routes.url_helpers.catalog_url(obj, :only_path => true), :target => '_blank', :title => t('colenda.links.new_tab')).html_safe
+      begin
+        obj = Finder.fedora_find(ingested_id)
+        truncated_title = "#{obj.title.first[0..100]}..."
+        link_to(truncated_title, Rails.application.routes.url_helpers.catalog_url(obj, :only_path => true), :target => '_blank', :title => t('colenda.links.new_tab')).html_safe
+      rescue
+        return
+      end
     end
   end
 
