@@ -1,11 +1,19 @@
 class MultipageItem < ActiveFedora::Base
   include Hydra::Works::WorkBehavior
 
+  include ::Identifiers
+
+  around_create :mint_uuid
+
+  around_save :manage_uuid
+
   has_many :pages
 
   contains 'thumbnail'
 
-  #TODO: Add unique identifier representation in properties
+  property :unique_identifier, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/unique_identifier'), multiple: false do |index|
+    index.as :stored_searchable, :facetable
+  end
 
   property :title, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/title'), multiple: true do |index|
     index.as :stored_searchable, :facetable
@@ -23,22 +31,19 @@ class MultipageItem < ActiveFedora::Base
     index.as :stored_searchable
   end
 
+  def mint_uuid
+    yield
+    self.mint_identifier
+  end
+
+  def manage_uuid
+    yield
+    self.manage_identifier_metadata if self.unique_identifier.present?
+  end
+
 
   def thumbnail_link
     self.thumbnail.ldp_source.subject
   end
-
-  def cover
-    nil
-  end
-
-  def mint_public_identifier
-    identifier = Ezid::Identifier.find(self.identifier)
-    identifier.who = self.creator if self.creator.present?
-    identifier.what = self.title if self.title.present?
-    identifier.when = self.date if self.date.present?
-    identifier.save
-  end
-
 
 end
