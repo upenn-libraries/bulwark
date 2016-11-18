@@ -1,6 +1,8 @@
-<% @document = ActiveFedora::Base.find(@object.unique_identifier.fedorafy) %>
+<% @document = Finder.fedora_find(@object.unique_identifier.fedorafy) %>
 
-<%= render :partial => "repos/review_descriptive_metadata" %>
-<%= render :partial => "repos/review_page_level_metadata" %>
-<%= render :partial => "repos/review_status_form" %>
+<% if @document.present? %>
+  <%= render :partial => "repos/review_descriptive_metadata" %>
+  <%= render :partial => "repos/review_page_level_metadata" %>
+  <%= render :partial => "repos/review_status_form" %>
+<% end %>
 

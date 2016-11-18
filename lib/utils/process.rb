@@ -1,6 +1,8 @@
 module Utils
   module Process
 
+    include Finder
+
     @@status_message
     @@status_type
     @@derivatives_working_destination
@@ -14,11 +16,7 @@ module Utils
       @oid = repo.names.fedora
       @@derivatives_working_destination = "#{@@working_path}/#{repo.derivatives_subdirectory}"
       @@status_type = :error
-      begin
-        af_object = ActiveFedora::Base.find(@oid)
-      rescue
-        af_object = nil
-      end
+      af_object = Finder.fedora_find(@oid)
       delete_duplicate(af_object) if af_object.present?
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
       FileUtils.rm(file)
@@ -43,12 +41,12 @@ module Utils
 
     def attach_files(oid = @oid, repo, parent_model, child_model)
       children = []
-      parent = ActiveFedora::Base.find(oid)
+      parent = Finder.fedora_find(oid)
       object_uri = ActiveFedora::Base.id_to_uri(oid)
       children_uris = ActiveFedora::Base.descendant_uris(object_uri)
       children_uris.delete_if { |c| c == object_uri }
       children_uris.each do |child_uri|
-        child = ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(child_uri))
+        child = Finder.fedora_find(ActiveFedora::Base.uri_to_id(child_uri))
         children << child
         if child.file_name.present?
           attach_file(repo, child, child.file_name, 'pageImage')
@@ -142,7 +140,7 @@ module Utils
       descs = ActiveFedora::Base.descendant_uris(uri)
       descs.each do |desc|
         begin
-          ActiveFedora::Base.find(ActiveFedora::Base.uri_to_id(desc)).send(action)
+          Finder.fedora_find(ActiveFedora::Base.uri_to_id(desc)).send(action)
         rescue
           next
         end
