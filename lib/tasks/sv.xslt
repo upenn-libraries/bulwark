@@ -125,7 +125,9 @@
 
     <xsl:template match="pages/page">
       <sv:node>
-      <xsl:attribute name="sv:name"><xsl:value-of select="identifier" /></xsl:attribute>
+      <xsl:attribute name="sv:name">
+        <xsl:value-of select="format-number(page_number, '00000')" />
+      </xsl:attribute>
       <sv:property sv:name="jcr:primaryType" sv:type="Name">
         <sv:value>nt:folder</sv:value>
       </sv:property>
@@ -141,6 +143,9 @@
       </sv:property>
       <sv:property sv:name="jcr:createdBy" sv:type="String">
         <sv:value>bypassAdmin</sv:value>
+      </sv:property>
+      <sv:property sv:name="ns004:uniqueIdentifier" sv:type="String" sv:multiple="false">
+        <sv:value><xsl:value-of select="concat($uuid, '/', format-number(page_number, '00000'))" /></sv:value>
       </sv:property>
       <sv:property sv:name="ns004:parentManuscript" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="$uuid" /></sv:value>

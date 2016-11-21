@@ -40,6 +40,7 @@ module Utils
     end
 
     def attach_files(oid = @oid, repo, parent_model, child_model)
+      repo.images_to_render = {}
       children = []
       parent = Finder.fedora_find(oid)
       object_uri = ActiveFedora::Base.id_to_uri(oid)
