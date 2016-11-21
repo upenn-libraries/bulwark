@@ -58,10 +58,6 @@ class Manuscript < MultipageItem
     index.as :stored_searchable, :facetable
   end
 
-  property :title, predicate: ::RDF::Vocab::DC.title, multiple: true do |index|
-    index.as :stored_searchable, :facetable
-  end
-
 
   # BiblioPhilly fields
 

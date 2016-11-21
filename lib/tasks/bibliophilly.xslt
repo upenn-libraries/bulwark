@@ -59,6 +59,10 @@
             <xsl:apply-templates select="file_list/file" />
           </sv:property>
 
+          <sv:property sv:name="ns004:uniqueIdentifier" sv:type="String" sv:multiple="false">
+              <sv:value><xsl:value-of select="$uuid" /></sv:value>
+          </sv:property>
+
           <sv:property sv:name="ns002:title" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="manuscript_name" />
           </sv:property>

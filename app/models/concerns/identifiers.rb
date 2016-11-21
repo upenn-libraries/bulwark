@@ -14,7 +14,6 @@ module Identifiers
     self.unique_identifier = Ezid::Identifier.mint(erc_information).id
   end
 
-
   def manage_identifier_metadata
     Ezid::Identifier.modify(self.unique_identifier, erc_information)
   end

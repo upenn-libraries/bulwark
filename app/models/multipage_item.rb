@@ -3,19 +3,17 @@ class MultipageItem < ActiveFedora::Base
 
   include ::Identifiers
 
-  around_create :mint_uuid
-
   around_save :manage_uuid
 
   has_many :pages
 
   contains 'thumbnail'
 
-  property :unique_identifier, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/unique_identifier'), multiple: false do |index|
+  property :unique_identifier, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/uniqueIdentifier'), multiple: false do |index|
     index.as :stored_searchable, :facetable
   end
 
-  property :title, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/title'), multiple: true do |index|
+  property :title, predicate: ::RDF::Vocab::DC.title, multiple: true do |index|
     index.as :stored_searchable, :facetable
   end
 
@@ -36,11 +34,15 @@ class MultipageItem < ActiveFedora::Base
     self.mint_identifier
   end
 
+  def format_uuid!
+    self.unique_identifier = self.unique_identifier.reverse_fedorafy
+  end
+
   def manage_uuid
+    self.format_uuid! if self.unique_identifier.present? && self.unique_identifier != self.unique_identifier.reverse_fedorafy
     yield
     self.manage_identifier_metadata if self.unique_identifier.present?
   end
-
 
   def thumbnail_link
     self.thumbnail.ldp_source.subject
