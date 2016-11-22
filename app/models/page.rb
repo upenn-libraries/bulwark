@@ -3,6 +3,8 @@ class Page < ActiveFedora::Base
 
   contains 'pageImage'
 
+  around_save :format_container_id
+
 
   # PQC page fields
 
@@ -81,6 +83,10 @@ class Page < ActiveFedora::Base
 
   # required
 
+  property :unique_identifier, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/uniqueIdentifier'), multiple: false do |index|
+    index.as :stored_searchable, :facetable
+  end
+
   property :parent_manuscript, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/parentManuscript'), multiple: true do |index|
     index.as :stored_searchable
   end
@@ -94,6 +100,16 @@ class Page < ActiveFedora::Base
   end
 
   belongs_to :manuscript, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
+
+  def format_container_id
+    self.format_container! if self.unique_identifier.present? && self.unique_identifier != self.unique_identifier.reverse_fedorafy
+    yield
+  end
+
+  def format_container!
+    self.unique_identifier = self.unique_identifier.reverse_fedorafy
+  end
+
 
   def serialized_attributes
     self.attribute_names.each_with_object('id' => id) { |key, hash| hash[key] = eval(self[key].inspect) }

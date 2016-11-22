@@ -38,7 +38,7 @@
             xmlns:mix="http://www.jcp.org/jcr/mix/1.0"
             xmlns:foaf="http://xmlns.com/foaf/0.1/"
             xmlns:dc="http://purl.org/dc/elements/1.1/">
-            <xsl:attribute name="sv:name"><xsl:value-of select="uuid" /></xsl:attribute>
+            <xsl:attribute name="sv:name"><xsl:value-of select="$uuid" /></xsl:attribute>
           <sv:property sv:name="jcr:primaryType" sv:type="Name">
             <sv:value>nt:folder</sv:value>
           </sv:property>
@@ -60,6 +60,9 @@
           </sv:property>
           <sv:property sv:name="ns002:coverage" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="coverage" />
+          </sv:property>
+          <sv:property sv:name="ns004:uniqueIdentifier" sv:type="String" sv:multiple="false">
+            <sv:value><xsl:value-of select="$uuid" /></sv:value>
           </sv:property>
           <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="false">
             <sv:value><xsl:apply-templates select="identifier"/></sv:value>
@@ -122,7 +125,9 @@
 
     <xsl:template match="pages/page">
       <sv:node>
-      <xsl:attribute name="sv:name"><xsl:value-of select="identifier" /></xsl:attribute>
+      <xsl:attribute name="sv:name">
+        <xsl:value-of select="format-number(page_number, '00000')" />
+      </xsl:attribute>
       <sv:property sv:name="jcr:primaryType" sv:type="Name">
         <sv:value>nt:folder</sv:value>
       </sv:property>
@@ -138,6 +143,9 @@
       </sv:property>
       <sv:property sv:name="jcr:createdBy" sv:type="String">
         <sv:value>bypassAdmin</sv:value>
+      </sv:property>
+      <sv:property sv:name="ns004:uniqueIdentifier" sv:type="String" sv:multiple="false">
+        <sv:value><xsl:value-of select="concat($uuid, '/', format-number(page_number, '00000'))" /></sv:value>
       </sv:property>
       <sv:property sv:name="ns004:parentManuscript" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="$uuid" /></sv:value>
