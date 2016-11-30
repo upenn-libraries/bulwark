@@ -379,7 +379,8 @@ class MetadataSource < ActiveRecord::Base
     (1..(iterator)).each do |i|
       mapped_values = {}
       workbook[z][y_start+i].cells.each do |c|
-        mapped_values[headers[c.column].downcase] = c.value if c.present?
+        xml_value = c.present? ? (c.value.is_a?(Float) && headers[c.column].downcase == 'serial_num') ? c.value.to_i : c.value.to_s.encode(:xml => :text) : ''
+        mapped_values[headers[c.column].downcase] = xml_value if xml_value.present?
       end
       mappings[i] = mapped_values
     end
