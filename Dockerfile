@@ -35,7 +35,7 @@ ADD rails_admin_colenda /home/app/webapp/rails_admin_colenda
 
 ADD string_exts /home/app/webapp/string_exts
 
-RUN bundle install
+RUN bundle install --binstubs --without development test
 
 COPY . /home/app/webapp/
 
