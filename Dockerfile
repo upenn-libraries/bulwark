@@ -43,13 +43,13 @@ CMD bundle update --source hydra && bundle update --source rails_admin
 
 RUN RAILS_ENV=production SECRET_KEY_BASE=x bundle exec rake assets:precompile --trace
 
-RUN chown -R app:app /home/app
+#RUN chown -R app:app /home/app
 
-RUN chmod ug+rw -R /home/app
+#RUN chmod ug+rw -R /home/app
 
-RUN chown -R app:app /usr/local/rvm/gems/ruby-2.2.5
+#RUN chown -R app:app /usr/local/rvm
 
-RUN chmod -R 700 /usr/local/rvm/gems/ruby-2.2.5
+#RUN chmod -R 755 /usr/local/rvm
 
 RUN rm -f /etc/service/nginx/down
 
