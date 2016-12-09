@@ -9,8 +9,16 @@ services:
       - '6379:6379'
     volumes:
       - 'redis:/var/lib/redis/data'
+  db:
+    image: mysql/mysql-server:5.7
+    env_file: .docker-environment
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - db:/var/lib/mysql
   web:
     depends_on:
+      - 'db'
       - 'redis'
     build: .
     ports:

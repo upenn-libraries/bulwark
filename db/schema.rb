@@ -14,111 +14,141 @@
 ActiveRecord::Schema.define(version: 20161116143346) do
 
   create_table "bookmarks", force: :cascade do |t|
-    t.integer  "user_id",       null: false
-    t.string   "user_type"
-    t.string   "document_id"
-    t.string   "title"
+    t.integer  "user_id",       limit: 4,   null: false
+    t.string   "user_type",     limit: 255
+    t.string   "document_id",   limit: 255
+    t.string   "title",         limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "document_type"
+    t.string   "document_type", limit: 255
   end
 
-  add_index "bookmarks", ["user_id"], name: "index_bookmarks_on_user_id"
+  add_index "bookmarks", ["user_id"], name: "index_bookmarks_on_user_id", using: :btree
 
   create_table "metadata_builders", force: :cascade do |t|
-    t.string   "parent_repo"
-    t.string   "source"
-    t.string   "preserve"
-    t.datetime "created_at",         null: false
-    t.datetime "updated_at",         null: false
-    t.integer  "repo_id"
-    t.integer  "metadata_source_id"
+    t.string   "parent_repo",        limit: 255
+    t.string   "source",             limit: 255
+    t.string   "preserve",           limit: 255
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.integer  "repo_id",            limit: 4
+    t.integer  "metadata_source_id", limit: 4
     t.datetime "last_xml_generated"
-    t.string   "xml_preview"
+    t.string   "xml_preview",        limit: 255
   end
 
-  add_index "metadata_builders", ["metadata_source_id"], name: "index_metadata_builders_on_metadata_source_id"
-  add_index "metadata_builders", ["repo_id"], name: "index_metadata_builders_on_repo_id"
+  add_index "metadata_builders", ["metadata_source_id"], name: "index_metadata_builders_on_metadata_source_id", using: :btree
+  add_index "metadata_builders", ["repo_id"], name: "index_metadata_builders_on_repo_id", using: :btree
 
   create_table "metadata_sources", force: :cascade do |t|
-    t.string   "path"
-    t.string   "view_type",             default: "horizontal"
-    t.integer  "num_objects",           default: 1
-    t.integer  "x_start",               default: 1
-    t.integer  "y_start",               default: 1
-    t.integer  "x_stop",                default: 1
-    t.integer  "y_stop",                default: 1
-    t.text     "original_mappings"
-    t.string   "root_element"
-    t.string   "parent_element"
-    t.text     "user_defined_mappings"
-    t.text     "children"
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
-    t.integer  "metadata_builder_id"
-    t.string   "source_type"
+    t.string   "path",                  limit: 255
+    t.string   "view_type",             limit: 255,   default: "horizontal"
+    t.integer  "num_objects",           limit: 4,     default: 1
+    t.integer  "x_start",               limit: 4,     default: 1
+    t.integer  "y_start",               limit: 4,     default: 1
+    t.integer  "x_stop",                limit: 4,     default: 1
+    t.integer  "y_stop",                limit: 4,     default: 1
+    t.text     "original_mappings",     limit: 65535
+    t.string   "root_element",          limit: 255
+    t.string   "parent_element",        limit: 255
+    t.text     "user_defined_mappings", limit: 65535
+    t.text     "children",              limit: 65535
+    t.datetime "created_at",                                                 null: false
+    t.datetime "updated_at",                                                 null: false
+    t.integer  "metadata_builder_id",   limit: 4
+    t.string   "source_type",           limit: 255
     t.datetime "last_extraction"
     t.datetime "last_settings_updated"
-    t.integer  "z",                     default: 1
-    t.string   "input_source"
-    t.string   "identifier"
+    t.integer  "z",                     limit: 4,     default: 1
+    t.string   "input_source",          limit: 255
+    t.string   "identifier",            limit: 255
   end
 
-  add_index "metadata_sources", ["metadata_builder_id"], name: "index_metadata_sources_on_metadata_builder_id"
+  add_index "metadata_sources", ["metadata_builder_id"], name: "index_metadata_sources_on_metadata_builder_id", using: :btree
 
-# Could not dump table "repos" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "repos", force: :cascade do |t|
+    t.string   "human_readable_name",        limit: 255
+    t.string   "description",                limit: 255
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.string   "metadata_subdirectory",      limit: 255
+    t.string   "assets_subdirectory",        limit: 255
+    t.string   "derivatives_subdirectory",   limit: 255
+    t.string   "file_extensions",            limit: 255
+    t.string   "metadata_source_extensions", limit: 255
+    t.boolean  "ingested"
+    t.string   "preservation_filename",      limit: 255
+    t.string   "review_status",              limit: 255
+    t.integer  "metadata_builder_id",        limit: 4
+    t.integer  "version_control_agent_id",   limit: 4
+    t.string   "owner",                      limit: 255
+    t.string   "steps",                      limit: 255
+    t.string   "admin_subdirectory",         limit: 255
+    t.string   "unique_identifier",          limit: 255
+    t.string   "thumbnail",                  limit: 255
+    t.string   "problem_files",              limit: 255
+    t.string   "images_to_render",           limit: 255
+  end
+
+  add_index "repos", ["metadata_builder_id"], name: "index_repos_on_metadata_builder_id", using: :btree
+  add_index "repos", ["version_control_agent_id"], name: "index_repos_on_version_control_agent_id", using: :btree
 
   create_table "roles", force: :cascade do |t|
-    t.string "name"
+    t.string "name", limit: 255
   end
 
   create_table "roles_users", id: false, force: :cascade do |t|
-    t.integer "role_id"
-    t.integer "user_id"
+    t.integer "role_id", limit: 4
+    t.integer "user_id", limit: 4
   end
 
-  add_index "roles_users", ["role_id", "user_id"], name: "index_roles_users_on_role_id_and_user_id"
-  add_index "roles_users", ["user_id", "role_id"], name: "index_roles_users_on_user_id_and_role_id"
+  add_index "roles_users", ["role_id", "user_id"], name: "index_roles_users_on_role_id_and_user_id", using: :btree
+  add_index "roles_users", ["user_id", "role_id"], name: "index_roles_users_on_user_id_and_role_id", using: :btree
 
   create_table "searches", force: :cascade do |t|
-    t.text     "query_params"
-    t.integer  "user_id"
-    t.string   "user_type"
+    t.text     "query_params", limit: 65535
+    t.integer  "user_id",      limit: 4
+    t.string   "user_type",    limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "searches", ["user_id"], name: "index_searches_on_user_id"
+  add_index "searches", ["user_id"], name: "index_searches_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
-    t.string   "email",                  default: "",    null: false
-    t.string   "encrypted_password",     default: "",    null: false
-    t.string   "reset_password_token"
+    t.string   "email",                  limit: 255, default: "",    null: false
+    t.string   "encrypted_password",     limit: 255, default: "",    null: false
+    t.string   "reset_password_token",   limit: 255
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          default: 0,     null: false
+    t.integer  "sign_in_count",          limit: 4,   default: 0,     null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip"
-    t.string   "last_sign_in_ip"
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
-    t.boolean  "guest",                  default: false
-    t.string   "job_activity"
+    t.string   "current_sign_in_ip",     limit: 255
+    t.string   "last_sign_in_ip",        limit: 255
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.boolean  "guest",                              default: false
+    t.string   "job_activity",           limit: 255
   end
 
-  add_index "users", ["email"], name: "index_users_on_email", unique: true
-  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
+  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
   create_table "version_control_agents", force: :cascade do |t|
-    t.string   "vc_type"
-    t.string   "remote_path"
-    t.integer  "repo_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.string   "vc_type",     limit: 255
+    t.string   "remote_path", limit: 255
+    t.integer  "repo_id",     limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
 
-  add_index "version_control_agents", ["repo_id"], name: "index_version_control_agents_on_repo_id"
+  add_index "version_control_agents", ["repo_id"], name: "index_version_control_agents_on_repo_id", using: :btree
 
+  add_foreign_key "metadata_builders", "metadata_sources"
+  add_foreign_key "metadata_builders", "repos"
+  add_foreign_key "metadata_sources", "metadata_builders"
+  add_foreign_key "repos", "metadata_builders"
+  add_foreign_key "repos", "version_control_agents"
+  add_foreign_key "version_control_agents", "repos"
 end

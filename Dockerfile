@@ -1,8 +1,6 @@
-FROM phusion/passenger-ruby22
+FROM codeforkjeff/passenger-ruby23:0.9.19-ruby-build
 
 MAINTAINER Katherine Lynch <katherly@upenn.edu>
-
-ENV HOME /home/app/webapp
 
 # Expose Nginx HTTP service
 EXPOSE 80
@@ -35,21 +33,13 @@ ADD rails_admin_colenda /home/app/webapp/rails_admin_colenda
 
 ADD string_exts /home/app/webapp/string_exts
 
-RUN bundle install --binstubs --without development test
+RUN bundle install
 
 COPY . /home/app/webapp/
 
 CMD bundle update --source hydra && bundle update --source rails_admin
 
 RUN RAILS_ENV=production SECRET_KEY_BASE=x bundle exec rake assets:precompile --trace
-
-#RUN chown -R app:app /home/app
-
-#RUN chmod ug+rw -R /home/app
-
-#RUN chown -R app:app /usr/local/rvm
-
-#RUN chmod -R 755 /usr/local/rvm
 
 RUN rm -f /etc/service/nginx/down
 
