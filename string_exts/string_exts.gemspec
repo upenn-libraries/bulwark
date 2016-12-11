@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
   s.version     = StringExts::VERSION
   s.authors     = ["Katherine Lynch"]
   s.email       = ["katherly@upenn.edu"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of StringExts."
-  s.description = "TODO: Description of StringExts."
+  s.homepage    = "https://github.com/upenn-libraries/colenda/tree/develop/string_exts"
+  s.summary     = "Summary of StringExts."
+  s.description = "Description of StringExts."
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]

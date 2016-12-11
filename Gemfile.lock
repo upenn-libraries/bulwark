@@ -324,6 +324,7 @@ GEM
     minitest (5.9.1)
     multi_json (1.12.1)
     multipart-post (2.0.0)
+    mysql2 (0.4.5)
     nenv (0.3.0)
     nested_form (0.3.2)
     net-http-persistent (2.9.4)
@@ -597,6 +598,7 @@ DEPENDENCIES
   launchy
   letter_opener
   mini_magick
+  mysql2
   pry-rails (~> 0.3.4)
   qa
   rails (= 4.2.5)
