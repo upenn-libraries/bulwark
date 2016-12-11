@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -qq -y --no-install-recommends \
         git-annex \
         git-core \
         imagemagick \
-        libsqlite3-dev \
+        libmysqlclient-dev \
         nodejs \
         xsltproc
 
