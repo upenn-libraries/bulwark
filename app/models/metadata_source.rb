@@ -373,10 +373,13 @@ class MetadataSource < ActiveRecord::Base
     workbook[z][y_start].cells.each do |c|
       headers << c.value
     end
-    while workbook[z][(y_start+1)+iterator].present? do
-      iterator += 1 if workbook[z][y_start+iterator][x_start].present?
+    if workbook[z][y_start+iterator].present?
+      while workbook[z][y_start+iterator][x_start+1].value.present? do
+        iterator += 1
+      end
     end
-    (1..(iterator)).each do |i|
+    num_pages = iterator - 1
+    (1..(num_pages)).each do |i|
       mapped_values = {}
       workbook[z][y_start+i].cells.each do |c|
         xml_value = c.present? ? (c.value.is_a?(Float) && headers[c.column].downcase == 'serial_num') ? c.value.to_i : c.value.to_s.encode(:xml => :text) : ''
