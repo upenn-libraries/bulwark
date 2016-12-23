@@ -19,6 +19,10 @@ module RepoHelper
     end
   end
 
+  def render_file_checks
+    render :partial => 'repos/file_checks' if @object.metadata_builder.xml_preview.present?
+  end
+
   def render_ingested_list
     if @object.ingested
       render :partial => 'repos/ingested_links'

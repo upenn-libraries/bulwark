@@ -78,6 +78,7 @@ en:
         set_source_types:
           first_time: 'Save source types'
           additional_times: 'Update source types'
+        files_checked: 'Check for missing or invalid files'
         publish_preview:
           first_time: 'Publish preview'
           additional_times: 'Republish preview'
@@ -171,6 +172,8 @@ en:
             tip: 'Example values from source: %{example}'
         children:
           label: 'Child/children of %{parent}'
+        file_field:
+          label: 'Filenames are referenced in:'
       xml:
         review_tag: 'review_status'
     version_control_agents:

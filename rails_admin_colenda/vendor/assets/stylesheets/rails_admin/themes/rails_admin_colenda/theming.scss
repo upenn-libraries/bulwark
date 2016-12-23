@@ -107,6 +107,7 @@ span.inline-pre,
 .metadata-source-select,
 .metadata-source-description,
 .metadata-source-mapping,
+.file-checks,
 .select-for-ingest,
 .review-status {
   margin: 20px 0px;
@@ -129,6 +130,7 @@ span.inline-pre,
 .review-status h2,
 .metadata-only-preview h2,
 .structural-metadata-preview h2,
+.file-checks h2,
 .problem-files h2,
 .metadata-source-types h3,
 .metadata-only-preview h3,
@@ -137,6 +139,13 @@ span.inline-pre,
   font-size: 16px;
   font-weight: bold;
   padding: 10px 0px;
+}
+
+.file-checks {
+  .last-file-checks {
+    color: $warning-red;
+    font-weight: bold;
+  }
 }
 
 .problem-files h3 {

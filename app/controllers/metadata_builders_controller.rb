@@ -1,6 +1,6 @@
 class MetadataBuildersController < ApplicationController
 
-  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :clear_files, :refresh_metadata, :generate_metadata, :generate_preview_xml]
+  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :clear_files, :refresh_metadata, :generate_metadata, :generate_preview_xml, :file_checks]
 
   def show
   end
@@ -44,6 +44,13 @@ class MetadataBuildersController < ApplicationController
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml"
   end
 
+  def file_checks
+    @metadata_builder.perform_file_checks
+    #@job = FileChecksJob.perform_later(@metadata_builder, root_url, current_user.email)
+    #initialize_job_activity('file_checks')
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest"
+  end
+
   def ingest
     if params[:to_ingest].present?
       @job = IngestJob.perform_later(@metadata_builder, params[:to_ingest], root_url, current_user.email)
@@ -77,7 +84,7 @@ class MetadataBuildersController < ApplicationController
 
   def metadata_builder_params
     params.require(:metadata_builder).permit(:parent_repo,
-      :metadata_source_attributes => [:id, :view_type, :num_objects, :x_start, :y_start, :x_stop, :y_stop, :original_mappings, :root_element, :parent_element, :user_defined_mappings, :children => []])
+      :metadata_source_attributes => [:id, :view_type, :num_objects, :x_start, :y_start, :x_stop, :y_stop, :original_mappings, :root_element, :parent_element, :user_defined_mappings, :file_field, :children => []])
   end
 
   def _update_metadata_sources

@@ -72,6 +72,10 @@ class MetadataSource < ActiveRecord::Base
     read_attribute(:source_type) || ''
   end
 
+  def file_field
+    read_attribute(:file_field) || ''
+  end
+
   def view_type
     read_attribute(:view_type) || ''
   end
@@ -136,6 +140,7 @@ class MetadataSource < ActiveRecord::Base
       when 'structural_bibid'
         self.root_element = 'pages'
         self.parent_element = 'page'
+        self.file_field = 'file_name'
         self.user_defined_mappings = _set_voyager_structural_metadata(working_path)
         self.identifier = self.original_mappings['bibid']
       when 'voyager'
@@ -352,7 +357,7 @@ class MetadataSource < ActiveRecord::Base
         vals = []
         vals_iterator = 2
         while workbook[z][y_start+iterator].present? && workbook[z][y_start+iterator][x_start+vals_iterator].present? do
-          vals << workbook[z][y_start+iterator][x_start+vals_iterator].value if workbook[z][y_start+iterator][x_start+vals_iterator].value.present?
+          vals << workbook[z][y_start+iterator][x_start+vals_iterator].value.to_s.encode(:xml => :text) if workbook[z][y_start+iterator][x_start+vals_iterator].value.present?
           vals_iterator += 1
         end
         mappings[header] = vals if header.present? && vals.present?
@@ -373,10 +378,8 @@ class MetadataSource < ActiveRecord::Base
     workbook[z][y_start].cells.each do |c|
       headers << c.value
     end
-    if workbook[z][y_start+iterator].present?
-      while workbook[z][y_start+iterator][x_start+1].value.present? do
-        iterator += 1
-      end
+    while workbook[z][y_start+iterator].present? do
+      iterator += 1 if workbook[z][y_start+iterator][x_start+1].value.present?
     end
     num_pages = iterator - 1
     (1..(num_pages)).each do |i|
@@ -401,6 +404,7 @@ class MetadataSource < ActiveRecord::Base
         :parent_element => 'page',
         :view_type => 'horizontal',
         :path => "#{parent.path} Page 2 (Structural)",
+        :file_field => 'file_name',
         :z => 2,
         :y_start => 3,
         :y_stop => 3,
@@ -427,6 +431,29 @@ class MetadataSource < ActiveRecord::Base
         self.user_defined_mappings.select {|key, map| pages_with_files << map if map['file_name'].present?}
         pages_with_files.present? ? pages_with_files.sort_by.first {|p| p['serial_num']}['file_name'] : nil
     end
+  end
+
+  def filenames
+    case self.source_type
+      when 'custom'
+        self.user_defined_mappings.each do |key, value|
+          orig = key if value['mapped_value'] == 'file_name'
+         end
+      when 'structural_bibid'
+        return self.user_defined_mappings['file_name']
+      when 'bibliophilly_structural'
+        filenames = []
+        self.user_defined_mappings.each do |key, value|
+          filenames << value['file_name'] if value['file_name'].present?
+        end
+        return filenames
+      else
+        return nil
+    end
+  end
+
+  def self.structural_types
+    %w[custom structural_bibid bibliophilly_structural]
   end
 
   private

@@ -1,5 +1,6 @@
 class MetadataBuilder < ActiveRecord::Base
   include ActionView::Helpers::UrlHelper
+  include Utils::Process
 
   belongs_to :repo, :foreign_key => 'repo_id'
   has_many :metadata_source, dependent: :destroy
@@ -58,6 +59,19 @@ class MetadataBuilder < ActiveRecord::Base
     self.metadata_source.first.build_xml
     self.store_xml_preview
     self.last_xml_generated = DateTime.now
+    self.save!
+  end
+
+  def perform_file_checks
+    self.repo.problem_files = {}
+    self.metadata_source.where(:source_type => MetadataSource.structural_types).each do |ms|
+      ms.filenames.each do |file|
+        validation_state = validate_file(file)
+        self.repo.log_problem_file(file, validation_state) if validation_state.present?
+      end
+    end
+    self.repo.save!
+    self.last_file_checks = DateTime.now
     self.save!
   end
 

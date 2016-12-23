@@ -31,6 +31,12 @@
             <%= content_tag(:div, t('colenda.metadata_sources.metadata_mapping.custom.field.tip', :example => p.last.to_s), :class => 'field-tip') %>
           <% end -%>
         <% end -%>
+        <h2>Define filename references in metadata</h2>
+        <p>Select field in which filenames are references</p>
+        <%= content_tag :div, :class => 'field' do -%>
+            <%= s.label :file_field, t('colenda.metadata_sources.metadata_mapping.children.label', :parent => prettify(source.path)) %>
+            <%= s.select :file_field, options_for_select(schema_terms, 'file_name') %>
+        <% end -%>
       <% end -%>
 
 

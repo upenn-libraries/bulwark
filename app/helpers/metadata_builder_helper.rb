@@ -26,6 +26,10 @@ module MetadataBuilderHelper
     end
   end
 
+  def render_file_checks_info
+    "#{"No known problems detected -- " if @object.problem_files.empty?} File checks last run at #{content_tag(:span, @object.metadata_builder.last_file_checks.strftime('%I:%M%p, %a %b %d, %Y '), :class => 'last-file-checks')}".html_safe if @object.metadata_builder.last_file_checks.present?
+  end
+
   def prettify(file_path_input)
       if file_path_input.is_a? Array
         file_path_array = Array.new

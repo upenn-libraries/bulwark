@@ -141,6 +141,8 @@ class Repo < ActiveRecord::Base
       self.package_metadata_info(working_path)
       self.generate_logs(working_path)
       self.push_artifacts
+      self.metadata_builder.last_file_checks = DateTime.now
+      self.metadata_builder.save!
     rescue
       self.save!
       raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => $!.backtrace)
@@ -202,6 +204,11 @@ class Repo < ActiveRecord::Base
 
   def update_steps(task)
     self.steps[task] = true
+    self.save!
+  end
+
+  def log_problem_file(file, problem)
+    self.problem_files[file] = problem
     self.save!
   end
 

@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       post :refresh_metadata
       post :fetch_voyager
       post :generate_preview_xml
+      post :file_checks
     end
   end
 
