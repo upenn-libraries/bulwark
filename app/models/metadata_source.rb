@@ -437,14 +437,14 @@ class MetadataSource < ActiveRecord::Base
     case self.source_type
       when 'custom'
         self.user_defined_mappings.each do |key, value|
-          orig = key if value['mapped_value'] == 'file_name'
+          orig = key if value['mapped_value'] == self.file_field
          end
       when 'structural_bibid'
-        return self.user_defined_mappings['file_name']
+        return self.user_defined_mappings[self.file_field]
       when 'bibliophilly_structural'
         filenames = []
         self.user_defined_mappings.each do |key, value|
-          filenames << value['file_name'] if value['file_name'].present?
+          filenames << value[self.file_field] if value[self.file_field].present?
         end
         return filenames
       else
