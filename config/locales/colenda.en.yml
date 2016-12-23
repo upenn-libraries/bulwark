@@ -25,6 +25,9 @@ en:
         ingest:
           subject: 'Ingestion and Derivative Generation completed'
           body: '%{uuid} has been ingested and its derivatives generated.  It is ready for review.  Review at: %{root_url}admin_repo/repo/%{link_fragment}/ingest'
+        file_checks:
+          subject: 'File checks performed'
+          body: 'File checks performed for %{uuid}.  Review the results at: %{root_url}admin_repo/repo/%{link_fragment}/ingest'
         generate_xml:
           subject: 'Preservation XML Generation completed'
           body: 'Preservation-level XML generated for %{uuid} has been generated and is ready for review.  Review at: %{root_url}admin_repo/repo/%{link_fragment}/preview_xml'

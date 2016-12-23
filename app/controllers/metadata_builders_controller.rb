@@ -45,9 +45,8 @@ class MetadataBuildersController < ApplicationController
   end
 
   def file_checks
-    @metadata_builder.perform_file_checks
-    #@job = FileChecksJob.perform_later(@metadata_builder, root_url, current_user.email)
-    #initialize_job_activity('file_checks')
+    @job = FileChecksJob.perform_later(@metadata_builder, root_url, current_user.email)
+    initialize_job_activity('file_checks')
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest"
   end
 
