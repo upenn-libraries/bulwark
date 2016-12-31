@@ -64,15 +64,19 @@ class MetadataBuilder < ActiveRecord::Base
 
   def perform_file_checks
     self.repo.problem_files = {}
-    self.metadata_source.where(:source_type => MetadataSource.structural_types).each do |ms|
+    working_path = self.repo.version_control_agent.clone
+    self.repo.version_control_agent.get(:get_location => "#{working_path}/#{self.repo.assets_subdirectory}")
+        self.metadata_source.where(:source_type => MetadataSource.structural_types).each do |ms|
       ms.filenames.each do |file|
-        validation_state = validate_file(file)
-        self.repo.log_problem_file(file, validation_state) if validation_state.present?
+        validation_state = validate_file("#{working_path}/#{self.repo.assets_subdirectory}/#{file}")
+        self.repo.log_problem_file("#{self.repo.assets_subdirectory}/#{file}", validation_state) if validation_state.present?
       end
     end
     self.repo.save!
     self.last_file_checks = DateTime.now
     self.save!
+    self.repo.version_control_agent.reset_hard
+    self.repo.version_control_agent.delete_clone
   end
 
   def transform_and_ingest(array)

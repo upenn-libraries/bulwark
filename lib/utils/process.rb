@@ -68,13 +68,13 @@ module Utils
       repo.version_control_agent.unlock(file_link)
 
       validation_state = validate_file(file_link)
-      if validation_state
+      if validation_state.nil?
         derivative_link = "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
         execute_curl(_build_command('file_attach', :file => derivative_link, :fid => parent.id, :child_container => child_container))
         repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_derivative', :file_name => parent.file_name))
       else
         @@status_type = :warning
-        repo.log_problem_file(file_link, validation_state)
+        repo.log_problem_file(file_link.gsub(@@working_path,''), validation_state)
       end
     end
 

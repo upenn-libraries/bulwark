@@ -378,8 +378,8 @@ class MetadataSource < ActiveRecord::Base
     workbook[z][y_start].cells.each do |c|
       headers << c.value
     end
-    while workbook[z][y_start+iterator].present? do
-      iterator += 1 if workbook[z][y_start+iterator][x_start+1].value.present?
+    while workbook[z][y_start+iterator].present? && workbook[z][y_start+iterator][x_start+1].value.present? do
+      iterator += 1
     end
     num_pages = iterator - 1
     (1..(num_pages)).each do |i|
@@ -436,9 +436,11 @@ class MetadataSource < ActiveRecord::Base
   def filenames
     case self.source_type
       when 'custom'
-        self.user_defined_mappings.each do |key, value|
-          orig = key if value['mapped_value'] == self.file_field
-         end
+        orig = ''
+        self.original_mappings.each do |key, value|
+          orig = value if key == self.file_field
+        end
+        return orig
       when 'structural_bibid'
         return self.user_defined_mappings[self.file_field]
       when 'bibliophilly_structural'

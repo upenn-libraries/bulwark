@@ -175,7 +175,7 @@ en:
             tip: 'Example values from source: %{example}'
         children:
           label: 'Child/children of %{parent}'
-        file_field:
+        filename_references:
           label: 'Filenames are referenced in:'
       xml:
         review_tag: 'review_status'

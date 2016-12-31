@@ -88,7 +88,7 @@ ActiveRecord::Schema.define(version: 20161223201915) do
     t.string   "admin_subdirectory",         limit: 255
     t.string   "unique_identifier",          limit: 255
     t.string   "thumbnail",                  limit: 255
-    t.string   "problem_files",              limit: 255
+    t.text     "problem_files",              limit: 4294967295
     t.text     "images_to_render",           limit: 4294967295
   end
 
