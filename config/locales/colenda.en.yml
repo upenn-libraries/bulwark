@@ -14,6 +14,8 @@ en:
           error: 'Metadata Builder was not updated successfully.'
         ingest:
           error: 'Select at least one file to ingest.'
+        file_checks:
+          success: 'File checks being performed in the background.  You will receive an email when all file checks are complete.'
         set_source:
           success: 'Metadata sources set successfully.'
         clear_files:

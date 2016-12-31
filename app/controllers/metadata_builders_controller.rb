@@ -47,7 +47,7 @@ class MetadataBuildersController < ApplicationController
   def file_checks
     @job = FileChecksJob.perform_later(@metadata_builder, root_url, current_user.email)
     initialize_job_activity('file_checks')
-    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest"
+    redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash =>  { :warning => t('colenda.controllers.metadata_builders.file_checks.success') }
   end
 
   def ingest
