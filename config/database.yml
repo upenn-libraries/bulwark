@@ -15,7 +15,7 @@ default: &default
   pool: 5
   username: root
   password: <%= ENV['MYSQL_ROOT_PASSWORD'] %>
-  host: db
+  host: localhost
 
 development:
   <<: *default
@@ -49,6 +49,7 @@ test:
 #
 production:
   <<: *default
+  host: db
   database: <%= ENV['DATABASE_NAME'] %>
   username: <%= ENV['DATABASE_USERNAME'] %>
   password: <%= ENV['DATABASE_PASSWORD'] %>

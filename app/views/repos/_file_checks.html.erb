@@ -1,0 +1,7 @@
+<div class="file-checks">
+  <h2>Perform file checks</h2>
+  <%= render_file_checks_info %>
+  <%= form_for @object.metadata_builder, :validate => true, :method => :post, :html => { :class => "file-checks-form" }, :url => "/metadata_builders/#{@object.metadata_builder.id}/file_checks" do |f| %>
+      <%= f.submit "Perform file checks now", :id => "file_checks_submit" %>
+  <% end -%>
+</div>

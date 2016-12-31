@@ -1,5 +1,6 @@
 class MetadataBuilder < ActiveRecord::Base
   include ActionView::Helpers::UrlHelper
+  include Utils::Process
 
   belongs_to :repo, :foreign_key => 'repo_id'
   has_many :metadata_source, dependent: :destroy
@@ -59,6 +60,23 @@ class MetadataBuilder < ActiveRecord::Base
     self.store_xml_preview
     self.last_xml_generated = DateTime.now
     self.save!
+  end
+
+  def perform_file_checks
+    self.repo.problem_files = {}
+    working_path = self.repo.version_control_agent.clone
+    self.repo.version_control_agent.get(:get_location => "#{working_path}/#{self.repo.assets_subdirectory}")
+        self.metadata_source.where(:source_type => MetadataSource.structural_types).each do |ms|
+      ms.filenames.each do |file|
+        validation_state = validate_file("#{working_path}/#{self.repo.assets_subdirectory}/#{file}")
+        self.repo.log_problem_file("#{self.repo.assets_subdirectory}/#{file}", validation_state) if validation_state.present?
+      end
+    end
+    self.repo.save!
+    self.last_file_checks = DateTime.now
+    self.save!
+    self.repo.version_control_agent.reset_hard
+    self.repo.version_control_agent.delete_clone
   end
 
   def transform_and_ingest(array)

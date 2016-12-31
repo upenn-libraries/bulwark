@@ -66,18 +66,15 @@ module Utils
       file_link = "#{@@working_path}/#{repo.assets_subdirectory}/#{file_name}"
       repo.version_control_agent.get(:get_location => file_link)
       repo.version_control_agent.unlock(file_link)
-      validated =  File.exist?(file_link) ? validate_file(file_link) : false
-      if validated
+
+      validation_state = validate_file(file_link)
+      if validation_state.nil?
         derivative_link = "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
         execute_curl(_build_command('file_attach', :file => derivative_link, :fid => parent.id, :child_container => child_container))
         repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_derivative', :file_name => parent.file_name))
       else
         @@status_type = :warning
-        if File.exist?(file_link)
-          repo.problem_files["#{repo.assets_subdirectory}/#{file_name}"] = 'invalid'
-        else
-          repo.problem_files["#{repo.assets_subdirectory}/#{file_name}"] = 'missing'
-        end
+        repo.log_problem_file(file_link.gsub(@@working_path,''), validation_state)
       end
     end
 
@@ -124,9 +121,11 @@ module Utils
     def validate_file(file)
       begin
         MiniMagick::Image.open(file)
-        return true
-      rescue MiniMagick::Invalid
-        return false
+        return nil
+      rescue => exception
+        return 'missing' if exception.inspect.downcase =~ /no such file/
+        return 'invalid' if exception.inspect.downcase =~ /minimagick::invalid/
+        return 'unknown file issue'
       end
     end
 
