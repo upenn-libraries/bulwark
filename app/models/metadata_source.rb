@@ -153,6 +153,7 @@ class MetadataSource < ActiveRecord::Base
       end
     end
     save_input_source(working_path) if self.input_source.present? && self.input_source.downcase.start_with?('http')
+    self.metadata_builder.repo.version_control_agent.add(:content => "#{working_path}/#{self.metadata_builder.repo.admin_subdirectory}")
     self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_input_source'))
     self.metadata_builder.repo.version_control_agent.push
     self.metadata_builder.repo.update_steps(:metadata_extracted)
@@ -685,7 +686,7 @@ class MetadataSource < ActiveRecord::Base
 
   def _fetch_write_save_preservation_xml(file_path = "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}", xml_content)
     file_path = _reconcile_working_path_slashes($working_path, file_path)
-    self.metadata_builder.repo.version_control_agent.unlock(file_path) if File.exists?(file_path)
+    self.metadata_builder.repo.version_control_agent.unlock(:content => file_path) if File.exists?(file_path)
     _build_preservation_xml(file_path, xml_content)
     self.metadata_builder.save!
   end
