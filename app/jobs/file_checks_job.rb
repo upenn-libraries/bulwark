@@ -8,7 +8,7 @@ class FileChecksJob < ActiveJobStatus::TrackableJob
     @metadata_builder = metadata_builder
     @root_url = root_url
     @user_email = user_email
-    @metadata_builder.perform_file_checks
+    @metadata_builder.perform_file_checks_and_generate_previews
   end
 
   private

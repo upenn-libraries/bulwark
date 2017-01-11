@@ -44,7 +44,6 @@ class MetadataBuilder < ActiveRecord::Base
     #TODO: Consider removing from MetadataBuilder
     self.source = source_files
     self.save!
-
     self.metadata_source.each do |mb_source|
       mb_source.delete unless source_files.include?(mb_source.path)
     end
@@ -62,21 +61,29 @@ class MetadataBuilder < ActiveRecord::Base
     self.save!
   end
 
-  def perform_file_checks
+  def perform_file_checks_and_generate_previews
     self.repo.problem_files = {}
     working_path = self.repo.version_control_agent.clone
     self.repo.version_control_agent.get(:get_location => "#{working_path}/#{self.repo.assets_subdirectory}")
-        self.metadata_source.where(:source_type => MetadataSource.structural_types).each do |ms|
+    self.metadata_source.where(:source_type => MetadataSource.structural_types).each do |ms|
       ms.filenames.each do |file|
-        validation_state = validate_file("#{working_path}/#{self.repo.assets_subdirectory}/#{file}")
-        self.repo.log_problem_file("#{self.repo.assets_subdirectory}/#{file}", validation_state) if validation_state.present?
+        file_path = "#{working_path}/#{self.repo.assets_subdirectory}/#{file}"
+        self.repo.version_control_agent.unlock(:content => file_path)
+        validation_state = validate_file(file_path)
+        self.repo.log_problem_file(file_path, validation_state) if validation_state.present?
+        self.repo.version_control_agent.unlock(:content => self.repo.derivatives_subdirectory)
+        generate_preview(file_path,"#{working_path}/#{self.repo.derivatives_subdirectory}") unless validation_state.present?
+        self.repo.version_control_agent.lock(file_path)
       end
     end
     self.repo.save!
     self.last_file_checks = DateTime.now
     self.save!
-    self.repo.version_control_agent.reset_hard
+    self.repo.version_control_agent.add(:content => "#{working_path}/#{self.repo.derivatives_subdirectory}")
+    self.repo.version_control_agent.commit('Added previews')
+    self.repo.version_control_agent.push
     self.repo.version_control_agent.delete_clone
+    Utils::Process.refresh_assets(self.repo)
   end
 
   def transform_and_ingest(array)
@@ -84,7 +91,7 @@ class MetadataBuilder < ActiveRecord::Base
     array.each do |file|
       file_path = "#{working_path}#{file.last}"
       self.repo.version_control_agent.get(:get_location => file_path)
-      self.repo.version_control_agent.unlock(file_path)
+      self.repo.version_control_agent.unlock(:content => file_path)
       unless canonical_identifier_check(file_path)
         next
       end
@@ -96,8 +103,14 @@ class MetadataBuilder < ActiveRecord::Base
       File.open(transformed_xml, 'w') {|f| f.puts fedora_xml }
       self.repo.ingest(transformed_xml, working_path)
     end
-    self.repo.version_control_agent.reset_hard
+    self.repo.version_control_agent.add
+    self.repo.version_control_agent.add(:content => repo.derivatives_subdirectory)
+    self.repo.version_control_agent.add(:content => repo.admin_subdirectory)
+    self.repo.version_control_agent.lock
+    self.repo.version_control_agent.commit('Ingest complete')
+    self.repo.version_control_agent.push
     self.repo.version_control_agent.delete_clone
+    Utils::Process.refresh_assets(self.repo)
   end
 
   def canonical_identifier_check(xml_file)
@@ -110,6 +123,11 @@ class MetadataBuilder < ActiveRecord::Base
 
   def qualified_metadata_files
     _available_files
+  end
+
+  def generate_preview(file_name, derivatives_directory)
+    Utils::Derivatives::Preview.generate_copy(file_name, derivatives_directory)
+    Utils::Derivatives::PreviewThumbnail.generate_copy(file_name, derivatives_directory)
   end
 
   def store_xml_preview

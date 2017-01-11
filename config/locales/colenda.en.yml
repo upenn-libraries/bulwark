@@ -192,7 +192,7 @@ en:
         generated_all_derivatives: 'Generated all derivatives for %{object_id}'
         jettison_metadata: 'Removed files not identified as metadata source and/or for long-term preservation'
         jettison_assets: 'Removed original asset files per metadata source type directive'
-        write_preservation_xml: 'Generated unified XML for %{metadata_source_path} at %{xml_path}'
+        write_preservation_xml: 'Generated unified XML'
       packaging_info: 'Source information for %{source_path}\npath: %{source_path}\nid (use to correlate children): %{source_id}\nsource_type: %{source_type}\nview_type: %{source_view_type}\nnum_objects: %{source_num_objects}\nx_start: %{source_x_start}\nx_stop: %{source_x_stop}\ny_start: %{source_y_start}\ny_stop: %{source_y_stop}\nchildren: %{source_children}\n\n'
     utils:
       warnings:

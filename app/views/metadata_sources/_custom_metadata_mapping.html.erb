@@ -1,57 +1,57 @@
 <div class="metadata-dashboard">
   <%= form_for @object.metadata_builder, :html => {:class => 'field-mappings'}, :validate => true, :url => "/metadata_builders/#{@object.metadata_builder.id}" do |f| %>
-  <% counter = 0 %>
-    <% @object.metadata_builder.metadata_source.each do |source| %>
-    <div class="metadata-source-mapping">
-      <%= f.fields_for :metadata_source, source do |s| %>
+      <% counter = 0 %>
+      <% @object.metadata_builder.metadata_source.each do |source| %>
+          <div class="metadata-source-mapping">
+            <%= f.fields_for :metadata_source, source do |s| %>
 
-      <%= field_set_tag t('colenda.metadata_sources.metadata_mapping.fieldset_label') do %>
-        <%= t('colenda.metadata_sources.metadata_mapping.instructions') %>
-      <% end %>
-      <h2><%= t('colenda.metadata_sources.metadata_mapping.mappings.heading', :file_name => (content_tag(:span, prettify(source.path), :class=> 'file-path'))).html_safe%></h2>
-      <%= content_tag :div, :class => 'field' do -%>
-        <%= s.label :root_element, t('colenda.metadata_sources.metadata_mapping.root_element.label') %>
-        <%= s.select :root_element, root_element_options, :include_blank => :true %>
-        <%= content_tag(:div, t('colenda.metadata_sources.metadata_mapping.root_element.tip'), :class => 'field-tip') %>
+                <%= field_set_tag t('colenda.metadata_sources.metadata_mapping.fieldset_label') do %>
+                    <%= t('colenda.metadata_sources.metadata_mapping.instructions') %>
+                <% end %>
+                <h2><%= t('colenda.metadata_sources.metadata_mapping.mappings.heading', :file_name => (content_tag(:span, prettify(source.path), :class=> 'file-path'))).html_safe%></h2>
+                <%= content_tag :div, :class => 'field' do -%>
+                    <%= s.label :root_element, t('colenda.metadata_sources.metadata_mapping.root_element.label') %>
+                    <%= s.select :root_element, root_element_options, :include_blank => :true %>
+                    <%= content_tag(:div, t('colenda.metadata_sources.metadata_mapping.root_element.tip'), :class => 'field-tip') %>
+                <% end -%>
+                <%= content_tag :div, :class => 'field' do -%>
+                    <%= s.label :parent_element, t('colenda.metadata_sources.metadata_mapping.child_element.label') %>
+                    <%= s.select :parent_element, parent_element_options, :include_blank => :true %>
+                    <%= content_tag(:div, t('colenda.metadata_sources.metadata_mapping.child_element.tip'), :class => 'field-tip') %>
+                <% end -%>
+
+                <%= render_metadata_preview(source) %>
+
+                <% if source.source_type == 'custom' -%>
+                    <% source.original_mappings.each do |p| %>
+                        <% value = (s.object.user_defined_mappings.present? && s.object.user_defined_mappings[p.first].present?) ? s.object.user_defined_mappings[p.first].values.first : schema_term_default(p.first) %>
+                        <%= content_tag :div, :class => 'field' do -%>
+                            <%= s.label "user_defined_mappings[#{p.first}][mapped_value]", t('colenda.metadata_sources.metadata_mapping.custom.field.label', :field => p.first) %>
+                            <%= select_tag "metadata_builder[metadata_source_attributes][#{counter}][user_defined_mappings][#{p.first}][mapped_value]", options_for_select(schema_terms, value) %>
+                            <%= content_tag(:div, t('colenda.metadata_sources.metadata_mapping.custom.field.tip', :example => p.last.to_s), :class => 'field-tip') %>
+                        <% end -%>
+                    <% end -%>
+                    <h2>Define filename references in metadata</h2>
+                    <p>Select field in which filenames are references</p>
+                    <%= content_tag :div, :class => 'field' do -%>
+                        <%= s.label :file_field, t('colenda.metadata_sources.metadata_mapping.filename_references.label', :parent => prettify(source.path)) %>
+                        <%= s.select :file_field, options_for_select(schema_terms, 'file_name') %>
+                    <% end -%>
+                <% end -%>
+
+
+                <% if @object.metadata_builder.metadata_source.size > 1 && @object.metadata_builder.metadata_source.all? { |a| a.source_type != 'bibliophilly' } %>
+                    <h2>Define relationships</h2>
+                    <p>Structure relationships between multiple metadata source files</p>
+                    <%= content_tag :div, :class => 'field' do -%>
+                        <%= s.label :children, t('colenda.metadata_sources.metadata_mapping.children.label', :parent => prettify(source.path)) %>
+                        <%= s.select :children, nested_relationships_values(source.path), {}, { :multiple => true } %>
+                    <% end -%>
+                <% end -%>
+                <% counter += 1 %>
+            <% end -%>
+          </div>
       <% end -%>
-      <%= content_tag :div, :class => 'field' do -%>
-        <%= s.label :parent_element, t('colenda.metadata_sources.metadata_mapping.child_element.label') %>
-        <%= s.select :parent_element, parent_element_options, :include_blank => :true %>
-        <%= content_tag(:div, t('colenda.metadata_sources.metadata_mapping.child_element.tip'), :class => 'field-tip') %>
-      <% end -%>
-
-      <%= render_metadata_preview(source) %>
-
-      <% if source.source_type == 'custom' -%>
-        <% source.original_mappings.each do |p| %>
-          <% value = (s.object.user_defined_mappings.present? && s.object.user_defined_mappings[p.first].present?) ? s.object.user_defined_mappings[p.first].values.first : schema_term_default(p.first) %>
-          <%= content_tag :div, :class => 'field' do -%>
-            <%= s.label "user_defined_mappings[#{p.first}][mapped_value]", t('colenda.metadata_sources.metadata_mapping.custom.field.label', :field => p.first) %>
-            <%= select_tag "metadata_builder[metadata_source_attributes][#{counter}][user_defined_mappings][#{p.first}][mapped_value]", options_for_select(schema_terms, value) %>
-            <%= content_tag(:div, t('colenda.metadata_sources.metadata_mapping.custom.field.tip', :example => p.last.to_s), :class => 'field-tip') %>
-          <% end -%>
-        <% end -%>
-        <h2>Define filename references in metadata</h2>
-        <p>Select field in which filenames are references</p>
-        <%= content_tag :div, :class => 'field' do -%>
-            <%= s.label :file_field, t('colenda.metadata_sources.metadata_mapping.filename_references.label', :parent => prettify(source.path)) %>
-            <%= s.select :file_field, options_for_select(schema_terms, 'file_name') %>
-        <% end -%>
-      <% end -%>
-
-
-      <% if @object.metadata_builder.metadata_source.size > 1 && @object.metadata_builder.metadata_source.all? { |a| a.source_type != 'bibliophilly' } %>
-        <h2>Define relationships</h2>
-        <p>Structure relationships between multiple metadata source files</p>
-        <%= content_tag :div, :class => 'field' do -%>
-          <%= s.label :children, t('colenda.metadata_sources.metadata_mapping.children.label', :parent => prettify(source.path)) %>
-          <%= s.select :children, nested_relationships_values(source.path), {}, { :multiple => true } %>
-        <% end -%>
-      <% end -%>
-      <% counter += 1 %>
-    <% end -%>
-  </div>
-    <% end -%>
-    <%= content_tag(:div, (f.submit form_label('metadata_mappings', @object.steps)), :class => 'form-bottom') %>
-    <% end -%>
+      <%= content_tag(:div, (f.submit form_label('metadata_mappings', @object.steps)), :class => 'form-bottom') %>
+  <% end -%>
 </div>

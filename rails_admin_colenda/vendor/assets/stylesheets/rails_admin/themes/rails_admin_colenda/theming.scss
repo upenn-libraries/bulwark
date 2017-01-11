@@ -141,6 +141,22 @@ span.inline-pre,
   padding: 10px 0px;
 }
 
+div[class$="structural-preview"] {
+  li {
+    padding: 20px 0px 0px 0px;
+    border-top: $medium-blue 1px solid;
+  }
+  .preview_image {
+    padding: 0px 0px 50px 00px;
+  }
+}
+
+
+
+pre.debug_dump kbd {
+  white-space: normal;
+}
+
 .file-checks {
   .last-file-checks {
     color: $warning-red;
