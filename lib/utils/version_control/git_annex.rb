@@ -95,7 +95,7 @@ module Utils
       end
 
       def unlock(options)
-        raise Utils::Error::VersionControl.new('Unlock command cannot be used without specifying content') unless options[:content].present?
+        raise Utils::Error::VersionControl.new(I18n.t('colenda.utils.version_control.git_annex.errors.unlock_no_options')) unless options[:content].present?
         dir = options[:location].present? ? options[:location] : @working_repo_path
         change_dir_working(dir)
         `git annex unlock #{Shellwords.escape(options[:content])}`

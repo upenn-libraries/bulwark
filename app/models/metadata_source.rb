@@ -186,7 +186,7 @@ class MetadataSource < ActiveRecord::Base
     files_to_jettison.each do |f|
       f = _reconcile_working_path_slashes($working_path, f)
       self.metadata_builder.repo.version_control_agent.unlock(:content => f)
-      self.metadata_builder.repo.version_control_agent.drop(:drop_location => f) && `rm -rf #{f}`
+      self.metadata_builder.repo.version_control_agent.drop(:drop_location => f) && `rm -rf #{Shellwords.escape(f)}`
     end
     $jettison_files = Set.new
   end

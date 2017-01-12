@@ -20,7 +20,7 @@ module MetadataSourceHelper
       mappings = ''
       metadata_preview = content_tag(:h2,t(heading_text_label))
       source.user_defined_mappings.each do |m,b|
-        mappings << "<li>Entry #{m}#{t(field_separator_label)} #{render_value(b)}</li>"
+        mappings << "<li>#{t('colenda.metadata_sources.metadata_mapping.structural_entry')} #{m}#{t(field_separator_label)} #{render_value(b)}</li>"
         file_name = b['file_name'] unless b.is_a?(Array)
         if file_name.present? && @object.metadata_builder.last_file_checks.present?
           mappings << content_tag(:div, derivative_link(file_name), :class => 'preview_image')

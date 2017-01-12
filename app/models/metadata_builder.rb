@@ -70,7 +70,7 @@ class MetadataBuilder < ActiveRecord::Base
         file_path = "#{working_path}/#{self.repo.assets_subdirectory}/#{file}"
         self.repo.version_control_agent.unlock(:content => file_path)
         validation_state = validate_file(file_path)
-        self.repo.log_problem_file(file_path, validation_state) if validation_state.present?
+        self.repo.log_problem_file(file_path.gsub(working_path,''), validation_state) if validation_state.present?
         self.repo.version_control_agent.unlock(:content => self.repo.derivatives_subdirectory)
         generate_preview(file_path,"#{working_path}/#{self.repo.derivatives_subdirectory}") unless validation_state.present?
         self.repo.version_control_agent.lock(file_path)
@@ -80,7 +80,7 @@ class MetadataBuilder < ActiveRecord::Base
     self.last_file_checks = DateTime.now
     self.save!
     self.repo.version_control_agent.add(:content => "#{working_path}/#{self.repo.derivatives_subdirectory}")
-    self.repo.version_control_agent.commit('Added previews')
+    self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_previews'))
     self.repo.version_control_agent.push
     self.repo.version_control_agent.delete_clone
     Utils::Process.refresh_assets(self.repo)
@@ -107,7 +107,7 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.add(:content => repo.derivatives_subdirectory)
     self.repo.version_control_agent.add(:content => repo.admin_subdirectory)
     self.repo.version_control_agent.lock
-    self.repo.version_control_agent.commit('Ingest complete')
+    self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'))
     self.repo.version_control_agent.push
     self.repo.version_control_agent.delete_clone
     Utils::Process.refresh_assets(self.repo)
