@@ -179,6 +179,9 @@ en:
           label: 'Child/children of %{parent}'
         filename_references:
           label: 'Filenames are referenced in:'
+        structural_entry: 'Entry'
+        previews:
+          issue_detected: 'Issue detected with %{file_name}: '
       xml:
         review_tag: 'review_status'
     version_control_agents:
@@ -192,7 +195,9 @@ en:
         generated_all_derivatives: 'Generated all derivatives for %{object_id}'
         jettison_metadata: 'Removed files not identified as metadata source and/or for long-term preservation'
         jettison_assets: 'Removed original asset files per metadata source type directive'
-        write_preservation_xml: 'Generated unified XML for %{metadata_source_path} at %{xml_path}'
+        write_preservation_xml: 'Generated unified XML'
+        generated_previews: 'Generated previews'
+        ingest_complete: 'Ingest complete'
       packaging_info: 'Source information for %{source_path}\npath: %{source_path}\nid (use to correlate children): %{source_id}\nsource_type: %{source_type}\nview_type: %{source_view_type}\nnum_objects: %{source_num_objects}\nx_start: %{source_x_start}\nx_stop: %{source_x_stop}\ny_start: %{source_y_start}\ny_stop: %{source_y_stop}\nchildren: %{source_children}\n\n'
     utils:
       warnings:
@@ -209,6 +214,7 @@ en:
             sync: 'Trying to perform git annex sync outside of an annexed repository.'
             leftover_clone: 'Leftover Git remote clone in working directory - %{directory}.'
             does_not_exist: 'Git remote does not exist.  Could not clone to perform tasks.'
+            unlock_no_options: 'Unlock command cannot be used without specifying content.'
             no_changes: 'Nothing staged for commit.'
             generic: 'Error from Git: %{error_message}'
       preprocess:

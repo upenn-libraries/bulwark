@@ -58,15 +58,14 @@ module Utils
         `git annex sync --content`
       end
 
-      def add(dir = @working_repo_path)
-        _get_drop_calls(dir, 'add')
+      def add(options)
+        content = options[:content].present? ? options[:content] : '.'
+        `git annex add #{Shellwords.escape(content)}`
       end
 
       def commit(commit_message)
         change_dir_working(@working_repo_path)
         working_repo = Git.open(@working_repo_path)
-        #TODO: Consider removing -- make adds explicit always?
-        working_repo.add(:all => true)
         begin
           working_repo.commit(commit_message)
         rescue => exception
@@ -95,14 +94,16 @@ module Utils
         _get_drop_calls(dir, 'drop')
       end
 
-      def unlock(file)
-        change_dir_working(@working_repo_path)
-        `git annex unlock #{_sanitize(file)}`
+      def unlock(options)
+        raise Utils::Error::VersionControl.new(I18n.t('colenda.utils.version_control.git_annex.errors.unlock_no_options')) unless options[:content].present?
+        dir = options[:location].present? ? options[:location] : @working_repo_path
+        change_dir_working(dir)
+        `git annex unlock #{Shellwords.escape(options[:content])}`
       end
 
-      def lock(file)
+      def lock(file = '.')
         change_dir_working(@working_repo_path)
-        `git annex lock #{_sanitize(file)}`
+        `git annex lock #{Shellwords.escape(file)}`
       end
 
       def rolling_upgrade(dir = @working_repo_path)
@@ -129,7 +130,7 @@ module Utils
       end
 
       def _get_drop_calls(dir, action)
-        dir = _sanitize(dir)
+        dir = Shellwords.escape(dir)
         if File.directory?(dir)
           Dir.chdir(dir)
           rolling_upgrade(dir)
@@ -153,20 +154,16 @@ module Utils
 
       def error_message(message)
         case(message)
-        when /no changes/
-          error_message = I18n.t('colenda.utils.version_control.git_annex.errors.no_changes')
-        when /does not exist/
-          error_message = I18n.t('colenda.utils.version_control.git_annex.errors.does_not_exist')
-        when /already exists and is not an empty directory/
-          error_message = I18n.t('colenda.utils.version_control.git_annex.errors.leftover_clone', :directory => @working_repo_path)
-        else
-          error_message = I18n.t('colenda.utils.version_control.git_annex.errors.generic', :error_message => message)
+          when /no changes/
+            error_message = I18n.t('colenda.utils.version_control.git_annex.errors.no_changes')
+          when /does not exist/
+            error_message = I18n.t('colenda.utils.version_control.git_annex.errors.does_not_exist')
+          when /already exists and is not an empty directory/
+            error_message = I18n.t('colenda.utils.version_control.git_annex.errors.leftover_clone', :directory => @working_repo_path)
+          else
+            error_message = I18n.t('colenda.utils.version_control.git_annex.errors.generic', :error_message => message)
         end
         error_message
-      end
-
-      def _sanitize(file_string)
-        Shellwords.escape(file_string)
       end
 
       def _version_numbers(output_array, split_char, string_to_search)
