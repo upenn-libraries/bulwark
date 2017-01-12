@@ -32,7 +32,17 @@ module MetadataSourceHelper
   end
 
   def derivative_link(file_name)
-    link_to(image_tag("#{Utils.config["federated_fs_path"]}/#{@object.names.directory}/#{@object.derivatives_subdirectory}/#{file_name}.thumb.jpeg"),"#{Utils.config["federated_fs_path"]}/#{@object.names.directory}/#{@object.derivatives_subdirectory}/#{file_name}.jpeg")
+    thumbnail_link = "#{Utils.config["federated_fs_path"]}/#{@object.names.directory}/#{@object.derivatives_subdirectory}/#{file_name}.thumb.jpeg"
+    image_link = "#{Utils.config["federated_fs_path"]}/#{@object.names.directory}/#{@object.derivatives_subdirectory}/#{file_name}.jpeg"
+    return link_to(image_tag(thumbnail_link), image_link) unless @object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"].present?
+    return @object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"].present? ?  problem_warning(file_name).html_safe : ''
+  end
+
+  def problem_warning(file_name)
+    content_tag :div, :class => 'inline-problem-files' do
+      concat(t('colenda.metadata_sources.metadata_mapping.previews.issue_detected', :file_name => file_name))
+      concat(content_tag(:span, "#{@object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"]}", :class => 'issue'))
+    end
   end
 
   def render_value(value)

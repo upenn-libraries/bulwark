@@ -180,6 +180,8 @@ en:
         filename_references:
           label: 'Filenames are referenced in:'
         structural_entry: 'Entry'
+        previews:
+          issue_detected: 'Issue detected with %{file_name}: '
       xml:
         review_tag: 'review_status'
     version_control_agents:

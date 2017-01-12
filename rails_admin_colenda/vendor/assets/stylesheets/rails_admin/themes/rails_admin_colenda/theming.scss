@@ -151,6 +151,15 @@ div[class$="structural-preview"] {
   }
 }
 
+.inline-problem-files {
+  font-size: 24px;
+  font-weight: bold;
+  .issue {
+    color: $warning-red;
+    text-transform: uppercase;
+  }
+}
+
 
 
 pre.debug_dump kbd {
