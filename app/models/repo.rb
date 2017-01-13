@@ -125,8 +125,8 @@ class Repo < ActiveRecord::Base
       self.version_control_agent.init_bare
       working_path = self.version_control_agent.clone
       _build_and_populate_directories(working_path)
-      self.version_control_agent.commit_bare(I18n.t('colenda.version_control_agents.commit_messages.commit_bare'))
-      self.version_control_agent.push_bare
+      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.commit_bare'))
+      self.version_control_agent.push
       self.version_control_agent.delete_clone
     end
   end
@@ -233,7 +233,7 @@ class Repo < ActiveRecord::Base
     formatted_types
   end
 
-private
+  private
 
   def _build_and_populate_directories(working_path)
     admin_directory = "#{working_path}/#{Utils.config[:object_admin_path]}"
@@ -247,11 +247,18 @@ private
     _make_subdir(assets_subdirectory, :keep => true)
     _make_subdir(derivatives_subdirectory, :keep => true)
     _populate_admin_manifest("#{admin_directory}")
+    _add_init_scripts(admin_directory)
   end
 
   def _make_subdir(directory, options = {})
     FileUtils.mkdir_p(directory)
     FileUtils.touch("#{directory}/.keep") if options[:keep]
+  end
+
+  def _add_init_scripts(directory)
+    FileUtils.mkdir_p("#{directory}/bin")
+    FileUtils.cp(Utils.config[:init_script_path], "#{directory}/bin/init.sh")
+    FileUtils.chmod(Utils.config[:init_script_permissions], "#{directory}/bin/init.sh")
   end
 
   def _populate_admin_manifest(admin_path)
@@ -263,18 +270,19 @@ private
     File.open(filesystem_semantics_path, "w+") do |file|
       file.puts("#{metadata_line}\n#{assets_line}")
     end
+
   end
 
   def _initialize_steps
     self.steps = {
-      :git_remote_initialized => false,
-      :metadata_sources_selected => false,
-      :metadata_source_type_specified => false,
-      :metadata_source_additional_info_set => false,
-      :metadata_extracted => false,
-      :metadata_mappings_generated => false,
-      :preservation_xml_generated => false,
-      :published_preview => false
+        :git_remote_initialized => false,
+        :metadata_sources_selected => false,
+        :metadata_source_type_specified => false,
+        :metadata_source_additional_info_set => false,
+        :metadata_extracted => false,
+        :metadata_mappings_generated => false,
+        :preservation_xml_generated => false,
+        :published_preview => false
     }
   end
 

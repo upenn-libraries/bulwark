@@ -66,7 +66,7 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.problem_files = {}
     working_path = self.repo.version_control_agent.clone
     self.repo.version_control_agent.get(:get_location => "#{working_path}/#{self.repo.assets_subdirectory}")
-        self.metadata_source.where(:source_type => MetadataSource.structural_types).each do |ms|
+    self.metadata_source.where(:source_type => MetadataSource.structural_types).each do |ms|
       ms.filenames.each do |file|
         validation_state = validate_file("#{working_path}/#{self.repo.assets_subdirectory}/#{file}")
         self.repo.log_problem_file("#{self.repo.assets_subdirectory}/#{file}", validation_state) if validation_state.present?
@@ -146,7 +146,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   def _available_files
     available_files = Array.new
-    working_path = self.repo.version_control_agent.clone
+    working_path = self.repo.version_control_agent.clone(:fsck => false)
     Dir.glob("#{working_path}/#{self.repo.metadata_subdirectory}/#{self.repo.format_types(self.repo.metadata_source_extensions)}") do |file|
       available_files << file.gsub(working_path,'')
     end

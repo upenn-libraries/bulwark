@@ -1,0 +1,7 @@
+#!/bin/bash
+
+git annex init --version=6
+git annex enableremote NAME_OF_REMOTE
+git config remote.origin.annex-ignore true
+git config annex.largefiles 'not (include=bin/*.sh)'
+git annex fsck --from NAME_OF_REMOTE --fast

@@ -29,7 +29,7 @@ class VersionControlAgent < ActiveRecord::Base
 
   def clone(options = {})
     _initialize_worker
-    options[:destination].nil? ? $worker.clone : $worker.clone(options[:destination])
+    $worker.clone(options)
   end
 
   def reset_hard
