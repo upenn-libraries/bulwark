@@ -32,6 +32,7 @@ gem 'git'
 gem 'rubyXL'
 gem 'mini_magick'
 gem 'sanitize'
+gem 'awesome_print'
 
 gem 'bunny'
 gem 'sidekiq'

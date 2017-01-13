@@ -52,9 +52,9 @@ class VersionControlAgent < ActiveRecord::Base
     $worker.commit_bare(message)
   end
 
-  def add(options)
+  def add(options = {})
     _initialize_worker
-    options[:get_location].nil? ? $worker.add : $worker.add(options[:add_location])
+    $worker.add(options)
   end
 
   def commit(message)
@@ -77,12 +77,12 @@ class VersionControlAgent < ActiveRecord::Base
     options[:drop_location].nil? ? $worker.drop : $worker.drop(options[:drop_location])
   end
 
-  def unlock(filename)
+  def unlock(options)
     _initialize_worker
-    $worker.unlock(filename)
+    $worker.unlock(options)
   end
 
-  def lock(filename)
+  def lock(filename = '.')
     _initialize_worker
     $worker.lock(filename)
   end

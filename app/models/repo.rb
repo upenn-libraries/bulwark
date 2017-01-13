@@ -143,13 +143,14 @@ class Repo < ActiveRecord::Base
       self.push_artifacts
       self.metadata_builder.last_file_checks = DateTime.now
       self.metadata_builder.save!
-    rescue
+    rescue => exception
       self.save!
-      raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => $!.backtrace)
+      raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => exception.message)
     end
   end
 
   def package_metadata_info(destination)
+    self.version_control_agent.unlock(:content => self.admin_subdirectory)
     File.open("#{destination}/#{self.admin_subdirectory}/#{self.names.directory}", 'w+') do |f|
       self.metadata_builder.metadata_source.each do |source|
         f.puts I18n.t('colenda.version_control_agents.packaging_info', :source_path => source.path, :source_id => source.id, :source_type => source.source_type, :source_view_type => source.view_type, :source_num_objects => source.num_objects, :source_x_start => source.x_start, :source_x_stop => source.x_stop, :source_y_start => source.y_start, :source_y_stop => source.y_stop, :source_children => source.children)
@@ -312,3 +313,5 @@ class Repo < ActiveRecord::Base
   end
 
 end
+
+

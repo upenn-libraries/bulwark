@@ -120,6 +120,7 @@ GEM
     arel (6.0.3)
     autoprefixer-rails (6.5.1)
       execjs
+    awesome_print (1.7.0)
     bcp47 (0.3.3)
       i18n
     bcrypt (3.1.11)
@@ -575,6 +576,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_job_status (= 1.1.0)
+  awesome_print
   blacklight_range_limit
   bootstrap-sass (= 3.3.4.1)
   bunny
