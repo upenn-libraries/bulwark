@@ -32,9 +32,9 @@ class VersionControlAgent < ActiveRecord::Base
     $worker.clone(options)
   end
 
-  def reset_hard
+  def reset_hard(options = {})
     _initialize_worker
-    $worker.reset_hard
+    options[:location].nil? ? $worker.reset_hard : $worker.reset_hard(options[:location])
   end
 
   def push_bare
@@ -42,9 +42,9 @@ class VersionControlAgent < ActiveRecord::Base
     $worker.push_bare
   end
 
-  def push(options = {})
+  def push
     _initialize_worker
-    $worker.push(options)
+    $worker.push
   end
 
   def commit_bare(message)
@@ -72,9 +72,9 @@ class VersionControlAgent < ActiveRecord::Base
     options[:directory].nil? ? $worker.sync('--content') : $worker.sync(options[:directory], '--content')
   end
 
-  def pull
+  def pull(options = {})
     _initialize_worker
-    $worker.pull
+    options[:location].nil? ? $worker.pull : $worker.pull(options[:location])
   end
 
   def drop(options = {})

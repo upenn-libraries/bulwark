@@ -89,6 +89,8 @@ module Utils
       display_path = "#{Utils.config[:assets_display_path]}/#{repo.names.directory}"
       if File.directory?("#{Utils.config[:assets_display_path]}/#{repo.names.directory}")
         Dir.chdir(display_path)
+        repo.version_control_agent.reset_hard(:location => "#{display_path}/#{repo.derivatives_subdirectory}")
+        repo.version_control_agent.pull(:location => "#{display_path}/#{repo.derivatives_subdirectory}")
         repo.version_control_agent.get(:location => "#{display_path}/#{repo.derivatives_subdirectory}")
         repo.version_control_agent.unlock(:location => "#{display_path}/#{repo.derivatives_subdirectory}", :content => "#{display_path}/#{repo.derivatives_subdirectory}")
       else

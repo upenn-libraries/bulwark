@@ -38,9 +38,9 @@ module Utils
         destination
       end
 
-      def reset_hard
-        working_repo = Git.open(@working_repo_path)
-        working_repo.reset_hard
+      def reset_hard(dir = @working_repo_path)
+        change_dir_working(dir)
+        `git reset --hard`
       end
 
       def sync(dir = @working_repo_path, options = '')
@@ -58,18 +58,16 @@ module Utils
         `git push origin master`
       end
 
-      def push(options)
-        sync_content = options[:sync_content].present? ? options[:sync_content] : true
+      def push
         change_dir_working(@working_repo_path)
         `git push origin master git-annex`
-        `git annex sync --content` if sync_content
+        `git annex sync --content`
       end
 
-      def pull
-        binding.pry
-        change_dir_working(@working_repo_path)
+      def pull(dir = @working_repo_path)
+        change_dir_working(dir)
         `git pull`
-        binding.pry
+        #binding.pry
       end
 
       def add(options)

@@ -135,13 +135,15 @@ class Repo < ActiveRecord::Base
   def ingest(file, working_path)
     begin
       @status = Utils::Process.import(file, self, working_path)
-      Utils::Process.refresh_assets(self)
       self.thumbnail = default_thumbnail
       self.save!
       Utils::Process.generate_thumbnail(self) if self.thumbnail.present?
       self.package_metadata_info(working_path)
       self.generate_logs(working_path)
-      self.push_artifacts
+      self.version_control_agent.add(:content => "#{working_path}/#{self.derivatives_subdirectory}")
+      self.version_control_agent.add(:content => "#{working_path}/#{self.admin_subdirectory}")
+      self.version_control_agent.commit('Added derivatives')
+      self.version_control_agent.push
       self.metadata_builder.last_file_checks = DateTime.now
       self.metadata_builder.save!
     rescue => exception
