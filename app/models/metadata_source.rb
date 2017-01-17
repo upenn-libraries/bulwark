@@ -152,10 +152,6 @@ class MetadataSource < ActiveRecord::Base
           self.identifier = self.original_mappings['Call Number/ID'].first
       end
     end
-    save_input_source(working_path) if self.input_source.present? && self.input_source.downcase.start_with?('http')
-    self.metadata_builder.repo.version_control_agent.add(:content => "#{working_path}/#{self.metadata_builder.repo.admin_subdirectory}")
-    self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_input_source'))
-    self.metadata_builder.repo.version_control_agent.push
     self.metadata_builder.repo.update_steps(:metadata_extracted)
     self.save!
   end
@@ -242,7 +238,7 @@ class MetadataSource < ActiveRecord::Base
         end
       end
     else
-      self.metadata_builder.repo.version_control_agent.get(:get_location => "#{$working_path}/#{fname}")
+      self.metadata_builder.repo.version_control_agent.get(:location => "#{$working_path}/#{fname}")
       inner_content << _child_values("#{$working_path}/#{fname}")
     end
     if self.root_element.present?
@@ -302,8 +298,8 @@ class MetadataSource < ActiveRecord::Base
     self.children.each do |child|
       child_path = MetadataSource.where(:id => child).pluck(:path).first
       child_content_path = _reconcile_working_path_slashes($working_path, "#{child_path}.xml")
-      self.metadata_builder.repo.version_control_agent.get(:get_location => key_path)
-      self.metadata_builder.repo.version_control_agent.get(:get_location => child_content_path)
+      self.metadata_builder.repo.version_control_agent.get(:location => key_path)
+      self.metadata_builder.repo.version_control_agent.get(:location => child_content_path)
       content = File.open(key_path, 'r'){|io| io.read}
       child_inner_content = File.open(child_content_path, 'r'){|io| io.read}
       _strip_headers(content) && _strip_headers(child_inner_content)
@@ -344,7 +340,7 @@ class MetadataSource < ActiveRecord::Base
     self.x_start = 2
     structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'bibliophilly_structural'} ? MetadataSource.find(self.children.first) : initialize_bibliophilly_structural(self)
     full_path = "#{working_path}#{self.path}"
-    self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
+    self.metadata_builder.repo.version_control_agent.get(:location => full_path)
     self.generate_bibliophilly_descrip_md(full_path)
     structural.generate_bibliophilly_struct_md(full_path)
   end
@@ -517,7 +513,7 @@ class MetadataSource < ActiveRecord::Base
 
   def _refresh_bibid(working_path = $working_path)
     full_path = _reconcile_working_path_slashes(working_path, "#{self.path}")
-    self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
+    self.metadata_builder.repo.version_control_agent.get(:location => full_path)
     worksheet = RubyXL::Parser.parse(full_path)
     case self.source_type
       when 'voyager'
@@ -549,7 +545,7 @@ class MetadataSource < ActiveRecord::Base
       case ext
         when 'xlsx'
           full_path = _reconcile_working_path_slashes(working_path, "#{self.path}")
-          self.metadata_builder.repo.version_control_agent.get(:get_location => full_path)
+          self.metadata_builder.repo.version_control_agent.get(:location => full_path)
           @mappings = _generate_mapping_options_xlsx(full_path)
         else
           raise I18n.t('colenda.errors.metadata_sources.illegal_source_type_generic')

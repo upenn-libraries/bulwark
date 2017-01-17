@@ -124,7 +124,8 @@ class Repo < ActiveRecord::Base
     unless Dir.exists?("#{Utils.config[:assets_path]}/#{self.names.directory}")
       self.version_control_agent.init_bare
       working_path = self.version_control_agent.clone
-      _build_and_populate_directories(working_path)
+      directory_sets = _build_and_populate_directories(working_path)
+      directory_sets.each{|dir_set| dir_set.each{|add_type,dirs| dirs.each{|dir| self.version_control_agent.add(:content => dir, :add_type => add_type) } } }
       self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.commit_bare'))
       self.version_control_agent.push
       self.version_control_agent.delete_clone
@@ -248,7 +249,8 @@ class Repo < ActiveRecord::Base
     _make_subdir(assets_subdirectory, :keep => true)
     _make_subdir(derivatives_subdirectory, :keep => true)
     _populate_admin_manifest("#{admin_directory}")
-    _add_init_scripts(admin_directory)
+    init_script_directory = _add_init_scripts(admin_directory)
+    [{:store => [admin_directory, derivatives_subdirectory], :git => [init_script_directory, data_directory, metadata_subdirectory, assets_subdirectory]}]
   end
 
   def _make_subdir(directory, options = {})
@@ -260,6 +262,7 @@ class Repo < ActiveRecord::Base
     FileUtils.mkdir_p("#{directory}/bin")
     FileUtils.cp(Utils.config[:init_script_path], "#{directory}/bin/init.sh")
     FileUtils.chmod(Utils.config[:init_script_permissions], "#{directory}/bin/init.sh")
+    "#{directory}/bin/init.sh"
   end
 
   def _populate_admin_manifest(admin_path)
@@ -301,7 +304,7 @@ class Repo < ActiveRecord::Base
   def _check_if_preserve_exists
     working_path = self.version_control_agent.clone
     fname = "#{working_path}/#{self.preservation_filename}"
-    self.version_control_agent.get(:get_location => fname)
+    self.version_control_agent.get(:location => fname)
     exist_status = File.exists?(fname)
     self.version_control_agent.drop
     self.version_control_agent.delete_clone

@@ -42,9 +42,9 @@ class VersionControlAgent < ActiveRecord::Base
     $worker.push_bare
   end
 
-  def push
+  def push(options = {})
     _initialize_worker
-    $worker.push
+    $worker.push(options)
   end
 
   def commit_bare(message)
@@ -64,7 +64,7 @@ class VersionControlAgent < ActiveRecord::Base
 
   def get(options = {})
     _initialize_worker
-    options[:get_location].nil? ? $worker.get : $worker.get(options[:get_location])
+    options[:location].nil? ? $worker.get : $worker.get(options[:location])
   end
 
   def sync_content(options = {})

@@ -25,7 +25,7 @@ module Utils
       attach_files(@oid, repo, Manuscript, Page)
       update_index(@oid)
       repo.save!
-      repo.version_control_agent.add
+      repo.version_control_agent.add(:content => repo.derivatives_subdirectory)
       repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives', :object_id => repo.names.fedora))
       repo.version_control_agent.push
       @@status_type = :success
@@ -66,7 +66,7 @@ module Utils
 
     def attach_file(repo, parent, file_name, child_container = 'child')
       file_link = "#{@@working_path}/#{repo.assets_subdirectory}/#{file_name}"
-      repo.version_control_agent.get(:get_location => file_link)
+      repo.version_control_agent.get(:location => file_link)
       repo.version_control_agent.unlock(:content => file_link)
       validation_state = validate_file(file_link)
       if validation_state.nil?
@@ -89,9 +89,8 @@ module Utils
       display_path = "#{Utils.config[:assets_display_path]}/#{repo.names.directory}"
       if File.directory?("#{Utils.config[:assets_display_path]}/#{repo.names.directory}")
         Dir.chdir(display_path)
-        repo.version_control_agent.sync_content(:directory => display_path)
-        repo.version_control_agent.get(:get_location => display_path)
-        repo.version_control_agent.unlock(:location => display_path, :content => "#{display_path}/#{repo.derivatives_subdirectory}")
+        repo.version_control_agent.get(:location => "#{display_path}/#{repo.derivatives_subdirectory}")
+        repo.version_control_agent.unlock(:location => "#{display_path}/#{repo.derivatives_subdirectory}", :content => "#{display_path}/#{repo.derivatives_subdirectory}")
       else
         repo.version_control_agent.clone(:destination => display_path)
         refresh_assets(repo)

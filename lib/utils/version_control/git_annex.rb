@@ -45,6 +45,7 @@ module Utils
 
       def sync(dir = @working_repo_path, options = '')
         begin
+          change_dir_working(dir)
           rolling_upgrade(dir)
           `git annex sync #{options}`
         rescue
@@ -57,16 +58,20 @@ module Utils
         `git push origin master`
       end
 
-      def push
+      def push(options)
+        sync_content = options[:sync_content].present? ? options[:sync_content] : true
         change_dir_working(@working_repo_path)
         `git push origin master git-annex`
-        `git annex sync --content`
+        `git annex sync --content` if sync_content
       end
 
       def add(options)
         content = options[:content].present? ? options[:content] : '.'
-        `git annex add #{Shellwords.escape(content)}`
+        add_type = options[:add_type].present? ? options[:add_type] : :store
+        return `git annex add #{Shellwords.escape(content)}` if add_type == :store
+        return `git add #{Shellwords.escape(content)}` if add_type == :git
       end
+
 
       def commit(commit_message)
         change_dir_working(@working_repo_path)
