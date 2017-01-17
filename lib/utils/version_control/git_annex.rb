@@ -65,6 +65,13 @@ module Utils
         `git annex sync --content` if sync_content
       end
 
+      def pull
+        binding.pry
+        change_dir_working(@working_repo_path)
+        `git pull`
+        binding.pry
+      end
+
       def add(options)
         content = options[:content].present? ? options[:content] : '.'
         add_type = options[:add_type].present? ? options[:add_type] : :store

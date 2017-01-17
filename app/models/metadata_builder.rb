@@ -113,9 +113,9 @@ class MetadataBuilder < ActiveRecord::Base
       self.repo.ingest(transformed_xml, working_path)
     end
     self.repo.version_control_agent.add
-    self.repo.version_control_agent.add(:content => repo.derivatives_subdirectory)
-    self.repo.version_control_agent.add(:content => repo.admin_subdirectory)
-    self.repo.version_control_agent.lock
+    self.repo.version_control_agent.add(:content => "#{working_path}/#{repo.derivatives_subdirectory}")
+    self.repo.version_control_agent.add(:content => "#{working_path}/#{repo.admin_subdirectory}")
+    #self.repo.version_control_agent.lock
     self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'))
     self.repo.version_control_agent.push
     self.repo.version_control_agent.delete_clone
