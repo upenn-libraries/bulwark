@@ -29,12 +29,14 @@ config/*.yml
 /app/views/repos/_git_instructions_custom.html.erb
 
 # Ignore bash script
-init.sh
 repo.sh
 just_jetty.sh
 
 # Ignore rdf
 *.rdf
+
+#Ignore docker
+/docker
 
 # Other stuff
 *.rdb
