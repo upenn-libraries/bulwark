@@ -61,10 +61,19 @@ class MetadataBuilder < ActiveRecord::Base
     self.save!
   end
 
+  def save_input_sources(working_path)
+    self.metadata_source.each do |source|
+      save_input_source(working_path) if source.input_source.present? && source.input_source.downcase.start_with?('http')
+      self.repo.version_control_agent.add(:content => "#{working_path}/#{self.metadata_builder.repo.admin_subdirectory}")
+      self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_input_source'))
+      self.repo.version_control_agent.push
+    end
+  end
+
   def perform_file_checks_and_generate_previews
     self.repo.problem_files = {}
     working_path = self.repo.version_control_agent.clone
-    self.repo.version_control_agent.get(:get_location => "#{working_path}/#{self.repo.assets_subdirectory}")
+    self.repo.version_control_agent.get(:location => "#{working_path}/#{self.repo.assets_subdirectory}")
     self.metadata_source.where(:source_type => MetadataSource.structural_types).each do |ms|
       ms.filenames.each do |file|
         file_path = "#{working_path}/#{self.repo.assets_subdirectory}/#{file}"
@@ -90,7 +99,7 @@ class MetadataBuilder < ActiveRecord::Base
     working_path = self.repo.version_control_agent.clone
     array.each do |file|
       file_path = "#{working_path}#{file.last}"
-      self.repo.version_control_agent.get(:get_location => file_path)
+      self.repo.version_control_agent.get(:location => file_path)
       self.repo.version_control_agent.unlock(:content => file_path)
       unless canonical_identifier_check(file_path)
         next
@@ -104,8 +113,8 @@ class MetadataBuilder < ActiveRecord::Base
       self.repo.ingest(transformed_xml, working_path)
     end
     self.repo.version_control_agent.add
-    self.repo.version_control_agent.add(:content => repo.derivatives_subdirectory)
-    self.repo.version_control_agent.add(:content => repo.admin_subdirectory)
+    self.repo.version_control_agent.add(:content => "#{working_path}/#{repo.derivatives_subdirectory}")
+    self.repo.version_control_agent.add(:content => "#{working_path}/#{repo.admin_subdirectory}")
     self.repo.version_control_agent.lock
     self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'))
     self.repo.version_control_agent.push
@@ -133,7 +142,7 @@ class MetadataBuilder < ActiveRecord::Base
   def store_xml_preview
     working_path = self.repo.version_control_agent.clone
     get_location = "#{working_path}/#{self.repo.metadata_subdirectory}"
-    self.repo.version_control_agent.get(:get_location => get_location)
+    self.repo.version_control_agent.get(:location => get_location)
     @sample_xml_docs = ''
     @file_links = Array.new
     Dir.glob("#{get_location}/*.xml") do |file|
@@ -164,7 +173,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   def _available_files
     available_files = Array.new
-    working_path = self.repo.version_control_agent.clone
+    working_path = self.repo.version_control_agent.clone(:fsck => false)
     Dir.glob("#{working_path}/#{self.repo.metadata_subdirectory}/#{self.repo.format_types(self.repo.metadata_source_extensions)}") do |file|
       available_files << file.gsub(working_path,'')
     end

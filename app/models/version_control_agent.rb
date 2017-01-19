@@ -29,12 +29,12 @@ class VersionControlAgent < ActiveRecord::Base
 
   def clone(options = {})
     _initialize_worker
-    options[:destination].nil? ? $worker.clone : $worker.clone(options[:destination])
+    $worker.clone(options)
   end
 
-  def reset_hard
+  def reset_hard(options = {})
     _initialize_worker
-    $worker.reset_hard
+    options[:location].nil? ? $worker.reset_hard : $worker.reset_hard(options[:location])
   end
 
   def push_bare
@@ -64,12 +64,17 @@ class VersionControlAgent < ActiveRecord::Base
 
   def get(options = {})
     _initialize_worker
-    options[:get_location].nil? ? $worker.get : $worker.get(options[:get_location])
+    options[:location].nil? ? $worker.get : $worker.get(options[:location])
   end
 
   def sync_content(options = {})
     _initialize_worker
     options[:directory].nil? ? $worker.sync('--content') : $worker.sync(options[:directory], '--content')
+  end
+
+  def pull(options = {})
+    _initialize_worker
+    options[:location].nil? ? $worker.pull : $worker.pull(options[:location])
   end
 
   def drop(options = {})

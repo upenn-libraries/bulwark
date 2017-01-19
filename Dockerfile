@@ -5,6 +5,8 @@ MAINTAINER Katherine Lynch <katherly@upenn.edu>
 # Expose Nginx HTTP service
 EXPOSE 80
 
+RUN add-apt-repository ppa:jtgeibel/ppa
+
 RUN apt-get update && apt-get install -qq -y --no-install-recommends \
         build-essential \
         default-jdk \
@@ -21,9 +23,19 @@ RUN mkdir -p /home/app/webapp/log
 
 RUN mkdir -p /home/app/webapp/tmp
 
+RUN mkdir -p /fs
+
+RUN mkdir -p /fs/pub
+
+RUN mkdir -p /fs/pub/data
+
+RUN mkdir -p /fs/pub/display
+
 RUN mkdir -p /home/app/webapp/string_exts
 
 RUN mkdir -p /home/app/webapp/rails_admin_colenda
+
+RUN chown -R app:app /fs
 
 WORKDIR /home/app/webapp
 
@@ -44,6 +56,14 @@ RUN RAILS_ENV=production SECRET_KEY_BASE=x bundle exec rake assets:precompile --
 RUN rm -f /etc/service/nginx/down
 
 RUN rm /etc/nginx/sites-enabled/default
+
+USER app
+
+RUN git config --global user.email 'docker-user@example.com'
+
+RUN git config --global user.name 'Docker User'
+
+USER root
 
 ADD webapp.conf /etc/nginx/sites-enabled/webapp.conf
 

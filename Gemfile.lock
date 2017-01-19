@@ -552,7 +552,6 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
-    sqlite3 (1.3.12)
     stomp (1.4.3)
     sxp (0.1.5)
     therubyracer (0.12.2)
@@ -617,7 +616,6 @@ DEPENDENCIES
   sdoc (~> 0.4.0)
   sidekiq
   sinatra
-  sqlite3
   string_exts!
   therubyracer
   uglifier (>= 1.3.0)

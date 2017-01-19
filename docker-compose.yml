@@ -18,7 +18,7 @@ services:
     depends_on:
       - 'db'
       - 'redis'
-    build: .
+    image: 'colenda_web:latest'
     ports:
       - '80:80'
     env_file:
@@ -30,7 +30,7 @@ services:
   sidekiq:
     depends_on:
       - 'redis'
-    build: .
+    image: 'colenda_web:latest'
     links:
       - 'redis'
     command: 'bundle exec sidekiq -C config/sidekiq.yml'
@@ -44,11 +44,9 @@ services:
     ports:
       - '15672:15672'
 
+
 volumes:
   redis:
   db:
   web:
-
-
-
 

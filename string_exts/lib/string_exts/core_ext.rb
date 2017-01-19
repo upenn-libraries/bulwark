@@ -25,8 +25,12 @@ String.class_eval do
     regex.present? ? true : false
   end
 
-  def valid_xml
+  def valid_xml_tag
     self.downcase.gsub(' ','_').gsub(/[^a-zA-Z0-9_.-]/, '')
+  end
+
+  def valid_xml_text
+    self.gsub(/\n/,'').encode(:xml => :text)
   end
 
   # Sanitizing user-submitted strings as filenames
@@ -57,6 +61,14 @@ String.class_eval do
 
   def reverse_fedorafy
     "ark:/#{self.gsub('-','/')}"
+  end
+
+  # S3 buckets
+
+  def bucketize
+    raise 'Could not bucketize -- string less than 3 characters long' if self.length < 3
+    raise 'String must begin and end with an alphanumeric value to have a valid bucket name derived' unless (self[0] =~ /[^0-9A-Za-z]/ && self[0..63].last =~ /[^0-9A-Za-z]/).nil?
+    self[0..63].downcase.gsub(/[^0-9A-Za-z\-]/, '').downcase
   end
 
   # XML files

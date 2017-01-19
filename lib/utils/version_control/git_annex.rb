@@ -21,25 +21,31 @@ module Utils
         `git init --bare #{@remote_repo_path}`
         Dir.chdir(@remote_repo_path)
         `git annex init origin`
+        `git config annex.largefiles 'not (include=.repoadmin/bin/*.sh)'`
         rolling_upgrade(@remote_repo_path)
+        init_special_remote(@remote_repo_path, 's3', @repo.unique_identifier)
       end
 
-      def clone(destination = @working_repo_path)
+      def clone(options = {})
+        destination = options[:destination].present? ? options[:destination] : @working_repo_path
+        fsck = options[:fsck].nil? ? true : options[:fsck]
         begin
           Git.clone(@remote_repo_path, destination)
+          init_clone(destination, fsck)
         rescue => exception
           raise Utils::Error::VersionControl.new(error_message(exception.message))
         end
         destination
       end
 
-      def reset_hard
-        working_repo = Git.open(@working_repo_path)
-        working_repo.reset_hard
+      def reset_hard(dir = @working_repo_path)
+        change_dir_working(dir)
+        `git reset --hard`
       end
 
       def sync(dir = @working_repo_path, options = '')
         begin
+          change_dir_working(dir)
           rolling_upgrade(dir)
           `git annex sync #{options}`
         rescue
@@ -58,10 +64,19 @@ module Utils
         `git annex sync --content`
       end
 
+      def pull(dir = @working_repo_path)
+        change_dir_working(dir)
+        `git pull`
+        #binding.pry
+      end
+
       def add(options)
         content = options[:content].present? ? options[:content] : '.'
-        `git annex add #{Shellwords.escape(content)}`
+        add_type = options[:add_type].present? ? options[:add_type] : :store
+        return `git annex add #{Shellwords.escape(content)}` if add_type == :store
+        return `git add #{Shellwords.escape(content)}` if add_type == :git
       end
+
 
       def commit(commit_message)
         change_dir_working(@working_repo_path)
@@ -81,7 +96,7 @@ module Utils
       end
 
       def remove_working_directory
-        `git annex drop --all`
+        `git annex drop --all --force`
         Dir.chdir(Rails.root.to_s)
         FileUtils.rm_rf(@working_repo_path, :secure => true) if File.directory?(@working_repo_path)
       end
@@ -112,6 +127,22 @@ module Utils
         unless version_string.include?("local repository version: #{Utils.config[:supported_vca_version]}")
           `git annex upgrade` if git_annex_upgrade_supported(version_string)
         end
+      end
+
+      def init_special_remote(dir = @working_repo_path, remote_type, remote_name)
+        change_dir_working(dir) unless Dir.pwd == dir
+        raise 'Missing S3 special remote environment variables' unless Utils::Storage::Ceph.required_configs?
+        `export AWS_ACCESS_KEY_ID=#{Utils::Storage::Ceph.config.aws_access_key_id}; export AWS_SECRET_ACCESS_KEY=#{Utils::Storage::Ceph.config.aws_secret_access_key};  git annex initremote #{Utils::Storage::Ceph.config.special_remote_name} type=#{Utils::Storage::Ceph.config.storage_type} encryption=#{Utils::Storage::Ceph.config.encryption} requeststyle=#{Utils::Storage::Ceph.config.request_style} host=#{Utils::Storage::Ceph.config.host} port=#{Utils::Storage::Ceph.config.port} bucket='#{remote_name.bucketize}'
+` if remote_type == 's3'
+      end
+
+      def init_clone(dir = @working_repo_path, fsck = true)
+        Dir.chdir(dir)
+        `git annex init --version=#{Utils.config[:supported_vca_version]}`
+        `git annex enableremote #{Utils::Storage::Ceph.config.special_remote_name}`
+        `git config remote.origin.annex-ignore true`
+        `git config annex.largefiles 'not (include=.repoadmin/bin/*.sh)'`
+        `git annex fsck --from #{Utils::Storage::Ceph.config.special_remote_name} --fast` if fsck
       end
 
       private
