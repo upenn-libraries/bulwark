@@ -7,3 +7,4 @@ Sidekiq.configure_client do |config|
 end
 
 Sidekiq.default_worker_options = { :retry => false }
+Sidekiq.logger.level = Logger::WARN
