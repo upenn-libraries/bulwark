@@ -21,23 +21,31 @@ services:
     image: 'colenda_web:latest'
     ports:
       - '80:80'
+      - '1234:22'
     env_file:
       - '.env'
     links:
-      - db
+      - 'db'
+      - 'redis'
     volumes:
       - 'web:/home/app/webapp'
+      - '${LOCAL_DATA}:/fs/pub/data'
+      - '${LOCAL_DISPLAY}:/fs/pub/display'
   sidekiq:
     depends_on:
       - 'redis'
     image: 'colenda_web:latest'
-    links:
-      - 'redis'
-    command: 'bundle exec sidekiq -C config/sidekiq.yml'
-    volumes:
-      - '.:/webapp'
+    ports:
+      - '25:25'
     env_file:
       - '.env'
+    links:
+      - 'redis'
+      - 'web'
+    command: 'bundle exec sidekiq -C config/sidekiq.yml'
+    volumes:
+      - '${LOCAL_DATA}:/fs/pub/data'
+      - '${LOCAL_DISPLAY}:/fs/pub/display'
   rabbitmq:
     image: 'rabbitmq:3-management'
     hostname: 'rabbitmq'

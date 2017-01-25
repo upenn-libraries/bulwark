@@ -5,6 +5,12 @@ MAINTAINER Katherine Lynch <katherly@upenn.edu>
 # Expose Nginx HTTP service
 EXPOSE 80
 
+# Expose ssh port for git commands
+EXPOSE 22
+
+# For SMTP
+EXPOSE 25
+
 RUN add-apt-repository ppa:jtgeibel/ppa
 
 RUN apt-get update && apt-get install -qq -y --no-install-recommends \
@@ -15,7 +21,17 @@ RUN apt-get update && apt-get install -qq -y --no-install-recommends \
         imagemagick \
         libmysqlclient-dev \
         nodejs \
+        openssh-server \
         xsltproc
+
+RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+# SSH login fix. Otherwise user is kicked off after login
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+
+ENV NOTVISIBLE "in users profile"
+
+RUN echo "export VISIBLE=now" >> /etc/profile
 
 RUN mkdir -p /home/app/webapp
 
@@ -34,6 +50,12 @@ RUN mkdir -p /fs/pub/display
 RUN mkdir -p /home/app/webapp/string_exts
 
 RUN mkdir -p /home/app/webapp/rails_admin_colenda
+
+RUN mkdir -p /etc/my_init.d
+
+ADD docker/gitannex.sh /etc/my_init.d/gitannex.sh
+
+ADD docker/ssh_service.sh /etc/my_init.d/ssh_service.sh
 
 RUN chown -R app:app /fs
 
@@ -71,5 +93,7 @@ ADD rails-env.conf /etc/nginx/main.d/rails-env.conf
 
 # Clean up APT and bundler when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+CMD ["/usr/sbin/sshd", "-D"]
 
 CMD ["/sbin/my_init"]
