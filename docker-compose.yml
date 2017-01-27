@@ -52,7 +52,6 @@ services:
     ports:
       - '15672:15672'
 
-
 volumes:
   redis:
   db:

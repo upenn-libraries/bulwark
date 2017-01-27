@@ -24,6 +24,7 @@ module Utils
         `git config annex.largefiles 'not (include=.repoadmin/bin/*.sh)'`
         rolling_upgrade(@remote_repo_path)
         init_special_remote(@remote_repo_path, 's3', @repo.unique_identifier)
+        FileUtils.chmod_R(Utils.config[:remote_repo_permissions], @remote_repo_path)
       end
 
       def clone(options = {})
