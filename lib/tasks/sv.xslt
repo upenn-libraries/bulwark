@@ -38,7 +38,7 @@
             xmlns:mix="http://www.jcp.org/jcr/mix/1.0"
             xmlns:foaf="http://xmlns.com/foaf/0.1/"
             xmlns:dc="http://purl.org/dc/elements/1.1/">
-            <xsl:attribute name="sv:name"><xsl:value-of select="$uuid" /></xsl:attribute>
+            <xsl:attribute name="sv:name"><xsl:value-of select="translate(substring-after($uuid,'ark:/'),'/','-')" /></xsl:attribute>
           <sv:property sv:name="jcr:primaryType" sv:type="Name">
             <sv:value>nt:folder</sv:value>
           </sv:property>

@@ -170,9 +170,9 @@ module Utils
     def _build_command(type, options = {})
       @fedora_yml = "#{Rails.root}/config/fedora.yml"
       fedora_config = YAML.load_file(File.expand_path(@fedora_yml, __FILE__))
-      @fedora_user = fedora_config['development']['user']
-      @fedora_password = fedora_config['development']['password']
-      @fedora_link = "#{fedora_config['development']['url']}#{fedora_config['development']['base_path']}"
+      @fedora_user = fedora_config["#{Rails.env}"]['user']
+      @fedora_password = fedora_config["#{Rails.env}"]['password']
+      @fedora_link = "#{fedora_config["#{Rails.env}"]['url']}#{fedora_config["#{Rails.env}"]['base_path']}"
       child_container = options[:child_container]
       file = options[:file]
       fid = options[:fid]
