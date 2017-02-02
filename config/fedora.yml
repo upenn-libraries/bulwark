@@ -1,7 +1,7 @@
 development:
   user: fedoraAdmin
   password: fedoraAdmin
-  url: http://localhost:8983/fcrepo/rest
+  url: http://localhost:8983/fedora/rest
   base_path: /dev
 test:
   user: fedoraAdmin
