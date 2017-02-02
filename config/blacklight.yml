@@ -1,6 +1,6 @@
 development:
   adapter: solr
-  url: http://localhost:8983/solr/blacklight-core
+  url: http://localhost:8983/solr/development
 test: &test
   adapter: solr
   url: <%= "http://127.0.0.1:#{ENV['TEST_JETTY_PORT'] || 8985}/solr/test" %>
