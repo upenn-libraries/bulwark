@@ -55,10 +55,9 @@ gem 'devise'
 gem 'devise-guests', '~> 0.3'
 
 gem 'rb-readline'
-gem 'pry-rails', '~> 0.3.4'
-gem 'pry-remote'
 
 group :development, :test do
+  gem 'pry-rails', '~> 0.3.4'
   gem 'jettywrapper'
   gem 'letter_opener'
   gem 'launchy'
