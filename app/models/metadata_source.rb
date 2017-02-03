@@ -505,7 +505,7 @@ class MetadataSource < ActiveRecord::Base
     data.xpath('//xml/page').each do |page|
       mapped_values['page_number'] << page['number']
       mapped_values['identifier'] << page['id']
-      mapped_values['file_name'] << "#{page['image.id']}.tif"
+      mapped_values['file_name'] << "#{page['image']}.tif"
       mapped_values['description'] << page['visiblepage']
     end
     mapped_values
