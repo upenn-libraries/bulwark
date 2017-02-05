@@ -87,7 +87,7 @@ span.site-name {
 **************/
 
 #header-navbar {
-  background: $upenn-blue asset-url('orrerybg_inv.png') top left repeat-x;
+  background-image: asset-url('orrerybg.jpg');
   height: 100px;
   margin-bottom: 0px;
   .navbar-brand {
