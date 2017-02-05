@@ -1,24 +1,21 @@
 <div id="header-navbar" class="navbar navbar-inverse navbar-static-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-    <button type="button" class="navbar-toggle btn collapsed" data-toggle="collapse" data-target="#user-util-collapse">
-      <span class="sr-only">Toggle navigation</span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </button>
-    <%= link_to application_name, root_path, class: "navbar-brand" %>
-    <div class="site-name"><%= link_to application_name, root_path %></div>
-    </div>
-
-    <div class="collapse navbar-collapse" id="user-util-collapse">
-      <%= render :partial=>'/user_util_links' %>
+    <div id="header-brand-links">
+      <%= link_to application_name, root_path, class: 'navbar-brand' %>
+      <div class="site-name"><%= link_to application_name, root_path %></div>
     </div>
   </div>
+<div class="collapse navbar-collapse" id="user-util-links">
+    <%= render :partial=>'/user_util_links' %>
 </div>
-
+<div id="beta-announcement">
+  <div id="beta-label">
+    <span class="label text">Beta</span>This service is in beta.
+  </div>
+</div>
 <div id="search-navbar" class="navbar navbar-default navbar-static-top" role="navigation">
   <div class="container">
     <%= render_search_bar  %>
   </div>
 </div>
+
+

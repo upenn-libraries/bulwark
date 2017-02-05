@@ -20,7 +20,7 @@ module RepoHelper
   end
 
   def render_file_checks
-    render :partial => 'repos/file_checks' if @object.metadata_builder.xml_preview.present?
+    render :partial => 'repos/file_checks'
 
   end
 

@@ -13,15 +13,19 @@ en:
         breadcrumb: 'Repo Information'
       ingest:
         title: 'Publish Preview'
-        menu: '5. Publish Preview'
+        menu: '6. Publish Preview'
         breadcrumb: 'Publish Preview'
       generate_metadata:
         title: 'Extract Metadata'
         menu: '3. Extract and Map Metadata'
         breadcrumb: 'Extract and Map Metadata'
+      files_check:
+        title: 'Check Files and Generate Derivatives'
+        menu: '4. Check Files and Generate Derivatives'
+        breadcrumb: 'Check Files and Generate Derivatives'
       preview_xml:
         title: 'Create Preservation XML'
-        menu: '4. Create Preservation XML'
+        menu: '5. Create Preservation XML'
         breadcrumb: 'Create Preservation XML'
       preserve:
         title: 'Select Metadata Sources'

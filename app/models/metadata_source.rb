@@ -259,7 +259,7 @@ class MetadataSource < ActiveRecord::Base
         end
       end
     else
-      self.num_objects = self.user_defined_mappings['page_number'].size
+      self.num_objects = self.user_defined_mappings.size
       self.save!
       inner_content << _child_values_voyager
     end
@@ -440,9 +440,7 @@ class MetadataSource < ActiveRecord::Base
           orig = value if key == self.file_field
         end
         return orig
-      when 'structural_bibid'
-        return self.user_defined_mappings[self.file_field]
-      when 'bibliophilly_structural'
+      when 'structural_bibid', 'bibliophilly_structural'
         filenames = []
         self.user_defined_mappings.each do |key, value|
           filenames << value[self.file_field] if value[self.file_field].present?
@@ -495,18 +493,17 @@ class MetadataSource < ActiveRecord::Base
   #TODO: Refactor to use config variables
   def _set_voyager_structural_metadata(working_path = $working_path)
     mapped_values = {}
-    mapped_values['page_number'] = []
-    mapped_values['identifier'] = []
-    mapped_values['file_name'] = []
-    mapped_values['description'] = []
     _refresh_bibid(working_path)
     voyager_source = open("#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}")
     data = Nokogiri::XML(voyager_source)
-    data.xpath('//xml/page').each do |page|
-      mapped_values['page_number'] << page['number']
-      mapped_values['identifier'] << page['id']
-      mapped_values['file_name'] << "#{page['image']}.tif"
-      mapped_values['description'] << page['visiblepage']
+    data.xpath('//xml/page').each_with_index do |page, index|
+      mapped_values[index+1] = {
+          'page_number' => page['number'],
+          'identifier' => page['id'],
+          'file_name' => "#{page['image']}.tif",
+          'description' => page['visiblepage']
+
+      }
     end
     mapped_values
   end
@@ -620,13 +617,14 @@ class MetadataSource < ActiveRecord::Base
 
   def _child_values_voyager
     content = ''
-    self.num_objects.times do |i|
+    self.user_defined_mappings.each do |entry_id, page_values|
       content << "<#{self.parent_element}>"
-      self.user_defined_mappings.each do |key, value|
-        content << "<#{key}>#{self.user_defined_mappings["#{key}"][i]}</#{key}>"
+      page_values.each do |key, value|
+        content << "<#{key}>#{value}</#{key}>"
       end
       content << "</#{self.parent_element}>"
     end
+
     content
   end
 

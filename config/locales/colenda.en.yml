@@ -160,10 +160,10 @@ en:
           label: 'Child element of root, for multi-item spreadsheets (optional):'
           tip: 'For single spreadsheets that describe more than one item -- Parent of each row of values in metadata source spreadsheet; Child of the root element.'
         voyager:
-          heading: 'Descriptive metadata fetched from Voyager'
+          heading: 'Descriptive metadata fetched from Voyager Lookup'
           field_separator: ':'
         structural_bibid:
-          heading: 'Sample of structural metadata fetched from Voyager (first 10 entries or fewer)'
+          heading: 'Sample of structural metadata fetched from Voyager Lookup'
           field_separator: ':'
         bibliophilly:
           heading: 'Sample metadata fetched from BiblioPhilly spreadsheet'
