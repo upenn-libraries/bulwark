@@ -1,4 +1,5 @@
 @import 'base/colors.css.scss';
+@import 'base/globals.css.scss';
 @import 'base/mixins.css.scss';
 
 /*************
@@ -7,14 +8,19 @@
 *
 **************/
 
+#header-navbar {
+  height: 70px;
+}
+
 .site-name {
-  width:500px;
+  width: 800px;
+  height: 100px;
   float: right;
-  padding-top: 10px;
+  font-family: $header-font-family;
+  padding-top: 30px;
    a {
-    font-size: 30px;
+    font-size: 36px;
     color: $text-white;
-    font-weight: bold;
   }
 }
 
@@ -25,6 +31,53 @@
 }
 
 
+body {
+  color: $text-black;
+  font-family: $font-family;
+}
+
+h1, h2, h3 {
+  color: $upenn-blue;
+}
+
+span.site-name {
+  font-size: 40px;
+  color: $text-white;
+  font-style: italic;
+}
+
+.navbar-nav {
+  li {
+    a {
+      color: $text-white;
+    }
+  }
+}
+
+#beta-announcement {
+  clear: both;
+  padding: 5px 10px;
+  background-color: $light-grey;
+  border-bottom: 1px solid $medium-grey;
+}
+
+#beta-label {
+  text-align: right;
+  font-size: 14px;
+}
+
+#beta-label .label {
+  background-color: $upenn-lighter-red;
+  width: 100px;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+#beta-label .text {
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
 
 
 /*************
@@ -34,15 +87,46 @@
 **************/
 
 #header-navbar {
+  background: $upenn-blue asset-url('orrerybg_inv.png') top left repeat-x;
+  height: 100px;
+  margin-bottom: 0px;
   .navbar-brand {
     background-image: asset-url('logo.png');
-    margin-top: 10px;
+    margin-top: 30px;
   }
 }
+
+#header-brand-links {
+  float: left;
+  padding-left: 10px;
+}
+
+#user-util-links {
+  background-color: $upenn-darkest-blue;
+  border-top: 1px solid $upenn-red;
+  a {
+    color: $text-white;
+  }
+  a:hover {
+    font-weight: bold;
+    text-decoration: underline;
+    background-color: $upenn-red;
+  }
+}
+
+#search-navbar {
+  clear: both;
+}
+
 
 .btn-primary {
   background-color: $upenn-red;
   border-color: $upenn-blue;
+}
+
+.btn-primary:hover {
+  border-color: $upenn-red;
+  background-color: $upenn-blue;
 }
 
 /*************
