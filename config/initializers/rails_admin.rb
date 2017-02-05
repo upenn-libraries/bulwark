@@ -4,6 +4,7 @@ require Rails.root.join('lib', 'rails_admin', 'clone_from_production.rb')
 require Rails.root.join('lib', 'rails_admin', 'sign_off_production.rb')
 require Rails.root.join('lib', 'rails_admin', 'ingest.rb')
 require Rails.root.join('lib', 'rails_admin', 'generate_metadata.rb')
+require Rails.root.join('lib', 'rails_admin', 'files_check.rb')
 require Rails.root.join('lib', 'rails_admin', 'preview_xml.rb')
 require Rails.root.join('lib', 'rails_admin', 'preserve.rb')
 require Rails.root.join('lib', 'rails_admin', 'repo_new.rb')
@@ -35,6 +36,7 @@ RailsAdmin.config do |config|
       only ['Repo']
     end
     generate_metadata
+    files_check
     preview_xml
     create_remote do
       only ['Repo']
