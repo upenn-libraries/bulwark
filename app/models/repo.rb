@@ -129,6 +129,7 @@ class Repo < ActiveRecord::Base
       self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.commit_bare'))
       self.version_control_agent.push
       self.version_control_agent.delete_clone
+      self.version_control_agent.set_remote_permissions
     end
   end
 
