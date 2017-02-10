@@ -27,6 +27,11 @@ class VersionControlAgent < ActiveRecord::Base
     $worker.initialize_bare_remote
   end
 
+  def set_remote_permissions
+    _initialize_worker
+    $worker.set_remote_permissions
+  end
+
   def clone(options = {})
     _initialize_worker
     $worker.clone(options)
