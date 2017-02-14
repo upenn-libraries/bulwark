@@ -139,7 +139,7 @@
         <sv:value>bypassAdmin</sv:value>
       </sv:property>
       <sv:property sv:name="ns001:hasModel" sv:type="String" sv:multiple="false">
-        <sv:value>Page</sv:value>
+        <sv:value>Image</sv:value>
       </sv:property>
       <sv:property sv:name="jcr:createdBy" sv:type="String">
         <sv:value>bypassAdmin</sv:value>

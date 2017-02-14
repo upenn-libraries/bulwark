@@ -6,8 +6,24 @@ development:
     - pages
     - records
   schema_terms:
+    - abstract
+    - contributor
+    - coverage
+    - creator
+    - date
+    - description
+    - format
+    - identifier
+    - includes
+    - includesComponent
+    - language
+    - publisher
+    - relation
+    - rights
+    - source
+    - subject
     - title
-    - author
+    - type
   canonical_identifier_path:
     - identifier
   unique_identifier_field: identifier

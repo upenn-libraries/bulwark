@@ -1,28 +1,4 @@
-class Page < ActiveFedora::Base
-  include Hydra::Works::FileSetBehavior
-
-  contains 'pageImage'
-
-  around_save :format_container_id
-
-
-  # PQC page fields
-
-  property :page_id, predicate: ::RDF::Vocab::DC.identifier, multiple: true do |index|
-    index.as :stored_searchable
-    index.type :stored_searchable
-  end
-
-  property :ocr_text, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/pageText'), multiple: true do |index|
-    index.as :stored_searchable
-  end
-
-  property :item_type, predicate: ::RDF::Vocab::DC.type, multiple: true do |index|
-    index.as :stored_searchable
-  end
-
-
-  # BiblioPhilly fields
+class BibliophillyStructuralSchema < ActiveTriples::Schema
 
   property :serial_num, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/serialNum'), multiple: true do |index|
     index.as :stored_searchable
@@ -78,41 +54,6 @@ class Page < ActiveFedora::Base
 
   property :value6, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/value6'), multiple: true do |index|
     index.as :stored_searchable
-  end
-
-
-  # required
-
-  property :unique_identifier, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/uniqueIdentifier'), multiple: false do |index|
-    index.as :stored_searchable, :facetable
-  end
-
-  property :parent_manuscript, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/parentManuscript'), multiple: true do |index|
-    index.as :stored_searchable
-  end
-
-  property :page_number, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/pageNumber'), multiple: true do |index|
-    index.as :stored_searchable
-  end
-
-  property :file_name, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/fileName'), multiple: false do |index|
-    index.as :stored_searchable
-  end
-
-  belongs_to :manuscript, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
-
-  def format_container_id
-    self.format_container! if self.unique_identifier.present? && self.unique_identifier != self.unique_identifier.reverse_fedorafy
-    yield
-  end
-
-  def format_container!
-    self.unique_identifier = self.unique_identifier.reverse_fedorafy
-  end
-
-
-  def serialized_attributes
-    self.attribute_names.each_with_object('id' => id) { |key, hash| hash[key] = eval(self[key].inspect) }
   end
 
 end
