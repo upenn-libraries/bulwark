@@ -41,3 +41,4 @@ just_jetty.sh
 # Other stuff
 *.rdb
 /.idea
+*.csv
