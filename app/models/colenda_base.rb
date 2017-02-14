@@ -1,16 +1,12 @@
-class MultipageItem < ActiveFedora::Base
+class ColendaBase < ActiveFedora::Base
   include Hydra::Works::WorkBehavior
 
   include ::Identifiers
-
   include ::PqcTerms
   include ::PremisTerms
 
   around_save :manage_uuid
 
-  has_many :pages
-
-  contains 'thumbnail'
 
   property :unique_identifier, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/uniqueIdentifier'), multiple: false do |index|
     index.as :stored_searchable, :facetable
@@ -29,10 +25,6 @@ class MultipageItem < ActiveFedora::Base
     self.format_uuid! if self.unique_identifier.present? && self.unique_identifier != self.unique_identifier.reverse_fedorafy
     yield
     self.manage_identifier_metadata if self.unique_identifier.present?
-  end
-
-  def thumbnail_link
-    self.thumbnail.ldp_source.subject
   end
 
 end

@@ -1,4 +1,4 @@
-class Manuscript < MultipageItem
+class Manuscript < MultiImageItem
 
   include ::BibliophillyTerms
 

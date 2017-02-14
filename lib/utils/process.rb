@@ -22,7 +22,7 @@ module Utils
       FileUtils.rm(file)
       repo.problem_files = {}
       repo.version_control_agent.unlock(:content => repo.derivatives_subdirectory)
-      attach_files(@oid, repo, Manuscript, Page)
+      attach_files(@oid, repo, Manuscript, Image)
       update_index(@oid)
       repo.save!
       repo.version_control_agent.add(:content => repo.derivatives_subdirectory)
@@ -52,13 +52,13 @@ module Utils
         child = Finder.fedora_find(ActiveFedora::Base.uri_to_id(child_uri))
         children << child
         if child.file_name.present?
-          attach_file(repo, child, child.file_name, 'pageImage')
+          attach_file(repo, child, child.file_name, 'imageFile')
           parent.members << child
         end
       end
       children_sorted = children.sort_by! { |c| c.page_number }
       children_sorted.each do |child_sorted|
-        file_print = child_sorted.pageImage.uri
+        file_print = child_sorted.imageFile.uri
         repo.images_to_render[file_print.to_s.html_safe] = child_sorted.serialized_attributes
       end
       parent.save

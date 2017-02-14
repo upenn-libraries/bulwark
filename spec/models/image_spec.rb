@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Page, type: :model do
+RSpec.describe Image, type: :model do
   it "has a valid factory" do
     expect(FactoryGirl.create(:page)).to be_valid
   end
