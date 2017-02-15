@@ -71,7 +71,6 @@ module Utils
       def pull(dir = @working_repo_path)
         change_dir_working(dir)
         `git pull`
-        #binding.pry
       end
 
       def add(options)

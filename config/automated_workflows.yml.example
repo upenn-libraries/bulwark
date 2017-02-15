@@ -1,0 +1,18 @@
+development:
+  openn:
+    csv:
+     owner: user@email.edu
+     description: X
+     initial_stop: create_repo
+test:
+  openn:
+    csv:
+      owner: user@email.edu
+      description: X
+      initial_stop: create_repo
+production:
+  openn:
+    csv:
+      owner: user@email.edu
+      description: X
+      initial_stop: create_repo

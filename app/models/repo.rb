@@ -14,6 +14,7 @@ class Repo < ActiveRecord::Base
   validates :metadata_subdirectory, presence: true
   validates :assets_subdirectory, presence: true
   validates :file_extensions, presence: true
+  validates :metadata_source_extensions, presence: true
   validates :preservation_filename, presence: true
 
   serialize :file_extensions, Array

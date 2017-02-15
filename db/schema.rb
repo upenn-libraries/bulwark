@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161223201915) do
+ActiveRecord::Schema.define(version: 20170215175627) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       limit: 4,   null: false
@@ -90,6 +90,8 @@ ActiveRecord::Schema.define(version: 20161223201915) do
     t.string   "thumbnail",                  limit: 255
     t.text     "problem_files",              limit: 4294967295
     t.text     "images_to_render",           limit: 4294967295
+    t.datetime "last_external_update"
+    t.string   "initial_stop",               limit: 255
   end
 
   add_index "repos", ["metadata_builder_id"], name: "index_repos_on_metadata_builder_id", using: :btree

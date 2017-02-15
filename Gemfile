@@ -29,6 +29,8 @@ gem 'rails_admin', git: 'https://github.com/kelynch/rails_admin.git', branch: 'j
 
 gem 'colorize'
 gem 'git'
+gem 'smarter_csv'
+gem 'activerecord-import'
 gem 'rubyXL'
 gem 'mini_magick'
 gem 'sanitize'
