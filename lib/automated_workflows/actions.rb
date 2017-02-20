@@ -11,8 +11,6 @@ module AutomatedWorkflows
           description = options[:description] || nil
           last_external_update = options[:last_external_update] || nil
           initial_stop = options[:initial_stop] || nil
-          endpoint_suffix = options[:endpoint_suffix] || ''
-          assets_suffix = options[:assets_suffix] || ''
 
           human_readable_name = repo_name.present? ? repo_name : AutomatedWorkflows::Bulk::Constants::DEFAULTS[repo_type][:human_readable_name]
 
@@ -31,8 +29,6 @@ module AutomatedWorkflows
             repo.metadata_source_extensions = metadata_source_extensions
             repo.preservation_filename = preservation_filename
             repo.last_external_update = last_external_update
-            repo.endpoint_suffix = endpoint_suffix
-            repo.assets_suffix = assets_suffix
             repo.initial_stop = initial_stop
           end
         end

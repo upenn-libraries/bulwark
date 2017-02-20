@@ -8,6 +8,9 @@ class Repo < ActiveRecord::Base
   has_one :metadata_builder, dependent: :destroy, :validate => false
   has_one :version_control_agent, dependent: :destroy, :validate => false
 
+  has_many :endpoint, dependent: :destroy
+  validates_associated :endpoint
+
   around_create :set_version_control_agent_and_repo
 
   validates :human_readable_name, presence: true

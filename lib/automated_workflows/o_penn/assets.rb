@@ -2,9 +2,16 @@ module AutomatedWorkflows
   module OPenn
     class Assets
 
-      def fetch(working_path, endpoint, repo)
-        source = [endpoint, repo.endpoint_suffix, repo.assets_suffix].reject(&:blank?).join('/')
-        destination = "#{working_path}/#{repo.assets_subdirectory}"
+      class << self
+        def endpoint(repo)
+          repo.endpoint.find_by(:content_type => 'assets')
+        end
+      end
+
+      def fetch(working_path, repo)
+        assets_endpoint = AutomatedWorkflows::OPenn::Assets.endpoint(repo)
+        source =  assets_endpoint.source
+        destination = "#{working_path}/#{assets_endpoint.destination}"
         result = AutomatedWorkflows::Actions::Binaries.fetch(source, destination, repo.file_extensions)
         repo.version_control_agent.add
         repo.version_control_agent.commit("Added assets")

@@ -5,9 +5,16 @@ module AutomatedWorkflows
   module OPenn
     class Metadata
 
-      def fetch(working_path, endpoint, repo)
-        source = [endpoint, repo.endpoint_suffix, repo.metadata_suffix].join('/')
-        destination = "#{working_path}/#{repo.metadata_subdirectory}"
+      class << self
+        def endpoint(repo)
+          repo.endpoint.find_by(:content_type => 'metadata')
+        end
+      end
+
+      def fetch(working_path, repo)
+        metadata_endpoint = AutomatedWorkflows::OPenn::Metadata.endpoint(repo)
+        source =  metadata_endpoint.source
+        destination = "#{working_path}/#{metadata_endpoint.destination}"
         result = AutomatedWorkflows::Actions::Binaries.fetch(source, destination, repo.metadata_source_extensions)
         repo.version_control_agent.add
         repo.version_control_agent.commit("Added metadata")

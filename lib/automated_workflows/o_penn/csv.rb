@@ -51,14 +51,24 @@ module AutomatedWorkflows
           file_lines.each do |dir|
             directory = dir.split('|').first
             last_updated = dir.split('|').last
-            AutomatedWorkflows::Actions::Repos.create(directory,
+            repo = AutomatedWorkflows::Actions::Repos.create(directory,
                                                       :owner => AutomatedWorkflows::OPenn::Csv.config.owner,
                                                       :description => AutomatedWorkflows::OPenn::Csv.config.description,
                                                       :last_external_update => last_updated,
                                                       :initial_stop => AutomatedWorkflows::OPenn::Csv.config.initial_stop,
-                                                      :endpoint_suffix => directory,
-                                                      :assets_suffix => AutomatedWorkflows::OPenn::Csv.config.assets_suffix,
                                                       :type =>'directory')
+            repo.endpoint += [Endpoint.create( :source => "#{AutomatedWorkflows::OPenn::Csv.config.endpoint}/#{directory}/#{AutomatedWorkflows::OPenn::Csv.config.metadata_suffix}",
+                                               :destination => repo.metadata_subdirectory,
+                                               :content_type => 'metadata',
+                                               :fetch_method => 'rsync',
+                                               :protocol => 'smb'),
+                              Endpoint.create( :source => "#{AutomatedWorkflows::OPenn::Csv.config.endpoint}/#{directory}/#{AutomatedWorkflows::OPenn::Csv.config.assets_suffix}",
+                                               :destination => repo.assets_subdirectory,
+                                               :content_type => 'assets',
+                                               :fetch_method => 'rsync',
+                                               :protocol => 'smb')]
+
+            repo.save!
             directories << directory
           end
           directories

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170217195837) do
+ActiveRecord::Schema.define(version: 20170220155126) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       limit: 4,   null: false
@@ -24,6 +24,19 @@ ActiveRecord::Schema.define(version: 20170217195837) do
   end
 
   add_index "bookmarks", ["user_id"], name: "index_bookmarks_on_user_id", using: :btree
+
+  create_table "endpoints", force: :cascade do |t|
+    t.string   "source",       limit: 255
+    t.string   "destination",  limit: 255
+    t.string   "content_type", limit: 255
+    t.string   "protocol",     limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.integer  "repo_id",      limit: 4
+    t.string   "fetch_method", limit: 255
+  end
+
+  add_index "endpoints", ["repo_id"], name: "index_endpoints_on_repo_id", using: :btree
 
   create_table "metadata_builders", force: :cascade do |t|
     t.string   "parent_repo",        limit: 255
@@ -71,8 +84,8 @@ ActiveRecord::Schema.define(version: 20170217195837) do
   create_table "repos", force: :cascade do |t|
     t.string   "human_readable_name",        limit: 255
     t.string   "description",                limit: 255
-    t.datetime "created_at",                                                 null: false
-    t.datetime "updated_at",                                                 null: false
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
     t.string   "metadata_subdirectory",      limit: 255
     t.string   "assets_subdirectory",        limit: 255
     t.string   "derivatives_subdirectory",   limit: 255
@@ -92,11 +105,10 @@ ActiveRecord::Schema.define(version: 20170217195837) do
     t.text     "images_to_render",           limit: 4294967295
     t.datetime "last_external_update"
     t.string   "initial_stop",               limit: 255
-    t.string   "endpoint_suffix",            limit: 255,        default: ""
-    t.string   "metadata_suffix",            limit: 255,        default: ""
-    t.string   "assets_suffix",              limit: 255,        default: ""
+    t.integer  "endpoint_id",                limit: 4
   end
 
+  add_index "repos", ["endpoint_id"], name: "index_repos_on_endpoint_id", using: :btree
   add_index "repos", ["metadata_builder_id"], name: "index_repos_on_metadata_builder_id", using: :btree
   add_index "repos", ["version_control_agent_id"], name: "index_repos_on_version_control_agent_id", using: :btree
 
@@ -152,9 +164,11 @@ ActiveRecord::Schema.define(version: 20170217195837) do
 
   add_index "version_control_agents", ["repo_id"], name: "index_version_control_agents_on_repo_id", using: :btree
 
+  add_foreign_key "endpoints", "repos"
   add_foreign_key "metadata_builders", "metadata_sources"
   add_foreign_key "metadata_builders", "repos"
   add_foreign_key "metadata_sources", "metadata_builders"
+  add_foreign_key "repos", "endpoints"
   add_foreign_key "repos", "metadata_builders"
   add_foreign_key "repos", "version_control_agents"
   add_foreign_key "version_control_agents", "repos"

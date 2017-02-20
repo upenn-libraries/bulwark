@@ -29,8 +29,8 @@ module AutomatedWorkflows
 
         working_path = repo.version_control_agent.clone
         if steps_to_complete.include?('fetch')
-          metadata.fetch(working_path, self.endpoint, repo)
-          assets.fetch(working_path, self.endpoint, repo)
+          metadata.fetch(working_path, repo)
+          assets.fetch(working_path, repo)
         end
 
         if steps_to_complete.include?('extract')

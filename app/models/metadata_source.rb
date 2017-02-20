@@ -81,7 +81,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def children=(children)
-    self[:children] = children.reject(&:empty?)
+    self[:children] = children.reject(&:blank?)
   end
 
   def source_type=(source_type)
