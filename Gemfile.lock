@@ -495,6 +495,7 @@ GEM
       rspec-mocks (~> 3.5.0)
       rspec-support (~> 3.5.0)
     rspec-support (3.5.0)
+    rsync (1.0.9)
     rubyXL (3.3.22)
       nokogiri (>= 1.4.4)
       rubyzip (>= 1.1.6)
@@ -577,7 +578,6 @@ PLATFORMS
 
 DEPENDENCIES
   active_job_status (= 1.1.0)
-  activerecord-import
   awesome_print
   blacklight_range_limit
   bootstrap-sass (= 3.3.4.1)
@@ -612,6 +612,7 @@ DEPENDENCIES
   roo
   rsolr (~> 1.0.6)
   rspec-rails
+  rsync
   rubyXL
   sanitize
   sass-rails (< 5.0)

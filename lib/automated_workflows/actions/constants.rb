@@ -1,5 +1,5 @@
 module AutomatedWorkflows
-  module Bulk
+  module Actions
     class Constants
       DEFAULTS = {}
 

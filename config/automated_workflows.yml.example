@@ -3,16 +3,18 @@ development:
     csv:
      owner: user@email.edu
      description: X
-     initial_stop: create_repo
+     initial_stop: create
+     metadata_suffix: X
+     assets_suffix: X
 test:
   openn:
     csv:
       owner: user@email.edu
       description: X
-      initial_stop: create_repo
+      initial_stop: create
 production:
   openn:
     csv:
       owner: user@email.edu
       description: X
-      initial_stop: create_repo
+      initial_stop: create

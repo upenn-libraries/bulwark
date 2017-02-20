@@ -52,6 +52,7 @@ class MetadataBuildersController < ApplicationController
 
   def ingest
     if params[:to_ingest].present?
+      binding.pry
       @job = IngestJob.perform_later(@metadata_builder, params[:to_ingest], root_url, current_user.email)
       initialize_job_activity('ingest')
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest"

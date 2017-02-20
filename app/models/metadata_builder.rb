@@ -32,12 +32,16 @@ class MetadataBuilder < ActiveRecord::Base
 
   def refresh_metadata
     @working_path = self.repo.version_control_agent.clone
+    get_mappings(@working_path)
+    self.repo.version_control_agent.delete_clone
+  end
+
+  def get_mappings(working_path)
     self.metadata_source.each do |source|
-      source.set_metadata_mappings(@working_path)
+      source.set_metadata_mappings(working_path)
       source.last_extraction = DateTime.now
       source.save!
     end
-    self.repo.version_control_agent.delete_clone
   end
 
   def set_source(source_files)
@@ -73,6 +77,12 @@ class MetadataBuilder < ActiveRecord::Base
   def perform_file_checks_and_generate_previews
     self.repo.problem_files = {}
     working_path = self.repo.version_control_agent.clone
+    file_checks_previews(working_path)
+    self.repo.version_control_agent.delete_clone
+    Utils::Process.refresh_assets(self.repo)
+  end
+
+  def file_checks_previews(working_path)
     self.repo.version_control_agent.get(:location => "#{working_path}/#{self.repo.assets_subdirectory}")
     self.metadata_source.where(:source_type => MetadataSource.structural_types).each do |ms|
       ms.filenames.each do |file|
@@ -91,14 +101,18 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.add(:content => "#{working_path}/#{self.repo.derivatives_subdirectory}")
     self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_previews'))
     self.repo.version_control_agent.push
-    self.repo.version_control_agent.delete_clone
-    Utils::Process.refresh_assets(self.repo)
   end
 
   def transform_and_ingest(array)
     working_path = self.repo.version_control_agent.clone
-    array.each do |file|
-      file_path = "#{working_path}#{file.last}"
+    ingest(working_path, array)
+    self.repo.version_control_agent.delete_clone
+    Utils::Process.refresh_assets(self.repo)
+  end
+
+  def ingest(working_path,files_array)
+    files_array.each do |file|
+      file_path = "#{working_path}/#{file.last}".gsub('//','/')
       self.repo.version_control_agent.get(:location => file_path)
       self.repo.version_control_agent.unlock(:content => file_path)
       unless canonical_identifier_check(file_path)
@@ -118,8 +132,6 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.lock
     self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'))
     self.repo.version_control_agent.push
-    self.repo.version_control_agent.delete_clone
-    Utils::Process.refresh_assets(self.repo)
   end
 
   def canonical_identifier_check(xml_file)
@@ -141,9 +153,16 @@ class MetadataBuilder < ActiveRecord::Base
 
   def store_xml_preview
     working_path = self.repo.version_control_agent.clone
+    read_and_store_xml(working_path)
+    self.repo.version_control_agent.delete_clone
+  end
+
+
+
+  def read_and_store_xml(working_path)
     get_location = "#{working_path}/#{self.repo.metadata_subdirectory}"
     self.repo.version_control_agent.get(:location => get_location)
-    @sample_xml_docs = ''
+    sample_xml_docs = ''
     @file_links = Array.new
     Dir.glob("#{get_location}/*.xml") do |file|
       if File.exist?(file)
@@ -157,15 +176,14 @@ class MetadataBuilder < ActiveRecord::Base
         sample_xml_doc.write(sample_xml, 1)
         header = content_tag(:h2, I18n.t('colenda.metadata_builders.xml_preview_header', :file => pretty_file))
         xml_code = content_tag(:pre, "#{sample_xml}")
-        @sample_xml_docs << content_tag(:div, anchor_tag << header << xml_code, :class => 'doc')
+        sample_xml_docs << content_tag(:div, anchor_tag << header << xml_code, :class => 'doc')
       end
     end
-    self.repo.version_control_agent.delete_clone
     @file_links_html = ''
     @file_links.each do |file_link|
       @file_links_html << content_tag(:li, file_link.html_safe)
     end
-    self.xml_preview = content_tag(:ul, @file_links_html.html_safe) << @sample_xml_docs.html_safe
+    self.xml_preview = content_tag(:ul, @file_links_html.html_safe) << sample_xml_docs.html_safe
     self.save!
   end
 

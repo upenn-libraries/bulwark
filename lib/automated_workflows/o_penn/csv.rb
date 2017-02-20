@@ -7,11 +7,17 @@ module AutomatedWorkflows
       attr_accessor :owner
       attr_accessor :description
       attr_accessor :initial_stop
+      attr_accessor :endpoint
+      attr_accessor :metadata_suffix
+      attr_accessor :assets_suffix
 
       def initialize
         @owner = ENV['OPENN_OWNER'] || AutomatedWorkflows.config['openn']['csv']['owner']
         @description = ENV['OPENN_DESCRIPTION'] || AutomatedWorkflows.config['openn']['csv']['description']
         @initial_stop = ENV['OPENN_INITIAL_STOP'] || AutomatedWorkflows.config['openn']['csv']['initial_stop']
+        @endpoint = ENV['OPENN_HARVESTING_ENDPOINT'] || nil
+        @metadata_suffix = ENV['OPENN_METADATA_ENDPOINT_SUFFIX'] || AutomatedWorkflows.config['openn']['csv']['metadata_suffix']
+        @assets_suffix = ENV['OPENN_ASSETS_ENDPOINT_SUFFIX'] || AutomatedWorkflows.config['openn']['csv']['assets_suffix']
       end
     end
 
@@ -45,12 +51,14 @@ module AutomatedWorkflows
           file_lines.each do |dir|
             directory = dir.split('|').first
             last_updated = dir.split('|').last
-            AutomatedWorkflows::Bulk::CreateManageRepos.create_repo(directory,
-                                                                    :owner => AutomatedWorkflows::OPenn::Csv.config.owner,
-                                                                    :description => AutomatedWorkflows::OPenn::Csv.config.description,
-                                                                    :last_external_update => last_updated,
-                                                                    :initial_stop => AutomatedWorkflows::OPenn::Csv.config.initial_stop,
-                                                                    :type =>'directory')
+            AutomatedWorkflows::Actions::Repos.create(directory,
+                                                      :owner => AutomatedWorkflows::OPenn::Csv.config.owner,
+                                                      :description => AutomatedWorkflows::OPenn::Csv.config.description,
+                                                      :last_external_update => last_updated,
+                                                      :initial_stop => AutomatedWorkflows::OPenn::Csv.config.initial_stop,
+                                                      :endpoint_suffix => directory,
+                                                      :assets_suffix => AutomatedWorkflows::OPenn::Csv.config.assets_suffix,
+                                                      :type =>'directory')
             directories << directory
           end
           directories

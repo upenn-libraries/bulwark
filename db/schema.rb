@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170215175627) do
+ActiveRecord::Schema.define(version: 20170217195837) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       limit: 4,   null: false
@@ -71,8 +71,8 @@ ActiveRecord::Schema.define(version: 20170215175627) do
   create_table "repos", force: :cascade do |t|
     t.string   "human_readable_name",        limit: 255
     t.string   "description",                limit: 255
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
+    t.datetime "created_at",                                                 null: false
+    t.datetime "updated_at",                                                 null: false
     t.string   "metadata_subdirectory",      limit: 255
     t.string   "assets_subdirectory",        limit: 255
     t.string   "derivatives_subdirectory",   limit: 255
@@ -92,6 +92,9 @@ ActiveRecord::Schema.define(version: 20170215175627) do
     t.text     "images_to_render",           limit: 4294967295
     t.datetime "last_external_update"
     t.string   "initial_stop",               limit: 255
+    t.string   "endpoint_suffix",            limit: 255,        default: ""
+    t.string   "metadata_suffix",            limit: 255,        default: ""
+    t.string   "assets_suffix",              limit: 255,        default: ""
   end
 
   add_index "repos", ["metadata_builder_id"], name: "index_repos_on_metadata_builder_id", using: :btree
