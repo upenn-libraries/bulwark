@@ -17,6 +17,7 @@ module Utils
       attr_accessor :aws_secret_access_key
       attr_accessor :encryption
       attr_accessor :request_style
+      attr_accessor :public
 
       def initialize
         # Always required
@@ -30,6 +31,7 @@ module Utils
         @aws_secret_access_key = ENV["AWS_SECRET_ACCESS_KEY"] || nil
         @encryption = ENV["STORAGE_ENCRYPTION"] || nil
         @request_style = ENV["REQUEST_STYLE"] || nil
+        @public = ENV["STORAGE_PUBLIC"] || nil
       end
 
     end
