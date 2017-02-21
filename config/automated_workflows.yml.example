@@ -1,0 +1,39 @@
+development:
+  openn:
+    csv:
+     owner: user@email.edu
+     description: X
+     initial_stop: create
+     metadata_suffix: X
+     assets_suffix: X
+     endpoints:
+       metadata_fetch_method: X
+       metadata_protocol: X
+       assets_fetch_method: X
+       assets_protocol: X
+test:
+  openn:
+    csv:
+      owner: user@email.edu
+      description: X
+      initial_stop: create
+      metadata_suffix: X
+      assets_suffix: X
+      endpoints:
+        metadata_fetch_method: X
+        metadata_protocol: X
+        assets_fetch_method: X
+        assets_protocol: X
+production:
+  openn:
+    csv:
+      owner: user@email.edu
+      description: X
+      initial_stop: create
+      metadata_suffix: X
+      assets_suffix: X
+      endpoints:
+        metadata_fetch_method: X
+        metadata_protocol: X
+        assets_fetch_method: X
+        assets_protocol: X

@@ -8,12 +8,16 @@ class Repo < ActiveRecord::Base
   has_one :metadata_builder, dependent: :destroy, :validate => false
   has_one :version_control_agent, dependent: :destroy, :validate => false
 
+  has_many :endpoint, dependent: :destroy
+  validates_associated :endpoint
+
   around_create :set_version_control_agent_and_repo
 
   validates :human_readable_name, presence: true
   validates :metadata_subdirectory, presence: true
   validates :assets_subdirectory, presence: true
   validates :file_extensions, presence: true
+  validates :metadata_source_extensions, presence: true
   validates :preservation_filename, presence: true
 
   serialize :file_extensions, Array
@@ -51,15 +55,15 @@ class Repo < ActiveRecord::Base
 
 
   def file_extensions=(file_extensions)
-    self[:file_extensions] = Array.wrap(file_extensions).reject(&:empty?)
+    self[:file_extensions] = Array.wrap(file_extensions).reject(&:blank?)
   end
 
   def metadata_source_extensions=(metadata_source_extensions)
-    self[:metadata_source_extensions] = Array.wrap(metadata_source_extensions).reject(&:empty?)
+    self[:metadata_source_extensions] = Array.wrap(metadata_source_extensions).reject(&:blank?)
   end
 
   def nested_relationships=(nested_relationships)
-    self[:nested_relationships] = nested_relationships.reject(&:empty?)
+    self[:nested_relationships] = nested_relationships.reject(&:blank?)
   end
 
   def preservation_filename=(preservation_filename)
@@ -143,7 +147,7 @@ class Repo < ActiveRecord::Base
       self.generate_logs(working_path)
       self.version_control_agent.add(:content => "#{working_path}/#{self.derivatives_subdirectory}")
       self.version_control_agent.add(:content => "#{working_path}/#{self.admin_subdirectory}")
-      self.version_control_agent.commit('Added derivatives')
+      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives'))
       self.version_control_agent.push
       self.metadata_builder.last_file_checks = DateTime.now
       self.metadata_builder.save!

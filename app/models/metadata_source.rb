@@ -81,7 +81,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def children=(children)
-    self[:children] = children.reject(&:empty?)
+    self[:children] = children.reject(&:blank?)
   end
 
   def source_type=(source_type)
@@ -164,30 +164,34 @@ class MetadataSource < ActiveRecord::Base
 
   def build_xml
     $working_path = self.metadata_builder.repo.version_control_agent.clone
-    self.generate_and_build_individual_xml
-    self.children.each do |child|
-      source = MetadataSource.find(child)
-      source.generate_and_build_individual_xml(source.path) unless source.source_type == 'bibliophilly_structural'
-    end
-    self.generate_preservation_xml
-    self.jettison_metadata($jettison_files)
-    content = "#{$working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
-    self.metadata_builder.repo.version_control_agent.add(:content => content)
-    self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_preservation_xml'))
-    self.metadata_builder.repo.version_control_agent.push
+    generate_all_xml($working_path)
     self.metadata_builder.repo.version_control_agent.delete_clone
   end
 
-  def jettison_metadata(files_to_jettison)
+  def generate_all_xml(working_path)
+    self.generate_and_build_individual_xml(working_path)
+    self.children.each do |child|
+      source = MetadataSource.find(child)
+      source.generate_and_build_individual_xml(working_path, source.path) unless source.source_type == 'bibliophilly_structural'
+    end
+    self.generate_preservation_xml(working_path)
+    self.jettison_metadata(working_path, $jettison_files) if $jettison_files.present?
+    content = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
+    self.metadata_builder.repo.version_control_agent.add(:content => content)
+    self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_preservation_xml'))
+    self.metadata_builder.repo.version_control_agent.push
+  end
+
+  def jettison_metadata(working_path, files_to_jettison)
     files_to_jettison.each do |f|
-      f = _reconcile_working_path_slashes($working_path, f)
+      f = _reconcile_working_path_slashes(working_path, f)
       self.metadata_builder.repo.version_control_agent.unlock(:content => f)
       self.metadata_builder.repo.version_control_agent.drop(:drop_location => f) && `rm -rf #{Shellwords.escape(f)}`
     end
     $jettison_files = Set.new
   end
 
-  def generate_and_build_individual_xml(fname = self.path)
+  def generate_and_build_individual_xml(working_path, fname = self.path)
     xml_fname = "#{fname}.xml"
     if self.user_defined_mappings.present? && self.root_element.present?
       case self.source_type
@@ -201,18 +205,18 @@ class MetadataSource < ActiveRecord::Base
           @xml_content_final_copy = xml_from_bibliophilly
       end
       $jettison_files.add(xml_fname)
-      _fetch_write_save_preservation_xml(xml_fname, @xml_content_final_copy)
+      _fetch_write_save_preservation_xml(working_path, xml_fname, @xml_content_final_copy)
     end
   end
 
-  def generate_preservation_xml
+  def generate_preservation_xml(working_path)
     if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'bibliophilly'
-      @xml_content_final = parent_id.present? ? MetadataSource.find(parent_id).generate_parent_child_xml : self.generate_parent_child_xml
+      @xml_content_final = parent_id.present? ? MetadataSource.find(parent_id).generate_parent_child_xml(working_path) : self.generate_parent_child_xml(working_path)
     else
-      file = File.new(_reconcile_working_path_slashes($working_path, "#{self.path}.xml"))
+      file = File.new(_reconcile_working_path_slashes(working_path, "#{self.path}.xml"))
       @xml_content_final = file.readline
     end
-    _fetch_write_save_preservation_xml(@xml_content_final)
+    _fetch_write_save_preservation_xml(working_path, @xml_content_final)
     self.metadata_builder.repo.update_steps(:preservation_xml_generated)
   end
 
@@ -291,13 +295,13 @@ class MetadataSource < ActiveRecord::Base
     "<#{self.root_element}>#{parent_content}<#{structural.root_element}>#{child_content}</#{structural.root_element}></#{self.root_element}>"
   end
 
-  def generate_parent_child_xml
+  def generate_parent_child_xml(working_path)
     content = ''
-    key_path = _reconcile_working_path_slashes($working_path, "#{self.path}.xml")
-    self.generate_and_build_individual_xml
+    key_path = _reconcile_working_path_slashes(working_path, "#{self.path}.xml")
+    self.generate_and_build_individual_xml(working_path)
     self.children.each do |child|
       child_path = MetadataSource.where(:id => child).pluck(:path).first
-      child_content_path = _reconcile_working_path_slashes($working_path, "#{child_path}.xml")
+      child_content_path = _reconcile_working_path_slashes(working_path, "#{child_path}.xml")
       self.metadata_builder.repo.version_control_agent.get(:location => key_path)
       self.metadata_builder.repo.version_control_agent.get(:location => child_content_path)
       content = File.open(key_path, 'r'){|io| io.read}
@@ -653,9 +657,9 @@ class MetadataSource < ActiveRecord::Base
     column_value
   end
 
-  def _build_preservation_xml(metadata_path_and_filename, content)
-    working_file = _reconcile_working_path_slashes($working_path, "#{metadata_path_and_filename}")
-    preservation_file = _reconcile_working_path_slashes($working_path, "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}")
+  def _build_preservation_xml(working_path, metadata_path_and_filename, content)
+    working_file = _reconcile_working_path_slashes(working_path, "#{metadata_path_and_filename}")
+    preservation_file = _reconcile_working_path_slashes(working_path, "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}")
     _manage_canonical_identifier(content) if working_file == preservation_file
     tmp_filename = "#{working_file}.tmp"
     if File.basename(metadata_path_and_filename) == self.metadata_builder.repo.preservation_filename
@@ -676,10 +680,10 @@ class MetadataSource < ActiveRecord::Base
     xml_content.insert((xml_content.index(root_element)+root_element.length), minted_identifier)
   end
 
-  def _fetch_write_save_preservation_xml(file_path = "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}", xml_content)
-    file_path = _reconcile_working_path_slashes($working_path, file_path)
+  def _fetch_write_save_preservation_xml(working_path, file_path = "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}", xml_content)
+    file_path = _reconcile_working_path_slashes(working_path, file_path)
     self.metadata_builder.repo.version_control_agent.unlock(:content => file_path) if File.exists?(file_path)
-    _build_preservation_xml(file_path, xml_content)
+    _build_preservation_xml(working_path, file_path, xml_content)
     self.metadata_builder.save!
   end
 

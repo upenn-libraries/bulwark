@@ -495,6 +495,7 @@ GEM
       rspec-mocks (~> 3.5.0)
       rspec-support (~> 3.5.0)
     rspec-support (3.5.0)
+    rsync (1.0.9)
     rubyXL (3.3.22)
       nokogiri (>= 1.4.4)
       rubyzip (>= 1.1.6)
@@ -524,6 +525,7 @@ GEM
       rack-protection (~> 1.4)
       tilt (>= 1.3, < 3)
     slop (3.6.0)
+    smarter_csv (1.1.4)
     solrizer (3.3.0)
       activesupport
       daemons
@@ -610,12 +612,14 @@ DEPENDENCIES
   roo
   rsolr (~> 1.0.6)
   rspec-rails
+  rsync
   rubyXL
   sanitize
   sass-rails (< 5.0)
   sdoc (~> 0.4.0)
   sidekiq
   sinatra
+  smarter_csv
   string_exts!
   therubyracer
   uglifier (>= 1.3.0)
