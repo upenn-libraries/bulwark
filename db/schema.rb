@@ -30,8 +30,10 @@ ActiveRecord::Schema.define(version: 20170220155126) do
     t.string   "destination",  limit: 255
     t.string   "content_type", limit: 255
     t.string   "protocol",     limit: 255
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.text     "parameters",   limit: 4294967295
+    t.text     "problems",     limit: 4294967295
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
     t.integer  "repo_id",      limit: 4
     t.string   "fetch_method", limit: 255
   end
@@ -67,6 +69,7 @@ ActiveRecord::Schema.define(version: 20170220155126) do
     t.string   "parent_element",        limit: 255
     t.text     "user_defined_mappings", limit: 65535
     t.text     "children",              limit: 4294967295
+    t.text     "parameters",            limit: 4294967295
     t.datetime "created_at",                                                      null: false
     t.datetime "updated_at",                                                      null: false
     t.integer  "metadata_builder_id",   limit: 4

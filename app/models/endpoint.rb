@@ -2,6 +2,8 @@ class Endpoint < ActiveRecord::Base
 
   belongs_to :repo, :foreign_key => 'repo_id'
 
+  serialize :problems, Hash
+
   def source
     read_attribute(:source) || ''
   end
@@ -21,5 +23,14 @@ class Endpoint < ActiveRecord::Base
   def protocol
     read_attribute(:protocol) || ''
   end
+
+  def params
+    read_attribute(:params) || ''
+  end
+
+  def problems
+    read_attribute(:problems) || ''
+  end
+
 
 end

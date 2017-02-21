@@ -55,15 +55,15 @@ class Repo < ActiveRecord::Base
 
 
   def file_extensions=(file_extensions)
-    self[:file_extensions] = Array.wrap(file_extensions).reject(&:empty?)
+    self[:file_extensions] = Array.wrap(file_extensions).reject(&:blank?)
   end
 
   def metadata_source_extensions=(metadata_source_extensions)
-    self[:metadata_source_extensions] = Array.wrap(metadata_source_extensions).reject(&:empty?)
+    self[:metadata_source_extensions] = Array.wrap(metadata_source_extensions).reject(&:blank?)
   end
 
   def nested_relationships=(nested_relationships)
-    self[:nested_relationships] = nested_relationships.reject(&:empty?)
+    self[:nested_relationships] = nested_relationships.reject(&:blank?)
   end
 
   def preservation_filename=(preservation_filename)
@@ -147,7 +147,7 @@ class Repo < ActiveRecord::Base
       self.generate_logs(working_path)
       self.version_control_agent.add(:content => "#{working_path}/#{self.derivatives_subdirectory}")
       self.version_control_agent.add(:content => "#{working_path}/#{self.admin_subdirectory}")
-      self.version_control_agent.commit('Added derivatives')
+      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives'))
       self.version_control_agent.push
       self.metadata_builder.last_file_checks = DateTime.now
       self.metadata_builder.save!

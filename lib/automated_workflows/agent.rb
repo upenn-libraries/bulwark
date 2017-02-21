@@ -29,8 +29,14 @@ module AutomatedWorkflows
 
         working_path = repo.version_control_agent.clone
         if steps_to_complete.include?('fetch')
-          metadata.fetch(working_path, repo)
-          assets.fetch(working_path, repo)
+          unless metadata.fetch(working_path, repo)
+            repo.version_control_agent.delete_clone
+            next
+          end
+          unless assets.fetch(working_path, repo)
+            repo.version_control_agent.delete_clone
+            next
+          end
         end
 
         if steps_to_complete.include?('extract')
@@ -59,6 +65,20 @@ module AutomatedWorkflows
     def steps(start = 'create', stop = 'create')
       steps = ['create','fetch','extract','file_check','xml','ingest']
       return steps[steps.index(start)..steps.index(stop)]
+    end
+
+    class << self
+
+      def verify_sources(repo)
+        repo.endpoint.each do |ep|
+          source_problems(ep, ep.source, 'Source not found') unless AutomatedWorkflows::Actions::Binaries.source_exists?(ep.source)
+        end
+      end
+
+      def source_problems(endpoint, source, problem)
+        endpoint.problems[source] = problem
+        endpoint.save!
+      end
     end
 
   end
