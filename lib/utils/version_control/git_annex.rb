@@ -124,6 +124,11 @@ module Utils
         `git annex lock #{Shellwords.escape(file)}`
       end
 
+      def look_up_key(path, dir = @working_repo_path)
+        change_dir_working(dir) unless Dir.pwd == dir
+        `git annex lookupkey #{path.gsub(dir, '')}`.chomp
+      end
+
       def rolling_upgrade(dir = @working_repo_path)
         change_dir_working(dir) unless Dir.pwd == dir
         version_string = `git annex version`

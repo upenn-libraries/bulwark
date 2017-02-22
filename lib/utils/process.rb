@@ -1,3 +1,5 @@
+require 'fastimage'
+
 module Utils
   module Process
 
@@ -52,14 +54,16 @@ module Utils
         child = Finder.fedora_find(ActiveFedora::Base.uri_to_id(child_uri))
         children << child
         if child.file_name.present?
-          attach_file(repo, child, child.file_name, 'imageFile')
+          width, height = attach_file(repo, child, child.file_name, 'imageFile')
           parent.members << child
+          file_print = child.imageFile.uri
+          repo.images_to_render[file_print.to_s.html_safe] = {'width' => width, 'height' => height}
         end
       end
       children_sorted = children.sort_by! { |c| c.page_number }
       children_sorted.each do |child_sorted|
         file_print = child_sorted.imageFile.uri
-        repo.images_to_render[file_print.to_s.html_safe] = child_sorted.serialized_attributes
+        repo.images_to_render[file_print.to_s.html_safe] = repo.images_to_render[file_print.to_s.html_safe].merge(child_sorted.serialized_attributes)
       end
       parent.save
     end
@@ -70,35 +74,45 @@ module Utils
       repo.version_control_agent.unlock(:content => file_link)
       validation_state = validate_file(file_link)
       if validation_state.nil?
-        binding.pry
-        derivative_link = "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
-        binding.pry
-        execute_curl(_build_command('file_attach', :file => derivative_link, :fid => parent.id, :child_container => child_container))
+        derivative_link = "#{@@working_path}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
+        file_url = attachable_url(repo, derivative_link)
+        execute_curl(_build_command('file_attach', :file => file_url, :fid => parent.id, :child_container => child_container))
+        return FastImage.size(derivative_link)
       else
         @@status_type = :warning
         repo.log_problem_file(file_link.gsub(@@working_path,''), validation_state)
+        return nil
       end
     end
 
     def generate_thumbnail(repo)
       unencrypted_thumbnail_path = "#{@@working_path}/#{repo.assets_subdirectory}/#{repo.thumbnail}"
-      thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{Utils.config[:federated_fs_path]}/#{repo.names.directory}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ''
-      execute_curl(_build_command('file_attach', :file => thumbnail_link, :fid => repo.names.fedora, :child_container => 'thumbnail'))
-      refresh_assets(repo)
+      thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{@@working_path}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ''
+      execute_curl(_build_command('file_attach', :file => attachable_url(repo, thumbnail_link), :fid => repo.names.fedora, :child_container => 'thumbnail'))
+      refresh_assets(@@working_path, repo)
     end
 
-    def refresh_assets(repo)
-      display_path = "#{Utils.config[:assets_display_path]}/#{repo.names.directory}"
-      if File.directory?("#{Utils.config[:assets_display_path]}/#{repo.names.directory}")
-        Dir.chdir(display_path)
-        repo.version_control_agent.reset_hard(:location => "#{display_path}/#{repo.derivatives_subdirectory}")
-        repo.version_control_agent.pull(:location => "#{display_path}/#{repo.derivatives_subdirectory}")
-        repo.version_control_agent.get(:location => "#{display_path}/#{repo.derivatives_subdirectory}")
-        repo.version_control_agent.unlock(:location => "#{display_path}/#{repo.derivatives_subdirectory}", :content => "#{display_path}/#{repo.derivatives_subdirectory}")
-      else
-        repo.version_control_agent.clone(:destination => display_path)
-        refresh_assets(repo)
+    def attachable_url(repo, file_path)
+      repo.version_control_agent.add(:content => file_path)
+      storage_link(repo.version_control_agent.look_up_key(file_path), repo)
+    end
+
+    def storage_link(key, repo)
+      "#{Utils::Storage::Ceph.config.protocol}#{Utils::Storage::Ceph.config.host}:#{Utils::Storage::Ceph.config.port}/#{repo.names.bucket}/#{key}"
+    end
+
+    def refresh_assets(working_path, repo)
+      repo.file_display_attributes = {}
+      Dir.chdir(working_path)
+      entries = Dir.entries("#{working_path}/#{repo.derivatives_subdirectory}").reject { |f| File.directory?("#{working_path}/#{repo.derivatives_subdirectory}/#{f}") }
+      entries.each do |file|
+        file_path = "#{working_path}/#{repo.derivatives_subdirectory}/#{file}"
+        width, height = FastImage.size(file_path)
+        repo.file_display_attributes[File.basename(attachable_url(repo, file_path))] = {:file_name => "#{repo.derivatives_subdirectory}/#{File.basename(file_path)}",
+                                                                                        :width => width,
+                                                                                        :height => height}
       end
+      repo.save!
     end
 
     def jettison_originals(repo, commit_message)

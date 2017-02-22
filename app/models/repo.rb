@@ -27,6 +27,7 @@ class Repo < ActiveRecord::Base
   serialize :review_status, Array
   serialize :steps, Hash
   serialize :problem_files, Hash
+  serialize :file_display_attributes, Hash
   serialize :images_to_render, Hash
 
   def set_version_control_agent_and_repo

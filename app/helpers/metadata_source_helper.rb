@@ -33,10 +33,22 @@ module MetadataSourceHelper
   end
 
   def derivative_link(file_name)
-    thumbnail_link = "#{Utils.config["federated_fs_path"]}/#{@object.names.directory}/#{@object.derivatives_subdirectory}/#{file_name}.thumb.jpeg"
-    image_link = "#{Utils.config["federated_fs_path"]}/#{@object.names.directory}/#{@object.derivatives_subdirectory}/#{file_name}.jpeg"
-    return link_to(image_tag(thumbnail_link), image_link) unless @object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"].present?
+
+    thumb_key = get_key_by_filename("#{@object.derivatives_subdirectory}/#{file_name}.thumb.jpeg")
+    preview_key = get_key_by_filename("#{@object.derivatives_subdirectory}/#{file_name}.jpeg")
+
+    thumbnail_link = Utils::Process.storage_link(thumb_key, @object)
+    preview_link = Utils::Process.storage_link(preview_key, @object)
+    return link_to(image_tag(thumbnail_link), preview_link) unless @object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"].present?
     return @object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"].present? ?  problem_warning(file_name).html_safe : ''
+  end
+
+  def get_key_by_filename(file_name)
+    key = ''
+    @object.file_display_attributes.each do |k, v|
+      key =  k if v.rassoc(file_name).try(:last).present?
+    end
+    return key
   end
 
   def problem_warning(file_name)

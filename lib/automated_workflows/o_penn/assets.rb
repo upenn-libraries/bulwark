@@ -25,7 +25,7 @@ module AutomatedWorkflows
 
       def file_checks(working_path, repo)
         repo.metadata_builder.file_checks_previews(working_path)
-        Utils::Process.refresh_assets(repo)
+        Utils::Process.refresh_assets(working_path, repo)
       end
 
     end

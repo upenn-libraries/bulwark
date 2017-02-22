@@ -4,8 +4,12 @@ module ApplicationHelper
 
   def render_image_list
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
-    images_to_render = repo.images_to_render
-    content_tag(:div, '', id: 'pages', data: images_to_render.keys.to_json )
+    rendered_keys = []
+    repo.images_to_render.each do |key, value|
+      rendered_keys << "#{key}?width=#{value['width']}&height=#{value['height']}"
+    end
+    content_tag(:div, '', id: 'pages', data: rendered_keys.to_json )
+
   end
 
   def flash_class(level)

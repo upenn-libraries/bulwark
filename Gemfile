@@ -33,6 +33,7 @@ gem 'smarter_csv'
 gem 'rsync'
 gem 'rubyXL'
 gem 'mini_magick'
+gem 'fastimage'
 gem 'sanitize'
 gem 'awesome_print'
 

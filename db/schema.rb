@@ -106,6 +106,7 @@ ActiveRecord::Schema.define(version: 20170220155126) do
     t.string   "thumbnail",                  limit: 255
     t.text     "problem_files",              limit: 4294967295
     t.text     "images_to_render",           limit: 4294967295
+    t.text     "file_display_attributes",    limit: 4294967295
     t.datetime "last_external_update"
     t.string   "initial_stop",               limit: 255
     t.integer  "endpoint_id",                limit: 4

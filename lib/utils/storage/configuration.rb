@@ -11,6 +11,7 @@ module Utils
       attr_accessor :storage_type
       attr_accessor :host
       attr_accessor :port
+      attr_accessor :protocol
 
       attr_accessor :special_remote_name
       attr_accessor :aws_access_key_id
@@ -24,6 +25,7 @@ module Utils
         @storage_type = ENV["STORAGE_TYPE"]
         @host = ENV["STORAGE_HOST"]
         @port = ENV["STORAGE_PORT"]
+        @protocol = ENV["STORAGE_PROTOCOL"]
 
         # Required for Ceph with S3 gateway
         @special_remote_name = ENV["SPECIAL_REMOTE_NAME"] || nil
