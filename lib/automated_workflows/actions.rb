@@ -43,9 +43,10 @@ module AutomatedWorkflows
             Rails.logger.warn "#{source} not found"
             return false
           end
-          formatted_extensions = extensions.length == 1 ? "*.#{extensions.first}" : "*.{#{extensions.join(',')}}"
-          fetch_path = "#{source}/#{formatted_extensions}".gsub('//','/')
-          Rsync.run(fetch_path, destination) do |result|
+          formatted_extensions = ''
+          extensions.each{|ext| formatted_extensions << " --include=*.#{ext}"}
+          fetch_path = "#{source}".gsub('//','/')
+          Rsync.run(fetch_path, destination, "-av #{formatted_extensions}") do |result|
             if result.success?
               result.changes.each do |change|
                 Rails.logger.info "#{change.filename} (#{change.summary})"
