@@ -43,9 +43,11 @@ RUN mkdir -p /fs
 
 RUN mkdir -p /fs/pub
 
+RUN mkdir -p /fs/priv
+
 RUN mkdir -p /fs/pub/data
 
-RUN mkdir -p /fs/pub/display
+RUN mkdir -p /fs/priv/harvest
 
 RUN mkdir -p /home/app/webapp/string_exts
 

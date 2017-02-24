@@ -20,7 +20,7 @@ module AutomatedWorkflows
         @owner = ENV['OPENN_OWNER'] || AutomatedWorkflows.config['openn']['csv']['owner']
         @description = ENV['OPENN_DESCRIPTION'] || AutomatedWorkflows.config['openn']['csv']['description']
         @initial_stop = ENV['OPENN_INITIAL_STOP'] || AutomatedWorkflows.config['openn']['csv']['initial_stop']
-        @endpoint = ENV['OPENN_HARVESTING_ENDPOINT'] || ''
+        @endpoint = ENV['OPENN_HARVESTING_ENDPOINT_REMOTE'] || ''
         @metadata_suffix = ENV['OPENN_METADATA_SUFFIX'] || AutomatedWorkflows.config['openn']['csv']['metadata_suffix']
         @assets_suffix = ENV['OPENN_ASSETS_SUFFIX'] || AutomatedWorkflows.config['openn']['csv']['assets_suffix']
         @metadata_fetch_method = AutomatedWorkflows.config['openn']['csv']['endpoints']['metadata_fetch_method'] || ''

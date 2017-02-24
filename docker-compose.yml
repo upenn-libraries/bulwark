@@ -30,7 +30,7 @@ services:
     volumes:
       - 'web:/home/app/webapp'
       - '${LOCAL_DATA}:/fs/pub/data'
-      - '${LOCAL_DISPLAY}:/fs/pub/display'
+      - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
   sidekiq:
     depends_on:
       - 'redis'
@@ -45,7 +45,7 @@ services:
     command: 'bundle exec sidekiq -C config/sidekiq.yml'
     volumes:
       - '${LOCAL_DATA}:/fs/pub/data'
-      - '${LOCAL_DISPLAY}:/fs/pub/display'
+      - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
   rabbitmq:
     image: 'rabbitmq:3-management'
     hostname: 'rabbitmq'
