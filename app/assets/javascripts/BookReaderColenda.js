@@ -3,18 +3,38 @@
 //
 // Copyright(c)2008-2009 Internet Archive. Software license AGPL version 3.
 
+function getParameterByName(name, url) {
+    if (!url) {
+        return
+    }
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
 // Create the BookReader object
 br = new BookReader();
 
 
-// Return the width of a given page.  Here we assume all images are 800 pixels wide
+// Return the width of a given page.
 br.getPageWidth = function(index) {
-    return 800;
+    number = parseInt(getParameterByName('width',br.pages[index]));
+    if(number <= 250){
+        calculatedNumber = number;
+    } else {
+        calculatedNumber = 250;
+    }
+    return calculatedNumber;
 }
 
-// Return the height of a given page.  Here we assume all images are 1200 pixels high
+// Return the height of a given page.
 br.getPageHeight = function(index) {
-    return 1200;
+    width = parseInt(getParameterByName('width',br.pages[index]));
+    height = parseInt(getParameterByName('height',br.pages[index]));
+    return (height/width)*250;
 }
 
 // We load the images from archive.org -- you can modify this function to retrieve images

@@ -1,3 +1,5 @@
+require 'fastimage'
+
 class MetadataBuilder < ActiveRecord::Base
   include ActionView::Helpers::UrlHelper
   include Utils::Process
@@ -78,8 +80,8 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.problem_files = {}
     working_path = self.repo.version_control_agent.clone
     file_checks_previews(working_path)
+    Utils::Process.refresh_assets(working_path, self.repo)
     self.repo.version_control_agent.delete_clone
-    Utils::Process.refresh_assets(self.repo)
   end
 
   def file_checks_previews(working_path)
@@ -92,6 +94,7 @@ class MetadataBuilder < ActiveRecord::Base
         self.repo.log_problem_file(file_path.gsub(working_path,''), validation_state) if validation_state.present?
         self.repo.version_control_agent.unlock(:content => self.repo.derivatives_subdirectory)
         generate_preview(file_path,"#{working_path}/#{self.repo.derivatives_subdirectory}") unless validation_state.present?
+        self.repo.version_control_agent.add(:content => file_path)
         self.repo.version_control_agent.lock(file_path)
       end
     end
@@ -106,8 +109,8 @@ class MetadataBuilder < ActiveRecord::Base
   def transform_and_ingest(array)
     working_path = self.repo.version_control_agent.clone
     ingest(working_path, array)
+    Utils::Process.refresh_assets(working_path, self.repo)
     self.repo.version_control_agent.delete_clone
-    Utils::Process.refresh_assets(self.repo)
   end
 
   def ingest(working_path,files_array)
@@ -147,8 +150,9 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def generate_preview(file_name, derivatives_directory)
-    Utils::Derivatives::Preview.generate_copy(file_name, derivatives_directory)
-    Utils::Derivatives::PreviewThumbnail.generate_copy(file_name, derivatives_directory)
+    preview = Utils::Derivatives::Preview.generate_copy(file_name, derivatives_directory)
+    thumbnail = Utils::Derivatives::PreviewThumbnail.generate_copy(file_name, derivatives_directory)
+    return [preview, thumbnail]
   end
 
   def store_xml_preview

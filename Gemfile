@@ -33,6 +33,7 @@ gem 'smarter_csv'
 gem 'rsync'
 gem 'rubyXL'
 gem 'mini_magick'
+gem 'fastimage'
 gem 'sanitize'
 gem 'awesome_print'
 
@@ -58,8 +59,9 @@ gem 'devise-guests', '~> 0.3'
 
 gem 'rb-readline'
 
+gem 'pry-rails', '~> 0.3.4'
+
 group :development, :test do
-  gem 'pry-rails', '~> 0.3.4'
   gem 'jettywrapper'
   gem 'letter_opener'
   gem 'launchy'

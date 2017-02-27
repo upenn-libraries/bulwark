@@ -2,7 +2,7 @@ module ModelNamingExtensions
 
   class Name
 
-    attr_reader :git, :directory, :human, :fedora, :filename
+    attr_reader :git, :directory, :human, :fedora, :filename, :bucket
 
     def initialize(object)
       @human = object.human_readable_name
@@ -10,6 +10,7 @@ module ModelNamingExtensions
       @git = @directory.gitify
       @fedora = object.unique_identifier.fedorafy
       @filename = @directory.filename_sanitize
+      @bucket = object.unique_identifier.bucketize
     end
 
   end

@@ -124,6 +124,11 @@ module Utils
         `git annex lock #{Shellwords.escape(file)}`
       end
 
+      def look_up_key(path, dir = @working_repo_path)
+        change_dir_working(dir) unless Dir.pwd == dir
+        `git annex lookupkey #{path.gsub(dir, '')}`.chomp
+      end
+
       def rolling_upgrade(dir = @working_repo_path)
         change_dir_working(dir) unless Dir.pwd == dir
         version_string = `git annex version`
@@ -135,7 +140,7 @@ module Utils
       def init_special_remote(dir = @working_repo_path, remote_type, remote_name)
         change_dir_working(dir) unless Dir.pwd == dir
         raise 'Missing S3 special remote environment variables' unless Utils::Storage::Ceph.required_configs?
-        `export AWS_ACCESS_KEY_ID=#{Utils::Storage::Ceph.config.aws_access_key_id}; export AWS_SECRET_ACCESS_KEY=#{Utils::Storage::Ceph.config.aws_secret_access_key};  git annex initremote #{Utils::Storage::Ceph.config.special_remote_name} type=#{Utils::Storage::Ceph.config.storage_type} encryption=#{Utils::Storage::Ceph.config.encryption} requeststyle=#{Utils::Storage::Ceph.config.request_style} host=#{Utils::Storage::Ceph.config.host} port=#{Utils::Storage::Ceph.config.port} bucket='#{remote_name.bucketize}'
+        `export AWS_ACCESS_KEY_ID=#{Utils::Storage::Ceph.config.aws_access_key_id}; export AWS_SECRET_ACCESS_KEY=#{Utils::Storage::Ceph.config.aws_secret_access_key};  git annex initremote #{Utils::Storage::Ceph.config.special_remote_name} type=#{Utils::Storage::Ceph.config.storage_type} encryption=#{Utils::Storage::Ceph.config.encryption} requeststyle=#{Utils::Storage::Ceph.config.request_style} host=#{Utils::Storage::Ceph.config.host} port=#{Utils::Storage::Ceph.config.port} public=#{Utils::Storage::Ceph.config.public} bucket='#{remote_name.bucketize}'
 ` if remote_type == 's3'
       end
 

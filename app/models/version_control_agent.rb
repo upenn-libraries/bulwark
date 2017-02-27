@@ -97,6 +97,11 @@ class VersionControlAgent < ActiveRecord::Base
     $worker.lock(filename)
   end
 
+  def look_up_key( path = '')
+    _initialize_worker
+    $worker.look_up_key(path)
+  end
+
   def delete_clone(options = {})
     _initialize_worker
     options[:drop_location].nil? ? $worker.drop : $worker.drop(options[:drop_location])

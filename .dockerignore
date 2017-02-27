@@ -1,4 +1,6 @@
 *.sqlite3
+*.xlsx
+*.csv
 jetty
 log
 tmp
