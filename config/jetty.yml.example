@@ -4,4 +4,3 @@ default:
   java_opts:
     - "-Xmx512m"
     - "-XX:MaxPermSize=128m"
-    - "-Dfcrepo.modeshape.configuration=file:///path/to/repository.json"
