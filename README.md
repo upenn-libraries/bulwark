@@ -21,7 +21,6 @@ An environment block for successfully deploying the application should look like
 development:
   assets_path: /absolute/path/on/fs
   assets_display_path: /absolute/path/on/fs
-  federated_fs_path: http://URL_or_IP/fedora/projection/to/federated/location
   file_path_label: FILE_PATH
   metadata_path_label: METADATA_PATH
   manifest_location: /absolute/path/on/fs/admin/manifest.txt
@@ -37,7 +36,6 @@ development:
 Edit the config file to reflect your local settings for the fields as follows:  
 * `assets_path` - The location on the filesystem where the application will maintain preservation-worthy files.
 * `assets_display_path` - The location on the filesystem where the application will handle serving display-worthy derivatives.
-* `federated_fs_path` - The projections mountpoint for filesystem federation, visible within Fedora, to access the filesystem, prefixed by the full URL or IP address.
 * `file_path_label` - A value used by the application to populate the semantic manifest.  This can be customized, or left FILE_PATH by default.
 * `metadata_path_label` - A value used by the application to populate the semantic manifest.  This can be customized, or left METADATA_PATH by default.
 * `manifest_location` - The location on the filesystem where a manifest containing minimal semantic information for the application to begin populating its own semantic knowledge base is stored.  See area below for configuration details of this file.
