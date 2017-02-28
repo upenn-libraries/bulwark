@@ -10,7 +10,7 @@ module Utils
       def initialize(repo)
         @repo = repo
         @remote_repo_path = "#{Utils.config[:assets_path]}/#{@repo.names.git}"
-        @working_repo_path = "#{Dir.mktmpdir}/#{@repo.names.git}"
+        @working_repo_path = "#{Utils.config[:workspace]}/#{path_seed(repo)}/#{@repo.names.git}"
       end
 
       def repo
@@ -101,7 +101,8 @@ module Utils
       def remove_working_directory
         `git annex drop --all --force`
         Dir.chdir(Rails.root.to_s)
-        FileUtils.rm_rf(@working_repo_path, :secure => true) if File.directory?(@working_repo_path)
+        parent_dir = @working_repo_path.gsub(repo.names.git,"")
+        FileUtils.rm_rf(parent_dir, :secure => true) if File.directory?(parent_dir)
       end
 
       def get(dir = @working_repo_path)
@@ -208,6 +209,12 @@ module Utils
       def _version_numbers(output_array, split_char, string_to_search)
         versions_line = output_array[output_array.index{|s| s.start_with?(string_to_search)}]
         versions_line.split("#{split_char}").last.lstrip.split(' ').map(&:to_i)
+      end
+
+      private
+
+      def path_seed(repo)
+        Digest::SHA256.hexdigest("#{repo.names.git}#{SecureRandom.uuid}")
       end
 
     end

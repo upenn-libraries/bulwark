@@ -10,6 +10,7 @@ development:
   init_script_path: abc
   init_script_permissions: abc
   object_data_path: data
+  workspace: /abs/path/to/workspace
   assets_path: /abs/path/to/data
   assets_display_path: /abs/path/to/display
   metadata_path_label: METADATA_PATH
