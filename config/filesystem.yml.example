@@ -2,7 +2,6 @@
 
 development:
   manifest_location: /abs/path/to/manifest.txt
-  federated_fs_path: http://localhost/fcrepo/rest/files
   fedora_xml_derivative: fedora.xml
   object_admin_path: .repoadmin
   object_derivatives_path: .derivs
@@ -11,6 +10,7 @@ development:
   init_script_path: abc
   init_script_permissions: abc
   object_data_path: data
+  workspace: /abs/path/to/workspace
   assets_path: /abs/path/to/data
   assets_display_path: /abs/path/to/display
   metadata_path_label: METADATA_PATH
@@ -21,13 +21,11 @@ development:
   problem_log: problems_log
 test:
   manifest_location: /path/to/manifest.txt
-  federated_fs_path: http://full/path/to/federated/fs
   metadata_path_label: metadata_label_in_manifest
   file_path_label: file_path_label_in_manifest
   repository_prefix: prefix
 production:
   manifest_location: /abs/path/to/manifest.txt
-  federated_fs_path: http://localhost/fcrepo/rest/files
   fedora_xml_derivative: fedora.xml
   object_admin_path: .repoadmin
   object_derivatives_path: .derivs

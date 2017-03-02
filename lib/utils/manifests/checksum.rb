@@ -55,9 +55,6 @@ module Utils
             hash_separated += arr
             hash_separated += '\n'
           end
-          file_list.each do |item|
-            item.gsub!(@fs_config['development']['federated_fs_path'], @fs_config['development']['assets_path'])
-          end
           hash_separated
         end
 

@@ -49,6 +49,8 @@ RUN mkdir -p /fs/pub/data
 
 RUN mkdir -p /fs/priv/harvest
 
+RUN mkdir -p /fs/priv/workspace
+
 RUN mkdir -p /home/app/webapp/string_exts
 
 RUN mkdir -p /home/app/webapp/rails_admin_colenda

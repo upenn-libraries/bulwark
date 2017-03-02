@@ -29,7 +29,8 @@ services:
       - 'redis'
     volumes:
       - 'web:/home/app/webapp'
-      - '${LOCAL_DATA}:/fs/pub/data'
+      - '${LOCAL_DATA}:${REMOTE_DATA}'
+      - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
       - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
   sidekiq:
     depends_on:
