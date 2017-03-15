@@ -193,6 +193,7 @@ en:
         generated_derivative: 'Generated derivative for %{file_name}'
         generated_thumbnail: 'Generated thumbnail for %{object_id}'
         generated_all_derivatives: 'Generated all derivatives for %{object_id}'
+        generated_preservation_metadata: 'Generated JHOVE XML for %{object_id}'
         jettison_metadata: 'Removed files not identified as metadata source and/or for long-term preservation'
         jettison_assets: 'Removed original asset files per metadata source type directive'
         write_preservation_xml: 'Generated unified XML'

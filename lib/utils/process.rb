@@ -25,6 +25,9 @@ module Utils
       repo.problem_files = {}
       repo.version_control_agent.unlock(:content => repo.derivatives_subdirectory)
       attach_files(@oid, repo, Manuscript, Image)
+      jhove = characterize_files(working_path, repo)
+      repo.version_control_agent.add(:content => "#{repo.metadata_subdirectory}/#{jhove.filename}")
+      repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_preservation_metadata', :object_id => repo.names.fedora))
       update_index(@oid)
       repo.save!
       repo.version_control_agent.add(:content => repo.derivatives_subdirectory)
@@ -144,6 +147,13 @@ module Utils
         return 'invalid' if exception.inspect.downcase =~ /minimagick::invalid/
         return 'unknown file issue'
       end
+    end
+
+    def characterize_files(working_path, repo)
+      target = "#{working_path}/#{repo.metadata_subdirectory}"
+      jhove_xml = Utils::Artifacts::Metadata::Preservation::Jhove.new(working_path, target = target)
+      jhove_xml.characterize
+      jhove_xml
     end
 
     def contains_blanks(file)
