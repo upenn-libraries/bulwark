@@ -139,7 +139,7 @@ class Repo < ActiveRecord::Base
   end
 
   def ingest(file, working_path)
-    # begin
+    begin
       @status = Utils::Process.import(file, self, working_path)
       self.thumbnail = default_thumbnail
       self.save!
@@ -152,10 +152,10 @@ class Repo < ActiveRecord::Base
       self.version_control_agent.push
       self.metadata_builder.last_file_checks = DateTime.now
       self.metadata_builder.save!
-    # rescue => exception
-    #   self.save!
-    #   raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => exception.message)
-    # end
+    rescue => exception
+       self.save!
+       raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => exception.message)
+    end
   end
 
   def package_metadata_info(destination)
