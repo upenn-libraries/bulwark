@@ -37,8 +37,8 @@ module MetadataSourceHelper
     thumb_key = get_key_by_filename("#{@object.derivatives_subdirectory}/#{file_name}.thumb.jpeg")
     preview_key = get_key_by_filename("#{@object.derivatives_subdirectory}/#{file_name}.jpeg")
 
-    thumbnail_link = Utils::Process.storage_link(thumb_key, @object)
-    preview_link = Utils::Process.storage_link(preview_key, @object)
+    thumbnail_link = Utils::Process.read_storage_link(thumb_key, @object)
+    preview_link = Utils::Process.read_storage_link(preview_key, @object)
     return link_to(image_tag(thumbnail_link), preview_link) unless @object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"].present?
     return @object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"].present? ?  problem_warning(file_name).html_safe : ''
   end

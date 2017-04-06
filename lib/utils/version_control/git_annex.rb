@@ -80,6 +80,13 @@ module Utils
         return `git add #{Shellwords.escape(content)}` if add_type == :git
       end
 
+      def copy(options)
+        content = options[:content].present? ? options[:content] : '.'
+        to = options[:to].present? ? "--to #{options[:to]}" : ''
+        from = options[:from].present? ? "--from #{options[:from]}" : ''
+        return `git annex copy #{Shellwords.escape(content)} #{from} #{to}`
+      end
+
 
       def commit(commit_message)
         change_dir_working(@working_repo_path)

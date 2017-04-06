@@ -19,6 +19,7 @@ module Utils
       attr_accessor :encryption
       attr_accessor :request_style
       attr_accessor :public
+      attr_accessor :read_host
 
       def initialize
         # Always required
@@ -34,6 +35,7 @@ module Utils
         @encryption = ENV["STORAGE_ENCRYPTION"] || nil
         @request_style = ENV["REQUEST_STYLE"] || nil
         @public = ENV["STORAGE_PUBLIC"] || nil
+        @read_host = ENV["STORAGE_READ_HOST"] || nil
       end
 
     end
