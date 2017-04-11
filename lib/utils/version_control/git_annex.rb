@@ -94,7 +94,7 @@ module Utils
         begin
           working_repo.commit(commit_message)
         rescue => exception
-          return if exception.message =~ /nothing to commit, working \w* clean/
+          return if exception.message =~ /nothing \w* commit, working \w* clean/ or exception.message == 'Nothing staged for commit.'
           raise Utils::Error::VersionControl.new(error_message(exception.message))
         end
       end

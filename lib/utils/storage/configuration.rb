@@ -20,6 +20,8 @@ module Utils
       attr_accessor :request_style
       attr_accessor :public
       attr_accessor :read_host
+      attr_accessor :read_protocol
+
 
       def initialize
         # Always required
@@ -36,6 +38,7 @@ module Utils
         @request_style = ENV["REQUEST_STYLE"] || nil
         @public = ENV["STORAGE_PUBLIC"] || nil
         @read_host = ENV["STORAGE_READ_HOST"] || nil
+        @read_protocol = ENV["STORAGE_READ_PROTOCOL"] || nil
       end
 
     end

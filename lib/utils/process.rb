@@ -23,14 +23,16 @@ module Utils
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
       FileUtils.rm(file)
       repo.problem_files = {}
+      repo.version_control_agent.get
       repo.version_control_agent.unlock(:content => '.')
       attach_files(@oid, repo, Manuscript, Image)
+      update_index(@oid)
+      repo.save!
       jhove = characterize_files(working_path, repo)
       repo.version_control_agent.add(:content => "#{repo.metadata_subdirectory}/#{jhove.filename}")
       repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_preservation_metadata', :object_id => repo.names.fedora))
-      update_index(@oid)
-      repo.save!
       repo.version_control_agent.add(:content => repo.derivatives_subdirectory)
+      repo.lock_keep_files(working_path)
       repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives', :object_id => repo.names.fedora))
       repo.version_control_agent.push
       @@status_type = :success
@@ -103,7 +105,7 @@ module Utils
     end
 
     def read_storage_link(key, repo)
-      "#{Utils::Storage::Ceph.config.protocol}#{Utils::Storage::Ceph.config.read_host}/#{repo.names.bucket}/#{key}"
+      "#{Utils::Storage::Ceph.config.read_protocol}#{Utils::Storage::Ceph.config.read_host}/#{repo.names.bucket}/#{key}"
     end
 
     def refresh_assets(working_path, repo)
