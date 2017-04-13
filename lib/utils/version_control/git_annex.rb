@@ -106,6 +106,7 @@ module Utils
       end
 
       def remove_working_directory
+        `git config annex.pidlock true`
         `git annex drop --all --force`
         Dir.chdir(Rails.root.to_s)
         parent_dir = @working_repo_path.gsub(repo.names.git,"")
