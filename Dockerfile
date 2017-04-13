@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -qq -y --no-install-recommends \
         libmysqlclient-dev \
         nodejs \
         openssh-server \
+        sudo \
         xsltproc
 
 RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
