@@ -23,14 +23,16 @@ module Utils
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
       FileUtils.rm(file)
       repo.problem_files = {}
-      repo.version_control_agent.unlock(:content => repo.derivatives_subdirectory)
+      repo.version_control_agent.get
+      repo.version_control_agent.unlock(:content => '.')
       attach_files(@oid, repo, Manuscript, Image)
+      update_index(@oid)
+      repo.save!
       jhove = characterize_files(working_path, repo)
       repo.version_control_agent.add(:content => "#{repo.metadata_subdirectory}/#{jhove.filename}")
       repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_preservation_metadata', :object_id => repo.names.fedora))
-      update_index(@oid)
-      repo.save!
       repo.version_control_agent.add(:content => repo.derivatives_subdirectory)
+      repo.lock_keep_files(working_path)
       repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives', :object_id => repo.names.fedora))
       repo.version_control_agent.push
       @@status_type = :success
@@ -63,10 +65,11 @@ module Utils
           repo.images_to_render[file_print.to_s.html_safe] = {'width' => width, 'height' => height}
         end
       end
+
       children_sorted = children.sort_by! { |c| c.page_number }
       children_sorted.each do |child_sorted|
         file_print = child_sorted.imageFile.uri
-        repo.images_to_render[file_print.to_s.html_safe] = repo.images_to_render[file_print.to_s.html_safe].merge(child_sorted.serialized_attributes)
+        repo.images_to_render[file_print.to_s.html_safe] = repo.images_to_render[file_print.to_s.html_safe].present? ? repo.images_to_render[file_print.to_s.html_safe].merge(child_sorted.serialized_attributes) : {}
       end
       parent.save
     end
@@ -97,11 +100,12 @@ module Utils
 
     def attachable_url(repo, file_path)
       repo.version_control_agent.add(:content => file_path)
-      storage_link(repo.version_control_agent.look_up_key(file_path), repo)
+      repo.version_control_agent.copy(:content => file_path, :to => Utils::Storage::Ceph.config.special_remote_name)
+      read_storage_link(repo.version_control_agent.look_up_key(file_path), repo)
     end
 
-    def storage_link(key, repo)
-      "#{Utils::Storage::Ceph.config.protocol}#{Utils::Storage::Ceph.config.host}:#{Utils::Storage::Ceph.config.port}/#{repo.names.bucket}/#{key}"
+    def read_storage_link(key, repo)
+      "#{Utils::Storage::Ceph.config.read_protocol}#{Utils::Storage::Ceph.config.read_host}/#{repo.names.bucket}/#{key}"
     end
 
     def refresh_assets(working_path, repo)

@@ -62,6 +62,11 @@ class VersionControlAgent < ActiveRecord::Base
     $worker.add(options)
   end
 
+  def copy(options = {})
+    _initialize_worker
+    $worker.copy(options)
+  end
+
   def commit(message)
     _initialize_worker
     $worker.commit(message)

@@ -153,8 +153,16 @@ class Repo < ActiveRecord::Base
       self.metadata_builder.last_file_checks = DateTime.now
       self.metadata_builder.save!
     rescue => exception
-      self.save!
-      raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => exception.message)
+       self.save!
+       raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => exception.message)
+    end
+  end
+
+  def lock_keep_files(working_path)
+    if File.exist?(working_path)
+      self.version_control_agent.lock("#{self.metadata_subdirectory}/.keep")
+      self.version_control_agent.lock("#{self.assets_subdirectory}/.keep")
+      self.version_control_agent.lock("#{self.derivatives_subdirectory}/.keep")
     end
   end
 
