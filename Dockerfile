@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -qq -y --no-install-recommends \
         nodejs \
         openssh-server \
         sudo \
+        vim \
         xsltproc
 
 RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
