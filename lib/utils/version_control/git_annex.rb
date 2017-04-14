@@ -158,6 +158,7 @@ module Utils
         `git annex init --version=#{Utils.config[:supported_vca_version]}`
         `git annex enableremote #{Utils::Storage::Ceph.config.special_remote_name}`
         `git config remote.origin.annex-ignore true`
+        `git config annex.pidlock true`
         `git config annex.largefiles 'not (include=.repoadmin/bin/*.sh)'`
         `git annex fsck --from #{Utils::Storage::Ceph.config.special_remote_name} --fast` if fsck
       end

@@ -6,7 +6,7 @@ module ApplicationHelper
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
     rendered_keys = []
     repo.images_to_render.each do |key, value|
-      rendered_keys << "#{key}?width=#{value['width']}&height=#{value['height']}"
+      rendered_keys << "#{public_fedora_path(key)}?width=#{value['width']}&height=#{value['height']}"
     end
     content_tag(:div, '', id: 'pages', data: rendered_keys.to_json )
 
@@ -35,6 +35,18 @@ module ApplicationHelper
           </li>
         )
     end.join.html_safe
+  end
+
+  def public_fedora_path(path)
+    # TODO: Turn env var into config option?
+    if ENV['PUBLIC_FEDORA_URL'].present?
+      fedora_yml = "#{Rails.root}/config/fedora.yml"
+      fedora_config = YAML.load(ERB.new(File.read(fedora_yml)).result)[Rails.env]
+      fedora_link = "#{fedora_config['url']}#{fedora_config['base_path']}"
+      return path.gsub(fedora_link, ENV['PUBLIC_FEDORA_URL'])
+    else
+      return path
+    end
   end
 
 end
