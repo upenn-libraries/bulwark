@@ -704,7 +704,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def self.source_types
-    source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.voyager_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.bibliophilly'), 'bibliophilly'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
+    source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.catalog_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.bibliophilly'), 'bibliophilly'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
   end
 
   def self.settings_fields
@@ -729,7 +729,7 @@ class MetadataSource < ActiveRecord::Base
   #     end
   #   end
   #   workbook.write(spreadsheet_derivative_path)
-  #   self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.voyager_derivative_spreadsheet'))
+  #   self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.catalog_derivative_spreadsheet'))
   #   self.metadata_builder.repo.version_control_agent.push
   #   generate_and_build_individual_xml("#{$working_path}/#{Utils.config[:object_derivatives_path]}/#{self.original_mappings["bibid"]}.xlsx")
   # end

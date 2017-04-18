@@ -134,7 +134,7 @@ en:
           heading: 'What type of metadata source is %{source}?'
           label: 'Source Type'
           list:
-            voyager_bibid: 'Voyager BibID Lookup Spreadsheet (XLSX)'
+            catalog_bibid: 'Catalog BibID Lookup Spreadsheet (XLSX)'
             structural_bibid: 'Structural Metadata from BibID Lookup Spreadsheet (XLSX)'
             bibliophilly: 'BiblioPhilly (XLSX)'
             custom: 'Custom Structural Metadata Spreadsheet (XLSX)'
@@ -160,10 +160,10 @@ en:
           label: 'Child element of root, for multi-item spreadsheets (optional):'
           tip: 'For single spreadsheets that describe more than one item -- Parent of each row of values in metadata source spreadsheet; Child of the root element.'
         voyager:
-          heading: 'Descriptive metadata fetched from Voyager Lookup'
+          heading: 'Descriptive metadata fetched from Catalog Lookup'
           field_separator: ':'
         structural_bibid:
-          heading: 'Sample of structural metadata fetched from Voyager Lookup'
+          heading: 'Sample of structural metadata fetched from Catalog Lookup'
           field_separator: ':'
         bibliophilly:
           heading: 'Sample metadata fetched from BiblioPhilly spreadsheet'
@@ -189,7 +189,7 @@ en:
         commit_bare: 'Added subdirectories according to the configuration specified in the repo configuration'
         post_ingest_artifacts: 'Added post-ingest artifacts'
         write_input_source: 'Saved source in original format'
-        voyager_derivative_spreadsheet: 'Created derivative spreadsheet of Voyager metadata'
+        catalog_derivative_spreadsheet: 'Created derivative spreadsheet of catalog metadata'
         generated_derivative: 'Generated derivative for %{file_name}'
         generated_thumbnail: 'Generated thumbnail for %{object_id}'
         generated_all_derivatives: 'Generated all derivatives for %{object_id}'
