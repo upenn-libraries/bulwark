@@ -50,7 +50,7 @@ module MetadataSourceHelper
     preview_link = Utils::Process.read_storage_link(preview_key, @object)
     return problem_warning(file_name, derivative_type).html_safe if @object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"].present?
     return link_to(image_tag(thumbnail_link), preview_link) if derivative_type == 'page_preview'
-    return link_to(image_tag(thumbnail_link, width: '120'), preview_link) if derivative_type == 'filename_thumb_preview'
+    return link_to(image_tag(thumbnail_link, width: '120', :alt => file_name,  :title => file_name), preview_link) if derivative_type == 'filename_thumb_preview'
 
   end
 

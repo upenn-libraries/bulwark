@@ -180,14 +180,13 @@ pre.debug_dump kbd {
   li {
     list-style: none;
     float: left;
-    width: 225px;
+    width: 160px;
     background-color: $light-grey;
     border: $dark-grey solid 1px;
     margin: 5px;
-    height: 225px;
+    height: 190px;
     text-align: center;
     display: inline-block;
-    padding: 5% 0px;
   }
 
   div.issue{
@@ -200,11 +199,9 @@ pre.debug_dump kbd {
   div.file-name {
     background-color: $background-black;
     color: $text-white;
-    font-size: 14px;
+    font-size: 12px;
     padding: 3px;
     margin-top: 5px;
-    position: absolute;
-    bottom: 5px;
   }
 }
 

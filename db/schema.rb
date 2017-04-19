@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170220155126) do
+ActiveRecord::Schema.define(version: 20170419183405) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       limit: 4,   null: false
@@ -110,6 +110,7 @@ ActiveRecord::Schema.define(version: 20170220155126) do
     t.datetime "last_external_update"
     t.string   "initial_stop",               limit: 255
     t.integer  "endpoint_id",                limit: 4
+    t.string   "last_action_performed",      limit: 255
   end
 
   add_index "repos", ["endpoint_id"], name: "index_repos_on_endpoint_id", using: :btree

@@ -56,4 +56,10 @@ class ReposController < ApplicationController
       message << t('colenda.controllers.repos.review_status.suffix', :email => current_user.email, :timestamp => Time.now)
       message
     end
+
+  def action_strings
+    {:generated_repo => }
+  end
+
+
 end
