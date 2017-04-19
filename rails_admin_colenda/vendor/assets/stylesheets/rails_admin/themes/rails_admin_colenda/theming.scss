@@ -154,6 +154,7 @@ div[class$="structural-preview"] {
 .inline-problem-files {
   font-size: 24px;
   font-weight: bold;
+  padding: 20px 0px;
   .issue {
     color: $warning-red;
     text-transform: uppercase;
@@ -170,6 +171,40 @@ pre.debug_dump kbd {
   .last-file-checks {
     color: $warning-red;
     font-weight: bold;
+  }
+}
+
+.preview-thumbnails {
+  display: inline-block;
+  position: relative;
+  li {
+    list-style: none;
+    float: left;
+    width: 225px;
+    background-color: $light-grey;
+    border: $dark-grey solid 1px;
+    margin: 5px;
+    height: 225px;
+    text-align: center;
+    display: inline-block;
+    padding: 5% 0px;
+  }
+
+  div.issue{
+    font-size: 16px;
+    color: $warning-red;
+    font-weight: bold;
+    display: block;
+    padding-top: 35%;
+  }
+  div.file-name {
+    background-color: $background-black;
+    color: $text-white;
+    font-size: 14px;
+    padding: 3px;
+    margin-top: 5px;
+    position: absolute;
+    bottom: 5px;
   }
 }
 
