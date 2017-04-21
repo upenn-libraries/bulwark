@@ -5,3 +5,7 @@
       <%= f.submit "Perform file checks now", :id => "file_checks_submit" %>
   <% end -%>
 </div>
+
+<% @object.metadata_builder.metadata_source.each do |ms| %>
+    <%= render_files_preview(ms) %>
+<% end -%>

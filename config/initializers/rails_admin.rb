@@ -121,6 +121,12 @@ RailsAdmin.config do |config|
       field :description do
         visible true
       end
+      field :last_action_performed do
+        visible true
+        pretty_value do
+          %{#{value[:description]}}.html_safe
+        end
+      end
     end
 
   end

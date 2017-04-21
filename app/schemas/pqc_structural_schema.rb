@@ -18,7 +18,6 @@ class PqcStructuralSchema < ActiveTriples::Schema
 
   property :page_id, predicate: ::RDF::Vocab::DC.identifier, multiple: true do |index|
     index.as :stored_searchable
-    index.type :stored_searchable
   end
 
   property :ocr_text, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/pageText'), multiple: true do |index|
@@ -26,6 +25,10 @@ class PqcStructuralSchema < ActiveTriples::Schema
   end
 
   property :item_type, predicate: ::RDF::Vocab::DC.type, multiple: true do |index|
+    index.as :stored_searchable
+  end
+
+  property :page_id, predicate: ::RDF::Vocab::DC.identifier, multiple: true do |index|
     index.as :stored_searchable
   end
 

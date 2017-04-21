@@ -56,4 +56,5 @@ class ReposController < ApplicationController
       message << t('colenda.controllers.repos.review_status.suffix', :email => current_user.email, :timestamp => Time.now)
       message
     end
+
 end

@@ -13,8 +13,7 @@ module MetadataSourceHelper
   end
 
   def render_metadata_preview(source)
-    accepted_types = %w(voyager structural_bibid bibliophilly bibliophilly_structural)
-    if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
+    if prepared_metadata?(source)
       heading_text_label = "colenda.metadata_sources.metadata_mapping.#{source.source_type}.heading"
       field_separator_label = "colenda.metadata_sources.metadata_mapping.#{source.source_type}.field_separator"
       mappings = ''
@@ -32,15 +31,30 @@ module MetadataSourceHelper
     end
   end
 
-  def derivative_link(file_name)
+  def render_files_preview(source)
+    return unless @object.metadata_builder.last_file_checks.present?
+    return unless prepared_structural?(source)
+    source_file_preview = ''
+    source.user_defined_mappings.each do |key, value_hash|
+      if value_hash[source.file_field].present?
+        file_name = "<div class=\"file-name\">#{"".html_safe + value_hash[source.file_field]}</div>".html_safe
+        derivative = derivative_link(value_hash[source.file_field],'filename_thumb_preview')
+        source_file_preview << "<li>#{derivative + file_name}</li>"
+      end
+    end
+    sources_preview = "<ul>#{source_file_preview}</ul>"
+    return sources_preview.present? ? "<div class=\"preview-thumbnails\">#{sources_preview}</div>".html_safe : ""
+  end
 
+  def derivative_link(file_name, derivative_type = 'page_preview')
     thumb_key = get_key_by_filename("#{@object.derivatives_subdirectory}/#{file_name}.thumb.jpeg")
     preview_key = get_key_by_filename("#{@object.derivatives_subdirectory}/#{file_name}.jpeg")
-
     thumbnail_link = Utils::Process.read_storage_link(thumb_key, @object)
     preview_link = Utils::Process.read_storage_link(preview_key, @object)
-    return link_to(image_tag(thumbnail_link), preview_link) unless @object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"].present?
-    return @object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"].present? ?  problem_warning(file_name).html_safe : ''
+    return problem_warning(file_name, derivative_type).html_safe if @object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"].present?
+    return link_to(image_tag(thumbnail_link), preview_link) if derivative_type == 'page_preview'
+    return link_to(image_tag(thumbnail_link, width: '120', :alt => file_name,  :title => file_name), preview_link) if derivative_type == 'filename_thumb_preview'
+
   end
 
   def get_key_by_filename(file_name)
@@ -51,11 +65,9 @@ module MetadataSourceHelper
     return key
   end
 
-  def problem_warning(file_name)
-    content_tag :div, :class => 'inline-problem-files' do
-      concat(t('colenda.metadata_sources.metadata_mapping.previews.issue_detected', :file_name => file_name))
-      concat(content_tag(:span, "#{@object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"]}", :class => 'issue'))
-    end
+  def problem_warning(file_name, warning_type = 'page_preview')
+    return "<div class=\"inline-problem-files\">#{t('colenda.metadata_sources.metadata_mapping.previews.issue_detected', :file_name => file_name)}<span class=\"issue\">#{@object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"]}</span></div>" if warning_type == 'page_preview'
+    return "<div class=\"issue\">#{@object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"]}</div>" if warning_type == 'filename_thumb_preview'
   end
 
   def render_value(value)
@@ -78,6 +90,24 @@ module MetadataSourceHelper
       child_array << [prettify(child.first), child.last]
     end
     child_array
+  end
+
+  def prepared_metadata?(source)
+    accepted_types = %w(voyager structural_bibid bibliophilly bibliophilly_structural)
+    return true if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
+    return false
+  end
+
+  def prepared_descriptive?(source)
+    accepted_types = %w(voyager bibliophilly)
+    return true if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
+    return false
+  end
+
+  def prepared_structural?(source)
+    accepted_types = %w(structural_bibid bibliophilly_structural)
+    return true if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
+    return false
   end
 
 end

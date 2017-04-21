@@ -29,6 +29,7 @@ class Repo < ActiveRecord::Base
   serialize :problem_files, Hash
   serialize :file_display_attributes, Hash
   serialize :images_to_render, Hash
+  serialize :last_action_performed, Hash
 
   def set_version_control_agent_and_repo
     yield
@@ -136,6 +137,7 @@ class Repo < ActiveRecord::Base
       self.version_control_agent.delete_clone
       self.version_control_agent.set_remote_permissions
     end
+    self.update_last_action(action_description[:git_remote_initialized])
   end
 
   def ingest(file, working_path)
@@ -185,6 +187,11 @@ class Repo < ActiveRecord::Base
       raise Utils::Error::Artifacts.new(error_message(exception.message))
     end
 
+  end
+
+  def update_last_action(update_string)
+    self.last_action_performed = { :description => update_string }
+    self.save!
   end
 
   def push_artifacts
@@ -325,6 +332,10 @@ class Repo < ActiveRecord::Base
     self.version_control_agent.drop
     self.version_control_agent.delete_clone
     exist_status
+  end
+
+  def action_description
+    { :git_remote_initialized => 'Repo initialized' }
   end
 
   def mint_initial_ark
