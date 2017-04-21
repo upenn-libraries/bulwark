@@ -57,9 +57,4 @@ class ReposController < ApplicationController
       message
     end
 
-  def action_strings
-    {:generated_repo => }
-  end
-
-
 end

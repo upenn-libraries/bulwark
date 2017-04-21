@@ -32,12 +32,15 @@ module MetadataSourceHelper
   end
 
   def render_files_preview(source)
+    return unless @object.metadata_builder.last_file_checks.present?
     return unless prepared_structural?(source)
     source_file_preview = ''
     source.user_defined_mappings.each do |key, value_hash|
-      file_name = "<div class=\"file-name\">#{"".html_safe + value_hash[source.file_field]}</div>".html_safe
-      derivative = derivative_link(value_hash[source.file_field],'filename_thumb_preview')
-      source_file_preview << "<li>#{derivative + file_name}</li>"
+      if value_hash[source.file_field].present?
+        file_name = "<div class=\"file-name\">#{"".html_safe + value_hash[source.file_field]}</div>".html_safe
+        derivative = derivative_link(value_hash[source.file_field],'filename_thumb_preview')
+        source_file_preview << "<li>#{derivative + file_name}</li>"
+      end
     end
     sources_preview = "<ul>#{source_file_preview}</ul>"
     return sources_preview.present? ? "<div class=\"preview-thumbnails\">#{sources_preview}</div>".html_safe : ""
