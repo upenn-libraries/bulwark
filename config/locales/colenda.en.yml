@@ -202,6 +202,7 @@ en:
         automated:
           added_metadata: 'Added metadata through automated workflow'
           added_assets: 'Added assets through automated workflow'
+      readme_contents: '## README for %{unique_identifier}\n\nFor up-to-date information regarding the structure and contents of this git repository, visit the RST Confluence page'
       packaging_info: 'Source information for %{source_path}\npath: %{source_path}\nid (use to correlate children): %{source_id}\nsource_type: %{source_type}\nview_type: %{source_view_type}\nnum_objects: %{source_num_objects}\nx_start: %{source_x_start}\nx_stop: %{source_x_stop}\ny_start: %{source_y_start}\ny_stop: %{source_y_stop}\nchildren: %{source_children}\n\n'
     utils:
       warnings:

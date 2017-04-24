@@ -177,14 +177,16 @@ pre.debug_dump kbd {
 .preview-thumbnails {
   display: inline-block;
   position: relative;
+  width: 75%;
+  background-color: $background-black;
   li {
     list-style: none;
     float: left;
-    width: 160px;
-    background-color: $light-grey;
+    width: auto;
+    background-color: $background-black;
     border: $dark-grey solid 1px;
     margin: 5px;
-    height: 190px;
+    height: auto;
     text-align: center;
     display: inline-block;
   }

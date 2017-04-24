@@ -266,6 +266,7 @@ class Repo < ActiveRecord::Base
     metadata_subdirectory = "#{working_path}/#{self.metadata_subdirectory}"
     assets_subdirectory = "#{working_path}/#{self.assets_subdirectory}"
     derivatives_subdirectory = "#{working_path}/#{self.derivatives_subdirectory}"
+    readme = _generate_readme(working_path)
     _make_subdir(admin_directory)
     _make_subdir(data_directory)
     _make_subdir(metadata_subdirectory, :keep => true)
@@ -273,7 +274,7 @@ class Repo < ActiveRecord::Base
     _make_subdir(derivatives_subdirectory, :keep => true)
     _populate_admin_manifest("#{admin_directory}")
     init_script_directory = _add_init_scripts(admin_directory)
-    [{:store => [admin_directory, derivatives_subdirectory], :git => [init_script_directory, data_directory, metadata_subdirectory, assets_subdirectory]}]
+    [{:store => [admin_directory, derivatives_subdirectory, readme], :git => [init_script_directory, data_directory, metadata_subdirectory, assets_subdirectory]}]
   end
 
   def _make_subdir(directory, options = {})
@@ -286,6 +287,12 @@ class Repo < ActiveRecord::Base
     FileUtils.cp(Utils.config[:init_script_path], "#{directory}/bin/init.sh")
     FileUtils.chmod(Utils.config[:init_script_permissions], "#{directory}/bin/init.sh")
     "#{directory}/bin/init.sh"
+  end
+
+  def _generate_readme(directory)
+    readme_filename = 'README.md'
+    File.open(readme_filename, 'w') { |file| file.write(I18n.t('colenda.version_control_agents.readme_contents', :unique_identifier => self.unique_identifier)) }
+    return "#{directory}/#{readme_filename}"
   end
 
   def _populate_admin_manifest(admin_path)
