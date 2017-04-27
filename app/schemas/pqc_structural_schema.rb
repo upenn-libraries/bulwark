@@ -12,7 +12,7 @@ class PqcStructuralSchema < ActiveTriples::Schema
     index.as :displayable
   end
 
-  property :hinge, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/hinge'), multiple: true do |index|
+  property :reading_direction, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/readingDirection'), multiple: true do |index|
     index.as :displayable
   end
 

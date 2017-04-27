@@ -498,12 +498,12 @@ class MetadataSource < ActiveRecord::Base
     _refresh_bibid(working_path)
     voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}"
     data = Nokogiri::XML(open(voyager_source))
-    hinge = _get_hinge(voyager_source)
+    reading_direction = _get_reading_direction(voyager_source)
     data.xpath('//xml/page').each_with_index do |page, index|
       mapped_values[index+1] = {
           'page_number' => page['number'],
           'sequence' => page['seq'],
-          'hinge' => hinge,
+          'reading_direction' => reading_direction,
           'side' => page['side'],
           'tocentry' => _get_tocentry(page),
           'identifier' => page['id'],
@@ -525,17 +525,17 @@ class MetadataSource < ActiveRecord::Base
     return tocentry
   end
 
-  def _get_hinge(xml_document)
-    hinge = 'hinge-left'
+  def _get_reading_direction(xml_document)
+    reading_direction = 'left-to-right'
     doc = Nokogiri::XML(open(xml_document))
     doc.remove_namespaces!
     doc_s = doc.xpath('//xml/record/datafield[@tag="996"]')
     if doc_s.present? && doc_s.length == 1
       d = doc_s.first
       element = _sanitize_elements(d).first
-      hinge = element.children.first.text
+      reading_direction = 'right-to-left' if element.children.first.text == 'hinge-right'
     end
-    return hinge
+    return reading_direction
   end
 
   def _sanitize_elements(node_set)
