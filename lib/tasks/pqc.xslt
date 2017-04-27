@@ -147,9 +147,6 @@
       <sv:property sv:name="ns004:uniqueIdentifier" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="concat($uuid, '/', format-number(page_number, '00000'))" /></sv:value>
       </sv:property>
-      <sv:property sv:name="ns004:parentManuscript" sv:type="String" sv:multiple="false">
-        <sv:value><xsl:value-of select="$uuid" /></sv:value>
-      </sv:property>
       <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="identifier" /></sv:value>
       </sv:property>
@@ -158,6 +155,18 @@
       </sv:property>
       <sv:property sv:name="ns004:pageNumber" sv:type="Long" sv:multiple="false">
         <sv:value><xsl:value-of select="page_number" /></sv:value>
+      </sv:property>
+      <sv:property sv:name="ns004:sequence" sv:type="Long" sv:multiple="false">
+        <sv:value><xsl:value-of select="sequence" /></sv:value>
+      </sv:property>
+      <sv:property sv:name="ns004:readingDirection" sv:type="String" sv:multiple="false">
+        <sv:value><xsl:value-of select="reading_direction" /></sv:value>
+      </sv:property>
+      <sv:property sv:name="ns004:side" sv:type="String" sv:multiple="false">
+        <sv:value><xsl:value-of select="side" /></sv:value>
+      </sv:property>
+      <sv:property sv:name="ns004:tocEntry" sv:type="String" sv:multiple="false">
+        <sv:value><xsl:value-of select="toc_entry" /></sv:value>
       </sv:property>
       <sv:property sv:name="ns004:pageText" sv:type="String" sv:multiple="false">
         <sv:value><xsl:value-of select="ocr_text" /></sv:value>

@@ -496,11 +496,16 @@ class MetadataSource < ActiveRecord::Base
   def _set_voyager_structural_metadata(working_path = $working_path)
     mapped_values = {}
     _refresh_bibid(working_path)
-    voyager_source = open("#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}")
-    data = Nokogiri::XML(voyager_source)
+    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}"
+    data = Nokogiri::XML(open(voyager_source))
+    reading_direction = _get_reading_direction(voyager_source)
     data.xpath('//xml/page').each_with_index do |page, index|
       mapped_values[index+1] = {
           'page_number' => page['number'],
+          'sequence' => page['seq'],
+          'reading_direction' => reading_direction,
+          'side' => page['side'],
+          'tocentry' => _get_tocentry(page),
           'identifier' => page['id'],
           'file_name' => "#{page['image']}.tif",
           'description' => page['visiblepage']
@@ -508,6 +513,33 @@ class MetadataSource < ActiveRecord::Base
       }
     end
     mapped_values
+  end
+
+  def _get_tocentry(page)
+    return {} unless page.children.present?
+    tocentry = {}
+    toc_entries = _sanitize_elements(page)
+    toc_entries.each do |te|
+      tocentry[te.attributes['name'].value] = te.children.first.text
+    end
+    return tocentry
+  end
+
+  def _get_reading_direction(xml_document)
+    reading_direction = 'left-to-right'
+    doc = Nokogiri::XML(open(xml_document))
+    doc.remove_namespaces!
+    doc_s = doc.xpath('//xml/record/datafield[@tag="996"]')
+    if doc_s.present? && doc_s.length == 1
+      d = doc_s.first
+      element = _sanitize_elements(d).first
+      reading_direction = 'right-to-left' if element.children.first.text == 'hinge-right'
+    end
+    return reading_direction
+  end
+
+  def _sanitize_elements(node_set)
+    return node_set.children.reject{|x| x.class == Nokogiri::XML::Text}
   end
 
   def _refresh_bibid(working_path = $working_path)
@@ -622,7 +654,8 @@ class MetadataSource < ActiveRecord::Base
     self.user_defined_mappings.each do |entry_id, page_values|
       content << "<#{self.parent_element}>"
       page_values.each do |key, value|
-        content << "<#{key}>#{value}</#{key}>"
+        value_string = value.present? ? "<#{key}>#{value}</#{key}>" : ''
+        content << value_string
       end
       content << "</#{self.parent_element}>"
     end

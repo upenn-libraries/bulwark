@@ -8,8 +8,7 @@ class Image < ActiveFedora::Base
 
   around_save :format_container_id
 
-  belongs_to :manuscript, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
-  belongs_to :photograph, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
+  belongs_to :multi_image_item, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
 
   def format_container_id
     self.format_container! if self.unique_identifier.present? && self.unique_identifier != self.unique_identifier.reverse_fedorafy
