@@ -85,6 +85,7 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def file_checks_previews(working_path)
+
     self.repo.version_control_agent.get(:location => "#{working_path}/#{self.repo.assets_subdirectory}")
     self.metadata_source.where(:source_type => MetadataSource.structural_types).each do |ms|
       ms.filenames.each do |file|

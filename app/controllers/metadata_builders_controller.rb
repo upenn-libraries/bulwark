@@ -1,5 +1,5 @@
 class MetadataBuildersController < ApplicationController
-
+  
   before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :clear_files, :refresh_metadata, :generate_metadata, :generate_preview_xml, :file_checks]
 
   def show

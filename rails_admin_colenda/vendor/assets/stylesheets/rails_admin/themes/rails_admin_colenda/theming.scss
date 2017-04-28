@@ -207,10 +207,14 @@ pre.debug_dump kbd {
   }
 }
 
-.problem-files h3 {
-  font-size: 14px;
-  font-weight:bold;
+.problem-files {
+  width: 75%;
+  h3 {
+    font-size: 14px;
+    font-weight:bold;
+  }
 }
+
 
 .select-for-ingest {
   input[type="checkbox"], label {

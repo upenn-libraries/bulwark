@@ -176,7 +176,7 @@ class MetadataSource < ActiveRecord::Base
     self.generate_and_build_individual_xml(working_path)
     self.children.each do |child|
       source = MetadataSource.find(child)
-      source.generate_and_build_individual_xml(working_path, source.path) unless source.source_type == 'bibliophilly_structural'
+      source.generate_and_build_individual_xml(working_path, source.path) unless %w[bibliophilly_structural kaplan_structural].include?(source.source_type)
     end
     self.generate_preservation_xml(working_path)
     self.jettison_metadata(working_path, $jettison_files) if $jettison_files.present?
@@ -205,10 +205,10 @@ class MetadataSource < ActiveRecord::Base
           @xml_content_final_copy = xml_from_voyager
         when 'structural_bibid'
           @xml_content_final_copy = xml_from_structural_bibid
-        when 'bibliophilly'
-          @xml_content_final_copy = xml_from_bibliophilly
-        when 'kaplan'
-          @xml_content_final_copy = self.xml
+        when 'bibliophilly', 'kaplan'
+          @xml_content_final_copy = xml_from_flat_mappings
+        else
+          return
       end
       $jettison_files.add(xml_fname)
       _fetch_write_save_preservation_xml(working_path, xml_fname, @xml_content_final_copy)
@@ -216,7 +216,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def generate_preservation_xml(working_path)
-    if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'bibliophilly'
+    if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'bibliophilly' && self.source_type != 'kaplan'
       @xml_content_final = parent_id.present? ? MetadataSource.find(parent_id).generate_parent_child_xml(working_path) : self.generate_parent_child_xml(working_path)
     else
       file = File.new(_reconcile_working_path_slashes(working_path, "#{self.path}.xml"))
@@ -281,7 +281,7 @@ class MetadataSource < ActiveRecord::Base
     wrapped_content
   end
 
-  def xml_from_bibliophilly
+  def xml_from_flat_mappings
     parent_content = ''
     child_content = ''
     self.user_defined_mappings.each do |mapping|
@@ -307,7 +307,7 @@ class MetadataSource < ActiveRecord::Base
     self.generate_and_build_individual_xml(working_path)
     self.children.each do |child|
       child_path = MetadataSource.where(:id => child).pluck(:path).first
-      child_content_path = _reconcile_working_path_slashes(working_path, "#{child_path}.xml")
+      child_content_path = _reconcile_working_path_slashes(working_path, "#{File.basename(child_path).directorify}.xml")
       self.metadata_builder.repo.version_control_agent.get(:location => key_path)
       self.metadata_builder.repo.version_control_agent.get(:location => child_content_path)
       content = File.open(key_path, 'r'){|io| io.read}
@@ -374,6 +374,7 @@ class MetadataSource < ActiveRecord::Base
     structural.save!
   end
 
+  # Only gets called if the metadata source file is a CSV
   def update_source_path(source_path, source_type = '')
     case source_type
       when 'kaplan'
@@ -565,7 +566,7 @@ class MetadataSource < ActiveRecord::Base
           orig = value if key == self.file_field
         end
         return orig
-      when 'structural_bibid', 'bibliophilly_structural'
+      when 'structural_bibid', 'bibliophilly_structural', 'kaplan_structural'
         filenames = []
         self.user_defined_mappings.each do |key, value|
           filenames << value[self.file_field] if value[self.file_field].present?
@@ -577,7 +578,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def self.structural_types
-    %w[custom structural_bibid bibliophilly_structural]
+    %w[custom structural_bibid bibliophilly_structural kaplan_structural]
   end
 
   private
@@ -829,6 +830,7 @@ class MetadataSource < ActiveRecord::Base
       review_status_content = generate_review_status_xml
       content << review_status_content
     end
+
     File.open(tmp_filename, 'w+') do |f|
       f << $xml_header unless content.start_with?($xml_header)
       f << content

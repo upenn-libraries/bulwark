@@ -4,9 +4,9 @@ class ApplicationController < ActionController::Base
   include Hydra::Controller::ControllerBehavior
   include Blacklight::Base
 
-  layout 'blacklight'
+  before_filter :_set_current_user
 
-  before_filter :authenticate_user!, :_set_current_user
+  layout 'blacklight'
 
   rescue_from ActiveRecord::RecordNotFound, :with => :rescue_not_found
 
