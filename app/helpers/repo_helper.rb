@@ -55,6 +55,7 @@ module RepoHelper
   end
 
   def render_review_status(repo)
+    return unless repo.present?
     if repo.ingested
       render :partial => 'review/review_status', :locals => { :stats => repo.review_status.reverse, :repo_id => repo.id }
     end

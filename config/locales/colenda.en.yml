@@ -137,6 +137,7 @@ en:
             catalog_bibid: 'Catalog BibID Lookup Spreadsheet (XLSX)'
             structural_bibid: 'Structural Metadata from BibID Lookup Spreadsheet (XLSX)'
             bibliophilly: 'BiblioPhilly (XLSX)'
+            kaplan: 'Kaplan (CSV)'
             custom: 'Custom Structural Metadata Spreadsheet (XLSX)'
         orientation:
           vertical: 'Vertical'
@@ -171,6 +172,12 @@ en:
         bibliophilly_structural:
           heading: 'Sample structural metadata fetched from Page 2 of BiblioPhilly spreadsheet'
           field_separator: ':'
+        kaplan:
+          heading: 'Sample metadata fetched from Kaplan spreadsheet'
+          field_separator: ':'
+        kaplan_structural:
+          heading: 'Sample structural metadata fetched from Kaplan spreadsheet'
+          field_separator: ':'
         custom:
           field:
             label: '"%{field}" should map to:'
@@ -197,6 +204,7 @@ en:
         jettison_metadata: 'Removed files not identified as metadata source and/or for long-term preservation'
         jettison_assets: 'Removed original asset files per metadata source type directive'
         write_preservation_xml: 'Generated unified XML'
+        write_xlsx_from_csv: 'Generated XSLX from CSV'
         generated_previews: 'Generated previews'
         ingest_complete: 'Ingest complete'
         automated:

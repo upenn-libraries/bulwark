@@ -50,7 +50,7 @@
             <sv:value>bypassAdmin</sv:value>
           </sv:property>
           <sv:property sv:name="ns001:hasModel" sv:type="String" sv:multiple="false">
-            <sv:value>Manuscript</sv:value>
+            <sv:value>Photograph</sv:value>
           </sv:property>
           <sv:property sv:name="jcr:createdBy" sv:type="String">
             <sv:value>bypassAdmin</sv:value>
@@ -77,7 +77,7 @@
             <xsl:apply-templates select="description" />
           </sv:property>
           <sv:property sv:name="ns002:type" sv:type="String" sv:multiple="false">
-            <sv:value>Manuscript</sv:value>
+            <sv:value>Photograph</sv:value>
           </sv:property>
           <sv:property sv:name="ns002:title" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="title" />

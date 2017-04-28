@@ -4,6 +4,7 @@ module ApplicationHelper
 
   def render_image_list
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
+    return unless repo.present? && repo.images_to_render.present?
     rendered_keys = []
     repo.images_to_render.each do |key, value|
       rendered_keys << "#{public_fedora_path(key)}?width=#{value['width']}&height=#{value['height']}"

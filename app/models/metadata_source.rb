@@ -1,4 +1,5 @@
 require 'open-uri'
+require 'csv_xlsx_converter'
 
 class MetadataSource < ActiveRecord::Base
 
@@ -128,6 +129,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def set_metadata_mappings(working_path = $working_path)
+
     if self.source_type.present?
       case self.source_type
         when 'custom'
@@ -150,6 +152,8 @@ class MetadataSource < ActiveRecord::Base
         when 'bibliophilly'
           self.set_bibliophilly_data(working_path)
           self.identifier = self.original_mappings['Call Number/ID'].first
+        when 'kaplan'
+          self.set_kaplan_data(working_path)
       end
     end
     self.metadata_builder.repo.update_steps(:metadata_extracted)
@@ -203,6 +207,8 @@ class MetadataSource < ActiveRecord::Base
           @xml_content_final_copy = xml_from_structural_bibid
         when 'bibliophilly'
           @xml_content_final_copy = xml_from_bibliophilly
+        when 'kaplan'
+          @xml_content_final_copy = self.xml
       end
       $jettison_files.add(xml_fname)
       _fetch_write_save_preservation_xml(working_path, xml_fname, @xml_content_final_copy)
@@ -349,6 +355,39 @@ class MetadataSource < ActiveRecord::Base
     structural.generate_bibliophilly_struct_md(full_path)
   end
 
+  def set_kaplan_data(working_path)
+    self.root_element = 'record'
+    self.view_type = 'horizontal'
+    self.y_start = 1
+    self.y_stop = 1
+    self.x_start = 1
+    self.x_stop = 17
+
+    structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'kaplan_structural'} ? MetadataSource.find(self.children.first) : initialize_kaplan_structural(self)
+
+    full_path = "#{working_path}#{self.path}"
+    self.metadata_builder.repo.version_control_agent.get(:location => full_path)
+    update_source_path(full_path, 'kaplan') if full_path.ends_with?('csv')
+    self.generate_kaplan_descrip_md(full_path)
+    self.save!
+    structural.generate_kaplan_struct_md(xml_sanitized(self.original_mappings))
+    structural.save!
+  end
+
+  def update_source_path(source_path, source_type = '')
+    case source_type
+      when 'kaplan'
+        source_path = csv_to_xlsx(source_path)
+        self.metadata_builder.repo.version_control_agent.add(:content => source_path)
+        self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_xlsx_from_csv'))
+        self.metadata_builder.repo.version_control_agent.push
+        self.path = "/#{self.metadata_builder.repo.metadata_subdirectory}/#{File.basename(source_path)}"
+        self.save!
+      else
+        return
+    end
+  end
+
   def generate_bibliophilly_descrip_md(full_path)
     mappings = {}
     iterator = 0
@@ -370,6 +409,50 @@ class MetadataSource < ActiveRecord::Base
     self.original_mappings = mappings
     self.user_defined_mappings = mappings
     self.save!
+  end
+
+  def generate_kaplan_descrip_md(full_path)
+    mappings = {}
+    headers = []
+    x_start, y_start, x_stop, y_stop, z = _offset
+    workbook = RubyXL::Parser.parse(full_path)
+    workbook[z][y_start].cells.each do |c|
+      headers << c.value
+    end
+    (x_start..x_stop).each do |i|
+      val = workbook[z][y_start+1][x_start+i].present? ? workbook[z][y_start+1][x_start+i].value : ''
+      header = headers[i]
+      mappings[header] = val
+    end
+
+    self.original_mappings = mappings
+    mappings = xml_sanitized(mappings)
+    mappings = crosswalk_to_pqc(mappings, self.source_type)
+    self.user_defined_mappings = mappings
+  end
+
+  def crosswalk_to_pqc(mappings, source_type)
+    pqc_mappings = {}
+    case source_type
+      when 'kaplan'
+        mappings.each do |key, value|
+          crosswalked_term = MetadataSourceCrosswalks::Kaplan.mapping(key)
+          mappings.delete(key) && next if crosswalked_term.nil?
+          pqc_mappings[crosswalked_term] = [] if pqc_mappings[crosswalked_term].nil?
+          pqc_mappings[crosswalked_term] << value if value.present?
+        end
+      else
+        return  mappings
+    end
+    return pqc_mappings
+  end
+
+  def xml_sanitized(mappings)
+    sanitized = {}
+    mappings.each do |key, value|
+      sanitized[key.to_s.valid_xml_tag] = value.to_s.valid_xml_text
+    end
+    return sanitized
   end
 
   def generate_bibliophilly_struct_md(full_path)
@@ -398,6 +481,30 @@ class MetadataSource < ActiveRecord::Base
     self.save!
   end
 
+  def generate_kaplan_struct_md(mappings)
+    return {} unless mappings['tiff_locators'].present?
+    structural_mappings = {}
+    file_names = mappings['tiff_locators'].split(';').uniq.each{|x| x.strip!}
+    file_names.each_with_index do |file, i|
+      side = ''
+      if File.basename(file, ".*").ends_with?('r')
+        side = 'recto'
+      elsif File.basename(file, ".*").ends_with?('v')
+        side = 'verso'
+      end
+      structural_mappings[i] = {
+          'sequence' => i,
+          'page_number' => i+1,
+          'reading_direction' => 'left-to-right',
+          'side' => side,
+          'file_name' => file,
+          'item_type' => mappings['genre']
+      }
+    end
+    self.original_mappings = structural_mappings
+    self.user_defined_mappings = structural_mappings
+  end
+
 
   def initialize_bibliophilly_structural(parent)
     struct = MetadataSource.create({
@@ -413,6 +520,22 @@ class MetadataSource < ActiveRecord::Base
                                        :y_stop => 3,
                                        :x_start => 1,
                                        :x_stop => 3 })
+    parent.children << struct
+    parent.save!
+    struct
+  end
+
+  def initialize_kaplan_structural(parent)
+
+    struct = MetadataSource.create({
+                                       :metadata_builder => self.metadata_builder,
+                                       :source_type => 'kaplan_structural',
+                                       :root_element => 'pages',
+                                       :parent_element => 'page',
+                                       :view_type => 'horizontal',
+                                       :path => "#{parent.path} Structural",
+                                       :file_field => 'file_name'
+                                   })
     parent.children << struct
     parent.save!
     struct
@@ -458,6 +581,13 @@ class MetadataSource < ActiveRecord::Base
   end
 
   private
+
+  def csv_to_xlsx(csv)
+    xlsx = csv.gsub('csv','xlsx')
+    converter = CsvXlsxConverter::CsvToXlsx.new(csv)
+    converter.convert(xlsx)
+    return xlsx
+  end
 
   def _set_voyager_data(working_path = $working_path)
     _refresh_bibid(working_path)
@@ -723,6 +853,7 @@ class MetadataSource < ActiveRecord::Base
   def _offset
     x_start = self.x_start - 1
     y_start = self.y_start - 1
+    x_stop = self.x_stop - 1
     y_stop = self.y_stop - 1
     z = self.z - 1
     return x_start, y_start, x_stop, y_stop, z
@@ -737,7 +868,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def self.source_types
-    source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.catalog_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.bibliophilly'), 'bibliophilly'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
+    source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.catalog_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.bibliophilly'), 'bibliophilly'], [I18n.t('colenda.metadata_sources.describe.source_type.list.kaplan'), 'kaplan'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
   end
 
   def self.settings_fields

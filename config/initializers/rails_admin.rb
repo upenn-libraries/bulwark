@@ -85,7 +85,7 @@ RailsAdmin.config do |config|
         :load_metadata_source_extensions
       end
       multiple do
-        false
+        true
       end
       help I18n.t('colenda.rails_admin.new_repo.metadata_source_extensions.help')
     end

@@ -121,7 +121,7 @@ class MetadataBuilder < ActiveRecord::Base
       unless canonical_identifier_check(file_path)
         next
       end
-      xslt_file = self.metadata_source.any?{|ms| ms.source_type == 'bibliophilly'} ? 'bibliophilly' : 'pqc'
+      xslt_file = xslt_file_select
       Dir.chdir(working_path)
       `xsltproc #{Rails.root}/lib/tasks/#{xslt_file}.xslt #{file_path}`
       transformed_xml = "#{working_path}/#{Utils.config[:fedora_xml_derivative]}"
@@ -135,6 +135,16 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.lock
     self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'))
     self.repo.version_control_agent.push
+  end
+
+  def xslt_file_select
+    if self.metadata_source.any?{|ms| ms.source_type == 'bibliophilly'}
+      return 'bibliophilly'
+    elsif self.metadata_source.any?{|ms| ms.source_type == 'kaplan'}
+      return 'kaplan'
+    else
+      return 'pqc'
+    end
   end
 
   def canonical_identifier_check(xml_file)
@@ -160,8 +170,6 @@ class MetadataBuilder < ActiveRecord::Base
     read_and_store_xml(working_path)
     self.repo.version_control_agent.delete_clone
   end
-
-
 
   def read_and_store_xml(working_path)
     get_location = "#{working_path}/#{self.repo.metadata_subdirectory}"
