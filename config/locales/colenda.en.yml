@@ -41,6 +41,8 @@ en:
         starts_with_xml: 'Invalid tag "%{value}" specified for "%{key}" - valid XML tags cannot start with %{xml}'
         starts_with_number: 'Invalid tag "%{value}" specified for "%{key}" - valid XML tags cannot begin with numbers'
         invalid_characters: 'Invalid tag "%{value}" specified for "%{key}" - valid XML tags can only contain letters, numbers, underscores, hyphens, and periods'
+    header_links:
+      admin_dashboard: 'Admin Dashboard'
     rails_admin:
       new_repo:
         labels:
