@@ -47,9 +47,14 @@ span.site-name {
 }
 
 .navbar-nav {
+  float: right;
+  height: 50px;
   li {
     a {
       color: $text-white;
+      :click {
+        background-color: $upenn-red;
+      }
     }
   }
 }
