@@ -31,7 +31,20 @@ Rails.application.routes.draw do
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
   root to: "catalog#index"
   blacklight_for :catalog
-  devise_for :users
+
+  devise_for :users, skip: :registrations
+  devise_scope :user do
+    resource :registration,
+             only: [:edit, :update],
+             path: 'users',
+             path_names: { new: 'sign_up' },
+             controller: 'devise/registrations',
+             as: :user_registration do
+      get :cancel
+    end
+  end
+
   mount Qa::Engine => '/qa'
   mount Sidekiq::Web => '/sidekiq'
+
 end

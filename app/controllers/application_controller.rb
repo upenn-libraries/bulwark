@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
 
   layout 'blacklight'
 
-  before_filter :authenticate_user!, :_set_current_user
+  before_filter :_set_current_user
 
   rescue_from ActiveRecord::RecordNotFound, :with => :rescue_not_found
 
