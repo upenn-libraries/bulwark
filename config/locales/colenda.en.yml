@@ -139,7 +139,7 @@ en:
             catalog_bibid: 'Catalog BibID Lookup Spreadsheet (XLSX)'
             structural_bibid: 'Structural Metadata from BibID Lookup Spreadsheet (XLSX)'
             bibliophilly: 'BiblioPhilly (XLSX)'
-            kaplan: 'Kaplan (CSV)'
+            kaplan: 'Kaplan (XLSX)'
             custom: 'Custom Structural Metadata Spreadsheet (XLSX)'
         orientation:
           vertical: 'Vertical'

@@ -65,7 +65,7 @@
             <sv:value><xsl:value-of select="$uuid" /></sv:value>
           </sv:property>
           <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="false">
-            <sv:value><xsl:apply-templates select="identifier"/></sv:value>
+            <xsl:apply-templates select="identifier" />
           </sv:property>
           <sv:property sv:name="ns002:language" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="language" />
@@ -105,6 +105,10 @@
     </xsl:template>
 
     <xsl:template match="coverage">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="identifier">
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
 
