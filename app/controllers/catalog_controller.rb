@@ -92,14 +92,16 @@ class CatalogController < ApplicationController
 
     # PQC
     config.add_index_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject'
-    config.add_index_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name'
-    config.add_index_field solr_name('date', :stored_searchable, type: :string), :label => 'Date'
     config.add_index_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
+    config.add_index_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name'
+    config.add_index_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name'
+    config.add_index_field solr_name('date', :stored_searchable, type: :string), :label => 'Date'
     config.add_index_field solr_name('language', :stored_searchable, type: :string), :label => 'Language'
     config.add_index_field solr_name('creator', :stored_searchable, type: :string), :label => 'Creator'
     config.add_index_field solr_name('publisher', :stored_searchable, type: :string), :label => 'Publisher'
     config.add_index_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
     config.add_index_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
+    config.add_index_field solr_name('format_type', :stored_searchable, type: :string), :label => 'Type'
 
     # BiblioPhilly
     config.add_index_field solr_name('manuscript_name', :stored_searchable, type: :string), :label => 'Manuscript Name'

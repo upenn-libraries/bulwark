@@ -6,6 +6,4 @@ class Photograph < MultiImageItem
     self.item_type ||= 'Photograph'
   end
 
-
-
 end

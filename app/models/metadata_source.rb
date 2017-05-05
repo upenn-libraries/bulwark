@@ -429,7 +429,17 @@ class MetadataSource < ActiveRecord::Base
     self.original_mappings = mappings
     mappings = xml_sanitized(mappings)
     mappings = crosswalk_to_pqc(mappings, self.source_type)
+    mappings['format_type'] = determine_format_type(mappings['item_type'])
     self.user_defined_mappings = mappings
+  end
+
+  def determine_format_type(source_mapping)
+    return nil unless source_mapping.present?
+    source_mapping = [source_mapping] unless source_mapping.respond_to?(:each)
+    ColendaBase.af_models.each do |model|
+      return [model] if source_mapping.any?{|a| a.include?(model)}
+    end
+    return []
   end
 
   def crosswalk_to_pqc(mappings, source_type)
