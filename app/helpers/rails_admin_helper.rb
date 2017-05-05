@@ -52,18 +52,6 @@ module RailsAdminHelper
     best_guess
   end
 
-  def render_display_attributes(view_type, attributes, image_key = '')
-    attributes_display = ''
-    attributes_display << content_tag(:h2, t('colenda.repos.ingest.review.metadata.preview.heading', :view_type => view_type.capitalize, :selected_attributes => identifier_selection(attributes)))
-    attributes_display << content_tag(:div, thumbnail_preview(image_key), :class => 'thumbnail') if image_key.present?
-    attributes.each do |key, value|
-      items = wrap_values(value)
-      attributes_display << content_tag(:strong, key)
-      attributes_display << content_tag(:ul, items)
-    end
-    content_tag(:div, attributes_display.html_safe, :class => 'fragment').html_safe
-  end
-
   def render_job_statuses(unique_identifier, process)
     flash_message = collect_job_status(unique_identifier, process)
     flash[flash_message.first] = flash_message.last if flash_message.present?
