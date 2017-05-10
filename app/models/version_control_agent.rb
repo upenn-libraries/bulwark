@@ -66,6 +66,7 @@ class VersionControlAgent < ActiveRecord::Base
   end
 
   def get(options = {})
+    init_worker
     options[:location].nil? ? @worker.get : @worker.get(options[:location])
   end
 
