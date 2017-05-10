@@ -7,10 +7,10 @@ module Utils
 
       attr_accessor :remote_repo_path, :working_repo_path
 
-      def initialize(repo)
+      def initialize(repo, path_namespace)
         @repo = repo
         @remote_repo_path = "#{Utils.config[:assets_path]}/#{@repo.names.git}"
-        @working_repo_path = "#{Utils.config[:workspace]}/#{path_seed(repo)}/#{@repo.names.git}"
+        @working_repo_path = "#{path_namespace}/#{@repo.names.git}"
       end
 
       def repo
@@ -94,7 +94,7 @@ module Utils
         begin
           working_repo.commit(commit_message)
         rescue => exception
-          return if exception.message =~ /nothing \w* commit, working \w* clean/ or exception.message == 'Nothing staged for commit.'
+          return if exception.message =~ /nothing \w* commit, working \w* clean/ or exception.message =~ /Changes not staged for commit/ or exception.message == 'Nothing staged for commit.'
           raise Utils::Error::VersionControl.new(error_message(exception.message))
         end
       end
@@ -218,12 +218,6 @@ module Utils
       def _version_numbers(output_array, split_char, string_to_search)
         versions_line = output_array[output_array.index{|s| s.start_with?(string_to_search)}]
         versions_line.split("#{split_char}").last.lstrip.split(' ').map(&:to_i)
-      end
-
-      private
-
-      def path_seed(repo)
-        Digest::SHA256.hexdigest("#{repo.names.git}#{SecureRandom.uuid}")
       end
 
     end

@@ -2,7 +2,7 @@ class VersionControlAgent < ActiveRecord::Base
 
   belongs_to :repo
 
-  after_create :set_worker_attributes
+  after_create :set_vca_attributes
 
   def vc_type
     read_attribute(:vc_type) || ''
@@ -16,107 +16,104 @@ class VersionControlAgent < ActiveRecord::Base
     self[:vc_type] = vc_type
   end
 
-  def set_worker_attributes
+  def set_vca_attributes
     remote_repo_path = "#{Utils.config[:assets_path]}/#{self.repo.names.git}"
     self.remote_path = remote_repo_path
     self.save!
   end
 
   def init_bare
-    _initialize_worker
-    $worker.initialize_bare_remote
+    init_worker
+    @worker.initialize_bare_remote
   end
 
   def set_remote_permissions
-    _initialize_worker
-    $worker.set_remote_permissions
+    init_worker
+    @worker.set_remote_permissions
   end
 
   def clone(options = {})
-    _initialize_worker
-    $worker.clone(options)
+    init_worker
+    @worker.clone(options)
   end
 
   def reset_hard(options = {})
-    _initialize_worker
-    options[:location].nil? ? $worker.reset_hard : $worker.reset_hard(options[:location])
+    options[:location].nil? ? @worker.reset_hard : @worker.reset_hard(options[:location])
   end
 
   def push_bare
-    _initialize_worker
-    $worker.push_bare
+    @worker.push_bare
   end
 
   def push
-    _initialize_worker
-    $worker.push
+    @worker.push
   end
 
   def commit_bare(message)
-    _initialize_worker
-    $worker.commit_bare(message)
+    @worker.commit_bare(message)
   end
 
   def add(options = {})
-    _initialize_worker
-    $worker.add(options)
+    @worker.add(options)
   end
 
   def copy(options = {})
-    _initialize_worker
-    $worker.copy(options)
+    @worker.copy(options)
   end
 
   def commit(message)
-    _initialize_worker
-    $worker.commit(message)
+    @worker.commit(message)
   end
 
   def get(options = {})
-    _initialize_worker
-    options[:location].nil? ? $worker.get : $worker.get(options[:location])
+    init_worker
+    options[:location].nil? ? @worker.get : @worker.get(options[:location])
   end
 
   def sync_content(options = {})
-    _initialize_worker
-    options[:directory].nil? ? $worker.sync('--content') : $worker.sync(options[:directory], '--content')
+    options[:directory].nil? ? @worker.sync('--content') : @worker.sync(options[:directory], '--content')
   end
 
   def pull(options = {})
-    _initialize_worker
-    options[:location].nil? ? $worker.pull : $worker.pull(options[:location])
+    options[:location].nil? ? @worker.pull : @worker.pull(options[:location])
   end
 
   def drop(options = {})
-    _initialize_worker
-    options[:drop_location].nil? ? $worker.drop : $worker.drop(options[:drop_location])
+    options[:drop_location].nil? ? @worker.drop : @worker.drop(options[:drop_location])
   end
 
   def unlock(options)
-    _initialize_worker
-    $worker.unlock(options)
+    @worker.unlock(options)
   end
 
   def lock(filename = '.')
-    _initialize_worker
-    $worker.lock(filename)
+    @worker.lock(filename)
   end
 
   def look_up_key( path = '')
-    _initialize_worker
-    $worker.look_up_key(path)
+    @worker.look_up_key(path)
   end
 
   def delete_clone(options = {})
-    _initialize_worker
-    options[:drop_location].nil? ? $worker.drop : $worker.drop(options[:drop_location])
-    $worker.remove_working_directory
+    options[:drop_location].nil? ? @worker.drop : @worker.drop(options[:drop_location])
+    @worker.remove_working_directory
   end
 
   private
 
-  def _initialize_worker
-    $worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo) unless (defined?($worker) && $worker.repo == repo)
+  def init_worker
+    return if @worker.present? && @worker.repo == repo
+    working_path_namespace = path_namespace
+    FileUtils.mkdir_p(working_path_namespace)
+    @worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo, working_path_namespace)
+  end
+
+  def path_seed
+    Digest::SHA256.hexdigest("#{repo.names.git}#{SecureRandom.uuid}")
+  end
+
+  def path_namespace
+    "#{Utils.config[:workspace]}/#{path_seed}"
   end
 
 end
