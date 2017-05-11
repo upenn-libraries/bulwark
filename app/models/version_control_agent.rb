@@ -37,66 +37,65 @@ class VersionControlAgent < ActiveRecord::Base
     @worker.clone(options)
   end
 
-  def reset_hard(options = {})
-    options[:location].nil? ? @worker.reset_hard : @worker.reset_hard(options[:location])
+  def reset_hard(location)
+    @worker.reset_hard(location)
   end
 
-  def push_bare
-    @worker.push_bare
+  def push_bare(location)
+    @worker.push_bare(location)
   end
 
-  def push
-    @worker.push
+  def push(location)
+    @worker.push(location)
   end
 
-  def commit_bare(message)
-    @worker.commit_bare(message)
+  def commit_bare(message, location)
+    @worker.commit_bare(message, location)
   end
 
-  def add(options = {})
-    @worker.add(options)
+  def add(options = {}, location)
+    @worker.add(options, location)
   end
 
-  def copy(options = {})
-    @worker.copy(options)
+  def copy(options = {}, location)
+    @worker.copy(options, location)
   end
 
-  def commit(message)
-    @worker.commit(message)
+  def commit(message, location)
+    @worker.commit(message, location)
   end
 
-  def get(options = {})
-    init_worker
-    options[:location].nil? ? @worker.get : @worker.get(options[:location])
+  def get(options = {}, location)
+    @worker.get(options, location)
   end
 
-  def sync_content(options = {})
-    options[:directory].nil? ? @worker.sync('--content') : @worker.sync(options[:directory], '--content')
+  def sync_content(location)
+    @worker.sync(location)
   end
 
-  def pull(options = {})
-    options[:location].nil? ? @worker.pull : @worker.pull(options[:location])
+  def pull(location)
+    @worker.pull(location)
   end
 
-  def drop(options = {})
-    options[:drop_location].nil? ? @worker.drop : @worker.drop(options[:drop_location])
+  def drop(options = {}, location)
+    @worker.drop(options, location)
   end
 
-  def unlock(options)
-    @worker.unlock(options)
+  def unlock(options, location)
+    @worker.unlock(options, location)
   end
 
-  def lock(filename = '.')
-    @worker.lock(filename)
+  def lock(filename = '.', location)
+    @worker.lock(filename, location)
   end
 
-  def look_up_key( path = '')
-    @worker.look_up_key(path)
+  def look_up_key(path = '', location)
+    @worker.look_up_key(location)
   end
 
-  def delete_clone(options = {})
-    options[:drop_location].nil? ? @worker.drop : @worker.drop(options[:drop_location])
-    @worker.remove_working_directory
+  def delete_clone(location)
+    @worker.drop(location)
+    @worker.remove_working_directory(location)
   end
 
   private

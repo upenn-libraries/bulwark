@@ -35,7 +35,7 @@ class MetadataBuilder < ActiveRecord::Base
   def refresh_metadata
     @working_path = self.repo.version_control_agent.clone
     get_mappings(@working_path)
-    self.repo.version_control_agent.delete_clone
+    self.repo.version_control_agent.delete_clone(@working_path)
   end
 
   def get_mappings(working_path)
@@ -70,9 +70,9 @@ class MetadataBuilder < ActiveRecord::Base
   def save_input_sources(working_path)
     self.metadata_source.each do |source|
       save_input_source(working_path) if source.input_source.present? && source.input_source.downcase.start_with?('http')
-      self.repo.version_control_agent.add(:content => "#{working_path}/#{self.metadata_builder.repo.admin_subdirectory}")
+      self.repo.version_control_agent.add({:content => "#{working_path}/#{self.metadata_builder.repo.admin_subdirectory}"}, working_path)
       self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_input_source'))
-      self.repo.version_control_agent.push
+      self.repo.version_control_agent.push(working_path)
     end
   end
 
@@ -81,43 +81,43 @@ class MetadataBuilder < ActiveRecord::Base
     working_path = self.repo.version_control_agent.clone
     file_checks_previews(working_path)
     Utils::Process.refresh_assets(working_path, self.repo)
-    self.repo.version_control_agent.delete_clone
+    self.repo.version_control_agent.delete_clone(working_path)
   end
 
   def file_checks_previews(working_path)
-    self.repo.version_control_agent.get(:location => "#{working_path}/#{self.repo.assets_subdirectory}")
+    self.repo.version_control_agent.get({:location => "#{working_path}/#{self.repo.assets_subdirectory}"}, working_path)
     self.metadata_source.where(:source_type => MetadataSource.structural_types).each do |ms|
       ms.filenames.each do |file|
         file_path = "#{working_path}/#{self.repo.assets_subdirectory}/#{file}"
-        self.repo.version_control_agent.unlock(:content => file_path)
+        self.repo.version_control_agent.unlock({:content => file_path}, working_path)
         validation_state = validate_file(file_path)
         self.repo.log_problem_file(file_path.gsub(working_path,''), validation_state) if validation_state.present?
-        self.repo.version_control_agent.unlock(:content => self.repo.derivatives_subdirectory)
+        self.repo.version_control_agent.unlock({:content => self.repo.derivatives_subdirectory}, working_path)
         generate_preview(file_path,"#{working_path}/#{self.repo.derivatives_subdirectory}") unless validation_state.present?
-        self.repo.version_control_agent.add(:content => file_path)
+        self.repo.version_control_agent.add({:content => file_path}, working_path)
         self.repo.version_control_agent.lock(file_path)
       end
     end
     self.repo.save!
     self.last_file_checks = DateTime.now
     self.save!
-    self.repo.version_control_agent.add(:content => "#{working_path}/#{self.repo.derivatives_subdirectory}")
-    self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_previews'))
-    self.repo.version_control_agent.push
+    self.repo.version_control_agent.add({:content => "#{working_path}/#{self.repo.derivatives_subdirectory}"}, working_path)
+    self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_previews'), working_path)
+    self.repo.version_control_agent.push(working_path)
   end
 
   def transform_and_ingest(array)
     working_path = self.repo.version_control_agent.clone
     ingest(working_path, array)
     Utils::Process.refresh_assets(working_path, self.repo)
-    self.repo.version_control_agent.delete_clone
+    self.repo.version_control_agent.delete_clone(working_path)
   end
 
   def ingest(working_path,files_array)
     files_array.each do |file|
       file_path = "#{working_path}/#{file.last}".gsub('//','/')
-      self.repo.version_control_agent.get(:location => file_path)
-      self.repo.version_control_agent.unlock(:content => file_path)
+      self.repo.version_control_agent.get({:location => file_path}, working_path)
+      self.repo.version_control_agent.unlock({:content => file_path}, working_path)
       unless canonical_identifier_check(file_path)
         next
       end
@@ -129,12 +129,12 @@ class MetadataBuilder < ActiveRecord::Base
       File.open(transformed_xml, 'w') {|f| f.puts fedora_xml }
       self.repo.ingest(transformed_xml, working_path)
     end
-    self.repo.version_control_agent.add
-    self.repo.version_control_agent.add(:content => "#{working_path}/#{repo.derivatives_subdirectory}")
-    self.repo.version_control_agent.add(:content => "#{working_path}/#{repo.admin_subdirectory}")
+    self.repo.version_control_agent.add(working_path)
+    self.repo.version_control_agent.add({:content => "#{working_path}/#{repo.derivatives_subdirectory}"}, working_path)
+    self.repo.version_control_agent.add({:content => "#{working_path}/#{repo.admin_subdirectory}"}, working_path)
     self.repo.version_control_agent.lock
-    self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'))
-    self.repo.version_control_agent.push
+    self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'), working_path)
+    self.repo.version_control_agent.push(working_path)
   end
 
   def canonical_identifier_check(xml_file)
@@ -158,20 +158,20 @@ class MetadataBuilder < ActiveRecord::Base
   def store_xml_preview
     working_path = self.repo.version_control_agent.clone
     read_and_store_xml(working_path)
-    self.repo.version_control_agent.delete_clone
+    self.repo.version_control_agent.delete_clone(working_path)
   end
 
 
 
   def read_and_store_xml(working_path)
     get_location = "#{working_path}/#{self.repo.metadata_subdirectory}"
-    self.repo.version_control_agent.get(:location => get_location)
+    self.repo.version_control_agent.get({:location => get_location}, working_path)
     sample_xml_docs = ''
     @file_links = Array.new
     Dir.glob("#{get_location}/*.xml") do |file|
       if File.exist?(file)
         pretty_file = file.gsub(working_path,'')
-        self.preserve.add(pretty_file) if File.basename(file) == self.repo.preservation_filename
+        self.preserve.add(pretty_file, working_path) if File.basename(file) == self.repo.preservation_filename
         @file_links << link_to(pretty_file, "##{file}")
         anchor_tag = content_tag(:a, '', :name=> file)
         sample_xml_content = File.open(file, 'r'){|io| io.read}
@@ -199,7 +199,7 @@ class MetadataBuilder < ActiveRecord::Base
     Dir.glob("#{working_path}/#{self.repo.metadata_subdirectory}/#{self.repo.format_types(self.repo.metadata_source_extensions)}") do |file|
       available_files << file.gsub(working_path,'')
     end
-    self.repo.version_control_agent.delete_clone
+    self.repo.version_control_agent.delete_clone(working_path)
     available_files
   end
 

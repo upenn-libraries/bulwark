@@ -42,45 +42,47 @@ module Utils
         destination
       end
 
-      def reset_hard(dir = @working_repo_path)
+      def reset_hard(dir)
         change_dir_working(dir)
         `git reset --hard`
       end
 
-      def sync(dir = @working_repo_path, options = '')
+      def sync(dir)
         begin
           change_dir_working(dir)
           rolling_upgrade(dir)
-          `git annex sync #{options}`
+          `git annex sync --content`
         rescue
           raise I18n.t('colenda.utils.version_control.git_annex.errors.sync')
         end
       end
 
-      def push_bare
-        change_dir_working(@working_repo_path)
+      def push_bare(dir)
+        change_dir_working(dir)
         `git push origin master`
       end
 
-      def push
-        change_dir_working(@working_repo_path)
+      def push(dir)
+        change_dir_working(dir)
         `git push origin master git-annex`
         `git annex sync --content`
       end
 
-      def pull(dir = @working_repo_path)
+      def pull(dir)
         change_dir_working(dir)
         `git pull`
       end
 
-      def add(options)
+      def add(options, dir)
+        change_dir_working(dir)
         content = options[:content].present? ? options[:content] : '.'
         add_type = options[:add_type].present? ? options[:add_type] : :store
         return `git annex add #{Shellwords.escape(content)}` if add_type == :store
         return `git add #{Shellwords.escape(content)}` if add_type == :git
       end
 
-      def copy(options)
+      def copy(options, dir)
+        change_dir_working(dir)
         content = options[:content].present? ? options[:content] : '.'
         to = options[:to].present? ? "--to #{options[:to]}" : ''
         from = options[:from].present? ? "--from #{options[:from]}" : ''
@@ -88,9 +90,9 @@ module Utils
       end
 
 
-      def commit(commit_message)
-        change_dir_working(@working_repo_path)
-        working_repo = Git.open(@working_repo_path)
+      def commit(commit_message, dir)
+        change_dir_working(dir)
+        working_repo = Git.open(dir)
         begin
           working_repo.commit(commit_message)
         rescue => exception
@@ -99,41 +101,43 @@ module Utils
         end
       end
 
-      def commit_bare(commit_message)
-        working_repo = Git.open(@working_repo_path)
+      def commit_bare(commit_message, dir)
+        working_repo = Git.open(dir)
         working_repo.add(:all => true)
         working_repo.commit(commit_message)
       end
 
-      def remove_working_directory
+      def remove_working_directory(dir)
         `git config annex.pidlock true`
         `git annex drop --all --force`
         Dir.chdir(Rails.root.to_s)
-        parent_dir = @working_repo_path.gsub(repo.names.git,"")
+        parent_dir = dir.gsub(repo.names.git,"")
         FileUtils.rm_rf(parent_dir, :secure => true) if File.directory?(parent_dir)
       end
 
-      def get(dir = @working_repo_path)
-        _get_drop_calls(dir, 'get')
+      def get(options, dir)
+        change_dir_working(dir)
+        get_dir = options[:location].present? ? options[:location] : dir
+        _get_drop_calls(get_dir, 'get')
       end
 
-      def drop(dir = @working_repo_path)
+      def drop(dir)
         _get_drop_calls(dir, 'drop')
       end
 
-      def unlock(options)
+      def unlock(options, dir)
         raise Utils::Error::VersionControl.new(I18n.t('colenda.utils.version_control.git_annex.errors.unlock_no_options')) unless options[:content].present?
-        dir = options[:location].present? ? options[:location] : @working_repo_path
+        dir = options[:location].present? ? options[:location] : dir
         change_dir_working(dir)
         `git annex unlock #{Shellwords.escape(options[:content])}`
       end
 
-      def lock(file = '.')
-        change_dir_working(@working_repo_path)
+      def lock(file = '.', dir)
+        change_dir_working(dir)
         `git annex lock #{Shellwords.escape(file)}`
       end
 
-      def look_up_key(path, dir = @working_repo_path)
+      def look_up_key(path, dir)
         change_dir_working(dir) unless Dir.pwd == dir
         `git annex lookupkey #{path.gsub(dir, '')}`.chomp
       end

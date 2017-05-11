@@ -14,9 +14,9 @@ module AutomatedWorkflows
         destination = "#{working_path}/#{assets_endpoint.destination}"
         result = AutomatedWorkflows::Actions::Binaries.fetch(source, destination, repo.file_extensions)
         if result
-          repo.version_control_agent.add
-          repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.automated.added_assets'))
-          repo.version_control_agent.push
+          repo.version_control_agent.add(working_path)
+          repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.automated.added_assets'), working_path)
+          repo.version_control_agent.push(working_path)
         else
           AutomatedWorkflows::Agent.source_problems(assets_endpoint, source, 'Source not found')
         end
