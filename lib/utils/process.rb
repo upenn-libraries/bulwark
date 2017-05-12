@@ -81,7 +81,7 @@ module Utils
       validation_state = validate_file(file_link)
       if validation_state.nil?
         derivative_link = "#{working_path}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
-        file_url = attachable_url(repo, derivative_link)
+        file_url = attachable_url(repo, working_path, derivative_link)
         execute_curl(_build_command('file_attach', :file => file_url, :fid => parent.id, :child_container => child_container))
         return FastImage.size(derivative_link)
       else
@@ -91,17 +91,18 @@ module Utils
       end
     end
 
-    def generate_thumbnail(repo)
-      unencrypted_thumbnail_path = "#{@@working_path}/#{repo.assets_subdirectory}/#{repo.thumbnail}"
-      thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{@@working_path}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ''
-      execute_curl(_build_command('file_attach', :file => attachable_url(repo, thumbnail_link), :fid => repo.names.fedora, :child_container => 'thumbnail'))
-      refresh_assets(@@working_path, repo)
+    def generate_thumbnail(repo, working_path)
+      unencrypted_thumbnail_path = "#{working_path}/#{repo.assets_subdirectory}/#{repo.thumbnail}"
+      thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{working_path}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ''
+      execute_curl(_build_command('file_attach', :file => attachable_url(repo, working_path, thumbnail_link), :fid => repo.names.fedora, :child_container => 'thumbnail'))
+      refresh_assets(working_path, repo)
     end
 
     def attachable_url(repo, working_path, file_path)
       repo.version_control_agent.add({:content => file_path}, working_path)
       repo.version_control_agent.copy({:content => file_path, :to => Utils::Storage::Ceph.config.special_remote_name}, working_path)
-      read_storage_link(repo.version_control_agent.look_up_key(file_path, working_path), repo)
+      lookup_key = repo.version_control_agent.look_up_key(file_path, working_path)
+      read_storage_link(lookup_key, repo)
     end
 
     def read_storage_link(key, repo)

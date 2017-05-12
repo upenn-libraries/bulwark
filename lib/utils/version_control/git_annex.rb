@@ -122,8 +122,10 @@ module Utils
         _get_drop_calls(get_dir, 'get')
       end
 
-      def drop(dir)
-        _get_drop_calls(dir, 'drop')
+      def drop(options = {}, dir)
+        change_dir_working(dir)
+        drop = options[:content].present? ? options[:content] : '.'
+        `git annex drop #{Shellwords.escape(options[:content])}`
       end
 
       def unlock(options, dir)
@@ -143,7 +145,7 @@ module Utils
         `git annex lookupkey #{path.gsub(dir, '')}`.chomp
       end
 
-      def rolling_upgrade(dir = @working_repo_path)
+      def rolling_upgrade(dir)
         change_dir_working(dir) unless Dir.pwd == dir
         version_string = `git annex version`
         unless version_string.include?("local repository version: #{Utils.config[:supported_vca_version]}")
@@ -151,14 +153,14 @@ module Utils
         end
       end
 
-      def init_special_remote(dir = @working_repo_path, remote_type, remote_name)
+      def init_special_remote(dir, remote_type, remote_name)
         change_dir_working(dir) unless Dir.pwd == dir
         raise 'Missing S3 special remote environment variables' unless Utils::Storage::Ceph.required_configs?
         `export AWS_ACCESS_KEY_ID=#{Utils::Storage::Ceph.config.aws_access_key_id}; export AWS_SECRET_ACCESS_KEY=#{Utils::Storage::Ceph.config.aws_secret_access_key};  git annex initremote #{Utils::Storage::Ceph.config.special_remote_name} type=#{Utils::Storage::Ceph.config.storage_type} encryption=#{Utils::Storage::Ceph.config.encryption} requeststyle=#{Utils::Storage::Ceph.config.request_style} host=#{Utils::Storage::Ceph.config.host} port=#{Utils::Storage::Ceph.config.port} public=#{Utils::Storage::Ceph.config.public} bucket='#{remote_name.bucketize}'
 ` if remote_type == 's3'
       end
 
-      def init_clone(dir = @working_repo_path, fsck = true)
+      def init_clone(dir, fsck = true)
         Dir.chdir(dir)
         `git annex init --version=#{Utils.config[:supported_vca_version]}`
         `git annex enableremote #{Utils::Storage::Ceph.config.special_remote_name}`
@@ -170,7 +172,7 @@ module Utils
 
       private
 
-      def change_dir_working(dir = @working_repo_path)
+      def change_dir_working(dir)
         directory = get_directory(dir)
         begin
           Dir.chdir(directory)

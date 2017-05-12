@@ -4,6 +4,10 @@ class VersionControlAgent < ActiveRecord::Base
 
   after_create :set_vca_attributes
 
+  def worker
+    @worker ||= create_worker
+  end
+
   def vc_type
     read_attribute(:vc_type) || ''
   end
@@ -23,85 +27,82 @@ class VersionControlAgent < ActiveRecord::Base
   end
 
   def init_bare
-    init_worker
-    @worker.initialize_bare_remote
+    self.worker.initialize_bare_remote
   end
 
   def set_remote_permissions
-    init_worker
-    @worker.set_remote_permissions
+    self.worker.set_remote_permissions
   end
 
   def clone(options = {})
-    init_worker
-    @worker.clone(options)
+    create_worker
+    self.worker.clone(options)
   end
 
   def reset_hard(location)
-    @worker.reset_hard(location)
+    self.worker.reset_hard(location)
   end
 
   def push_bare(location)
-    @worker.push_bare(location)
+    self.worker.push_bare(location)
   end
 
   def push(location)
-    @worker.push(location)
+    self.worker.push(location)
   end
 
   def commit_bare(message, location)
-    @worker.commit_bare(message, location)
+    self.worker.commit_bare(message, location)
   end
 
   def add(options = {}, location)
-    @worker.add(options, location)
+    self.worker.add(options, location)
   end
 
   def copy(options = {}, location)
-    @worker.copy(options, location)
+    self.worker.copy(options, location)
   end
 
   def commit(message, location)
-    @worker.commit(message, location)
+    self.worker.commit(message, location)
   end
 
   def get(options = {}, location)
-    @worker.get(options, location)
+    self.worker.get(options, location)
   end
 
   def sync_content(location)
-    @worker.sync(location)
+    self.worker.sync(location)
   end
 
   def pull(location)
-    @worker.pull(location)
+    self.worker.pull(location)
   end
 
   def drop(options = {}, location)
-    @worker.drop(options, location)
+    self.worker.drop(options, location)
   end
 
   def unlock(options, location)
-    @worker.unlock(options, location)
+    self.worker.unlock(options, location)
   end
 
   def lock(filename = '.', location)
-    @worker.lock(filename, location)
+    self.worker.lock(filename, location)
   end
 
   def look_up_key(path = '', location)
-    @worker.look_up_key(location)
+    self.worker.look_up_key(path, location)
   end
 
   def delete_clone(location)
-    @worker.drop(location)
-    @worker.remove_working_directory(location)
+    self.worker.drop(location)
+    self.worker.remove_working_directory(location)
   end
 
   private
 
-  def init_worker
-    return if @worker.present? && @worker.repo == repo
+  def create_worker
     working_path_namespace = path_namespace
     FileUtils.mkdir_p(working_path_namespace)
     @worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo, working_path_namespace)

@@ -145,7 +145,7 @@ class Repo < ActiveRecord::Base
       @status = Utils::Process.import(file, self, working_path)
       self.thumbnail = default_thumbnail
       self.save!
-      Utils::Process.generate_thumbnail(self) if self.thumbnail.present?
+      Utils::Process.generate_thumbnail(self, working_path) if self.thumbnail.present?
       self.package_metadata_info(working_path)
       self.generate_logs(working_path)
       self.version_control_agent.add({:content => "#{working_path}/#{self.derivatives_subdirectory}"}, working_path)

@@ -29,9 +29,8 @@ class MetadataBuildersController < ApplicationController
   end
 
   def refresh_metadata
-    @metadata_builder.refresh_metadata
-    #@job = MetadataExtractionJob.perform_later(@metadata_builder, root_url, current_user.email)
-    #initialize_job_activity('metadata_extraction')
+    @job = MetadataExtractionJob.perform_later(@metadata_builder, root_url, current_user.email)
+    initialize_job_activity('metadata_extraction')
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata"
     @metadata_builder.repo.update_last_action(action_description[:metadata_extracted])
   end
@@ -43,26 +42,23 @@ class MetadataBuildersController < ApplicationController
   end
 
   def generate_preview_xml
-    @metadata_builder.build_xml_files
-    #@job = GenerateXmlJob.perform_later(@metadata_builder, root_url, current_user.email)
-    #initialize_job_activity('generate_xml')
+    @job = GenerateXmlJob.perform_later(@metadata_builder, root_url, current_user.email)
+    initialize_job_activity('generate_xml')
     @metadata_builder.repo.update_last_action(action_description[:preservation_xml_generated])
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/preview_xml"
   end
 
   def file_checks
-    @metadata_builder.perform_file_checks_and_generate_previews
-    #@job = FileChecksJob.perform_later(@metadata_builder, root_url, current_user.email)
-    #initialize_job_activity('file_checks')
+    @job = FileChecksJob.perform_later(@metadata_builder, root_url, current_user.email)
+    initialize_job_activity('file_checks')
     @metadata_builder.repo.update_last_action(action_description[:file_checks_run])
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/files_check", :flash =>  { :warning => t('colenda.controllers.metadata_builders.file_checks.success') }
   end
 
   def ingest
     if params[:to_ingest].present?
-      @metadata_builder.transform_and_ingest(params[:to_ingest])
-      #@job = IngestJob.perform_later(@metadata_builder, params[:to_ingest], root_url, current_user.email)
-      #initialize_job_activity('ingest')
+      @job = IngestJob.perform_later(@metadata_builder, params[:to_ingest], root_url, current_user.email)
+      initialize_job_activity('ingest')
       @metadata_builder.repo.update_last_action(action_description[:published_preview])
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest"
     else

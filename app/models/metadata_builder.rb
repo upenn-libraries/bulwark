@@ -171,7 +171,7 @@ class MetadataBuilder < ActiveRecord::Base
     Dir.glob("#{get_location}/*.xml") do |file|
       if File.exist?(file)
         pretty_file = file.gsub(working_path,'')
-        self.preserve.add(pretty_file, working_path) if File.basename(file) == self.repo.preservation_filename
+        self.preserve.add(pretty_file) if File.basename(file) == self.repo.preservation_filename
         @file_links << link_to(pretty_file, "##{file}")
         anchor_tag = content_tag(:a, '', :name=> file)
         sample_xml_content = File.open(file, 'r'){|io| io.read}
