@@ -103,6 +103,8 @@ class CatalogController < ApplicationController
     config.add_index_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
     config.add_index_field solr_name('format_type', :stored_searchable, type: :string), :label => 'Type'
 
+    config.add_index_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number'
+
     # BiblioPhilly
     config.add_index_field solr_name('manuscript_name', :stored_searchable, type: :string), :label => 'Manuscript Name'
     config.add_index_field solr_name('administrative_contact', :stored_searchable, type: :string), :label => 'Administrative Contact'
@@ -152,6 +154,10 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name'
     config.add_show_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name'
     config.add_show_field solr_name('geographic_subject', :stored_searchable, type: :string), :label => 'Geographic Subject'
+
+
+    # Catalog
+    config.add_show_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number'
 
 
     # BiblioPhilly

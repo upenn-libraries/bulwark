@@ -30,11 +30,11 @@ module AutomatedWorkflows
         working_path = repo.version_control_agent.clone
         if steps_to_complete.include?('fetch')
           unless metadata.fetch(working_path, repo)
-            repo.version_control_agent.delete_clone
+            repo.version_control_agent.delete_clone(working_path)
             next
           end
           unless assets.fetch(working_path, repo)
-            repo.version_control_agent.delete_clone
+            repo.version_control_agent.delete_clone(working_path)
             next
           end
         end
@@ -56,7 +56,7 @@ module AutomatedWorkflows
           ingest.ingest_and_index(working_path, repo)
         end
 
-        repo.version_control_agent.delete_clone
+        repo.version_control_agent.delete_clone(working_path)
 
       end
 

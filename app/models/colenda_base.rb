@@ -4,6 +4,7 @@ class ColendaBase < ActiveFedora::Base
   include ::Identifiers
   include ::PqcTerms
   include ::PremisTerms
+  include ::CatalogTerms
 
   around_save :manage_uuid
 

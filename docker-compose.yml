@@ -46,6 +46,7 @@ services:
     command: 'bundle exec sidekiq -C config/sidekiq.yml'
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
+      - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
       - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
   rabbitmq:
     image: 'rabbitmq:3-management'
