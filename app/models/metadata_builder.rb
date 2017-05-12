@@ -95,7 +95,7 @@ class MetadataBuilder < ActiveRecord::Base
         self.repo.version_control_agent.unlock({:content => self.repo.derivatives_subdirectory}, working_path)
         generate_preview(file_path,"#{working_path}/#{self.repo.derivatives_subdirectory}") unless validation_state.present?
         self.repo.version_control_agent.add({:content => file_path}, working_path)
-        self.repo.version_control_agent.lock(file_path)
+        self.repo.version_control_agent.lock(file_path, working_path)
       end
     end
     self.repo.save!
@@ -132,7 +132,7 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.add(working_path)
     self.repo.version_control_agent.add({:content => "#{working_path}/#{repo.derivatives_subdirectory}"}, working_path)
     self.repo.version_control_agent.add({:content => "#{working_path}/#{repo.admin_subdirectory}"}, working_path)
-    self.repo.version_control_agent.lock
+    self.repo.version_control_agent.lock(working_path)
     self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'), working_path)
     self.repo.version_control_agent.push(working_path)
   end

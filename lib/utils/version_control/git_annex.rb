@@ -108,6 +108,7 @@ module Utils
       end
 
       def remove_working_directory(dir)
+        change_dir_working(dir)
         `git config annex.pidlock true`
         `git annex drop --all --force`
         Dir.chdir(Rails.root.to_s)
