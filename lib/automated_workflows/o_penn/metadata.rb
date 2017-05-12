@@ -17,9 +17,9 @@ module AutomatedWorkflows
         destination = "#{working_path}/#{metadata_endpoint.destination}"
         result = AutomatedWorkflows::Actions::Binaries.fetch(source, destination, repo.metadata_source_extensions)
         if result
-          repo.version_control_agent.add
-          repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.automated.added_metadata'))
-          repo.version_control_agent.push
+          repo.version_control_agent.add(working_path)
+          repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.automated.added_metadata'), working_path)
+          repo.version_control_agent.push(working_path)
         else
           AutomatedWorkflows::Agent.source_problems(metadata_endpoint, source, 'Source not found')
         end

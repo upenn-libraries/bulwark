@@ -1,7 +1,9 @@
 module CustomEncodings
   module Marc21
     class Constants
+
       TAGS = {}
+
       TAGS['110'] = { '*' => 'author' }
       TAGS['245'] = { '*' => 'title' }
       TAGS['300'] = { '*' => 'description' }
@@ -16,6 +18,11 @@ module CustomEncodings
         'y' => 'date',
         'z' => 'coverage'
       }
+
+      HOLDINGS = { '//record/holdings/holding/display_call_no' => 'display_call_number',
+                   '//record/holdings/holding/normalized_call_no' => 'normalized_call_number'
+      }
+
     end
   end
 end

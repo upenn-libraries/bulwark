@@ -131,10 +131,10 @@ class Repo < ActiveRecord::Base
       self.version_control_agent.init_bare
       working_path = self.version_control_agent.clone
       directory_sets = _build_and_populate_directories(working_path)
-      directory_sets.each{|dir_set| dir_set.each{|add_type,dirs| dirs.each{|dir| self.version_control_agent.add(:content => dir, :add_type => add_type) } } }
-      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.commit_bare'))
-      self.version_control_agent.push
-      self.version_control_agent.delete_clone
+      directory_sets.each{|dir_set| dir_set.each{|add_type,dirs| dirs.each{|dir| self.version_control_agent.add({:content => dir, :add_type => add_type}, working_path) } } }
+      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.commit_bare'), working_path)
+      self.version_control_agent.push(working_path)
+      self.version_control_agent.delete_clone(working_path)
       self.version_control_agent.set_remote_permissions
     end
     self.update_last_action(action_description[:git_remote_initialized])
@@ -145,13 +145,13 @@ class Repo < ActiveRecord::Base
       @status = Utils::Process.import(file, self, working_path)
       self.thumbnail = default_thumbnail
       self.save!
-      Utils::Process.generate_thumbnail(self) if self.thumbnail.present?
+      Utils::Process.generate_thumbnail(self, working_path) if self.thumbnail.present?
       self.package_metadata_info(working_path)
       self.generate_logs(working_path)
-      self.version_control_agent.add(:content => "#{working_path}/#{self.derivatives_subdirectory}")
-      self.version_control_agent.add(:content => "#{working_path}/#{self.admin_subdirectory}")
-      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives'))
-      self.version_control_agent.push
+      self.version_control_agent.add({:content => "#{working_path}/#{self.derivatives_subdirectory}"}, working_path)
+      self.version_control_agent.add({:content => "#{working_path}/#{self.admin_subdirectory}"}, working_path)
+      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives'), working_path)
+      self.version_control_agent.push(working_path)
       self.metadata_builder.last_file_checks = DateTime.now
       self.metadata_builder.save!
     rescue => exception
@@ -162,15 +162,15 @@ class Repo < ActiveRecord::Base
 
   def lock_keep_files(working_path)
     if File.exist?(working_path)
-      self.version_control_agent.lock("#{self.metadata_subdirectory}/.keep")
-      self.version_control_agent.lock("#{self.assets_subdirectory}/.keep")
-      self.version_control_agent.lock("#{self.derivatives_subdirectory}/.keep")
+      self.version_control_agent.lock("#{self.metadata_subdirectory}/.keep", working_path)
+      self.version_control_agent.lock("#{self.assets_subdirectory}/.keep", working_path)
+      self.version_control_agent.lock("#{self.derivatives_subdirectory}/.keep", working_path)
     end
   end
 
-  def package_metadata_info(destination)
-    self.version_control_agent.unlock(:content => self.admin_subdirectory)
-    File.open("#{destination}/#{self.admin_subdirectory}/#{self.names.directory}", 'w+') do |f|
+  def package_metadata_info(working_path)
+    self.version_control_agent.unlock({:content => self.admin_subdirectory}, working_path)
+    File.open("#{working_path}/#{self.admin_subdirectory}/#{self.names.directory}", 'w+') do |f|
       self.metadata_builder.metadata_source.each do |source|
         f.puts I18n.t('colenda.version_control_agents.packaging_info', :source_path => source.path, :source_id => source.id, :source_type => source.source_type, :source_view_type => source.view_type, :source_num_objects => source.num_objects, :source_x_start => source.x_start, :source_x_stop => source.x_stop, :source_y_start => source.y_start, :source_y_stop => source.y_stop, :source_children => source.children)
       end
@@ -194,12 +194,12 @@ class Repo < ActiveRecord::Base
     self.save!
   end
 
-  def push_artifacts
+  def push_artifacts(working_path)
     begin
-      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.post_ingest_artifacts'))
-      self.version_control_agent.push
+      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.post_ingest_artifacts'), working_path)
+      self.version_control_agent.push(working_path)
     rescue
-      self.version_control_agent.push
+      self.version_control_agent.push(working_path)
     end
   end
 
@@ -334,10 +334,10 @@ class Repo < ActiveRecord::Base
   def _check_if_preserve_exists
     working_path = self.version_control_agent.clone
     fname = "#{working_path}/#{self.preservation_filename}"
-    self.version_control_agent.get(:location => fname)
+    self.version_control_agent.get({:location => fname}, working_path)
     exist_status = File.exists?(fname)
-    self.version_control_agent.drop
-    self.version_control_agent.delete_clone
+    self.version_control_agent.drop(working_path)
+    self.version_control_agent.delete_clone(working_path)
     exist_status
   end
 

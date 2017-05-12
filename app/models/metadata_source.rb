@@ -163,7 +163,7 @@ class MetadataSource < ActiveRecord::Base
   def build_xml
     working_path = self.metadata_builder.repo.version_control_agent.clone
     generate_all_xml(working_path)
-    self.metadata_builder.repo.version_control_agent.delete_clone
+    self.metadata_builder.repo.version_control_agent.delete_clone(working_path)
   end
 
   def generate_all_xml(working_path)
@@ -175,16 +175,16 @@ class MetadataSource < ActiveRecord::Base
     self.generate_preservation_xml(working_path)
     self.jettison_metadata(working_path, $jettison_files) if $jettison_files.present?
     content = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
-    self.metadata_builder.repo.version_control_agent.add(:content => content)
-    self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_preservation_xml'))
-    self.metadata_builder.repo.version_control_agent.push
+    self.metadata_builder.repo.version_control_agent.add({:content => content}, working_path)
+    self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_preservation_xml'), working_path)
+    self.metadata_builder.repo.version_control_agent.push(working_path)
   end
 
   def jettison_metadata(working_path, files_to_jettison)
     files_to_jettison.each do |f|
       f = _reconcile_working_path_slashes(working_path, f)
-      self.metadata_builder.repo.version_control_agent.unlock(:content => f)
-      self.metadata_builder.repo.version_control_agent.drop(:drop_location => f) && `rm -rf #{Shellwords.escape(f)}`
+      self.metadata_builder.repo.version_control_agent.unlock({:content => f}, working_path)
+      self.metadata_builder.repo.version_control_agent.drop({:drop_location => f}, working_path) && `rm -rf #{Shellwords.escape(f)}`
     end
     $jettison_files = Set.new
   end
@@ -240,7 +240,7 @@ class MetadataSource < ActiveRecord::Base
         end
       end
     else
-      self.metadata_builder.repo.version_control_agent.get(:location => "#{working_path}/#{fname}")
+      self.metadata_builder.repo.version_control_agent.get({:location => "#{working_path}/#{fname}"}, working_path)
       inner_content << _child_values("#{working_path}/#{fname}")
     end
     if self.root_element.present?
@@ -300,8 +300,8 @@ class MetadataSource < ActiveRecord::Base
     self.children.each do |child|
       child_path = MetadataSource.where(:id => child).pluck(:path).first
       child_content_path = _reconcile_working_path_slashes(working_path, "#{child_path}.xml")
-      self.metadata_builder.repo.version_control_agent.get(:location => key_path)
-      self.metadata_builder.repo.version_control_agent.get(:location => child_content_path)
+      self.metadata_builder.repo.version_control_agent.get({:location => key_path}, working_path)
+      self.metadata_builder.repo.version_control_agent.get({:location => child_content_path}, working_path)
       content = File.open(key_path, 'r'){|io| io.read}
       child_inner_content = File.open(child_content_path, 'r'){|io| io.read}
       _strip_headers(content) && _strip_headers(child_inner_content)
@@ -342,7 +342,7 @@ class MetadataSource < ActiveRecord::Base
     self.x_start = 2
     structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'bibliophilly_structural'} ? MetadataSource.find(self.children.first) : initialize_bibliophilly_structural(self)
     full_path = "#{working_path}#{self.path}"
-    self.metadata_builder.repo.version_control_agent.get(:location => full_path)
+    self.metadata_builder.repo.version_control_agent.get({:location => full_path}, working_path)
     self.generate_bibliophilly_descrip_md(full_path)
     structural.generate_bibliophilly_struct_md(full_path)
   end
@@ -487,6 +487,7 @@ class MetadataSource < ActiveRecord::Base
     mapped_values.each do |entry|
       mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
     end
+    mapped_values.merge!(_get_holdings_terms(data))
     mapped_values
   end
 
@@ -536,13 +537,22 @@ class MetadataSource < ActiveRecord::Base
     return reading_direction
   end
 
+  def _get_holdings_terms(xml_data)
+    mappings = {}
+    xml_data.remove_namespaces!
+    CustomEncodings::Marc21::Constants::HOLDINGS.each do |xpath, term|
+      mappings[term] = xml_data.xpath(xpath).first.present? ? xml_data.xpath(xpath).first.children.first.text : ''
+    end
+    return mappings
+  end
+
   def _sanitize_elements(node_set)
     return node_set.children.reject{|x| x.class == Nokogiri::XML::Text}
   end
 
   def _refresh_bibid(working_path)
     full_path = _reconcile_working_path_slashes(working_path, "#{self.path}")
-    self.metadata_builder.repo.version_control_agent.get(:location => full_path)
+    self.metadata_builder.repo.version_control_agent.get({:location => full_path}, working_path)
     worksheet = RubyXL::Parser.parse(full_path)
     case self.source_type
       when 'voyager'
@@ -574,7 +584,7 @@ class MetadataSource < ActiveRecord::Base
       case ext
         when 'xlsx'
           full_path = _reconcile_working_path_slashes(working_path, "#{self.path}")
-          self.metadata_builder.repo.version_control_agent.get(:location => full_path)
+          self.metadata_builder.repo.version_control_agent.get({:location => full_path}, working_path)
           @mappings = _generate_mapping_options_xlsx(full_path)
         else
           raise I18n.t('colenda.errors.metadata_sources.illegal_source_type_generic')
@@ -713,7 +723,7 @@ class MetadataSource < ActiveRecord::Base
 
   def _fetch_write_save_preservation_xml(working_path, file_path = "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}", xml_content)
     file_path = _reconcile_working_path_slashes(working_path, file_path)
-    self.metadata_builder.repo.version_control_agent.unlock(:content => file_path) if File.exists?(file_path)
+    self.metadata_builder.repo.version_control_agent.unlock({:content => file_path}, working_path) if File.exists?(file_path)
     _build_preservation_xml(working_path, file_path, xml_content)
     self.metadata_builder.save!
   end
