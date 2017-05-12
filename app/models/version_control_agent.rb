@@ -103,17 +103,8 @@ class VersionControlAgent < ActiveRecord::Base
   private
 
   def create_worker
-    working_path_namespace = path_namespace
-    FileUtils.mkdir_p(working_path_namespace)
-    @worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo, working_path_namespace)
+    @worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo)
   end
 
-  def path_seed
-    Digest::SHA256.hexdigest("#{repo.names.git}#{SecureRandom.uuid}")
-  end
-
-  def path_namespace
-    "#{Utils.config[:workspace]}/#{path_seed}"
-  end
 
 end

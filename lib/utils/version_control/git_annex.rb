@@ -7,10 +7,10 @@ module Utils
 
       attr_accessor :remote_repo_path, :working_repo_path
 
-      def initialize(repo, path_namespace)
+      def initialize(repo)
         @repo = repo
         @remote_repo_path = "#{Utils.config[:assets_path]}/#{@repo.names.git}"
-        @working_repo_path = "#{path_namespace}/#{@repo.names.git}"
+        @working_repo_path = ''
       end
 
       def repo
@@ -31,6 +31,9 @@ module Utils
       end
 
       def clone(options = {})
+        working_path_namespace = path_namespace
+        FileUtils.mkdir_p(working_path_namespace)
+        @working_repo_path = "#{working_path_namespace}/#{@repo.names.git}"
         destination = options[:destination].present? ? options[:destination] : @working_repo_path
         fsck = options[:fsck].nil? ? true : options[:fsck]
         begin
@@ -108,7 +111,6 @@ module Utils
       end
 
       def remove_working_directory(dir)
-        change_dir_working(dir)
         `git config annex.pidlock true`
         `git annex drop --all --force`
         Dir.chdir(Rails.root.to_s)
@@ -226,6 +228,15 @@ module Utils
         versions_line = output_array[output_array.index{|s| s.start_with?(string_to_search)}]
         versions_line.split("#{split_char}").last.lstrip.split(' ').map(&:to_i)
       end
+
+      def path_seed
+        Digest::SHA256.hexdigest("#{repo.names.git}#{SecureRandom.uuid}")
+      end
+
+      def path_namespace
+        "#{Utils.config[:workspace]}/#{path_seed}"
+      end
+
 
     end
   end
