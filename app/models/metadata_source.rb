@@ -487,6 +487,7 @@ class MetadataSource < ActiveRecord::Base
     mapped_values.each do |entry|
       mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
     end
+    mapped_values.merge!(_get_holdings_terms(data))
     mapped_values
   end
 
@@ -534,6 +535,15 @@ class MetadataSource < ActiveRecord::Base
       reading_direction = 'right-to-left' if element.children.first.text == 'hinge-right'
     end
     return reading_direction
+  end
+
+  def _get_holdings_terms(xml_data)
+    mappings = {}
+    xml_data.remove_namespaces!
+    CustomEncodings::Marc21::Constants::HOLDINGS.each do |xpath, term|
+      mappings[term] = xml_data.xpath(xpath).first.present? ? xml_data.xpath(xpath).first.children.first.text : ''
+    end
+    return mappings
   end
 
   def _sanitize_elements(node_set)

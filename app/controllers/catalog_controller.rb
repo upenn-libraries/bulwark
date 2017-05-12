@@ -95,6 +95,8 @@ class CatalogController < ApplicationController
     config.add_index_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
     config.add_index_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
 
+    config.add_index_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number'
+
     # BiblioPhilly
     config.add_index_field solr_name('manuscript_name', :stored_searchable, type: :string), :label => 'Manuscript Name'
     config.add_index_field solr_name('administrative_contact', :stored_searchable, type: :string), :label => 'Administrative Contact'
@@ -140,6 +142,10 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
     config.add_show_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject'
     config.add_show_field solr_name('title', :stored_searchable, type: :string), :label => 'Title'
+
+    # Catalog
+    config.add_show_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number'
+
 
     # BiblioPhilly
     config.add_show_field solr_name('administrative_contact', :stored_searchable, type: :string), :label => 'Administrative Contact'
