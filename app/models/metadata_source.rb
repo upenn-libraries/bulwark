@@ -357,8 +357,8 @@ class MetadataSource < ActiveRecord::Base
     self.view_type = 'horizontal'
     self.y_start = 1
     self.y_stop = 1
-    self.x_start = 1
-    self.x_stop = 17
+    self.x_start = 18
+    self.x_stop = 44
 
     structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'kaplan_structural'} ? MetadataSource.find(self.children.first) : initialize_kaplan_structural(self)
 
@@ -417,8 +417,8 @@ class MetadataSource < ActiveRecord::Base
     workbook[z][y_start].cells.each do |c|
       headers << c.value
     end
-    (x_start..x_stop).each do |i|
-      val = workbook[z][y_start+1][x_start+i].present? ? workbook[z][y_start+1][x_start+i].value : ''
+    (x_start..x_stop).each_with_index do |i, index|
+      val = workbook[z][y_start+1][x_start+index].present? ? workbook[z][y_start+1][x_start+index].value : ''
       header = headers[i]
       mappings[header] = val
     end
@@ -490,9 +490,9 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def generate_kaplan_struct_md(mappings)
-    return {} unless mappings['tiff_locators'].present?
+    return {} unless mappings['tiff_locat'].present?
     structural_mappings = {}
-    file_names = mappings['tiff_locators'].split(';').uniq.each{|x| x.strip!}
+    file_names = mappings['tiff_locat'].split(';').uniq.each{|x| x.strip!}
     file_names.each_with_index do |file, i|
       side = ''
       if File.basename(file, ".*").ends_with?('r')
