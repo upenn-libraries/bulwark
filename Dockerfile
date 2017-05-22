@@ -43,13 +43,13 @@ RUN mkdir -p /home/app/webapp/tmp
 
 RUN mkdir -p /fs
 
-RUN mkdir -p /fs/pub
+RUN mkdir -p /fs/automated
 
-RUN mkdir -p /fs/priv
+RUN mkdir -p /fs/pub
 
 RUN mkdir -p /fs/pub/data
 
-RUN mkdir -p /fs/priv/harvest
+RUN mkdir -p /fs/priv
 
 RUN mkdir -p /fs/priv/workspace
 

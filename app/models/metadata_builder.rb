@@ -124,19 +124,17 @@ class MetadataBuilder < ActiveRecord::Base
       xslt_file = self.metadata_source.any?{|ms| ms.source_type == 'bibliophilly'} ? 'bibliophilly' : 'pqc'
       Dir.chdir(working_path)
       `xsltproc #{Rails.root}/lib/tasks/#{xslt_file}.xslt #{file_path}`
-      `xsltproc #{Rails.root}/lib/tasks/pqc_mets.xslt #{file_path}`
       transformed_xml = "#{working_path}/#{Utils.config[:fedora_xml_derivative]}"
-      mets_xml = "#{working_path}/#{Utils.config[:mets_xml_derivative]}"
-      FileUtils.mv("#{working_path}/#{Utils.config[:mets_xml_derivative]}", "#{working_path}/#{self.repo.metadata_subdirectory}/#{Utils.config[:mets_xml_derivative]}")
-      fedora_xml = File.read(transformed_xml).gsub(repo.unique_identifier, repo.names.fedora)
+      fedora_xml = File.read(transformed_xml).gsub(self.repo.unique_identifier, repo.names.fedora)
       File.open(transformed_xml, 'w') {|f| f.puts fedora_xml }
       self.repo.ingest(transformed_xml, working_path)
     end
     self.repo.version_control_agent.add(working_path)
-    self.repo.version_control_agent.add({:content => "#{working_path}/#{repo.derivatives_subdirectory}"}, working_path)
-    self.repo.version_control_agent.add({:content => "#{working_path}/#{repo.admin_subdirectory}"}, working_path)
-    self.repo.version_control_agent.lock(working_path)
+    self.repo.version_control_agent.add({:content => "#{working_path}/#{self.repo.derivatives_subdirectory}"}, working_path)
+    self.repo.version_control_agent.add({:content => "#{working_path}/#{self.repo.admin_subdirectory}"}, working_path)
+    self.repo.version_control_agent.add({:content => "#{working_path}/#{self.repo.metadata_subdirectory}"}, working_path)
     self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'), working_path)
+    self.repo.version_control_agent.lock(working_path)
     self.repo.version_control_agent.push(working_path)
   end
 

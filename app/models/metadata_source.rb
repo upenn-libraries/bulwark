@@ -173,11 +173,17 @@ class MetadataSource < ActiveRecord::Base
       source.generate_and_build_individual_xml(working_path, source.path) unless source.source_type == 'bibliophilly_structural'
     end
     self.generate_preservation_xml(working_path)
+    self.generate_pqc_xml(working_path)
     self.jettison_metadata(working_path, $jettison_files) if $jettison_files.present?
     content = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
     self.metadata_builder.repo.version_control_agent.add({:content => content}, working_path)
     self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_preservation_xml'), working_path)
     self.metadata_builder.repo.version_control_agent.push(working_path)
+  end
+
+  def generate_pqc_xml(working_path)
+    file_name = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"
+    `xsltproc #{Rails.root}/lib/tasks/pqc_mets.xslt #{file_name}`
   end
 
   def jettison_metadata(working_path, files_to_jettison)
