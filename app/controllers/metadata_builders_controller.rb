@@ -84,6 +84,15 @@ class MetadataBuildersController < ApplicationController
 
   private
 
+  def action_description
+    { :metadata_sources_updated => 'Metadata source information updated',
+      :metadata_extracted => 'Metadata extraction from source(s) initialized',
+      :metadata_mappings_generated => 'Metadata mappings set',
+      :file_checks_run => 'File checks and derivative generation initialized',
+      :preservation_xml_generated => 'Preservation XML generation initialized',
+      :published_preview => 'Object ingestion initialized' }
+  end
+
   def _set_metadata_builder
     @metadata_builder = MetadataBuilder.find(params[:id])
   end
@@ -120,17 +129,6 @@ class MetadataBuildersController < ApplicationController
 
   def _return_location
     return_location = params[:metadata_builder][:metadata_source_attributes].any?{ |h| h.last.keys.any? { |i| ['user_defined_mappings', 'root_element'].index i } } ? 'generate_metadata' : 'preserve'
-  end
-
-  private
-
-  def action_description
-    { :metadata_sources_updated => 'Metadata source information updated',
-      :metadata_extracted => 'Metadata extraction from source(s) initialized',
-      :metadata_mappings_generated => 'Metadata mapppings set',
-      :file_checks_run => 'File checks and derivative generation initialized',
-      :preservation_xml_generated => 'Preservation XML generation initialized',
-      :published_preview => 'Object ingestion initialized' }
   end
 
 end
