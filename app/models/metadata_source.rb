@@ -250,7 +250,7 @@ class MetadataSource < ActiveRecord::Base
       inner_content << _child_values("#{working_path}/#{fname}")
     end
     if self.root_element.present?
-      wrapped_content = "<#{root_element.valid_xml_tag}>#{inner_content.valid_xml_text}</#{root_element.valid_xml_tag}>"
+      wrapped_content = "<#{root_element.valid_xml_tag}>#{inner_content}</#{root_element.valid_xml_tag}>"
     else
       wrapped_content = "#{inner_content}"
     end
@@ -272,7 +272,7 @@ class MetadataSource < ActiveRecord::Base
       inner_content << _child_values_voyager
     end
     if self.root_element.present?
-      wrapped_content = "<#{root_element.valid_xml_tag}>#{inner_content.valid_xml_text}</#{root_element.valid_xml_tag}>"
+      wrapped_content = "<#{root_element.valid_xml_tag}>#{inner_content}</#{root_element.valid_xml_tag}>"
     else
       wrapped_content = "#{inner_content}"
     end
@@ -648,13 +648,13 @@ class MetadataSource < ActiveRecord::Base
       when 'horizontal'
         self.num_objects.times do |i|
           content << "<#{self.parent_element}>"
-          content << _get_row_values(workbook, i, x_start, y_start, x_stop, y_stop, z)
+          content << _get_row_values(workbook, i, x_start, y_start, x_stop, y_stop, z).valid_xml_text
           content << "</#{self.parent_element}>"
         end
       when 'vertical'
         self.num_objects.times do |i|
           content << "<#{self.parent_element}>"
-          content << _get_column_values(workbook, i, x_start, y_start, x_stop, y_stop, z)
+          content << _get_column_values(workbook, i, x_start, y_start, x_stop, y_stop, z).valid_xml_text
           content << "</#{self.parent_element}>"
         end
       else
@@ -668,7 +668,7 @@ class MetadataSource < ActiveRecord::Base
     self.user_defined_mappings.each do |entry_id, page_values|
       content << "<#{self.parent_element}>"
       page_values.each do |key, value|
-        value_string = value.present? ? "<#{key}>#{value}</#{key}>" : ''
+        value_string = value.present? ? "<#{key.valid_xml_tag}>#{value.valid_xml_text}</#{key.valid_xml_tag}>" : ''
         content << value_string
       end
       content << "</#{self.parent_element}>"
