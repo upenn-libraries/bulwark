@@ -230,7 +230,7 @@ class MetadataSource < ActiveRecord::Base
       tag = mapping.first
       mapped_values_array = mapping.last.try(:each) || Array[*mapping.last.lstrip]
       mapped_values_array.each do |mapped_val|
-        @xml_content << "<#{tag}>#{mapped_val}</#{tag}>"
+        @xml_content << "<#{tag.valid_xml_tag}>#{mapped_val.valid_xml_text}</#{tag.valid_xml_tag}>"
       end
     end
     @xml_content_transformed = "<#{self.root_element}>#{@xml_content}</#{self.root_element}>"
@@ -242,7 +242,7 @@ class MetadataSource < ActiveRecord::Base
       self.user_defined_mappings.each do |mapping|
         tag = mapping.last['mapped_value']
         self.original_mappings[mapping.first].each do |field_value|
-          inner_content << "<#{tag}>#{field_value}</#{tag}>"
+          inner_content << "<#{tag.valid_xml_tag}>#{field_value.valid_xml_text}</#{tag.valid_xml_tag}>"
         end
       end
     else
@@ -250,7 +250,7 @@ class MetadataSource < ActiveRecord::Base
       inner_content << _child_values("#{working_path}/#{fname}")
     end
     if self.root_element.present?
-      wrapped_content = "<#{root_element}>#{inner_content}</#{root_element}>"
+      wrapped_content = "<#{root_element.valid_xml_tag}>#{inner_content.valid_xml_text}</#{root_element.valid_xml_tag}>"
     else
       wrapped_content = "#{inner_content}"
     end
@@ -272,7 +272,7 @@ class MetadataSource < ActiveRecord::Base
       inner_content << _child_values_voyager
     end
     if self.root_element.present?
-      wrapped_content = "<#{root_element}>#{inner_content}</#{root_element}>"
+      wrapped_content = "<#{root_element.valid_xml_tag}>#{inner_content.valid_xml_text}</#{root_element.valid_xml_tag}>"
     else
       wrapped_content = "#{inner_content}"
     end
