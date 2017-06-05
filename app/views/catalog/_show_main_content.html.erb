@@ -1,6 +1,7 @@
+<%= javascript_include_tag "BookReader" %>
+
 <%= javascript_include_tag "BookReaderColenda" %>
 
-<%= javascript_include_tag "BookReader" %>
 <%= render 'previous_next_doc' %>
 
 <% @page_title = t('blacklight.search.show.title', :document_title => document_show_html_title, :application_name => application_name).html_safe %>
