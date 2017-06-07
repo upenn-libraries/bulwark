@@ -490,11 +490,21 @@ class MetadataSource < ActiveRecord::Base
       end
     end
     mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{self.original_mappings['bibid']}"] unless mapped_values.keys.include?('identifier')
+    mapped_values['collection'] = [_get_voyager_collection(self.original_mappings['bibid'])]
     mapped_values.each do |entry|
       mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
     end
+
     mapped_values.merge!(_get_holdings_terms(data))
     mapped_values
+  end
+
+  def _get_voyager_collection(bib_id)
+    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}/#{bib_id}"
+    data = Nokogiri::XML(open(voyager_source))
+    data.remove_namespaces!
+    collection_name = data.xpath('//page/collection/name').children.first.text
+    return collection_name
   end
 
   #TODO: Refactor to use config variables

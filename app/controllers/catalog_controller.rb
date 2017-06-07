@@ -60,6 +60,9 @@ class CatalogController < ApplicationController
     config.add_facet_field solr_name('relation', :facetable), :label => 'Relation'
     config.add_facet_field solr_name('source', :facetable), :label => 'Source'
 
+    # Catalog
+    config.add_facet_field solr_name('collection', :facetable), :label => 'Collection'
+
     # BiblioPhilly
     config.add_facet_field solr_name('holding_institution', :facetable), :label => 'Holding Institution'
     config.add_facet_field solr_name('repository_name', :facetable), :label => 'Repository Name'
@@ -145,7 +148,7 @@ class CatalogController < ApplicationController
 
     # Catalog
     config.add_show_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number'
-
+    config.add_show_field solr_name('collection', :stored_searchable, type: :string), :label => 'Collection'
 
     # BiblioPhilly
     config.add_show_field solr_name('administrative_contact', :stored_searchable, type: :string), :label => 'Administrative Contact'
