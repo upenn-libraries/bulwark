@@ -187,6 +187,8 @@ class MetadataSource < ActiveRecord::Base
   def generate_pqc_xml(working_path)
     file_name = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"
     `xsltproc #{Rails.root}/lib/tasks/pqc_mets.xslt #{file_name}`
+    pqc_path = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{Utils.config['mets_xml_derivative']}"
+    FileUtils.mv(Utils.config["mets_xml_derivative"], pqc_path) if Utils.config["mets_xml_derivative"].present?
   end
 
   def jettison_metadata(working_path, files_to_jettison)
@@ -507,7 +509,7 @@ class MetadataSource < ActiveRecord::Base
         side = 'verso'
       end
       structural_mappings[i] = {
-          'sequence' => i,
+          'sequence' => i+1,
           'page_number' => i+1,
           'reading_direction' => 'left-to-right',
           'side' => side,
@@ -862,7 +864,7 @@ class MetadataSource < ActiveRecord::Base
     File.rename(tmp_filename, working_file)
   end
 
-  def     _manage_canonical_identifier(xml_content)
+  def _manage_canonical_identifier(xml_content)
     minted_identifier = "<#{MetadataSchema.config[:unique_identifier_field]}>#{self.metadata_builder.repo.unique_identifier}</#{MetadataSchema.config[:unique_identifier_field]}>"
     root_element = "<#{true_root_element(self)}>"
     xml_content.insert((xml_content.index(root_element)+root_element.length), minted_identifier)

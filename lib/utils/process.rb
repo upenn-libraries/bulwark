@@ -25,7 +25,7 @@ module Utils
       repo.problem_files = {}
       repo.version_control_agent.get(working_path)
       repo.version_control_agent.unlock({:content => '.'}, working_path)
-      attach_files(@oid, repo, working_path, Manuscript, Image)
+      attach_files(@oid, repo, working_path)
       update_index(@oid)
       repo.save!
       jhove = characterize_files(working_path, repo)
@@ -48,7 +48,7 @@ module Utils
       clear_af_cache(object_id)
     end
 
-    def attach_files(oid = @oid, repo, working_path, parent_model, child_model)
+    def attach_files(oid = @oid, repo, working_path)
       repo.images_to_render = {}
       children = []
       parent = Finder.fedora_find(oid)
