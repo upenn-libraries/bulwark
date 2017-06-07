@@ -14,7 +14,7 @@ class ColendaBase < ActiveFedora::Base
   end
 
   def self.af_models
-    %w[Manuscript Book Photograph Pamphlet Periodical]
+    %w[Manuscript PrintedWork]
   end
 
   def mint_uuid

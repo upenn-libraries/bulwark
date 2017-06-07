@@ -1,0 +1,4 @@
+class PrintedWork < MultiImageItem
+
+
+end

@@ -434,7 +434,6 @@ class MetadataSource < ActiveRecord::Base
     self.original_mappings = mappings
     mappings = xml_sanitized(mappings)
     mappings = crosswalk_to_pqc(mappings, self.source_type)
-    mappings['format_type'] = determine_format_type(mappings['item_type'])
     self.user_defined_mappings = mappings
   end
 
