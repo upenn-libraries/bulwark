@@ -31,29 +31,36 @@ module AutomatedWorkflows
         if steps_to_complete.include?('fetch')
           unless metadata.fetch(working_path, repo)
             repo.version_control_agent.delete_clone(working_path)
+            repo.update_last_action(action_description[:fetch_metadata])
             next
           end
           unless assets.fetch(working_path, repo)
             repo.version_control_agent.delete_clone(working_path)
+            repo.update_last_action(action_description[:fetch_assets])
             next
           end
         end
 
         if steps_to_complete.include?('extract')
           metadata.create_sources(working_path, repo)
+          repo.update_last_action(action_description[:metadata_sources_updated])
           metadata.extract(working_path, repo)
+          repo.update_last_action(action_description[:metadata_extracted])
         end
 
         if steps_to_complete.include?('file_check')
           assets.file_checks(working_path, repo)
+          repo.update_last_action(action_description[:file_checks_run])
         end
 
         if steps_to_complete.include?('xml')
           xml.generate(working_path, repo)
+          repo.update_last_action(action_description[:preservation_xml_generated])
         end
 
         if steps_to_complete.include?('ingest')
           ingest.ingest_and_index(working_path, repo)
+          repo.update_last_action(action_description[:published_preview])
         end
 
         repo.version_control_agent.delete_clone(working_path)
@@ -65,6 +72,17 @@ module AutomatedWorkflows
     def steps(start = 'create', stop = 'create')
       steps = ['create','fetch','extract','file_check','xml','ingest']
       return steps[steps.index(start)..steps.index(stop)]
+    end
+
+    def action_description
+      { :fetch_metadata => 'Automated: metadata fetched from endpoint',
+        :fetch_assets => 'Automated: assets fetched from endpoint',
+        :metadata_sources_updated => 'Automated: metadata source information updated',
+        :metadata_extracted => 'Automated: metadata extraction from source(s) initialized',
+        :metadata_mappings_generated => 'Automated: metadata mappings set',
+        :file_checks_run => 'Automated: file checks and derivative generated',
+        :preservation_xml_generated => 'Automated: preservation XML generated',
+        :published_preview => 'Automated: object ingested' }
     end
 
     class << self

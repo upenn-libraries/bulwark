@@ -176,11 +176,17 @@ class MetadataSource < ActiveRecord::Base
       source.generate_and_build_individual_xml(working_path, source.path) unless %w[bibliophilly_structural kaplan_structural].include?(source.source_type)
     end
     self.generate_preservation_xml(working_path)
+    self.generate_pqc_xml(working_path)
     self.jettison_metadata(working_path, $jettison_files) if $jettison_files.present?
     content = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
     self.metadata_builder.repo.version_control_agent.add({:content => content}, working_path)
     self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_preservation_xml'), working_path)
     self.metadata_builder.repo.version_control_agent.push(working_path)
+  end
+
+  def generate_pqc_xml(working_path)
+    file_name = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"
+    `xsltproc #{Rails.root}/lib/tasks/pqc_mets.xslt #{file_name}`
   end
 
   def jettison_metadata(working_path, files_to_jettison)
@@ -229,7 +235,7 @@ class MetadataSource < ActiveRecord::Base
       tag = mapping.first
       mapped_values_array = mapping.last.try(:each) || Array[*mapping.last.lstrip]
       mapped_values_array.each do |mapped_val|
-        @xml_content << "<#{tag}>#{mapped_val}</#{tag}>"
+        @xml_content << "<#{tag.valid_xml_tag}>#{mapped_val.valid_xml_text}</#{tag.valid_xml_tag}>"
       end
     end
     @xml_content_transformed = "<#{self.root_element}>#{@xml_content}</#{self.root_element}>"
@@ -241,7 +247,7 @@ class MetadataSource < ActiveRecord::Base
       self.user_defined_mappings.each do |mapping|
         tag = mapping.last['mapped_value']
         self.original_mappings[mapping.first].each do |field_value|
-          inner_content << "<#{tag}>#{field_value}</#{tag}>"
+          inner_content << "<#{tag.valid_xml_tag}>#{field_value.valid_xml_text}</#{tag.valid_xml_tag}>"
         end
       end
     else
@@ -249,7 +255,7 @@ class MetadataSource < ActiveRecord::Base
       inner_content << _child_values("#{working_path}/#{fname}")
     end
     if self.root_element.present?
-      wrapped_content = "<#{root_element}>#{inner_content}</#{root_element}>"
+      wrapped_content = "<#{root_element.valid_xml_tag}>#{inner_content}</#{root_element.valid_xml_tag}>"
     else
       wrapped_content = "#{inner_content}"
     end
@@ -271,7 +277,7 @@ class MetadataSource < ActiveRecord::Base
       inner_content << _child_values_voyager
     end
     if self.root_element.present?
-      wrapped_content = "<#{root_element}>#{inner_content}</#{root_element}>"
+      wrapped_content = "<#{root_element.valid_xml_tag}>#{inner_content}</#{root_element.valid_xml_tag}>"
     else
       wrapped_content = "#{inner_content}"
     end
@@ -782,13 +788,13 @@ class MetadataSource < ActiveRecord::Base
       when 'horizontal'
         self.num_objects.times do |i|
           content << "<#{self.parent_element}>"
-          content << _get_row_values(workbook, i, x_start, y_start, x_stop, y_stop, z)
+          content << _get_row_values(workbook, i, x_start, y_start, x_stop, y_stop, z).valid_xml_text
           content << "</#{self.parent_element}>"
         end
       when 'vertical'
         self.num_objects.times do |i|
           content << "<#{self.parent_element}>"
-          content << _get_column_values(workbook, i, x_start, y_start, x_stop, y_stop, z)
+          content << _get_column_values(workbook, i, x_start, y_start, x_stop, y_stop, z).valid_xml_text
           content << "</#{self.parent_element}>"
         end
       else
@@ -802,7 +808,7 @@ class MetadataSource < ActiveRecord::Base
     self.user_defined_mappings.each do |entry_id, page_values|
       content << "<#{self.parent_element}>"
       page_values.each do |key, value|
-        value_string = value.present? ? "<#{key}>#{value}</#{key}>" : ''
+        value_string = value.present? ? "<#{key.valid_xml_tag}>#{value.valid_xml_text}</#{key.valid_xml_tag}>" : ''
         content << value_string
       end
       content << "</#{self.parent_element}>"
