@@ -668,13 +668,22 @@ class MetadataSource < ActiveRecord::Base
     self.user_defined_mappings.each do |entry_id, page_values|
       content << "<#{self.parent_element}>"
       page_values.each do |key, value|
-        value_string = value.present? ? "<#{key.valid_xml_tag}>#{value.valid_xml_text}</#{key.valid_xml_tag}>" : ''
+        value_string = xml_value(key, value)
         content << value_string
       end
       content << "</#{self.parent_element}>"
     end
-
     content
+  end
+
+  def xml_value(key,value)
+    return '' unless [key, value].reject(&:empty?).present?
+    return "<#{key.valid_xml_tag}>#{value.valid_xml_text}</#{key.valid_xml_tag}>" if value.is_a?(String)
+    if value.is_a?(Hash)
+      nested_values = ''
+      value.each{|t,v| nested_values << "<#{t.valid_xml_tag}>#{v.valid_xml_text}</#{t.valid_xml_tag}>"}
+      return "<#{key}>#{nested_values}</#{key}>"
+    end
   end
 
   def _get_row_values(workbook, index, x_start, y_start, x_stop, y_stop, z)
