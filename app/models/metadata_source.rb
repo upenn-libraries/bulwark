@@ -183,7 +183,10 @@ class MetadataSource < ActiveRecord::Base
 
   def generate_pqc_xml(working_path)
     file_name = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"
+    Dir.chdir(working_path)
     `xsltproc #{Rails.root}/lib/tasks/pqc_mets.xslt #{file_name}`
+    pqc_path = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{Utils.config['mets_xml_derivative']}"
+    FileUtils.mv(Utils.config["mets_xml_derivative"], pqc_path) if Utils.config["mets_xml_derivative"].present?
   end
 
   def jettison_metadata(working_path, files_to_jettison)
