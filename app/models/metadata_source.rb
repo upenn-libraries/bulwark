@@ -186,6 +186,7 @@ class MetadataSource < ActiveRecord::Base
 
   def generate_pqc_xml(working_path)
     file_name = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"
+    Dir.chdir(working_path)
     `xsltproc #{Rails.root}/lib/tasks/pqc_mets.xslt #{file_name}`
     pqc_path = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{Utils.config['mets_xml_derivative']}"
     FileUtils.mv(Utils.config["mets_xml_derivative"], pqc_path) if Utils.config["mets_xml_derivative"].present?
@@ -631,11 +632,21 @@ class MetadataSource < ActiveRecord::Base
       end
     end
     mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{self.original_mappings['bibid']}"] unless mapped_values.keys.include?('identifier')
+    mapped_values['collection'] = [_get_voyager_collection(self.original_mappings['bibid'])]
     mapped_values.each do |entry|
       mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
     end
+
     mapped_values.merge!(_get_holdings_terms(data))
     mapped_values
+  end
+
+  def _get_voyager_collection(bib_id)
+    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}/#{bib_id}"
+    data = Nokogiri::XML(open(voyager_source))
+    data.remove_namespaces!
+    collection_name = data.xpath('//page/collection/name').children.first.text
+    return collection_name
   end
 
   #TODO: Refactor to use config variables
@@ -809,13 +820,22 @@ class MetadataSource < ActiveRecord::Base
     self.user_defined_mappings.each do |entry_id, page_values|
       content << "<#{self.parent_element}>"
       page_values.each do |key, value|
-        value_string = value.present? ? "<#{key.valid_xml_tag}>#{value.valid_xml_text}</#{key.valid_xml_tag}>" : ''
+        value_string = xml_value(key, value)
         content << value_string
       end
       content << "</#{self.parent_element}>"
     end
-
     content
+  end
+
+  def xml_value(key,value)
+    return '' unless [key, value].reject(&:empty?).present?
+    return "<#{key.valid_xml_tag}>#{value.valid_xml_text}</#{key.valid_xml_tag}>" if value.is_a?(String)
+    if value.is_a?(Hash)
+      nested_values = ''
+      value.each{|t,v| nested_values << "<#{t.valid_xml_tag}>#{v.valid_xml_text}</#{t.valid_xml_tag}>"}
+      return "<#{key}>#{nested_values}</#{key}>"
+    end
   end
 
   def _get_row_values(workbook, index, x_start, y_start, x_stop, y_stop, z)

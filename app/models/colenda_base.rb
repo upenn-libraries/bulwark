@@ -8,7 +8,6 @@ class ColendaBase < ActiveFedora::Base
 
   around_save :manage_uuid
 
-
   property :unique_identifier, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/uniqueIdentifier'), multiple: false do |index|
     index.as :stored_searchable, :facetable
   end

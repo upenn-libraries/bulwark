@@ -70,6 +70,9 @@
           <sv:property sv:name="ns004:normalizedCallNumber" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="normalized_call_number" />
           </sv:property>
+          <sv:property sv:name="ns004:collection" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="collection" />
+          </sv:property>
           <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="identifier" />
           </sv:property>
@@ -127,6 +130,10 @@
     </xsl:template>
 
     <xsl:template match="normalized_call_number">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="collection">
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
 

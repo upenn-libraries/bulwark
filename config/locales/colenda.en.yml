@@ -1,5 +1,11 @@
 en:
   colenda:
+    static:
+      homepage:
+        blurb_html: "<p>Colenda is a system for long-term preservation and access to digital assets stewarded by %{institution_link}.  It is a project of the Libraries, developed using the Samvera software framework.  At this time, content accessible to the public in this application is in the public domain and is therefore available for public use.</p>"
+        institution_link_href: 'http://www.library.upenn.edu'
+        institution_link_text: 'Penn Libraries'
+        beta_html: '<div class="alert alert-warning"><p>This site is currently in beta and may be periodically unavailable as we make improvements to the service.</p></div>'
     controllers:
       repos:
         update:
