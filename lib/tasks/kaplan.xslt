@@ -94,6 +94,9 @@
           <sv:property sv:name="ns004:geographicSubject" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="geographic_subject" />
           </sv:property>
+          <sv:property sv:name="ns004:collection" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="collection" />
+          </sv:property>
           <xsl:apply-templates select="pages/page" />
           </sv:node>
         </exsl:document>
@@ -117,6 +120,10 @@
     </xsl:template>
 
     <xsl:template match="language">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="collection">
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
 

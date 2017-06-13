@@ -17,7 +17,8 @@ module MetadataSourceCrosswalks
                'corporation_name'=>'corporate_name',
                'corporatio'=>'corporate_name',
                'location'=>'geographic_subject',
-               'date'=>'date'
+               'date'=>'date',
+               'collection' => 'collection'
       }
       mapped_term = terms[term_to_be_mapped].present? ? terms[term_to_be_mapped] : nil
       return mapped_term

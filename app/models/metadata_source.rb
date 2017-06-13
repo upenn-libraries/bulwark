@@ -433,6 +433,7 @@ class MetadataSource < ActiveRecord::Base
     end
 
     self.original_mappings = mappings
+    mappings['collection'] = 'Arnold and Deanne Kaplan Collection of Americana'
     mappings = xml_sanitized(mappings)
     mappings = crosswalk_to_pqc(mappings, self.source_type)
     self.user_defined_mappings = mappings
