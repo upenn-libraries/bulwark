@@ -65,10 +65,16 @@ module Utils
         `git push origin master`
       end
 
-      def push(dir)
+      def push(options, dir)
         change_dir_working(dir)
+        content = options[:content].present? ? options[:content] : nil
         `git push origin master git-annex`
-        `git annex sync --content`
+        if content.present?
+          `git annex sync --content-of=#{Shellwords.escape(content)}`
+        else
+          `git annex sync --content`
+        end
+
       end
 
       def pull(dir)

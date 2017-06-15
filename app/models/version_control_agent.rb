@@ -47,8 +47,8 @@ class VersionControlAgent < ActiveRecord::Base
     self.worker.push_bare(location)
   end
 
-  def push(location)
-    self.worker.push(location)
+  def push(options = {}, location)
+    self.worker.push(options, location)
   end
 
   def commit_bare(message, location)
