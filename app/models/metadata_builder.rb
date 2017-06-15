@@ -65,6 +65,7 @@ class MetadataBuilder < ActiveRecord::Base
     self.store_xml_preview
     self.last_xml_generated = DateTime.now
     self.save!
+    
   end
 
   def save_input_sources(working_path)
@@ -129,12 +130,14 @@ class MetadataBuilder < ActiveRecord::Base
       File.open(transformed_xml, 'w') {|f| f.puts fedora_xml }
       self.repo.ingest(transformed_xml, working_path)
     end
+
     self.repo.version_control_agent.add(working_path)
     self.repo.version_control_agent.add({:content => "#{working_path}/#{self.repo.derivatives_subdirectory}"}, working_path)
     self.repo.version_control_agent.add({:content => "#{working_path}/#{self.repo.admin_subdirectory}"}, working_path)
+    self.repo.version_control_agent.add({:content => "#{working_path}/#{self.repo.assets_subdirectory}"}, working_path)
     self.repo.version_control_agent.add({:content => "#{working_path}/#{self.repo.metadata_subdirectory}"}, working_path)
-    self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'), working_path)
     self.repo.version_control_agent.lock(working_path)
+    self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'), working_path)
     self.repo.version_control_agent.push(working_path)
   end
 
@@ -177,7 +180,10 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.get({:location => get_location}, working_path)
     sample_xml_docs = ''
     @file_links = Array.new
-    Dir.glob("#{get_location}/*.xml") do |file|
+    files_to_store = []
+    files_to_store << "#{get_location}/#{self.repo.preservation_filename}"
+    files_to_store << "#{get_location}/#{Utils.config['mets_xml_derivative']}"
+    files_to_store.each do |file|
       if File.exist?(file)
         pretty_file = file.gsub(working_path,'')
         self.preserve.add(pretty_file) if File.basename(file) == self.repo.preservation_filename
@@ -191,6 +197,7 @@ class MetadataBuilder < ActiveRecord::Base
         xml_code = content_tag(:pre, "#{sample_xml}")
         sample_xml_docs << content_tag(:div, anchor_tag << header << xml_code, :class => 'doc')
       end
+
     end
     @file_links_html = ''
     @file_links.each do |file_link|

@@ -181,7 +181,7 @@ class MetadataSource < ActiveRecord::Base
     content = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
     self.metadata_builder.repo.version_control_agent.add({:content => content}, working_path)
     self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_preservation_xml'), working_path)
-    self.metadata_builder.repo.version_control_agent.push(working_path)
+    self.metadata_builder.repo.version_control_agent.push({:content => content}, working_path)
   end
 
   def generate_pqc_xml(working_path)
