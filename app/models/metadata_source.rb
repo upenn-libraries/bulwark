@@ -178,12 +178,15 @@ class MetadataSource < ActiveRecord::Base
     content = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}"
     self.metadata_builder.repo.version_control_agent.add({:content => content}, working_path)
     self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_preservation_xml'), working_path)
-    self.metadata_builder.repo.version_control_agent.push(working_path)
+    self.metadata_builder.repo.version_control_agent.push({:content => content}, working_path)
   end
 
   def generate_pqc_xml(working_path)
     file_name = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"
+    Dir.chdir(working_path)
     `xsltproc #{Rails.root}/lib/tasks/pqc_mets.xslt #{file_name}`
+    pqc_path = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{Utils.config['mets_xml_derivative']}"
+    FileUtils.mv(Utils.config["mets_xml_derivative"], pqc_path) if Utils.config["mets_xml_derivative"].present?
   end
 
   def jettison_metadata(working_path, files_to_jettison)
@@ -490,11 +493,21 @@ class MetadataSource < ActiveRecord::Base
       end
     end
     mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{self.original_mappings['bibid']}"] unless mapped_values.keys.include?('identifier')
+    mapped_values['collection'] = [_get_voyager_collection(self.original_mappings['bibid'])]
     mapped_values.each do |entry|
       mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
     end
+
     mapped_values.merge!(_get_holdings_terms(data))
     mapped_values
+  end
+
+  def _get_voyager_collection(bib_id)
+    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}/#{bib_id}"
+    data = Nokogiri::XML(open(voyager_source))
+    data.remove_namespaces!
+    collection_name = data.xpath('//page/collection/name').children.first.text
+    return collection_name
   end
 
   #TODO: Refactor to use config variables

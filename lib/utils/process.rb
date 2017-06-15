@@ -57,6 +57,7 @@ module Utils
       children_uris.delete_if { |c| c == object_uri }
       children_uris.each do |child_uri|
         child = Finder.fedora_find(ActiveFedora::Base.uri_to_id(child_uri))
+        next unless child.present?
         children << child
         if child.file_name.present?
           width, height = attach_file(repo, working_path, child, child.file_name, 'imageFile')
