@@ -7,9 +7,7 @@ module MetadataSourceCrosswalks
                'genre'=>'item_type',
                'genre_sublevel'=>'item_type',
                'genre_subl'=>'item_type',
-               'description_1'=>'title',
-               'descript_1'=>'title',
-               'description_2'=>'description',
+               'descript_1'=> 'description',
                'person_name_1'=>'personal_name',
                'person_name_2'=>'personal_name',
                'person_nam'=>'personal_name',
@@ -18,7 +16,9 @@ module MetadataSourceCrosswalks
                'corporatio'=>'corporate_name',
                'location'=>'geographic_subject',
                'date'=>'date',
-               'collection' => 'collection'
+               'collection' => 'collection',
+               'thing_uuid' => 'identifier',
+               'objects_refno' => 'identifier'
       }
       mapped_term = terms[term_to_be_mapped].present? ? terms[term_to_be_mapped] : nil
       return mapped_term

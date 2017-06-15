@@ -142,8 +142,8 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('contributor', :stored_searchable, type: :string), :label => 'Contributor'
     config.add_show_field solr_name('coverage', :stored_searchable, type: :string), :label => 'Coverage'
     config.add_show_field solr_name('creator', :stored_searchable, type: :string), :label => 'Creator'
-    config.add_show_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
     config.add_show_field solr_name('date', :stored_searchable, type: :string), :label => 'Date'
+    config.add_show_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
     config.add_show_field solr_name('format', :stored_searchable, type: :string), :label => 'Format'
     config.add_show_field solr_name('identifier', :stored_searchable, type: :string), :label => 'Identifier'
     config.add_show_field solr_name('language', :stored_searchable, type: :string), :label => 'Language'
@@ -152,11 +152,11 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
     config.add_show_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
     config.add_show_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject'
-    config.add_show_field solr_name('title', :stored_searchable, type: :string), :label => 'Title'
     config.add_show_field solr_name('item_type', :stored_searchable, type: :string), :label => 'Type'
     config.add_show_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name'
     config.add_show_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name'
     config.add_show_field solr_name('geographic_subject', :stored_searchable, type: :string), :label => 'Geographic Subject'
+    config.add_show_field solr_name('title', :stored_searchable, type: :string), :label => 'Title'
 
 
     # Catalog

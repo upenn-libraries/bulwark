@@ -436,6 +436,7 @@ class MetadataSource < ActiveRecord::Base
     mappings['collection'] = 'Arnold and Deanne Kaplan Collection of Americana'
     mappings = xml_sanitized(mappings)
     mappings = crosswalk_to_pqc(mappings, self.source_type)
+    mappings['title'] = mappings['description']  #Only needed while there is no explicit title field for this source type
     self.user_defined_mappings = mappings
   end
 
@@ -456,7 +457,15 @@ class MetadataSource < ActiveRecord::Base
           crosswalked_term = MetadataSourceCrosswalks::Kaplan.mapping(key)
           mappings.delete(key) && next if crosswalked_term.nil?
           pqc_mappings[crosswalked_term] = [] if pqc_mappings[crosswalked_term].nil?
-          pqc_mappings[crosswalked_term] << value if value.present?
+          if value.present?
+            if value.respond_to?(:each)
+              value.reject(&:empty?).each do |v|
+                pqc_mappings[crosswalked_term] << v
+              end
+            else
+              pqc_mappings[crosswalked_term] << value
+            end
+          end
         end
       else
         return  mappings
