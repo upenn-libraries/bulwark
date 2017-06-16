@@ -93,6 +93,10 @@ class CatalogController < ApplicationController
     # solr fields to be displayed in the index (search results) view
     #   The ordering of the field names is the order of the display
 
+    # Catalog
+    config.add_index_field solr_name('collection', :stored_searchable, type: :string), :label => 'Collection'
+    config.add_index_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number'
+
     # PQC
     config.add_index_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject'
     config.add_index_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
@@ -105,8 +109,6 @@ class CatalogController < ApplicationController
     config.add_index_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
     config.add_index_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
     config.add_index_field solr_name('format_type', :stored_searchable, type: :string), :label => 'Type'
-
-    config.add_index_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number'
 
     # BiblioPhilly
     config.add_index_field solr_name('manuscript_name', :stored_searchable, type: :string), :label => 'Manuscript Name'

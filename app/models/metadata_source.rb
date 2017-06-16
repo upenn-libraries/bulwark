@@ -368,10 +368,9 @@ class MetadataSource < ActiveRecord::Base
     self.y_stop = 1
     self.x_start = 18
     self.x_stop = 44
-
     structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'kaplan_structural'} ? MetadataSource.find(self.children.first) : initialize_kaplan_structural(self)
-
-    full_path = "#{working_path}#{self.path}"
+    sanitized = "#{working_path}/" unless working_path.ends_with?('/')
+    full_path = "#{sanitized}#{self.path}"
     self.metadata_builder.repo.version_control_agent.get({:location => full_path}, working_path)
     update_source_path(full_path, 'kaplan') if full_path.ends_with?('csv')
     self.generate_kaplan_descrip_md(full_path)

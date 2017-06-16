@@ -31,6 +31,7 @@ services:
       - 'web:/home/app/webapp'
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
+      - '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
       - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
   sidekiq:
     depends_on:
@@ -47,6 +48,7 @@ services:
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
+      - '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
       - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
   rabbitmq:
     image: 'rabbitmq:3-management'
