@@ -51,7 +51,7 @@ RUN mkdir -p /fs/priv
 
 RUN mkdir -p /fs/priv/workspace
 
-RUN mkdir -p /fs/automate_mm
+RUN mkdir -p /fs/automate
 
 RUN mkdir -p /fs/automate_kaplan
 

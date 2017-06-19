@@ -61,7 +61,7 @@ class CatalogController < ApplicationController
     config.add_facet_field solr_name('relation', :facetable), :label => 'Relation'
     config.add_facet_field solr_name('source', :facetable), :label => 'Source'
     config.add_facet_field solr_name('personal_name', :facetable), :label => 'Personal Name'
-    config.add_facet_field solr_name('corporate_name', :facetable), :label => 'Corporate Name'
+    config.add_facet_field solr_name('corporate_name', :facetable), :label => 'Corporate Name', helper_method: 'html_facet'
     config.add_facet_field solr_name('geographic_subject', :facetable), :label => 'Geographic Subject'
 
     # Catalog
@@ -101,7 +101,7 @@ class CatalogController < ApplicationController
     config.add_index_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject'
     config.add_index_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
     config.add_index_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name'
-    config.add_index_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name'
+    config.add_index_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name', helper_method: 'html_entity'
     config.add_index_field solr_name('date', :stored_searchable, type: :string), :label => 'Date'
     config.add_index_field solr_name('language', :stored_searchable, type: :string), :label => 'Language'
     config.add_index_field solr_name('creator', :stored_searchable, type: :string), :label => 'Creator'
@@ -156,7 +156,7 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject'
     config.add_show_field solr_name('item_type', :stored_searchable, type: :string), :label => 'Type'
     config.add_show_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name'
-    config.add_show_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name'
+    config.add_show_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name', helper_method: 'html_entity'
     config.add_show_field solr_name('geographic_subject', :stored_searchable, type: :string), :label => 'Geographic Subject'
     config.add_show_field solr_name('title', :stored_searchable, type: :string), :label => 'Title'
 

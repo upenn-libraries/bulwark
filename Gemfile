@@ -38,6 +38,7 @@ gem 'mini_magick'
 gem 'fastimage'
 gem 'sanitize'
 gem 'awesome_print'
+gem 'htmlentities'
 
 gem 'bunny'
 gem 'sidekiq'

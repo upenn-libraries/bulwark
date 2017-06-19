@@ -600,6 +600,7 @@ DEPENDENCIES
   fastimage
   git
   guard-rspec
+  htmlentities
   hydra!
   hydra-pcdm
   hydra-works
