@@ -70,7 +70,7 @@ module Utils
         content = options[:content].present? ? options[:content] : nil
         `git push origin master git-annex`
         if content.present?
-          `git annex sync --content-of=#{Shellwords.escape(content)}`
+          `git annex copy #{Shellwords.escape(content)} --to=#{Utils::Storage::Ceph.config.special_remote_name}`
         else
           `git annex sync --content`
         end
