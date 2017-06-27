@@ -256,10 +256,17 @@ class CatalogController < ApplicationController
       }
     end
 
-    config.add_search_field('author') do |field|
+    config.add_search_field('personal_name') do |field|
       field.solr_local_parameters = {
-        :qf => '$author_qf',
-        :pf => '$author_pf'
+          :qf => '$personal_name_qf',
+          :pf => '$personal_name_pf'
+      }
+    end
+
+    config.add_search_field('corporate_name') do |field|
+      field.solr_local_parameters = {
+          :qf => '$corporate_name_qf',
+          :pf => '$corporate_name_pf'
       }
     end
 
