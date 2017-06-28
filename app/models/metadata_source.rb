@@ -469,9 +469,10 @@ class MetadataSource < ActiveRecord::Base
   def _set_voyager_data(working_path)
     _refresh_bibid(working_path)
     mapped_values = {}
-    voyager_source = open("#{MetadataSchema.config[:voyager][:http_lookup]}/#{self.original_mappings['bibid']}.xml")
-    data = Nokogiri::XML(voyager_source)
-    data.children.children.children.children.children.each do |child|
+    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}"
+    data = Nokogiri::XML(open(voyager_source))
+    nodeset = data.xpath('//page/response/result/doc/xml[@name="marcrecord"]').children.first
+    nodeset.children.each do |child|
       if child.name == 'datafield' && CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value].present?
         if CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value]['*'].present?
           header = _fetch_header_from_voyager(child)
@@ -481,11 +482,13 @@ class MetadataSource < ActiveRecord::Base
           end
         else
           child.children.each do |c|
-            header = _fetch_header_from_subfield_voyager(child.attributes['tag'].value, c)
-            if header.present?
-              mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
-              c.children.each do |s|
-                mapped_values["#{header}"] << s.text
+            if c.name == 'subfield'
+              header = _fetch_header_from_subfield_voyager(child.attributes['tag'].value, c)
+              if header.present?
+                mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
+                c.children.each do |s|
+                  mapped_values["#{header}"] << s.text
+                end
               end
             end
           end
@@ -497,9 +500,17 @@ class MetadataSource < ActiveRecord::Base
     mapped_values.each do |entry|
       mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
     end
-
-    mapped_values.merge!(_get_holdings_terms(data))
+    mapped_values = _voyager_cleanup(mapped_values)
     mapped_values
+  end
+
+  def _voyager_cleanup(mappings)
+    mappings.each do |key, value|
+      value = [value] unless value.respond_to?(:each)
+      value.each{|v| v.strip!}
+      sanitized_values = value.reject(&:empty?)
+      mappings[key] = sanitized_values
+    end
   end
 
   def _get_voyager_collection(bib_id)
@@ -554,15 +565,6 @@ class MetadataSource < ActiveRecord::Base
       reading_direction = 'right-to-left' if element.children.first.text == 'hinge-right'
     end
     return reading_direction
-  end
-
-  def _get_holdings_terms(xml_data)
-    mappings = {}
-    xml_data.remove_namespaces!
-    CustomEncodings::Marc21::Constants::HOLDINGS.each do |xpath, term|
-      mappings[term] = xml_data.xpath(xpath).first.present? ? xml_data.xpath(xpath).first.children.first.text : ''
-    end
-    return mappings
   end
 
   def _sanitize_elements(node_set)
