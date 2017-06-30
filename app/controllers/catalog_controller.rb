@@ -98,6 +98,8 @@ class CatalogController < ApplicationController
     config.add_index_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
     config.add_index_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
 
+    # Catalog
+    config.add_index_field solr_name('collection', :stored_searchable), :label => 'Collection'
     config.add_index_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number'
 
     # BiblioPhilly

@@ -36,6 +36,10 @@ class PqcSchema < ActiveTriples::Schema
     index.as :stored_searchable, :facetable
   end
 
+  property :language, predicate: ::RDF::Vocab::DC.language, multiple: true do |index|
+    index.as :stored_searchable, :facetable
+  end
+
   property :identifier, predicate: ::RDF::Vocab::DC.identifier, multiple: true do |index|
     index.as :stored_searchable
   end
