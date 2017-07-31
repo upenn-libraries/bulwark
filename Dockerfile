@@ -1,4 +1,4 @@
-FROM codeforkjeff/passenger-ruby23:0.9.19-ruby-build
+FROM pennlib/passenger-ruby23:0.9.23-ruby-build
 
 MAINTAINER Katherine Lynch <katherly@upenn.edu>
 
