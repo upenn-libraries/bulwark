@@ -60,7 +60,7 @@ String.class_eval do
   # For lookup against Repo objects
 
   def reverse_fedorafy
-    "ark:/#{self.gsub('-','/')}"
+    self.start_with?('ark:/') ? self.gsub('-','/') : "ark:/#{self.gsub('-','/')}"
   end
 
   # S3 buckets
