@@ -2,7 +2,7 @@ renderViewer = function() {
     imagesArray = jQuery.parseJSON($("#pages").attr("data"));
     var viewer = OpenSeadragon({
         id: "openseadragon",
-        prefixUrl: "/assets/",
+        prefixUrl: "/assets/openseadragon/",
         preserveViewport: true,
         constrainDuringPan: true,
         visibilityRatio:    1,

@@ -37,6 +37,7 @@ gem 'mini_magick'
 gem 'fastimage'
 gem 'sanitize'
 gem 'awesome_print'
+gem 'openseadragon'
 
 gem 'bunny'
 gem 'sidekiq'

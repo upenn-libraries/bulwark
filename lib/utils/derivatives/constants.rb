@@ -7,10 +7,10 @@ module Utils
                                :extension => 'jpeg',
                                :quality => 90
       }
-      COPY_TYPES['preview'] = { :width => 1800,
-                                :height => 5000,
+      COPY_TYPES['preview'] = { :width => 3500,
+                                :height => 7000,
                                 :extension => 'jpeg',
-                                :quality => 75
+                                :quality => 90
       }
       COPY_TYPES['preview_thumbnail'] = { :width => 500,
                                           :height => 800,

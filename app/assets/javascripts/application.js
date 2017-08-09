@@ -16,6 +16,4 @@
 //= require jquery_ujs
 //= require blacklight/blacklight
 //= require blacklight_range_limit
-//= require openseadragon
-//= require openseadragon.js.map
 //= require colenda
