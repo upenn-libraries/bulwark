@@ -4,12 +4,17 @@ module ApplicationHelper
 
   def render_image_list
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
-    rendered_keys = []
-    repo.images_to_render.each do |key, value|
-      rendered_keys << "#{public_fedora_path(key)}?width=#{value['width']}&height=#{value['height']}"
-    end
-    content_tag(:div, '', id: 'pages', data: rendered_keys.to_json )
+    return content_tag(:div, '', id: 'pages', data: repo.images_to_render['iiif']['images'].to_json ) + render_openseadragon(repo)
+  end
 
+  def render_openseadragon(repo)
+    return "<div id=\"openseadragon\" dir=\"#{resolve_reading_direction(repo.images_to_render['iiif']['reading_direction'])}\" style=\"width: 800px; height: 600px;\"></div>".html_safe
+  end
+
+  def resolve_reading_direction(reading_direction)
+    return 'ltr' unless reading_direction.present?
+    return 'ltr' if %w[left-to-right ltr].include?(reading_direction)
+    return 'rtl' if %w[right-to-left rtl].include?(reading_direction)
   end
 
   def flash_class(level)

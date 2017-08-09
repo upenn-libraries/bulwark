@@ -1,0 +1,13 @@
+# Default settings RabbitMQ
+
+development:
+  iiif:
+    image_server: "http://localhost/iiif/2"
+
+test:
+  iiif:
+    image_server: "http://localhost/iiif/2"
+
+production:
+  iiif:
+    image_server: "http://localhost/iiif/2"

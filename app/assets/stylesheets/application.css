@@ -13,7 +13,6 @@
  
  *= require bookreader/BookReader/BookReader
  *= require review
- *= require reader
  *= require_self
  *= require_tree .
  *= require upenn

@@ -46,6 +46,13 @@ class MetadataBuilder < ActiveRecord::Base
     end
   end
 
+  def determine_reading_direction
+    default_direction = 'ltr'
+    structural_source = self.metadata_source.where(:source_type => MetadataSource.structural_types).pluck(:user_defined_mappings).first
+    lookup_key = structural_source.keys.first
+    return structural_source[lookup_key]['reading_direction'].present? ? structural_source[lookup_key]['reading_direction'] : default_direction
+  end
+
   def set_source(source_files)
     #TODO: Consider removing from MetadataBuilder
     self.source = source_files
@@ -65,7 +72,6 @@ class MetadataBuilder < ActiveRecord::Base
     self.store_xml_preview
     self.last_xml_generated = DateTime.now
     self.save!
-    
   end
 
   def save_input_sources(working_path)

@@ -25,7 +25,6 @@ module Utils
       repo.problem_files = {}
       repo.version_control_agent.get(working_path)
       repo.version_control_agent.unlock({:content => '.'}, working_path)
-      attach_files(@oid, repo, working_path, Manuscript, Image)
       update_index(@oid)
       repo.save!
       jhove = characterize_files(working_path, repo)
@@ -121,6 +120,9 @@ module Utils
                                                                                         :width => width,
                                                                                         :height => height}
       end
+
+      repo.images_to_render['iiif'] = { 'reading_direction' => repo.metadata_builder.determine_reading_direction,
+                                        'images' => repo.file_display_attributes.keys.collect { |key| "#{Display.config['iiif']['image_server']}/#{repo.names.bucket}%2F#{key}/info.json" }.delete_if { |x| !(x.ends_with?(".tif.jpeg/info.json"))}}
       repo.save!
     end
 
