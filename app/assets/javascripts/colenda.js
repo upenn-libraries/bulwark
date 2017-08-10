@@ -1,8 +1,9 @@
 renderViewer = function() {
     imagesArray = jQuery.parseJSON($("#pages").attr("data"));
+    assetsHash = jQuery.parseJSON($("#navImages").attr("data"));
     var viewer = OpenSeadragon({
         id: "openseadragon",
-        prefixUrl: "/assets/openseadragon/",
+        prefixUrl: '',
         preserveViewport: true,
         constrainDuringPan: true,
         visibilityRatio:    1,
@@ -13,7 +14,8 @@ renderViewer = function() {
         sequenceMode:       true,
         showReferenceStrip: true,
         referenceStripScroll: "horizontal",
-        tileSources: imagesArray
+        tileSources: imagesArray,
+        navImages: assetsHash
     });
     return viewer;
 }

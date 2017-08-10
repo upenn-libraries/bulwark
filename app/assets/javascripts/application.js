@@ -11,9 +11,9 @@
 // about supported directives.
 //
 
-//= require_tree .
 //= require jquery
 //= require jquery_ujs
 //= require blacklight/blacklight
 //= require blacklight_range_limit
+//= require openseadragon
 //= require colenda
