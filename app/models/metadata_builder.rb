@@ -113,6 +113,15 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.push(working_path)
   end
 
+  def get_structural_filenames
+    filenames = []
+    ms = self.metadata_source.where(:source_type => MetadataSource.structural_types).first
+    ms.user_defined_mappings.each do |key,value|
+      filenames << value[ms.file_field]
+    end
+    return filenames
+  end
+
   def transform_and_ingest(array)
     working_path = self.repo.version_control_agent.clone
     ingest(working_path, array)

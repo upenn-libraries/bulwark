@@ -111,6 +111,7 @@ module Utils
 
     def refresh_assets(working_path, repo)
       repo.file_display_attributes = {}
+      display_array = []
       Dir.chdir(working_path)
       entries = Dir.entries("#{working_path}/#{repo.derivatives_subdirectory}").reject { |f| File.directory?("#{working_path}/#{repo.derivatives_subdirectory}/#{f}") }
       entries.each do |file|
@@ -121,8 +122,15 @@ module Utils
                                                                                         :height => height}
       end
 
+      repo.metadata_builder.get_structural_filenames.each do |filename|
+        entry = repo.file_display_attributes.select{|key, hash| hash[:file_name].split('/').last == "#{filename}.jpeg"}
+        raise I18n.t('colenda.utils.process.warnings.multiple_structural_files') if entry.length > 1
+        display_array << entry.keys.first
+      end
+
       repo.images_to_render['iiif'] = { 'reading_direction' => repo.metadata_builder.determine_reading_direction,
-                                        'images' => repo.file_display_attributes.keys.collect { |key| "#{Display.config['iiif']['image_server']}/#{repo.names.bucket}%2F#{key}/info.json" }.delete_if { |x| !(x.ends_with?(".tif.jpeg/info.json"))}}
+                                        'images' => display_array.map{ |s| "#{Display.config['iiif']['image_server']}/#{repo.names.bucket}%2F#{s}/info.json" }
+      }
       repo.save!
     end
 
