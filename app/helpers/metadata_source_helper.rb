@@ -42,8 +42,8 @@ module MetadataSourceHelper
         source_file_preview << "<li>#{derivative + file_name}</li>"
       end
     end
-    sources_preview = "<ul>#{source_file_preview}</ul>"
-    return sources_preview.present? ? "<div class=\"preview-thumbnails\">#{sources_preview}</div>".html_safe : ""
+    sources_preview = "<ul><li id=\"spacer\" class=\"hide\"><span class=\"screenreader\">Spacer item to facilitate off-by-one</span><span id=\"note\">Spacer image</span></li>#{source_file_preview}</ul>"
+    return sources_preview.present? ? "<div id=\"preview-thumbnails\">#{sources_preview}</div>".html_safe : ""
   end
 
   def derivative_link(file_name, derivative_type = 'page_preview')
@@ -53,7 +53,7 @@ module MetadataSourceHelper
     preview_link = Utils::Process.read_storage_link(preview_key, @object)
     return problem_warning(file_name, derivative_type).html_safe if @object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"].present?
     return link_to(image_tag(thumbnail_link), preview_link) if derivative_type == 'page_preview'
-    return link_to(image_tag(thumbnail_link, width: '120', :alt => file_name,  :title => file_name), preview_link) if derivative_type == 'filename_thumb_preview'
+    return link_to(image_tag(thumbnail_link, :alt => file_name,  :title => file_name), preview_link) if derivative_type == 'filename_thumb_preview'
 
   end
 
