@@ -50,7 +50,7 @@ div.image-viewer-controls{
     padding: 10px 0px 20px 0px;
     label {
       padding: 0px 5px;
-      font-size: 12px;
+      font-size: 16px;
     }
     input[type="range"] {
       width: 200px;
@@ -256,9 +256,14 @@ pre.debug_dump kbd {
   div.file-name {
     background-color: $background-black;
     color: $text-white;
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: bold;
     padding: 3px;
     margin-top: 5px;
+    a {
+      color: $text-white;
+      text-decoration: underline;
+    }
   }
 }
 
