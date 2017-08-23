@@ -179,6 +179,12 @@ en:
         bibliophilly_structural:
           heading: 'Sample structural metadata fetched from Page 2 of BiblioPhilly spreadsheet'
           field_separator: ':'
+        pap:
+          heading: 'Descriptive metadata fetched from Catalog Lookup'
+          field_separator: ':'
+        pap_structural:
+          heading: 'Sample of structural metadata fetched from Catalog Lookup'
+          field_separator: ':'
         custom:
           field:
             label: '"%{field}" should map to:'

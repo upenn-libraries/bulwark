@@ -135,13 +135,13 @@ class MetadataSource < ActiveRecord::Base
           end
           self.original_mappings = _convert_metadata(working_path)
           self.identifier = self.path.filename_sanitize
-        when 'structural_bibid'
+        when 'structural_bibid', 'pap_structural'
           self.root_element = 'pages'
           self.parent_element = 'page'
           self.file_field = 'file_name'
           self.user_defined_mappings = _set_voyager_structural_metadata(working_path)
           self.identifier = self.original_mappings['bibid']
-        when 'voyager'
+        when 'voyager', 'pap'
           self.root_element = MetadataSchema.config[:voyager][:root_element] || 'record'
           self.user_defined_mappings = _set_voyager_data(working_path)
           self.identifier = self.original_mappings['bibid']
@@ -170,7 +170,7 @@ class MetadataSource < ActiveRecord::Base
     self.generate_and_build_individual_xml(working_path)
     self.children.each do |child|
       source = MetadataSource.find(child)
-      source.generate_and_build_individual_xml(working_path, source.path) unless source.source_type == 'bibliophilly_structural'
+      source.generate_and_build_individual_xml(working_path, source.path) unless %w[bibliophilly_structural].include?(source.source_type)
     end
     self.generate_preservation_xml(working_path)
     self.generate_pqc_xml(working_path)
@@ -204,12 +204,12 @@ class MetadataSource < ActiveRecord::Base
       case self.source_type
         when 'custom'
           @xml_content_final_copy = xml_from_custom(working_path, fname)
-        when 'voyager'
+        when 'voyager', 'pap'
           @xml_content_final_copy = xml_from_voyager
-        when 'structural_bibid'
+        when 'structural_bibid', 'pap_structural'
           @xml_content_final_copy = xml_from_structural_bibid
         when 'bibliophilly'
-          @xml_content_final_copy = xml_from_bibliophilly
+          @xml_content_final_copy = xml_from_flat_mappings
       end
       $jettison_files.add(xml_fname)
       _fetch_write_save_preservation_xml(working_path, xml_fname, @xml_content_final_copy)
@@ -217,7 +217,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def generate_preservation_xml(working_path)
-    if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'bibliophilly'
+    if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'bibliophilly' && self.source_type != 'kaplan'
       @xml_content_final = parent_id.present? ? MetadataSource.find(parent_id).generate_parent_child_xml(working_path) : self.generate_parent_child_xml(working_path)
     else
       file = File.new(_reconcile_working_path_slashes(working_path, "#{self.path}.xml"))
@@ -282,7 +282,7 @@ class MetadataSource < ActiveRecord::Base
     wrapped_content
   end
 
-  def xml_from_bibliophilly
+  def xml_from_flat_mappings
     parent_content = ''
     child_content = ''
     self.user_defined_mappings.each do |mapping|
@@ -449,7 +449,7 @@ class MetadataSource < ActiveRecord::Base
           orig = value if key == self.file_field
         end
         return orig
-      when 'structural_bibid', 'bibliophilly_structural'
+      when 'structural_bibid', 'bibliophilly_structural', 'pap_structural'
         filenames = []
         self.user_defined_mappings.each do |key, value|
           filenames << value[self.file_field] if value[self.file_field].present?
@@ -461,7 +461,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def self.structural_types
-    %w[custom structural_bibid bibliophilly_structural]
+    %w[custom structural_bibid bibliophilly_structural pap_structural]
   end
 
   private
@@ -469,7 +469,7 @@ class MetadataSource < ActiveRecord::Base
   def _set_voyager_data(working_path)
     _refresh_bibid(working_path)
     mapped_values = {}
-    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}"
+    voyager_source = reconcile_voyager_source(self.source_type, self.original_mappings['bibid'])
     data = Nokogiri::XML(open(voyager_source))
     nodeset = data.xpath('//page/response/result/doc/xml[@name="marcrecord"]').children.first
     nodeset.children.each do |child|
@@ -496,7 +496,7 @@ class MetadataSource < ActiveRecord::Base
       end
     end
     mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{self.original_mappings['bibid']}"] unless mapped_values.keys.include?('identifier')
-    mapped_values['collection'] = [_get_voyager_collection(self.original_mappings['bibid'])]
+    mapped_values['collection'] = [_get_voyager_collection(self.source_type, self.original_mappings['bibid'])]
     mapped_values.each do |entry|
       mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
     end
@@ -513,19 +513,25 @@ class MetadataSource < ActiveRecord::Base
     end
   end
 
-  def _get_voyager_collection(bib_id)
-    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}/#{bib_id}"
+  def _get_voyager_collection(source_type, bib_id)
+    voyager_source = reconcile_voyager_source(source_type, bib_id)
     data = Nokogiri::XML(open(voyager_source))
     data.remove_namespaces!
     collection_name = data.xpath('//page/collection/name').children.first.text
     return collection_name
   end
 
+  def reconcile_voyager_source(source_type, bib_id)
+    return nil unless source_type.present?
+    return "#{MetadataSchema.config[:voyager][:http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{bib_id}" if %w[voyager structural_bibid].include?(source_type)
+    return "#{MetadataSchema.config[:pap][:http_lookup]}#{MetadataSchema.config[:pap][:structural_identifier_prefix]}#{bib_id}" if %w[pap pap_structural].include?(source_type)
+  end
+
   #TODO: Refactor to use config variables
   def _set_voyager_structural_metadata(working_path)
     mapped_values = {}
     _refresh_bibid(working_path)
-    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}"
+    voyager_source = reconcile_voyager_source(self.source_type, self.original_mappings['bibid'])
     data = Nokogiri::XML(open(voyager_source))
     reading_direction = _get_reading_direction(voyager_source)
     data.xpath('//xml/page').each_with_index do |page, index|
@@ -576,11 +582,11 @@ class MetadataSource < ActiveRecord::Base
     self.metadata_builder.repo.version_control_agent.get({:location => full_path}, working_path)
     worksheet = RubyXL::Parser.parse(full_path)
     case self.source_type
-      when 'voyager'
+      when 'voyager', 'pap'
         page = 0
         x = 0
         y = 1
-      when 'structural_bibid'
+      when 'structural_bibid', 'pap_structural'
         page = 0
         x = 0
         y = 0
@@ -775,7 +781,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def self.source_types
-    source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.catalog_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.bibliophilly'), 'bibliophilly'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
+    source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.catalog_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.pap_structural'), 'pap_structural'], [I18n.t('colenda.metadata_sources.describe.source_type.list.bibliophilly'), 'bibliophilly'], [I18n.t('colenda.metadata_sources.describe.source_type.list.pap'), 'pap'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
   end
 
   def self.settings_fields
