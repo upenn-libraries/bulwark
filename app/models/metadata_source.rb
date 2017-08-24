@@ -135,19 +135,29 @@ class MetadataSource < ActiveRecord::Base
           end
           self.original_mappings = _convert_metadata(working_path)
           self.identifier = self.path.filename_sanitize
-        when 'structural_bibid', 'pap_structural'
+        when 'structural_bibid'
           self.root_element = 'pages'
           self.parent_element = 'page'
           self.file_field = 'file_name'
           self.user_defined_mappings = _set_voyager_structural_metadata(working_path)
           self.identifier = self.original_mappings['bibid']
-        when 'voyager', 'pap'
+        when 'voyager'
           self.root_element = MetadataSchema.config[:voyager][:root_element] || 'record'
           self.user_defined_mappings = _set_voyager_data(working_path)
           self.identifier = self.original_mappings['bibid']
         when 'bibliophilly'
           self.set_bibliophilly_data(working_path)
           self.identifier = self.original_mappings['Call Number/ID'].first
+        when 'pap'
+          self.root_element = MetadataSchema.config[:voyager][:root_element] || 'record'
+          self.user_defined_mappings = _set_marmite_data(working_path)
+          self.identifier = self.original_mappings['bibid']
+        when 'pap_structural'
+          self.root_element = 'pages'
+          self.parent_element = 'page'
+          self.file_field = 'file_name'
+          self.user_defined_mappings = _set_marmite_structural_metadata(working_path)
+          self.identifier = self.original_mappings['bibid']
       end
     end
     self.metadata_builder.repo.update_steps(:metadata_extracted)
@@ -469,13 +479,13 @@ class MetadataSource < ActiveRecord::Base
   def _set_voyager_data(working_path)
     _refresh_bibid(working_path)
     mapped_values = {}
-    voyager_source = reconcile_voyager_source(self.source_type, self.original_mappings['bibid'])
+    voyager_source = reconcile_metadata_lookup_source(self.source_type, self.original_mappings['bibid'])
     data = Nokogiri::XML(open(voyager_source))
     nodeset = data.xpath('//page/response/result/doc/xml[@name="marcrecord"]').children.first
     nodeset.children.each do |child|
       if child.name == 'datafield' && CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value].present?
         if CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value]['*'].present?
-          header = _fetch_header_from_voyager(child)
+          header = _fetch_header_from_marc21(child)
           mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
           child.children.each do |c|
             mapped_values["#{header}"] << c.text
@@ -483,7 +493,7 @@ class MetadataSource < ActiveRecord::Base
         else
           child.children.each do |c|
             if c.name == 'subfield'
-              header = _fetch_header_from_subfield_voyager(child.attributes['tag'].value, c)
+              header = _fetch_header_from_subfield_catalog(child.attributes['tag'].value, c)
               if header.present?
                 mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
                 c.children.each do |s|
@@ -496,15 +506,15 @@ class MetadataSource < ActiveRecord::Base
       end
     end
     mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{self.original_mappings['bibid']}"] unless mapped_values.keys.include?('identifier')
-    mapped_values['collection'] = [_get_voyager_collection(self.source_type, self.original_mappings['bibid'])]
+    mapped_values['collection'] = [_get_catalog_collection(self.source_type, self.original_mappings['bibid'])]
     mapped_values.each do |entry|
       mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
     end
-    mapped_values = _voyager_cleanup(mapped_values)
+    mapped_values = _catalog_xml_cleanup(mapped_values)
     mapped_values
   end
 
-  def _voyager_cleanup(mappings)
+  def _catalog_xml_cleanup(mappings)
     mappings.each do |key, value|
       value = [value] unless value.respond_to?(:each)
       value.each{|v| v.strip!}
@@ -513,27 +523,29 @@ class MetadataSource < ActiveRecord::Base
     end
   end
 
-  def _get_voyager_collection(source_type, bib_id)
-    voyager_source = reconcile_voyager_source(source_type, bib_id)
+  def _get_catalog_collection(source_type, bib_id)
+    voyager_source = reconcile_metadata_lookup_source(source_type, bib_id)
     data = Nokogiri::XML(open(voyager_source))
     data.remove_namespaces!
     collection_name = data.xpath('//page/collection/name').children.first.text
     return collection_name
   end
 
-  def reconcile_voyager_source(source_type, bib_id)
+  def reconcile_metadata_lookup_source(source_type, bib_id)
     return nil unless source_type.present?
     return "#{MetadataSchema.config[:voyager][:http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{bib_id}" if %w[voyager structural_bibid].include?(source_type)
-    return "#{MetadataSchema.config[:pap][:http_lookup]}#{MetadataSchema.config[:pap][:structural_identifier_prefix]}#{bib_id}" if %w[pap pap_structural].include?(source_type)
+    return "#{MetadataSchema.config[:pap][:http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:http_lookup_suffix]}" if source_type == 'pap'
+    return "#{MetadataSchema.config[:pap][:structural_http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:structural_lookup_suffix]}" if source_type == 'pap_structural'
+
   end
 
   #TODO: Refactor to use config variables
   def _set_voyager_structural_metadata(working_path)
     mapped_values = {}
     _refresh_bibid(working_path)
-    voyager_source = reconcile_voyager_source(self.source_type, self.original_mappings['bibid'])
+    voyager_source = reconcile_metadata_lookup_source(self.source_type, self.original_mappings['bibid'])
     data = Nokogiri::XML(open(voyager_source))
-    reading_direction = _get_reading_direction(voyager_source)
+    reading_direction = _get_catalog_reading_direction(voyager_source)
     data.xpath('//xml/page').each_with_index do |page, index|
       mapped_values[index+1] = {
           'page_number' => page['number'],
@@ -550,6 +562,82 @@ class MetadataSource < ActiveRecord::Base
     mapped_values
   end
 
+  def _set_marmite_data(working_path)
+    _refresh_bibid(working_path)
+    mapped_values = {}
+    catalog_source = reconcile_metadata_lookup_source(self.source_type, self.original_mappings['bibid'])
+    data = Nokogiri::XML(open(catalog_source))
+    data.remove_namespaces!
+    nodeset = data.xpath('//records/record').children
+    nodeset.each do |child|
+      if child.name == 'datafield' && CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value].present?
+        if CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value]['*'].present?
+          header = _fetch_header_from_marc21(child)
+          mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
+          child.children.each do |c|
+            mapped_values["#{header}"] << c.text
+          end
+        else
+          child.children.each do |c|
+            if c.name == 'subfield'
+              header = _fetch_header_from_subfield_catalog(child.attributes['tag'].value, c)
+              if header.present?
+                mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
+                c.children.each do |s|
+                  mapped_values["#{header}"] << s.text
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+    mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{self.original_mappings['bibid']}"] unless mapped_values.keys.include?('identifier')
+    mapped_values['collection'] = [_collection_name(self.source_type)]
+    mapped_values['display_call_number'] = [_marmite_call_number(nodeset)]
+    mapped_values.each do |entry|
+      mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
+    end
+    mapped_values = _catalog_xml_cleanup(mapped_values)
+    mapped_values
+  end
+
+  def _set_marmite_structural_metadata(working_path)
+    mapped_values = {}
+    _refresh_bibid(working_path)
+    catalog_source = reconcile_metadata_lookup_source(self.source_type, self.original_mappings['bibid'])
+    data = Nokogiri::XML(open(catalog_source))
+    data.remove_namespaces!
+    reading_direction = _get_marmite_reading_direction(catalog_source)
+    data.xpath('//record/pages/page').each_with_index do |page, index|
+      mapped_values[index+1] = {
+          'page_number' => page['number'],
+          'sequence' => page['seq'],
+          'reading_direction' => reading_direction,
+          'side' => page['side'],
+          'tocentry' => _get_tocentry(page),
+          'identifier' => page['id'],
+          'file_name' => "#{page['image']}.tif",
+          'description' => page['visiblepage']
+
+      }
+    end
+    mapped_values
+  end
+
+  def _collection_name(source_type)
+    return 'Print at Penn: Selected Printed Works' if source_type == 'pap'
+    return ''
+  end
+
+  def _marmite_call_number(nodeset)
+    call_numbers = []
+    nodeset.xpath('//holdings/holding/call_number').each do |holding|
+      call_numbers << holding.text if holding.text.present?
+    end
+    return call_numbers
+  end
+
   def _get_tocentry(page)
     return {} unless page.children.present?
     tocentry = {}
@@ -560,11 +648,24 @@ class MetadataSource < ActiveRecord::Base
     return tocentry
   end
 
-  def _get_reading_direction(xml_document)
+  def _get_catalog_reading_direction(xml_document)
     reading_direction = 'left-to-right'
     doc = Nokogiri::XML(open(xml_document))
     doc.remove_namespaces!
     doc_s = doc.xpath('//xml/record/datafield[@tag="996"]')
+    if doc_s.present? && doc_s.length == 1
+      d = doc_s.first
+      element = _sanitize_elements(d).first
+      reading_direction = 'right-to-left' if element.children.first.text == 'hinge-right'
+    end
+    return reading_direction
+  end
+
+  def _get_marmite_reading_direction(xml_document)
+    reading_direction = 'left-to-right'
+    doc = Nokogiri::XML(open(xml_document))
+    doc.remove_namespaces!
+    doc_s = doc.xpath('//records/record/datafield[@tag="996"]')
     if doc_s.present? && doc_s.length == 1
       d = doc_s.first
       element = _sanitize_elements(d).first
@@ -596,12 +697,12 @@ class MetadataSource < ActiveRecord::Base
     self.original_mappings = {'bibid' => worksheet[page][y][x].value}
   end
 
-  def _fetch_header_from_voyager(voyager_field)
-    CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes['tag'].value]['*']
+  def _fetch_header_from_marc21(marc_field)
+    CustomEncodings::Marc21::Constants::TAGS[marc_field.attributes['tag'].value]['*']
   end
 
-  def _fetch_header_from_subfield_voyager(tag_value, voyager_child_field)
-    CustomEncodings::Marc21::Constants::TAGS[tag_value][voyager_child_field.attributes['code'].value]
+  def _fetch_header_from_subfield_catalog(tag_value, marc_subfield)
+    CustomEncodings::Marc21::Constants::TAGS[tag_value][marc_subfield.attributes['code'].value]
   end
 
   def _convert_metadata(working_path)
