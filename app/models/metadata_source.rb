@@ -126,7 +126,6 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def set_metadata_mappings(working_path)
-    binding.pry
     if self.source_type.present?
       case self.source_type
         when 'custom'
