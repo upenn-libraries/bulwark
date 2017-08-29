@@ -593,7 +593,6 @@ class MetadataSource < ActiveRecord::Base
       end
     end
     mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{self.original_mappings['bibid']}"] unless mapped_values.keys.include?('identifier')
-    mapped_values['collection'] = [_collection_name(self.source_type)]
     mapped_values['display_call_number'] = [_marmite_call_number(nodeset)]
     mapped_values.each do |entry|
       mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
@@ -623,11 +622,6 @@ class MetadataSource < ActiveRecord::Base
       }
     end
     mapped_values
-  end
-
-  def _collection_name(source_type)
-    return 'Print at Penn: Selected Printed Works' if source_type == 'pap'
-    return ''
   end
 
   def _marmite_call_number(nodeset)

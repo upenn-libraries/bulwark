@@ -25,6 +25,7 @@ module CustomEncodings
                       'y' => 'date',
                       'z' => 'coverage'
       }
+      TAGS['710'] = { 'a' => 'collection' }
 
     end
   end
