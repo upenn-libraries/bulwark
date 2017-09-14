@@ -58,14 +58,16 @@ module ApplicationHelper
 
   def render_image_list
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
-    return content_tag(:div, '', id: 'pages', data: repo.images_to_render['iiif']['images'].to_json ) + render_openseadragon(repo)
+    images_list = repo.images_to_render['iiif'].present? ? repo.images_to_render['iiif']['images'] : legacy_image_list(repo)
+    return content_tag(:div, '', id: 'pages', data: images_list.to_json ) + render_openseadragon(repo)
   end
 
   def render_openseadragon(repo)
-    return "<div id=\"openseadragon\" dir=\"#{resolve_reading_direction(repo.images_to_render['iiif']['reading_direction'])}\" style=\"width: 800px; height: 600px;\"></div>".html_safe
+    return "<div id=\"openseadragon\" dir=\"#{resolve_reading_direction(repo)}\" style=\"width: 800px; height: 600px;\"></div>".html_safe
   end
 
-  def resolve_reading_direction(reading_direction)
+  def resolve_reading_direction(repo)
+    reading_direction = repo.images_to_render['iiif'].present? ? repo.images_to_render['iiif']['reading_direction'] : legacy_reading_direction(repo)
     return 'ltr' unless reading_direction.present?
     return 'ltr' if %w[left-to-right ltr].include?(reading_direction)
     return 'rtl' if %w[right-to-left rtl].include?(reading_direction)
@@ -106,6 +108,16 @@ module ApplicationHelper
     else
       return path
     end
+  end
+
+  def legacy_image_list(repo)
+    keys = repo.file_display_attributes.keys.select{|key| key.end_with?(".tif.jpeg")}
+    return keys.map{|k|"#{Display.config['iiif']['image_server']}/#{repo.names.bucket}%2F#{k}/info.json"}
+
+  end
+
+  def legacy_reading_direction(repo)
+    return repo.images_to_render.first.present? ? repo.images_to_render.first[1]['reading_direction'].first : 'left-to-right'
   end
 
 end
