@@ -48,6 +48,10 @@ class PqcSchema < ActiveTriples::Schema
     index.as :stored_searchable, :facetable
   end
 
+  property :provenance, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/provenance'), multiple: true do |index|
+    index.as :stored_searchable, :facetable
+  end
+
   property :relation, predicate: ::RDF::Vocab::DC.relation, multiple: true do |index|
     index.as :stored_searchable, :facetable
   end

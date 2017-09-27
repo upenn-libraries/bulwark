@@ -12,7 +12,7 @@ module AutomatedWorkflows
           last_external_update = options[:last_external_update] || nil
           initial_stop = options[:initial_stop] || nil
 
-          human_readable_name = repo_name.present? ? repo_name : AutomatedWorkflows::Bulk::Constants::DEFAULTS[repo_type][:human_readable_name]
+          human_readable_name = repo_name.present? ? repo_name : AutomatedWorkflows::Constants::DEFAULTS[repo_type][:human_readable_name]
 
           metadata_subdirectory = AutomatedWorkflows::Constants::DEFAULTS[repo_type][:metadata_subdirectory]
           assets_subdirectory = AutomatedWorkflows::Constants::DEFAULTS[repo_type][:assets_subdirectory]

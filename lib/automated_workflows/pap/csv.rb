@@ -45,7 +45,7 @@ module AutomatedWorkflows
           return "#{csv_filename} not found" unless File.exist?(csv_filename)
           directories = []
           listing = SmarterCSV.process(csv_filename)
-          listing.each { |row| directories << "#{row[:path]}|#{row[:updated]}" }
+          listing.each { |row| directories << "#{row[:path]}|#{row[:timestamp]}|#{row[:directive_name]}" }
           directories.uniq!
           f = File.new("#{csv_filename.gsub('.csv','.txt')}", 'w')
           directories.each { |d| f << "#{d}\n" }
@@ -56,11 +56,10 @@ module AutomatedWorkflows
         def generate_repos(csv)
           directories_file = convert_csv(csv)
           file_lines = File.readlines(directories_file).each{|l| l.strip! }
-          directories = []
+          repos = []
           file_lines.each do |dir|
-            directory = dir.split('|').first
-            last_updated = dir.split('|').last
-            repo = AutomatedWorkflows::Actions::Repos.create(directory,
+            directory, last_updated, repo_name = dir.split('|')
+            repo = AutomatedWorkflows::Actions::Repos.create(repo_name,
                                                              :owner => AutomatedWorkflows::Pap::Csv.config.owner,
                                                              :description => AutomatedWorkflows::Pap::Csv.config.description,
                                                              :last_external_update => last_updated,
@@ -83,9 +82,9 @@ module AutomatedWorkflows
             repo.endpoint += [desc, struct]
             AutomatedWorkflows::Agent.verify_sources(repo)
             repo.save!
-            directories << directory
+            repos << repo_name
           end
-          directories
+          repos
         end
 
       end
