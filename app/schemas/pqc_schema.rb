@@ -24,6 +24,18 @@ class PqcSchema < ActiveTriples::Schema
     index.as :stored_searchable, :facetable
   end
 
+  property :personal_name, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/personalName'), multiple: true do |index|
+    index.as :stored_searchable, :facetable
+  end
+
+  property :corporate_name, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/corporateName'), multiple: true do |index|
+    index.as :stored_searchable, :facetable
+  end
+
+  property :geographic_subject, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/geographicSubject'), multiple: true do |index|
+    index.as :stored_searchable, :facetable
+  end
+
   property :coverage, predicate: ::RDF::Vocab::DC.coverage, multiple: true do |index|
     index.as :stored_searchable, :facetable
   end
