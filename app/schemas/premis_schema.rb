@@ -24,10 +24,6 @@ class PremisSchema < ActiveTriples::Schema
     index.as :displayable
   end
 
-  property :format, predicate: ::RDF::Vocab::PREMIS.Format, multiple: true do |index|
-    index.as :displayable
-  end
-
   property :format_designation, predicate: ::RDF::Vocab::PREMIS.FormatDesignation, multiple: true do |index|
     index.as :displayable
   end

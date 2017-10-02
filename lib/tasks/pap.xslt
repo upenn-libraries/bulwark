@@ -89,13 +89,16 @@
             <xsl:apply-templates select="publisher" />
           </sv:property>
           <sv:property sv:name="ns002:type" sv:type="String" sv:multiple="false">
-            <sv:value>Manuscript</sv:value>
+            <sv:value>Printed Work</sv:value>
           </sv:property>
           <sv:property sv:name="ns002:title" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="title" />
           </sv:property>
           <sv:property sv:name="ns002:date" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="date" />
+          </sv:property>
+          <sv:property sv:name="ns002:format" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="format" />
           </sv:property>
           <sv:property sv:name="ns004:personalName" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="personal_name" />
@@ -128,6 +131,10 @@
   </xsl:template>
 
   <xsl:template match="language">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
+
+  <xsl:template match="format">
     <sv:value><xsl:apply-templates /></sv:value>
   </xsl:template>
 

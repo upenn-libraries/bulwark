@@ -71,7 +71,7 @@
             <xsl:apply-templates select="normalized_call_number" />
           </sv:property>
           <sv:property sv:name="ns004:collection" sv:type="String" sv:multiple="false">
-            <xsl:apply-templates select="collection" />
+            <sv:value>Penn in Hand: Selected Manuscripts</sv:value>
           </sv:property>
           <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="false">
             <sv:value><xsl:apply-templates select="identifier"/></sv:value>
@@ -96,6 +96,9 @@
           </sv:property>
           <sv:property sv:name="ns002:date" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="date" />
+          </sv:property>
+          <sv:property sv:name="ns002:format" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="format" />
           </sv:property>
           <sv:property sv:name="ns004:personalName" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="personal_name" />
@@ -128,6 +131,10 @@
     </xsl:template>
 
     <xsl:template match="language">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="format">
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
 

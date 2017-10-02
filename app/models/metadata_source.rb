@@ -139,11 +139,11 @@ class MetadataSource < ActiveRecord::Base
           self.root_element = 'pages'
           self.parent_element = 'page'
           self.file_field = 'file_name'
-          self.user_defined_mappings = _set_voyager_structural_metadata(working_path)
+          self.user_defined_mappings = _set_marmite_structural_metadata(working_path)
           self.identifier = self.original_mappings['bibid']
         when 'voyager'
           self.root_element = MetadataSchema.config[:voyager][:root_element] || 'record'
-          self.user_defined_mappings = _set_voyager_data(working_path)
+          self.user_defined_mappings = _set_marmite_data(working_path)
           self.identifier = self.original_mappings['bibid']
         when 'bibliophilly'
           self.set_bibliophilly_data(working_path)
@@ -533,10 +533,8 @@ class MetadataSource < ActiveRecord::Base
 
   def reconcile_metadata_lookup_source(source_type, bib_id)
     return nil unless source_type.present?
-    return "#{MetadataSchema.config[:voyager][:http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{bib_id}" if %w[voyager structural_bibid].include?(source_type)
-    return "#{MetadataSchema.config[:pap][:http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:http_lookup_suffix]}" if source_type == 'pap'
-    return "#{MetadataSchema.config[:pap][:structural_http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:structural_lookup_suffix]}" if source_type == 'pap_structural'
-
+    return "#{MetadataSchema.config[:pap][:http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:http_lookup_suffix]}" if %w[voyager pap].include?(source_type)
+    return "#{MetadataSchema.config[:pap][:structural_http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:structural_lookup_suffix]}" if %w[structural_bibid pap_structural].include?(source_type)
   end
 
   #TODO: Refactor to use config variables
@@ -572,13 +570,21 @@ class MetadataSource < ActiveRecord::Base
     nodeset.each do |child|
       if child.name == 'datafield' && CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value].present?
         if CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value]['*'].present?
-          rollup_values = []
-          header = _fetch_header_from_marc21(child)
-          mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
-          child.children.each do |c|
-            rollup_values << c.text unless c.text.strip.empty?
+          if  CustomEncodings::Marc21::Constants::ROLLUP_FIELDS.include?(child.attributes['tag'].value)
+            rollup_values = []
+            header = _fetch_header_from_marc21(child)
+            mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
+            child.children.each do |c|
+              rollup_values << c.text unless c.text.strip.empty?
+            end
+            mapped_values["#{header}"] << rollup_values.join(' -- ') if rollup_values.present?
+          else
+            header = _fetch_header_from_marc21(child)
+            mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
+            child.children.each do |c|
+              mapped_values["#{header}"] << c.text
+            end
           end
-          mapped_values["#{header}"] << rollup_values.join(' -- ') if rollup_values.present?
         else
           child.children.each do |c|
             if c.name == 'subfield'
@@ -690,7 +696,12 @@ class MetadataSource < ActiveRecord::Base
       else
         raise I18n.t('colenda.errors.metadata_sources.illegal_source_type')
     end
-    self.original_mappings = {'bibid' => worksheet[page][y][x].value}
+    bib_id = _legacy_bib_id_check(worksheet[page][y][x].value)
+    self.original_mappings = {'bibid' => bib_id}
+  end
+
+  def _legacy_bib_id_check(bib_to_check)
+    return bib_to_check.start_with?("99") && bib_to_check.end_with?("3503681") ? bib_to_check : "99#{bib_to_check}3503681"
   end
 
   def _fetch_header_from_marc21(marc_field)

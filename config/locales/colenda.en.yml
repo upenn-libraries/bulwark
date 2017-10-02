@@ -93,8 +93,8 @@ en:
           additional_times: 'Update source types'
         files_checked: 'Check for missing or invalid files'
         publish_preview:
-          first_time: 'Publish preview'
-          additional_times: 'Republish preview'
+          first_time: 'Approve for ingest'
+          additional_times: 'Re-approve for ingest'
     repos:
       create_remote_link_text: 'Create Remote'
       preservation_xml_link_text: 'Create Preservation XML'

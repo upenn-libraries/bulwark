@@ -11,11 +11,11 @@ module CustomEncodings
       TAGS['110'] = { 'a' => 'corporate_name' }
       TAGS['245'] = { '*' => 'title' }
       TAGS['246'] = { 'a' => 'title' }
-      TAGS['260'] = { 'b' => 'publisher' }
+      TAGS['260'] = { '*' => 'publisher' }
       TAGS['300'] = { '*' => 'format' }
       TAGS['590'] = { '*' => 'description' }
       TAGS['500'] = { '*' => 'bibliographic_note' }
-      TAGS['510'] = { '*' => 'identifier' }
+      TAGS['510'] = { 'a' => 'citation_note' }
       TAGS['520'] = { '*' => 'abstract' }
       TAGS['522'] = { '*' => 'coverage' }
       TAGS['524'] = { '*' => 'preferred_citation_note' }
