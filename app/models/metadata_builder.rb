@@ -174,8 +174,6 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.delete_clone(working_path)
   end
 
-
-
   def read_and_store_xml(working_path)
     get_location = "#{working_path}/#{self.repo.metadata_subdirectory}"
     self.repo.version_control_agent.get({:location => get_location}, working_path)
@@ -206,6 +204,11 @@ class MetadataBuilder < ActiveRecord::Base
     end
     self.xml_preview = content_tag(:ul, @file_links_html.html_safe) << sample_xml_docs.html_safe
     self.save!
+  end
+
+  def update_queue_status(queue_status)
+    self.repo.queued = queue_status
+    self.repo.save!
   end
 
   private

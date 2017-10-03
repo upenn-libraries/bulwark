@@ -92,9 +92,12 @@ en:
           first_time: 'Save source types'
           additional_times: 'Update source types'
         files_checked: 'Check for missing or invalid files'
+        queued_for_ingest:
+          first_time: 'Approve and add to ingest queue'
+          additional_times: 'Re-approve and re-add to ingest queue'
         publish_preview:
-          first_time: 'Approve for ingest'
-          additional_times: 'Re-approve for ingest'
+          first_time: 'Publish preview'
+          additional_times: 'Re-publish preview'
     repos:
       create_remote_link_text: 'Create Remote'
       preservation_xml_link_text: 'Create Preservation XML'
@@ -114,6 +117,15 @@ en:
             heading: 'Admin Actions'
           status:
             heading: 'Review Status'
+          queued:
+            heading: 'Review for Ingestion'
+            fieldset: 'Add to queue?'
+            label: '%{uuid}'
+          in_queue:
+            heading: 'Object is Queued for Ingest'
+            fieldset: '%{uuid} is queued but has not yet begun ingestion.  Remove from queue?'
+            label: 'Remove %{uuid} from ingest queue'
+            submit: 'Remove now'
           problem_files:
             heading: 'File Issues Detected for %{human_readable_name}'
             li: 'Filename: %{filename} - %{problem}'

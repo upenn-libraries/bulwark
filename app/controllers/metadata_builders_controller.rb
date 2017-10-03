@@ -1,6 +1,6 @@
 class MetadataBuildersController < ApplicationController
 
-  before_action :_set_metadata_builder, only: [:show, :edit, :update, :ingest, :set_source, :clear_files, :refresh_metadata, :generate_metadata, :generate_preview_xml, :file_checks]
+  before_action :_set_metadata_builder, only: [:show, :edit, :update, :queue_for_ingest, :remove_from_queue, :set_source, :clear_files, :refresh_metadata, :generate_metadata, :generate_preview_xml, :file_checks]
 
   def show
   end
@@ -29,9 +29,8 @@ class MetadataBuildersController < ApplicationController
   end
 
   def refresh_metadata
-    @metadata_builder.refresh_metadata
-    #@job = MetadataExtractionJob.perform_later(@metadata_builder, root_url, current_user.email)
-    #initialize_job_activity('metadata_extraction')
+    @job = MetadataExtractionJob.perform_later(@metadata_builder, root_url, current_user.email)
+    initialize_job_activity('metadata_extraction')
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata"
     @metadata_builder.repo.update_last_action(action_description[:metadata_extracted])
   end
@@ -56,14 +55,19 @@ class MetadataBuildersController < ApplicationController
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/files_check", :flash =>  { :warning => t('colenda.controllers.metadata_builders.file_checks.success') }
   end
 
-  def ingest
-    if params[:to_ingest].present?
-      @job = IngestJob.perform_later(@metadata_builder, params[:to_ingest], root_url, current_user.email)
-      initialize_job_activity('ingest')
-      @metadata_builder.repo.update_last_action(action_description[:published_preview])
+  def queue_for_ingest
+    if params[:metadata_builder][:queue_for_ingest].present?
+      @metadata_builder.update_queue_status(true)
+      @metadata_builder.repo.update_last_action(action_description[:queued_for_ingest])
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest"
-    else
-      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest", :flash => { :error => t('colenda.controllers.metadata_builders.ingest.error')}
+    end
+  end
+
+  def remove_from_queue
+    if params[:metadata_builder][:remove_from_ingest_queue].present?
+      @metadata_builder.update_queue_status(false)
+      @metadata_builder.repo.update_last_action(action_description[:removed_from_queue])
+      redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest"
     end
   end
 
@@ -91,6 +95,8 @@ class MetadataBuildersController < ApplicationController
       :metadata_mappings_generated => 'Metadata mappings set',
       :file_checks_run => 'File checks and derivative generation initialized',
       :preservation_xml_generated => 'Preservation XML generation initialized',
+      :queued_for_ingest => 'Queued for ingest',
+      :removed_from_queue => 'Removed from ingest queue',
       :published_preview => 'Object ingestion initialized' }
   end
 

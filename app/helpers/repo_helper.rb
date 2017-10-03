@@ -12,16 +12,19 @@ module RepoHelper
   end
 
   def render_ingest_or_message
-    if @object.metadata_builder.xml_preview.present?
-      render :partial => 'repos/ingest_select'
+    if @object.queued
+      render :partial => 'repos/in_queue'
     else
-      render :partial => 'repos/no_xml'
+      if @object.metadata_builder.xml_preview.present?
+        render :partial => 'repos/ingest_select'
+      else
+        render :partial => 'repos/no_xml'
+      end
     end
   end
 
   def render_file_checks
     render :partial => 'repos/file_checks'
-
   end
 
   def render_ingested_list

@@ -90,6 +90,8 @@ module RailsAdminHelper
       repo_steps[:metadata_source_type_specified] ? t('colenda.rails_admin.labels.set_source_types.additional_times') : t('colenda.rails_admin.labels.set_source_types.first_time')
     when 'file_checks'
       t('colenda.rails_admin.labels.file_checked')
+    when 'queued_for_ingest'
+      repo_steps[:published_preview] ? t('colenda.rails_admin.labels.queued_for_ingest.additional_times') : t('colenda.rails_admin.labels.queued_for_ingest.first_time')
     when 'publish_preview'
       repo_steps[:published_preview] ? t('colenda.rails_admin.labels.publish_preview.additional_times') : t('colenda.rails_admin.labels.publish_preview.first_time')
     else
