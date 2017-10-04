@@ -22,8 +22,6 @@ RailsAdmin.config do |config|
   config.current_user_method(&:current_user)
 
   config.navigation_static_links = {
-    'Dashboard' => '/admin_repo',
-    'View Fedora Queue' => '/admin_repo/in_queue',
     'Front End' => '/'
   }
 
