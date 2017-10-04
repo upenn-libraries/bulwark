@@ -8,6 +8,10 @@ require Rails.root.join('lib', 'rails_admin', 'files_check.rb')
 require Rails.root.join('lib', 'rails_admin', 'preview_xml.rb')
 require Rails.root.join('lib', 'rails_admin', 'preserve.rb')
 require Rails.root.join('lib', 'rails_admin', 'repo_new.rb')
+require Rails.root.join('lib', 'rails_admin', 'in_queue.rb')
+
+RailsAdmin::Config::Actions.register(RailsAdmin::Config::Actions::InQueue)
+
 
 RailsAdmin.config do |config|
   config.main_app_name = ['Review', 'Admin Dashboard']
@@ -18,6 +22,8 @@ RailsAdmin.config do |config|
   config.current_user_method(&:current_user)
 
   config.navigation_static_links = {
+    'Dashboard' => '/admin_repo',
+    'View Fedora Queue' => '/admin_repo/in_queue',
     'Front End' => '/'
   }
 
@@ -26,6 +32,7 @@ RailsAdmin.config do |config|
   config.actions do
     dashboard                     # mandatory
     index
+    in_queue
     repo_new do
       only ['Repo']
     end

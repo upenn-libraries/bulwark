@@ -7,6 +7,10 @@ en:
         breadcrumb: 'Add a New Repo'
         done: 'created'
         warning_reason: 'Metadata subdirectory and assets subdirectory are the same.'
+      in_queue:
+        title: 'View items in Fedora Queue'
+        menu: 'View Fedora Queue'
+        breadcrumb: 'View Fedora Queue'
       git_actions:
         title: 'Repo Information'
         menu: '1. Repo Information'

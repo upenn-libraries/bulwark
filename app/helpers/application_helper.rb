@@ -9,7 +9,15 @@ module ApplicationHelper
       rendered_keys << "#{public_fedora_path(key)}?width=#{value['width']}&height=#{value['height']}"
     end
     content_tag(:div, '', id: 'pages', data: rendered_keys.to_json )
+  end
 
+  def render_fedora_queue
+    a = ''
+    ids = Repo.where("queued").pluck(:id, :human_readable_name)
+    ids.each do |id|
+      a << content_tag(:li,link_to(id[1], "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{id[0]}/ingest"))
+    end
+    return content_tag(:ul, a.html_safe)
   end
 
   def flash_class(level)
