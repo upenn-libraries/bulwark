@@ -570,14 +570,14 @@ class MetadataSource < ActiveRecord::Base
     nodeset.each do |child|
       if child.name == 'datafield' && CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value].present?
         if CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value]['*'].present?
-          if  CustomEncodings::Marc21::Constants::ROLLUP_FIELDS.include?(child.attributes['tag'].value)
+          if CustomEncodings::Marc21::Constants::ROLLUP_FIELDS[child.attributes['tag'].value].present?
             rollup_values = []
             header = _fetch_header_from_marc21(child)
             mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
             child.children.each do |c|
               rollup_values << c.text unless c.text.strip.empty?
             end
-            mapped_values["#{header}"] << rollup_values.join(' -- ') if rollup_values.present?
+            mapped_values["#{header}"] << rollup_values.join(CustomEncodings::Marc21::Constants::ROLLUP_FIELDS[child.attributes['tag'].value]['separator']) if rollup_values.present?
           else
             header = _fetch_header_from_marc21(child)
             mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?

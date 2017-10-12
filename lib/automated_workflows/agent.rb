@@ -4,12 +4,13 @@ module AutomatedWorkflows
     attr_accessor :workflow
     attr_accessor :object_set
     attr_accessor :endpoint
+    attr_accessor :options
 
-    def initialize(workflow, object_set, endpoint)
+    def initialize(workflow, object_set, endpoint, options = {})
       @workflow = workflow
       @object_set = object_set
       @endpoint = endpoint.chomp('/')
-
+      @options = options
     end
 
     def instantiate_worker(step)
@@ -22,12 +23,14 @@ module AutomatedWorkflows
       self.object_set.each do |obj|
         repo = Repo.find_by(:human_readable_name => obj)
         steps_to_complete = self.steps('fetch', repo.initial_stop)
-        metadata = self.instantiate_worker('Metadata') if steps_to_complete.include?('fetch' || 'extract')
-        assets = self.instantiate_worker('Assets') if steps_to_complete.include?('fetch' || 'file_check' || 'ingest')
-        xml = self.instantiate_worker('XML') if steps_to_complete.include?('xml')
-        ingest = self.instantiate_worker('Ingest') if steps_to_complete.include?('ingest')
+        steps_to_complete = steps_to_complete - options[:steps_to_skip] if options[:steps_to_skip].present?
+        metadata = self.instantiate_worker('Metadata') if (steps_to_complete & %w[fetch extract]).present?
+        assets = self.instantiate_worker('Assets') if (steps_to_complete & %w[fetch file_check ingest]).present?
+        xml = self.instantiate_worker('XML') if (steps_to_complete & %w[xml]).present?
+        ingest = self.instantiate_worker('Ingest') if (steps_to_complete & %w[ingest]).present?
 
         working_path = repo.version_control_agent.clone
+
         if steps_to_complete.include?('fetch')
           unless metadata.fetch(working_path, repo)
             repo.version_control_agent.delete_clone(working_path)

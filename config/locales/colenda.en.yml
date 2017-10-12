@@ -122,10 +122,7 @@ en:
             fieldset: 'Add to queue?'
             label: '%{uuid}'
           in_queue:
-            heading: 'Object is Queued for Ingest'
-            fieldset: '%{uuid} is queued but has not yet begun ingestion.  Remove from queue?'
-            label: 'Remove %{uuid} from ingest queue'
-            submit: 'Remove now'
+            heading: 'Object %{uuid} is Queued for Ingest'
           problem_files:
             heading: 'File Issues Detected for %{human_readable_name}'
             li: 'Filename: %{filename} - %{problem}'

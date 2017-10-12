@@ -50,7 +50,11 @@ module CustomEncodings
       TAGS['752'] = { '*' => 'geographic_subject' }
       TAGS['856'] = { 'u' => 'relation' }
 
-      ROLLUP_FIELDS = ['650','752']
+      ROLLUP_FIELDS = {}
+
+      ROLLUP_FIELDS['260'] = {'separator' => ' '}
+      ROLLUP_FIELDS['650'] = {'separator' => ' -- '}
+      ROLLUP_FIELDS['752'] = {'separator' => ' -- '}
 
     end
   end
