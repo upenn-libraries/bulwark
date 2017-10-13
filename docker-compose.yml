@@ -16,6 +16,11 @@ services:
     env_file: '.env'
     volumes:
       - 'db:/var/lib/mysql'
+  phalt_app:
+    image: 'phalt:latest'
+    ports:
+      - '9292'
+    env_file: '.env_phalt'
   web:
     restart: 'unless-stopped'
     depends_on:
@@ -30,6 +35,7 @@ services:
     links:
       - 'db'
       - 'redis'
+      - 'phalt_app:phalt_app'
     volumes:
       - 'web:/home/app/webapp'
       - '${LOCAL_DATA}:${REMOTE_DATA}'
