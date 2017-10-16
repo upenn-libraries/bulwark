@@ -120,9 +120,16 @@ en:
           queued:
             heading: 'Review for Ingestion'
             fieldset: 'Add to queue?'
-            label: '%{uuid}'
+            label: 'Add %{name} to ingest queue'
           in_queue:
-            heading: 'Object %{uuid} is Queued for Ingest'
+            heading: 'Object Queued for Ingest'
+            fieldset: '%{uuid} is queued but has not yet begun ingestion.  Remove from queue?'
+            label: 'Remove %{name} from ingest queue'
+            submit: 'Remove now'
+          process_batch:
+            heading: 'Sign Off on this Batch'
+            label: 'The objects listed below are ready for processing in Fedora.  Once begun, this processing job must complete before new representations can be added to Fedora.'
+            submit: 'Submit'
           problem_files:
             heading: 'File Issues Detected for %{human_readable_name}'
             li: 'Filename: %{filename} - %{problem}'

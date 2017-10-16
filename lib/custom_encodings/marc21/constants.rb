@@ -7,11 +7,25 @@ module CustomEncodings
       TAGS['026'] = { 'e' => 'identifier'}
       TAGS['035'] = { 'a' => 'identifier'}
       TAGS['099'] = { 'a' => 'display_call_number'}
-      TAGS['100'] = { '*' => 'creator' }
+      TAGS['100'] = { 'a' => 'creator' }
       TAGS['110'] = { 'a' => 'corporate_name' }
-      TAGS['245'] = { '*' => 'title' }
+      TAGS['245'] = { 'a' => 'title',
+                      'b' => 'title',
+                      'c' => 'title',
+                      'f' => 'title',
+                      'g' => 'title',
+                      'h' => 'title',
+                      'k' => 'title',
+                      'n' => 'title',
+                      'p' => 'title',
+                      's' => 'title' }
       TAGS['246'] = { 'a' => 'title' }
-      TAGS['260'] = { '*' => 'publisher' }
+      TAGS['260'] = { 'a' => 'publisher',
+                      'b' => 'publisher',
+                      'c' => 'publisher',
+                      'e' => 'publisher',
+                      'f' => 'publisher',
+                      'g' => 'publisher' }
       TAGS['300'] = { '*' => 'format' }
       TAGS['590'] = { '*' => 'description' }
       TAGS['500'] = { '*' => 'bibliographic_note' }

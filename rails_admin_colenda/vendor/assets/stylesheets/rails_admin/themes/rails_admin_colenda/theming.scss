@@ -149,6 +149,7 @@ span.inline-pre,
 .file-checks,
 .select-for-ingest,
 .remove-from-queue,
+.process-batch,
 .review-status {
   margin: 20px 0px;
   padding: 10px;
@@ -167,6 +168,7 @@ span.inline-pre,
 .xml-preview h2,
 .select-for-ingest h2,
 .remove-from-queue h2,
+.process-batch h2,
 .ingested-links h2,
 .review-status h2,
 .metadata-only-preview h2,
@@ -279,7 +281,8 @@ pre.debug_dump kbd {
 }
 
 .select-for-ingest,
-.remove-from-queue {
+.remove-from-queue,
+.process-batch {
   legend {
     font-size: 14px;
   }

@@ -116,9 +116,11 @@ RailsAdmin.config do |config|
       end
       field :owner do
         visible true
+        searchable true
       end
       field :human_readable_name do
         visible true
+        searchable true
       end
       field :directory_link do
         visible true
@@ -128,6 +130,7 @@ RailsAdmin.config do |config|
       end
       field :last_action_performed do
         visible true
+        searchable true
         pretty_value do
           %{#{value[:description]}}.html_safe
         end
