@@ -111,7 +111,7 @@ ActiveRecord::Schema.define(version: 20171002182317) do
     t.string   "initial_stop",               limit: 255
     t.integer  "endpoint_id",                limit: 4
     t.string   "last_action_performed",      limit: 255
-    t.boolean  "queued"
+    t.string   "queued",                     limit: 255
   end
 
   add_index "repos", ["endpoint_id"], name: "index_repos_on_endpoint_id", using: :btree

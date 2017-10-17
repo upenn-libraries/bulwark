@@ -2,11 +2,13 @@
   <h2><%= t('colenda.repos.ingest.review.queued.heading')%></h2>
   <%= form_for @object.metadata_builder, :validate => true, :method => :post, :html => { :class => "ingest-select-form" }, :url => "/metadata_builders/#{@object.metadata_builder.id}/queue_for_ingest" do |f| %>
       <% @object.metadata_builder.preserve.each do |preserve| %>
-          <div class="checkbox">
-            <%= field_set_tag "#{@object.unique_identifier} | #{@object.names.human}" %>
-                <%= f.check_box :queue_for_ingest, checked: false, required: true %>
-                <%= f.label :queue_for_ingest, t('colenda.repos.ingest.review.queued.label', :name => @object.names.human) %>
-            <% end -%>
+        <div class="checkbox">
+          <%= field_set_tag "#{@object.unique_identifier} | #{@object.names.human}" %>
+          <%= content_tag :div, :class => 'field' do -%>
+              <%= f.check_box :queue_for_ingest, checked: false, required: false %>
+              <%= f.label :queue_for_ingest, t('colenda.repos.ingest.review.queued.label', :name => @object.names.human) %>
+          <% end -%>
+      <% end -%>
           </div>
       <%= f.submit form_label("queued_for_ingest", @object.steps), :id => "ingest_select_submit" %>
   <% end -%>

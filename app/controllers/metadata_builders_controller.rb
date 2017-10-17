@@ -56,16 +56,16 @@ class MetadataBuildersController < ApplicationController
   end
 
   def queue_for_ingest
-    if params[:metadata_builder][:queue_for_ingest].present?
-      @metadata_builder.update_queue_status(true)
-      @metadata_builder.repo.update_last_action(action_description[:queued_for_ingest])
+    if params[:metadata_builder].present?
+      key = @metadata_builder.update_queue_status(params[:metadata_builder])
+      @metadata_builder.repo.update_last_action(action_description[key])
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest"
     end
   end
 
   def remove_from_queue
     if params[:metadata_builder][:remove_from_ingest_queue].present?
-      @metadata_builder.update_queue_status(false)
+      @metadata_builder.update_queue_status(params[:metadata_builder])
       @metadata_builder.repo.update_last_action(action_description[:removed_from_queue])
       redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/ingest"
     end
@@ -95,6 +95,8 @@ class MetadataBuildersController < ApplicationController
       :metadata_mappings_generated => 'Metadata mappings set',
       :file_checks_run => 'File checks and derivative generation initialized',
       :preservation_xml_generated => 'Preservation XML generation initialized',
+      :review_complete => 'Pre-Fedora review complete',
+      :remove_from_queue => 'Removed from queue',
       :queued_for_ingest => 'Queued for ingest',
       :removed_from_queue => 'Removed from ingest queue',
       :published_preview => 'Object ingestion initialized' }

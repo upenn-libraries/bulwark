@@ -206,9 +206,19 @@ class MetadataBuilder < ActiveRecord::Base
     self.save!
   end
 
-  def update_queue_status(queue_status)
+  def update_queue_status(queue_params)
+    queue_status = nil
+    if queue_params['remove_from_ingest_queue'].present?
+      queue_status = nil if queue_params['remove_from_ingest_queue'].to_i > 0
+      key = :remove_from_queue
+    end
+    if queue_params['queue_for_ingest'].present?
+      queue_status = 'ingest' if queue_params['queue_for_ingest'].to_i > 0
+      key = :review_complete
+    end
     self.repo.queued = queue_status
     self.repo.save!
+    return key
   end
 
   private

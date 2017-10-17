@@ -80,7 +80,8 @@ h2, h3 {
   background-color: $light-grey;
 }
 
-form.field-mappings .field {
+form.field-mappings .field,
+.select-for-ingest .field {
   margin: 10px 0px;
 }
 .metadata-source-types {
@@ -93,7 +94,8 @@ form.field-mappings .field label {
   display: block;
 }
 
-.field-mappings .field-tip {
+.field-mappings .field-tip,
+.select-for-ingest .field-tip {
   color: $text-black;
   font-size: 0.7em;
 }

@@ -13,7 +13,7 @@ module ApplicationHelper
 
   def render_fedora_queue
     a = ''
-    ids = Repo.where('queued' => true).pluck(:id, :human_readable_name)
+    ids = Repo.where('queued' => 'ingest').pluck(:id, :human_readable_name)
     return 'Nothing in the queue' if ids.length == 0
     ids.each do |id|
       a << content_tag(:li,link_to(id[1], "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{id[0]}/ingest"))
