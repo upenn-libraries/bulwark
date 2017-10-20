@@ -1,0 +1,10 @@
+<div class="process-batch">
+  <h2><%= "#{t('colenda.repos.ingest.review.process_batch.heading')}"%></h2>
+  <%= form_tag :validate => true, :method => :post, :html => { :class => "process_batch-select-form" } %>
+      <div class="checkbox">
+        <%= hidden_field_tag 'queue_values', Repo.where('queued' => 'ingest').pluck(:human_readable_name).to_s %>
+        <%= check_box_tag :process_batch, checked: false, required: true %>
+        <%= label_tag :process_batch, t('colenda.repos.ingest.review.process_batch.label') %>
+      <%= submit_tag t('colenda.repos.ingest.review.process_batch.submit'), :id => "remove_queue_select_submit" %>
+      </div>
+</div>
