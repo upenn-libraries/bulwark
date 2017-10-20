@@ -11,9 +11,19 @@ module ApplicationHelper
     content_tag(:div, '', id: 'pages', data: rendered_keys.to_json )
   end
 
-  def render_fedora_queue
+  def render_reviewed_queue
     a = ''
     ids = Repo.where('queued' => 'ingest').pluck(:id, :human_readable_name)
+    return 'Nothing in the queue' if ids.length == 0
+    ids.each do |id|
+      a << content_tag(:li,link_to(id[1], "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{id[0]}/ingest"))
+    end
+    return content_tag(:ul, a.html_safe)
+  end
+
+  def render_fedora_queue
+    a = ''
+    ids = Repo.where('queued' => 'fedora').pluck(:id, :human_readable_name)
     return 'Nothing in the queue' if ids.length == 0
     ids.each do |id|
       a << content_tag(:li,link_to(id[1], "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{id[0]}/ingest"))

@@ -1,6 +1,11 @@
 en:
   admin:
     actions:
+      batch_new:
+        title: 'Add a Batch'
+        menu: 'Add a Batch'
+        breadcrumb: 'Add a Batch'
+        done: 'created'
       repo_new:
         title: 'Add a New Repo'
         menu: 'Add a New Repo'

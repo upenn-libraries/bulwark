@@ -12,6 +12,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :batches do
+    member do
+      post :batch_new
+    end
+  end
+
   resources :metadata_builders do
     member do
       post :update
