@@ -50,7 +50,7 @@ en:
           body: 'Batch %{uuid} removed from queue for Fedora, queue list: %{queue_list}.'
         batch_processed:
           subject: 'Batch processed into Fedora'
-          body: 'Batch %{uuid} processed in Fedora.  See report for %{queue_list}.'
+          body: 'Batch %{uuid} processed in Fedora.  See report for %{queue_list} - %{report_blob}'
     validators:
       xml_tags:
         starts_with_xml: 'Invalid tag "%{value}" specified for "%{key}" - valid XML tags cannot start with %{xml}'

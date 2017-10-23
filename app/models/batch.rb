@@ -57,11 +57,14 @@ class Batch < ActiveRecord::Base
 
   def activate
     self.status = 'in_progress'
+    self.start = DateTime.now
     self.save!
   end
 
   def wrapup
     self.status = 'complete'
+    self.end = DateTime.now
+    self.save!
     set_queued_status(self.queue_list, {:action => 'processed'})
     relay_message('processed')
   end
@@ -76,9 +79,20 @@ class Batch < ActiveRecord::Base
       MessengerClient.client.publish(I18n.t('rabbitmq.publish.messages.batch_removed'))
       NotificationMailer.process_completed_email(I18n.t('colenda.mailers.notification.batch_removed.subject'), BatchOps.config[:email], I18n.t('colenda.mailers.notification.batch_removed.body', :uuid => self.id, :queue_list => self.queue_list)).deliver_now
     elsif action == 'processed'
+      report_blob = run_report(self.queue_list)
       MessengerClient.client.publish(I18n.t('rabbitmq.publish.messages.batch_processed'))
-      NotificationMailer.process_completed_email(I18n.t('colenda.mailers.notification.batch_processed.subject'), BatchOps.config[:email], I18n.t('colenda.mailers.notification.batch_processed.body', :uuid => self.id, :queue_list => self.queue_list)).deliver_now
+      NotificationMailer.process_completed_email(I18n.t('colenda.mailers.notification.batch_processed.subject'), "#{BatchOps.config[:email]};#{self.email};", I18n.t('colenda.mailers.notification.batch_processed.body', :uuid => self.id, :queue_list => self.queue_list, :report_blob => report_blob)).deliver_now
     end
+  end
+
+  def run_report(identifiers)
+    report_blob = "(page_count excludes reference shots)\nStarted: #{self.start} | Ended: #{self.end}\n"
+    report_blob << "Ark_Identifier | Directive_Name | Page_Count\n"
+    identifiers.each do |uuid|
+      repo = Repo.where(:unique_identifier => uuid).first
+      report_blob << "#{uuid} | #{repo.names.human} | #{repo.images_to_render.keys.length}\n"
+    end
+    return report_blob
   end
 
 end
