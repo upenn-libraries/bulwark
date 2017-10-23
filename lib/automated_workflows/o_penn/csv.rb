@@ -57,7 +57,7 @@ module AutomatedWorkflows
         def generate_repos(csv)
           directories_file = convert_csv(csv)
           file_lines = File.readlines(directories_file).each{|l| l.strip! }
-          directories = []
+          identifiers = []
           file_lines.each do |dir|
             directory = dir.split('|').first
             last_updated = dir.split('|').last
@@ -84,9 +84,9 @@ module AutomatedWorkflows
             repo.endpoint += [desc, struct]
             AutomatedWorkflows::Agent.verify_sources(repo)
             repo.save!
-            directories << directory
+            identifiers << repo.unique_identifier
           end
-          directories
+          identifiers
         end
 
       end

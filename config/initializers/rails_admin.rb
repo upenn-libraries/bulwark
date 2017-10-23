@@ -91,6 +91,12 @@ RailsAdmin.config do |config|
         visible true
         searchable true
       end
+      field :start do
+        visible true
+      end
+      field :end do
+        visible true
+      end
     end
   end
 

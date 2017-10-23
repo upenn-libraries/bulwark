@@ -74,7 +74,7 @@ module AutomatedWorkflows
 
     def determine_steps(repo_stop, workflow)
       return self.steps('fetch', AutomatedWorkflows.config['ingest_only']['initial_stop']) if workflow == AutomatedWorkflows::IngestOnly
-      return self.steps('fetch', repo.initial_stop)
+      return self.steps('fetch', repo_stop)
     end
 
     def steps(start = 'create', stop = 'create')

@@ -82,7 +82,7 @@ module AutomatedWorkflows
             repo.endpoint += [desc, struct]
             AutomatedWorkflows::Agent.verify_sources(repo)
             repo.save!
-            repos << repo_name
+            repos << repo.unique_identifier
           end
           repos
         end
