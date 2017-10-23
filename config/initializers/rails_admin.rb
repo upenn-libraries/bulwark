@@ -41,6 +41,9 @@ RailsAdmin.config do |config|
     git_actions do
       only ['Repo']
     end
+    delete do
+      only ['Batch']
+    end
     preserve do
       only ['Repo']
     end
@@ -81,6 +84,10 @@ RailsAdmin.config do |config|
         searchable true
       end
       field :email do
+        visible true
+        searchable true
+      end
+      field :status do
         visible true
         searchable true
       end

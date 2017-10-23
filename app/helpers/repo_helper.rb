@@ -12,8 +12,10 @@ module RepoHelper
   end
 
   def render_ingest_or_message
-    if @object.queued
+    if @object.queued == 'ingest'
       render :partial => 'repos/in_queue'
+    elsif @object.queued == 'fedora'
+      render :partial => 'repos/processing'
     else
       if @object.metadata_builder.xml_preview.present?
         render :partial => 'repos/ingest_select'

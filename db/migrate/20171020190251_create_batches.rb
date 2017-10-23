@@ -5,7 +5,7 @@ class CreateBatches < ActiveRecord::Migration
       t.string :email
       t.timestamp :start
       t.timestamp :end
-      t.string :exit_status
+      t.string :status
 
       t.timestamps null: false
     end

@@ -42,6 +42,15 @@ en:
         metadata_extraction:
           subject: 'Metadata Extraction completed'
           body: 'Metadata extraction complete for %{uuid}.  Review at: %{root_url}admin_repo/repo/%{link_fragment}/generate_metadata'
+        batch_created:
+          subject: 'Batch ready for Fedora'
+          body: 'Batch %{uuid} ready for Fedora, queue list: %{queue_list}.'
+        batch_removed:
+          subject: 'Batch removed from queue for Fedora'
+          body: 'Batch %{uuid} removed from queue for Fedora, queue list: %{queue_list}.'
+        batch_processed:
+          subject: 'Batch processed into Fedora'
+          body: 'Batch %{uuid} processed in Fedora.  See report for %{queue_list}.'
     validators:
       xml_tags:
         starts_with_xml: 'Invalid tag "%{value}" specified for "%{key}" - valid XML tags cannot start with %{xml}'
@@ -126,6 +135,9 @@ en:
             fieldset: '%{uuid} is queued but has not yet begun ingestion.  Remove from queue?'
             label: 'Remove %{name} from ingest queue'
             submit: 'Remove now'
+          processing:
+            heading: 'Object in batch to Fedora'
+            message: 'You will receive an email when the batch is complete.'
           process_batch:
             heading: 'Sign Off on this Batch'
             label: 'The objects listed below are ready for processing in Fedora.  Once begun, this processing job must complete before new representations can be added to Fedora.'

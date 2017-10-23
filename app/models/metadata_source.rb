@@ -612,6 +612,7 @@ class MetadataSource < ActiveRecord::Base
   def _set_marmite_structural_metadata(working_path)
     mapped_values = {}
     _refresh_bibid(working_path)
+
     catalog_source = reconcile_metadata_lookup_source(self.source_type, self.original_mappings['bibid'])
     data = Nokogiri::XML(open(catalog_source))
     data.remove_namespaces!
