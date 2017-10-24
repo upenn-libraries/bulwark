@@ -12,14 +12,16 @@ class Batch < ActiveRecord::Base
   def queue_repos
     yield
     set_queued_status(self.queue_list, {:action => 'add'})
-    relay_message('create')
+    message = I18n.t('colenda.mailers.notification.batch_created.body', :uuid => self.id, :queue_list => self.queue_list)
+    MailerJob.perform_now('create', message)
   end
 
   def dequeue_repos
     errors.add(:base, 'Batch in process to Fedora, cannot delete') if self.status == 'in_progress'
     return false if errors.present?
     set_queued_status(self.queue_list, {:action => 'remove'}) if errors.blank?
-    relay_message('remove')
+    message = I18n.t('colenda.mailers.notification.batch_removed.body', :uuid => self.id, :queue_list => self.queue_list)
+    MailerJob.perform_now('remove', message)
   end
 
   def queue_list=(queue_list)
@@ -66,23 +68,9 @@ class Batch < ActiveRecord::Base
     self.end = DateTime.now
     self.save!
     set_queued_status(self.queue_list, {:action => 'processed'})
-    relay_message('processed')
-  end
-
-  private
-
-  def relay_message(action)
-    if action == 'create'
-      MessengerClient.client.publish(I18n.t('rabbitmq.publish.messages.batch_created'))
-      NotificationMailer.process_completed_email(I18n.t('colenda.mailers.notification.batch_created.subject'), BatchOps.config[:email], I18n.t('colenda.mailers.notification.batch_created.body', :uuid => self.id, :queue_list => self.queue_list)).deliver_now
-    elsif action == 'remove'
-      MessengerClient.client.publish(I18n.t('rabbitmq.publish.messages.batch_removed'))
-      NotificationMailer.process_completed_email(I18n.t('colenda.mailers.notification.batch_removed.subject'), BatchOps.config[:email], I18n.t('colenda.mailers.notification.batch_removed.body', :uuid => self.id, :queue_list => self.queue_list)).deliver_now
-    elsif action == 'processed'
-      report_blob = run_report(self.queue_list)
-      MessengerClient.client.publish(I18n.t('rabbitmq.publish.messages.batch_processed'))
-      NotificationMailer.process_completed_email(I18n.t('colenda.mailers.notification.batch_processed.subject'), "#{BatchOps.config[:email]};#{self.email};", I18n.t('colenda.mailers.notification.batch_processed.body', :uuid => self.id, :queue_list => self.queue_list, :report_blob => report_blob)).deliver_now
-    end
+    report_blob = run_report(self.queue_list)
+    message = I18n.t('colenda.mailers.notification.batch_processed.body', :uuid => self.id, :queue_list => self.queue_list, :report_blob => report_blob)
+    MailerJob.perform_now('processed', message, self.email)
   end
 
   def run_report(identifiers)

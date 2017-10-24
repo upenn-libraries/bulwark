@@ -5,9 +5,7 @@ en:
         generate_xml: 'XML generated'
         metadata_extraction: 'Metadata extracted'
         file_checks: 'File checks performed'
-        batch_created: 'Batch created'
-        batch_removed: 'Batch removed'
-        batch_processed: 'Batch processed'
+        mailer: 'Mail created'
         ingest: 'Ingest complete'
     errors:
       publish: 'Could not publish message to %{host}'
