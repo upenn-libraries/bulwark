@@ -465,7 +465,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def validate_bib_id(bib_id)
-    return bib_id.length <= 7 ? "99#{bib_id}3503681" : bib_id
+    return bib_id.to_s.length <= 7 ? "99#{bib_id}3503681" : bib_id.to_s
   end
 
   private
