@@ -464,12 +464,16 @@ class MetadataSource < ActiveRecord::Base
     %w[custom structural_bibid bibliophilly_structural]
   end
 
+  def validate_bib_id(bib_id)
+    return bib_id.length <= 7 ? "99#{bib_id}3503681" : bib_id
+  end
+
   private
 
   def _set_voyager_data(working_path)
     _refresh_bibid(working_path)
     mapped_values = {}
-    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}"
+    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{validate_bib_id(self.original_mappings['bibid'])}"
     data = Nokogiri::XML(open(voyager_source))
     nodeset = data.xpath('//page/response/result/doc/xml[@name="marcrecord"]').children.first
     nodeset.children.each do |child|
@@ -495,7 +499,7 @@ class MetadataSource < ActiveRecord::Base
         end
       end
     end
-    mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{self.original_mappings['bibid']}"] unless mapped_values.keys.include?('identifier')
+    mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{validate_bib_id(self.original_mappings['bibid'])}"] unless mapped_values.keys.include?('identifier')
     mapped_values['collection'] = [_get_voyager_collection(self.original_mappings['bibid'])]
     mapped_values.each do |entry|
       mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
@@ -514,7 +518,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def _get_voyager_collection(bib_id)
-    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}/#{bib_id}"
+    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}/#{validate_bib_id(bib_id)}"
     data = Nokogiri::XML(open(voyager_source))
     data.remove_namespaces!
     collection_name = data.xpath('//page/collection/name').children.first.text
@@ -525,7 +529,7 @@ class MetadataSource < ActiveRecord::Base
   def _set_voyager_structural_metadata(working_path)
     mapped_values = {}
     _refresh_bibid(working_path)
-    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}"
+    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{validate_bib_id(self.original_mappings['bibid'])}"
     data = Nokogiri::XML(open(voyager_source))
     reading_direction = _get_reading_direction(voyager_source)
     data.xpath('//xml/page').each_with_index do |page, index|
