@@ -27,10 +27,15 @@ class Batch < ActiveRecord::Base
   def queue_list=(queue_list)
     queued = Array.wrap(queue_list).reject(&:blank?)
     self[:queue_list] = queued
+    self[:directive_names] = reconcile_names(queued)
   end
 
   def email=(email)
     self[:email] = email
+  end
+
+  def directive_names=(directive_names)
+    self[:directive_names] = directive_names
   end
 
   def set_queued_status(queue_list, options = {})
@@ -81,6 +86,14 @@ class Batch < ActiveRecord::Base
       report_blob << "#{uuid} | #{repo.names.human} | #{repo.images_to_render.keys.length}\n"
     end
     return report_blob
+  end
+
+  def reconcile_names(queue_list)
+    names = ''
+    queue_list.each do |u|
+      names << "#{Repo.where(:unique_identifier => u).pluck(:human_readable_name).first}|"
+    end
+    return names.to_s
   end
 
 end

@@ -154,4 +154,12 @@ module RailsAdminHelper
     image_tag(thumbnail_link, :width => 100, :height => 150)
   end
 
+  def self.render_queue_names(names)
+    queue_names = ''
+    names.split('|').each do |name|
+      queue_names << "<li>#{name}</li>"
+    end
+    return "<ul>#{queue_names}</ul>"
+  end
+
 end

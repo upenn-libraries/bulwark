@@ -75,13 +75,23 @@ RailsAdmin.config do |config|
       end
       required(true)
     end
+    field :directive_names do
+      visible false
+    end
     field :email do
       required(true)
     end
     list do
       field :queue_list do
+        visible false
+      end
+      field :directive_names do
         visible true
+        label 'Queue List'
         searchable true
+        pretty_value do
+          RailsAdminHelper.render_queue_names(value).html_safe
+        end
       end
       field :email do
         visible true

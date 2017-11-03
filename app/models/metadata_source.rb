@@ -586,13 +586,31 @@ class MetadataSource < ActiveRecord::Base
             end
           end
         else
-          child.children.each do |c|
-            if c.name == 'subfield'
-              header = _fetch_header_from_subfield_catalog(child.attributes['tag'].value, c)
-              if header.present?
-                mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
-                c.children.each do |s|
-                  mapped_values["#{header}"] << s.text
+
+          if CustomEncodings::Marc21::Constants::ROLLUP_FIELDS[child.attributes['tag'].value].present?
+            rollup_values = []
+            header = ''
+            child.children.each do |c|
+              if c.name == 'subfield'
+                header = _fetch_header_from_subfield_catalog(child.attributes['tag'].value, c)
+                if header.present?
+                  mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
+                  c.children.each do |s|
+                    rollup_values << s.text unless s.text.strip.empty?
+                  end
+                end
+              end
+            end
+            mapped_values["#{header}"] << rollup_values.join(CustomEncodings::Marc21::Constants::ROLLUP_FIELDS[child.attributes['tag'].value]['separator']) if rollup_values.present?
+          else
+            child.children.each do |c|
+              if c.name == 'subfield'
+                header = _fetch_header_from_subfield_catalog(child.attributes['tag'].value, c)
+                if header.present?
+                  mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
+                  c.children.each do |s|
+                    mapped_values["#{header}"] << s.text
+                  end
                 end
               end
             end
