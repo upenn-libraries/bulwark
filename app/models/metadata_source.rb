@@ -474,12 +474,16 @@ class MetadataSource < ActiveRecord::Base
     %w[custom structural_bibid bibliophilly_structural pap_structural]
   end
 
+  def validate_bib_id(bib_id)
+    return bib_id.to_s.length <= 7 ? "99#{bib_id}3503681" : bib_id.to_s
+  end
+
   private
 
   def _set_voyager_data(working_path)
     _refresh_bibid(working_path)
     mapped_values = {}
-    voyager_source = reconcile_metadata_lookup_source(self.source_type, self.original_mappings['bibid'])
+    voyager_source = reconcile_metadata_lookup_source(self.source_type, validate_bib_id(self.original_mappings['bibid']))
     data = Nokogiri::XML(open(voyager_source))
     nodeset = data.xpath('//page/response/result/doc/xml[@name="marcrecord"]').children.first
     nodeset.children.each do |child|
@@ -505,7 +509,7 @@ class MetadataSource < ActiveRecord::Base
         end
       end
     end
-    mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{self.original_mappings['bibid']}"] unless mapped_values.keys.include?('identifier')
+    mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{validate_bib_id(self.original_mappings['bibid'])}"] unless mapped_values.keys.include?('identifier')
     mapped_values['collection'] = [_get_catalog_collection(self.source_type, self.original_mappings['bibid'])]
     mapped_values.each do |entry|
       mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
@@ -541,7 +545,7 @@ class MetadataSource < ActiveRecord::Base
   def _set_voyager_structural_metadata(working_path)
     mapped_values = {}
     _refresh_bibid(working_path)
-    voyager_source = reconcile_metadata_lookup_source(self.source_type, self.original_mappings['bibid'])
+    voyager_source = reconcile_metadata_lookup_source(self.source_type, validate_bib_id(self.original_mappings['bibid']))
     data = Nokogiri::XML(open(voyager_source))
     reading_direction = _get_catalog_reading_direction(voyager_source)
     data.xpath('//xml/page').each_with_index do |page, index|
