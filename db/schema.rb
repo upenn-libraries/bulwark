@@ -11,7 +11,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170628203612) do
+ActiveRecord::Schema.define(version: 20171020190251) do
+
+  create_table "batches", force: :cascade do |t|
+    t.string   "queue_list",      limit: 255
+    t.string   "directive_names", limit: 255
+    t.string   "email",           limit: 255
+    t.datetime "start"
+    t.datetime "end"
+    t.string   "status",          limit: 255
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       limit: 4,   null: false
@@ -111,6 +122,7 @@ ActiveRecord::Schema.define(version: 20170628203612) do
     t.string   "initial_stop",               limit: 255
     t.integer  "endpoint_id",                limit: 4
     t.string   "last_action_performed",      limit: 255
+    t.string   "queued",                     limit: 255
   end
 
   add_index "repos", ["endpoint_id"], name: "index_repos_on_endpoint_id", using: :btree

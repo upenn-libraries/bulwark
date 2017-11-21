@@ -65,7 +65,6 @@ class MetadataBuilder < ActiveRecord::Base
     self.store_xml_preview
     self.last_xml_generated = DateTime.now
     self.save!
-    
   end
 
   def save_input_sources(working_path)
@@ -122,7 +121,7 @@ class MetadataBuilder < ActiveRecord::Base
       unless canonical_identifier_check(file_path)
         next
       end
-      xslt_file = self.metadata_source.any?{|ms| ms.source_type == 'bibliophilly'} ? 'bibliophilly' : 'pqc'
+      xslt_file = xslt_file_select
       Dir.chdir(working_path)
       `xsltproc #{Rails.root}/lib/tasks/#{xslt_file}.xslt #{file_path}`
       transformed_xml = "#{working_path}/#{Utils.config[:fedora_xml_derivative]}"
@@ -139,6 +138,16 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.lock(working_path)
     self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'), working_path)
     self.repo.version_control_agent.push(working_path)
+  end
+
+  def xslt_file_select
+    if self.metadata_source.any?{|ms| ms.source_type == 'bibliophilly'}
+      return 'bibliophilly'
+    elsif self.metadata_source.any?{|ms| ms.source_type == 'pap'}
+      return 'pap'
+    else
+      return 'pqc'
+    end
   end
 
   def canonical_identifier_check(xml_file)
@@ -164,8 +173,6 @@ class MetadataBuilder < ActiveRecord::Base
     read_and_store_xml(working_path)
     self.repo.version_control_agent.delete_clone(working_path)
   end
-
-
 
   def read_and_store_xml(working_path)
     get_location = "#{working_path}/#{self.repo.metadata_subdirectory}"
@@ -197,6 +204,21 @@ class MetadataBuilder < ActiveRecord::Base
     end
     self.xml_preview = content_tag(:ul, @file_links_html.html_safe) << sample_xml_docs.html_safe
     self.save!
+  end
+
+  def update_queue_status(queue_params)
+    queue_status = nil
+    if queue_params['remove_from_ingest_queue'].present?
+      queue_status = nil if queue_params['remove_from_ingest_queue'].to_i > 0
+      key = :remove_from_queue
+    end
+    if queue_params['queue_for_ingest'].present?
+      queue_status = 'ingest' if queue_params['queue_for_ingest'].to_i > 0
+      key = :review_complete
+    end
+    self.repo.queued = queue_status
+    self.repo.save!
+    return key
   end
 
   private

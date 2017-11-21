@@ -39,6 +39,18 @@
                   <mods:language>
                     <xsl:apply-templates select="language" />
                   </mods:language>
+                  <mods:name type="personal">
+                    <xsl:apply-templates select="personal_name" />
+                  </mods:name>
+                  <mods:name type="corporate">
+                    <xsl:apply-templates select="corporate_name" />
+                  </mods:name>
+                  <mods:subject>
+                    <xsl:apply-templates select="subject" />
+                  </mods:subject>
+                  <mods:subject>
+                    <xsl:apply-templates select="geographic_subject" />
+                  </mods:subject>
                   <mods:physicalDescription>
                     <mods:extent><xsl:apply-templates select="description" /></mods:extent>
                     <mods:digitalOrigin>reformatted digital</mods:digitalOrigin>
@@ -78,6 +90,22 @@
 
   <xsl:template match="description">
     <xsl:apply-templates />
+  </xsl:template>
+
+  <xsl:template match="personal_name">
+    <mods:namePart><xsl:apply-templates /></mods:namePart>
+  </xsl:template>
+
+  <xsl:template match="corporate_name">
+    <mods:namePart><xsl:apply-templates /></mods:namePart>
+  </xsl:template>
+
+  <xsl:template match="subject">
+    <mods:topic><xsl:apply-templates /></mods:topic>
+  </xsl:template>
+
+  <xsl:template match="geographic_subject">
+    <mods:geographic><xsl:apply-templates /></mods:geographic>
   </xsl:template>
 
   <xsl:template match="bibliography_note">

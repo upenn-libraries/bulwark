@@ -80,7 +80,8 @@ h2, h3 {
   background-color: $light-grey;
 }
 
-form.field-mappings .field {
+form.field-mappings .field,
+.select-for-ingest .field {
   margin: 10px 0px;
 }
 .metadata-source-types {
@@ -93,7 +94,8 @@ form.field-mappings .field label {
   display: block;
 }
 
-.field-mappings .field-tip {
+.field-mappings .field-tip,
+.select-for-ingest .field-tip {
   color: $text-black;
   font-size: 0.7em;
 }
@@ -148,6 +150,8 @@ span.inline-pre,
 .metadata-source-mapping,
 .file-checks,
 .select-for-ingest,
+.remove-from-queue,
+.process-batch,
 .review-status {
   margin: 20px 0px;
   padding: 10px;
@@ -165,6 +169,8 @@ span.inline-pre,
 .metadata-source-mapping h2,
 .xml-preview h2,
 .select-for-ingest h2,
+.remove-from-queue h2,
+.process-batch h2,
 .ingested-links h2,
 .review-status h2,
 .metadata-only-preview h2,
@@ -179,6 +185,10 @@ span.inline-pre,
   font-size: 16px;
   font-weight: bold;
   padding: 10px 0px;
+}
+
+.remove-from-queue h2 {
+  color: $warning-red;
 }
 
 div[class$="structural-preview"] {
@@ -272,7 +282,12 @@ pre.debug_dump kbd {
   font-weight:bold;
 }
 
-.select-for-ingest {
+.select-for-ingest,
+.remove-from-queue,
+.process-batch {
+  legend {
+    font-size: 14px;
+  }
   input[type="checkbox"], label {
     margin-left: 10px;
   }

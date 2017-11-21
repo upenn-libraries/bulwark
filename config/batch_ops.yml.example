@@ -1,0 +1,6 @@
+development:
+  email: 'x@upenn.edu'
+test:
+  email: 'x@upenn.edu'
+production:
+  email: 'x@upenn.edu'
