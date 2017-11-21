@@ -5,6 +5,7 @@ en:
         generate_xml: 'XML generated'
         metadata_extraction: 'Metadata extracted'
         file_checks: 'File checks performed'
+        mailer: 'Mail created'
         ingest: 'Ingest complete'
     errors:
       publish: 'Could not publish message to %{host}'

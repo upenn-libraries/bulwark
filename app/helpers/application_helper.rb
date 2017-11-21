@@ -4,12 +4,32 @@ module ApplicationHelper
 
   def render_image_list
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
+    return '' unless repo.images_to_render.present?
     rendered_keys = []
     repo.images_to_render.each do |key, value|
       rendered_keys << "#{public_fedora_path(key)}?width=#{value['width']}&height=#{value['height']}"
     end
     content_tag(:div, '', id: 'pages', data: rendered_keys.to_json )
+  end
 
+  def render_reviewed_queue
+    a = ''
+    ids = Repo.where('queued' => 'ingest').pluck(:id, :human_readable_name)
+    a = 'Nothing approved waiting for batching' if ids.length == 0
+    ids.each do |id|
+      a << content_tag(:li,link_to(id[1], "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{id[0]}/ingest"))
+    end
+    return content_tag(:ul, a.html_safe)
+  end
+
+  def render_fedora_queue
+    a = ''
+    ids = Repo.where('queued' => 'fedora').pluck(:id, :human_readable_name)
+    a = 'Nothing in the queue' if ids.length == 0
+    ids.each do |id|
+      a << content_tag(:li,link_to(id[1], "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{id[0]}/ingest"))
+    end
+    return content_tag(:ul, a.html_safe)
   end
 
   def flash_class(level)

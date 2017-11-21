@@ -41,6 +41,10 @@ class ReposController < ApplicationController
     redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/map_metadata", :flash => { @message.keys.first => @message.values.first }
   end
 
+  def in_queue
+    binding.pry
+  end
+
 
   private
     def set_repo
