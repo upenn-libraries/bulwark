@@ -45,7 +45,7 @@ module AutomatedWorkflows
           return "#{csv_filename} not found" unless File.exist?(csv_filename)
           directories = []
           listing = SmarterCSV.process(csv_filename)
-          listing.each { |row| directories << row[:path] }
+          listing.each { |row| directories << "#{row[:path]}|#{row[:unique_identifier]}|#{row[:directive_name]}" }
           directories.uniq!
           f = File.new("#{csv_filename.gsub('.csv','.txt')}", 'w')
           directories.each { |d| f << "#{d}\n" }
@@ -58,13 +58,14 @@ module AutomatedWorkflows
           file_lines = File.readlines(directories_file).each{|l| l.strip! }
           directories = []
           file_lines.each do |dir|
-            directory = dir
+            directory, unique_identifier, repo_name = dir.split('|')
             last_updated = DateTime.now
-            repo = AutomatedWorkflows::Actions::Repos.create(directory,
+            repo = AutomatedWorkflows::Actions::Repos.create(repo_name,
                                                              :owner => AutomatedWorkflows::Kaplan::Csv.config.owner,
                                                              :description => AutomatedWorkflows::Kaplan::Csv.config.description,
                                                              :last_external_update => last_updated,
                                                              :initial_stop => AutomatedWorkflows::Kaplan::Csv.config.initial_stop,
+                                                             :unique_identifier => unique_identifier,
                                                              :type =>'directory')
             desc = Endpoint.where(:repo => repo, :source => "#{AutomatedWorkflows::Kaplan::Csv.config.endpoint}/#{directory}/#{AutomatedWorkflows::Kaplan::Csv.config.metadata_suffix}").first_or_create
             desc.update_attributes( :destination => repo.metadata_subdirectory,
