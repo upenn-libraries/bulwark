@@ -205,7 +205,7 @@ class Repo < ActiveRecord::Base
 
   #TODO: Eventually offload to metadata source subclasses
   def default_thumbnail
-    structural_types = %w[structural_bibid custom bibliophilly_structural kaplan_structural]
+    structural_types = %w[structural_bibid custom bibliophilly_structural kaplan_structural pap_structural]
     single_structural_source = MetadataSource.where('metadata_builder_id = ? AND source_type IN (?)', self.metadata_builder, structural_types).pluck(:id)
     single_structural_source.length == 1 ? MetadataSource.find(single_structural_source.first).thumbnail : nil
   end

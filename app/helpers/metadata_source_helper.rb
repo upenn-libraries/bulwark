@@ -19,9 +19,8 @@ module MetadataSourceHelper
       mappings = ''
       metadata_preview = content_tag(:h2,t(heading_text_label))
       source.user_defined_mappings.each do |m,b|
-        mappings << "<li>#{t('colenda.metadata_sources.metadata_mapping.structural_entry')} #{m}#{t(field_separator_label)} #{render_value(b)}</li>"
-        file_name = b['file_name'] unless b.is_a?(Array)
-
+        file_name, anchor_tag = file_field_values(source.file_field, source.user_defined_mappings[m]) if source.file_field.present?
+        mappings << "<li>#{anchor_tag}#{t('colenda.metadata_sources.metadata_mapping.structural_entry')} #{m}#{t(field_separator_label)} #{render_value(b)}</li>"
         if file_name.present? && @object.metadata_builder.last_file_checks.present?
           mappings << content_tag(:div, derivative_link(file_name), :class => 'preview_image')
         end
@@ -31,19 +30,26 @@ module MetadataSourceHelper
     end
   end
 
+  def file_field_values(file_field_key, mappings)
+    return '','' unless mappings[file_field_key].present?
+    return "#{mappings[file_field_key]}", "<a name=\"#{mappings[file_field_key]}\" href= \"#\" title=\"Anchor tag for #{mappings[file_field_key]}\"></a>"
+  end
+
   def render_files_preview(source)
     return unless @object.metadata_builder.last_file_checks.present?
     return unless prepared_structural?(source)
     source_file_preview = ''
     source.user_defined_mappings.each do |key, value_hash|
       if value_hash[source.file_field].present?
-        file_name = "<div class=\"file-name\">#{"".html_safe + value_hash[source.file_field]}</div>".html_safe
+        file_name = "#{"".html_safe + value_hash[source.file_field]}"
+        link_path = "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{@object.id}/generate_metadata##{file_name}"
+        file_div = "<div class=\"file-name\">#{link_to(file_name, link_path)}</div>".html_safe
         derivative = derivative_link(value_hash[source.file_field],'filename_thumb_preview')
-        source_file_preview << "<li>#{derivative + file_name}</li>"
+        source_file_preview << "<li>#{derivative + file_div}</li>"
       end
     end
-    sources_preview = "<ul>#{source_file_preview}</ul>"
-    return sources_preview.present? ? "<div class=\"preview-thumbnails\">#{sources_preview}</div>".html_safe : ""
+    sources_preview = "<ul><li id=\"spacer\" class=\"hide\"><span class=\"screenreader\">Spacer item to facilitate off-by-one</span><span id=\"note\">Spacer image</span></li>#{source_file_preview}</ul>"
+    return sources_preview.present? ? "<div id=\"preview-thumbnails\">#{sources_preview}</div>".html_safe : ""
   end
 
   def derivative_link(file_name, derivative_type = 'page_preview')
@@ -53,7 +59,7 @@ module MetadataSourceHelper
     preview_link = Utils::Process.read_storage_link(preview_key, @object)
     return problem_warning(file_name, derivative_type).html_safe if @object.problem_files["/#{@object.assets_subdirectory}/#{file_name}"].present?
     return link_to(image_tag(thumbnail_link), preview_link) if derivative_type == 'page_preview'
-    return link_to(image_tag(thumbnail_link, width: '120', :alt => file_name,  :title => file_name), preview_link) if derivative_type == 'filename_thumb_preview'
+    return link_to(image_tag(thumbnail_link, :alt => file_name,  :title => file_name), preview_link) if derivative_type == 'filename_thumb_preview'
 
   end
 
@@ -93,19 +99,19 @@ module MetadataSourceHelper
   end
 
   def prepared_metadata?(source)
-    accepted_types = %w(voyager structural_bibid bibliophilly bibliophilly_structural kaplan kaplan_structural)
+    accepted_types = %w(voyager structural_bibid bibliophilly bibliophilly_structural pap pap_structural kaplan kaplan_structural)
     return true if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
     return false
   end
 
   def prepared_descriptive?(source)
-    accepted_types = %w(voyager bibliophilly kaplan)
+    accepted_types = %w(voyager bibliophilly pap kaplan)
     return true if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
     return false
   end
 
   def prepared_structural?(source)
-    accepted_types = %w(structural_bibid bibliophilly_structural kaplan_structural)
+    accepted_types = %w(structural_bibid bibliophilly_structural pap_structural kaplan_structural)
     return true if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
     return false
   end

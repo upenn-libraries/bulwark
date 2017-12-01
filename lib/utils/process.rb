@@ -37,7 +37,7 @@ module Utils
       repo.version_control_agent.push(working_path)
       @@status_type = :success
       @@status_message = I18n.t('colenda.utils.process.success.ingest_complete')
-      Repo.update(repo.id, :ingested => true)
+      Repo.update(repo.id, :ingested => true, :queued => false)
       {@@status_type => @@status_message}
     end
 

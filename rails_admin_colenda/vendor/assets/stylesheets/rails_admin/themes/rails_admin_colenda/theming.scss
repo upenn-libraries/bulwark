@@ -13,6 +13,10 @@
 
 @import "font-awesome";
 
+.screenreader {
+  @include accessible-hide;
+}
+
 
 form input[type="submit"] {
   padding: 5px;
@@ -22,6 +26,41 @@ form input[type="submit"] {
   background-color: #428bca;
   border-color: #357ebd;
 }
+
+div.image-viewer-controls{
+  background-color: $background-black;
+  color: $text-white;
+  border: 3px solid $dark-grey;
+  padding: 20px;
+  width: 75%;
+  h2 {
+    font-size: 12px;
+  }
+  .float-left {
+    float: left;
+    margin-left: 20px;
+  }
+
+  .float-right {
+    float: right;
+    margin-right: 20px;
+  }
+  form[class$="viewer-controls-form"] {
+    display: block;
+    padding: 10px 0px 20px 0px;
+    label {
+      padding: 0px 5px;
+      font-size: 16px;
+    }
+    input[type="range"] {
+      width: 200px;
+    }
+    input[type="checkbox"] {
+      margin: 0px 20px;
+    }
+  }
+}
+
 
 /* Resetting inherited margin spacing */
 h2, h3 {
@@ -41,7 +80,8 @@ h2, h3 {
   background-color: $light-grey;
 }
 
-form.field-mappings .field {
+form.field-mappings .field,
+.select-for-ingest .field {
   margin: 10px 0px;
 }
 .metadata-source-types {
@@ -54,7 +94,8 @@ form.field-mappings .field label {
   display: block;
 }
 
-.field-mappings .field-tip {
+.field-mappings .field-tip,
+.select-for-ingest .field-tip {
   color: $text-black;
   font-size: 0.7em;
 }
@@ -109,6 +150,8 @@ span.inline-pre,
 .metadata-source-mapping,
 .file-checks,
 .select-for-ingest,
+.remove-from-queue,
+.process-batch,
 .review-status {
   margin: 20px 0px;
   padding: 10px;
@@ -126,11 +169,14 @@ span.inline-pre,
 .metadata-source-mapping h2,
 .xml-preview h2,
 .select-for-ingest h2,
+.remove-from-queue h2,
+.process-batch h2,
 .ingested-links h2,
 .review-status h2,
 .metadata-only-preview h2,
 .structural-metadata-preview h2,
 .file-checks h2,
+.image-viewer-controls h2,
 .problem-files h2,
 .metadata-source-types h3,
 .metadata-only-preview h3,
@@ -139,6 +185,10 @@ span.inline-pre,
   font-size: 16px;
   font-weight: bold;
   padding: 10px 0px;
+}
+
+.remove-from-queue h2 {
+  color: $warning-red;
 }
 
 div[class$="structural-preview"] {
@@ -174,11 +224,23 @@ pre.debug_dump kbd {
   }
 }
 
-.preview-thumbnails {
+#preview-thumbnails {
   display: inline-block;
   position: relative;
   width: 75%;
   background-color: $background-black;
+  #spacer {
+    width: 120px;
+    height:120px;
+    margin: 5px;
+    text-align: center;
+    line-height: 110px;
+    #note {
+      color: $text-white;
+      font-weight: bold;
+      font-size: 14px;
+    }
+  }
   li {
     list-style: none;
     float: left;
@@ -189,6 +251,9 @@ pre.debug_dump kbd {
     height: auto;
     text-align: center;
     display: inline-block;
+    img {
+      width: 120px;
+    }
   }
 
   div.issue{
@@ -201,9 +266,14 @@ pre.debug_dump kbd {
   div.file-name {
     background-color: $background-black;
     color: $text-white;
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: bold;
     padding: 3px;
     margin-top: 5px;
+    a {
+      color: $text-white;
+      text-decoration: underline;
+    }
   }
 }
 
@@ -215,8 +285,12 @@ pre.debug_dump kbd {
   }
 }
 
-
-.select-for-ingest {
+.select-for-ingest,
+.remove-from-queue,
+.process-batch {
+  legend {
+    font-size: 14px;
+  }
   input[type="checkbox"], label {
     margin-left: 10px;
   }

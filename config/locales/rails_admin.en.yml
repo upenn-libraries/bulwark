@@ -1,12 +1,21 @@
 en:
   admin:
     actions:
+      batch_new:
+        title: 'Add a Batch'
+        menu: 'Add a Batch'
+        breadcrumb: 'Add a Batch'
+        done: 'created'
       repo_new:
         title: 'Add a New Repo'
         menu: 'Add a New Repo'
         breadcrumb: 'Add a New Repo'
         done: 'created'
         warning_reason: 'Metadata subdirectory and assets subdirectory are the same.'
+      in_queue:
+        title: 'View items in Fedora Queue'
+        menu: 'View Fedora Queue'
+        breadcrumb: 'View Fedora Queue'
       git_actions:
         title: 'Repo Information'
         menu: '1. Repo Information'
@@ -17,12 +26,12 @@ en:
         breadcrumb: 'Publish Preview'
       generate_metadata:
         title: 'Extract Metadata'
-        menu: '3. Extract and Map Metadata'
-        breadcrumb: 'Extract and Map Metadata'
+        menu: '3. Extract Metadata'
+        breadcrumb: 'Extract Metadata'
       files_check:
-        title: 'Check Files and Generate Derivatives'
-        menu: '4. Check Files and Generate Derivatives'
-        breadcrumb: 'Check Files and Generate Derivatives'
+        title: 'Check Files'
+        menu: '4. Check Files'
+        breadcrumb: 'Check Files'
       preview_xml:
         title: 'Create Preservation XML'
         menu: '5. Create Preservation XML'

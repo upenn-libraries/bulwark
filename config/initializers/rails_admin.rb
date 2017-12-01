@@ -8,6 +8,11 @@ require Rails.root.join('lib', 'rails_admin', 'files_check.rb')
 require Rails.root.join('lib', 'rails_admin', 'preview_xml.rb')
 require Rails.root.join('lib', 'rails_admin', 'preserve.rb')
 require Rails.root.join('lib', 'rails_admin', 'repo_new.rb')
+require Rails.root.join('lib', 'rails_admin', 'batch_new.rb')
+require Rails.root.join('lib', 'rails_admin', 'in_queue.rb')
+
+RailsAdmin::Config::Actions.register(RailsAdmin::Config::Actions::InQueue)
+
 
 RailsAdmin.config do |config|
   config.main_app_name = ['Review', 'Admin Dashboard']
@@ -21,28 +26,87 @@ RailsAdmin.config do |config|
     'Front End' => '/'
   }
 
-  config.included_models = ['Repo']
+  config.included_models = ['Repo', 'Batch']
 
   config.actions do
     dashboard                     # mandatory
     index
+    in_queue
     repo_new do
       only ['Repo']
+    end
+    batch_new do
+      only ['Batch']
     end
     git_actions do
       only ['Repo']
     end
+    delete do
+      only ['Batch']
+    end
     preserve do
       only ['Repo']
     end
-    generate_metadata
-    files_check
-    preview_xml
+    generate_metadata do
+      only ['Repo']
+    end
+    files_check do
+      only ['Repo']
+    end
+    preview_xml do
+      only ['Repo']
+    end
     create_remote do
       only ['Repo']
     end
     ingest do
       only ['Repo']
+    end
+  end
+
+  config.model Batch do
+    field :queue_list, :enum do
+      label 'Queue List'
+      enum_method do
+        :load_all_queueable
+      end
+      multiple do
+        true
+      end
+      required(true)
+    end
+    field :directive_names do
+      visible false
+    end
+    field :email do
+      required(true)
+    end
+    list do
+      field :queue_list do
+        visible false
+      end
+      field :directive_names do
+        visible true
+        label 'Queue List'
+        searchable true
+        pretty_value do
+          RailsAdminHelper.render_queue_names(value).html_safe
+        end
+      end
+      field :email do
+        visible true
+        searchable true
+      end
+      field :status do
+        visible true
+        searchable true
+      end
+      field :start do
+        visible true
+      end
+      field :end do
+        visible true
+      end
     end
   end
 
@@ -111,9 +175,11 @@ RailsAdmin.config do |config|
       end
       field :owner do
         visible true
+        searchable true
       end
       field :human_readable_name do
         visible true
+        searchable true
       end
       field :directory_link do
         visible true
@@ -123,6 +189,7 @@ RailsAdmin.config do |config|
       end
       field :last_action_performed do
         visible true
+        searchable true
         pretty_value do
           %{#{value[:description]}}.html_safe
         end

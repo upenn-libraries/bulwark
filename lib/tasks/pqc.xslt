@@ -71,7 +71,7 @@
             <xsl:apply-templates select="normalized_call_number" />
           </sv:property>
           <sv:property sv:name="ns004:collection" sv:type="String" sv:multiple="false">
-            <xsl:apply-templates select="collection" />
+            <sv:value>Penn in Hand: Selected Manuscripts</sv:value>
           </sv:property>
           <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="identifier" />
@@ -85,6 +85,9 @@
           <sv:property sv:name="ns002:description" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="description" />
           </sv:property>
+          <sv:property sv:name="ns002:publisher" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="publisher" />
+          </sv:property>
           <sv:property sv:name="ns002:type" sv:type="String" sv:multiple="false">
             <sv:value>Manuscript</sv:value>
           </sv:property>
@@ -94,6 +97,10 @@
           <sv:property sv:name="ns002:date" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="date" />
           </sv:property>
+          <sv:property sv:name="ns002:format" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="format" />
+          </sv:property>
+
           <sv:property sv:name="ns004:personalName" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="personal_name" />
           </sv:property>
@@ -102,6 +109,9 @@
           </sv:property>
           <sv:property sv:name="ns004:geographicSubject" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="geographic_subject" />
+          </sv:property>
+          <sv:property sv:name="ns004:provenance" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="provenance" />
           </sv:property>
           <xsl:apply-templates select="pages/page" />
           </sv:node>
@@ -122,6 +132,10 @@
     </xsl:template>
 
     <xsl:template match="language">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="format">
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
 
@@ -154,6 +168,26 @@
     </xsl:template>
 
     <xsl:template match="description">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="publisher">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="provenance">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="personal_name">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="corporate_name">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="geographic_subject">
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
 

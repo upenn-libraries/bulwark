@@ -65,7 +65,6 @@ class MetadataBuilder < ActiveRecord::Base
     self.store_xml_preview
     self.last_xml_generated = DateTime.now
     self.save!
-    
   end
 
   def save_input_sources(working_path)
@@ -146,6 +145,8 @@ class MetadataBuilder < ActiveRecord::Base
       return 'bibliophilly'
     elsif self.metadata_source.any?{|ms| ms.source_type == 'kaplan'}
       return 'kaplan'
+    elsif self.metadata_source.any?{|ms| ms.source_type == 'pap'}
+      return 'pap'
     else
       return 'pqc'
     end
@@ -205,6 +206,21 @@ class MetadataBuilder < ActiveRecord::Base
     end
     self.xml_preview = content_tag(:ul, @file_links_html.html_safe) << sample_xml_docs.html_safe
     self.save!
+  end
+
+  def update_queue_status(queue_params)
+    queue_status = nil
+    if queue_params['remove_from_ingest_queue'].present?
+      queue_status = nil if queue_params['remove_from_ingest_queue'].to_i > 0
+      key = :remove_from_queue
+    end
+    if queue_params['queue_for_ingest'].present?
+      queue_status = 'ingest' if queue_params['queue_for_ingest'].to_i > 0
+      key = :review_complete
+    end
+    self.repo.queued = queue_status
+    self.repo.save!
+    return key
   end
 
   private
