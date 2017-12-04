@@ -34,10 +34,10 @@ module AutomatedWorkflows
         desc = MetadataSource.where(:metadata_builder => repo.metadata_builder, :path => desc_source).first_or_create
         desc.update_attributes( view_type: 'horizontal',
                                 num_objects: 1,
-                                x_start: 18,
-                                y_start: 1,
-                                x_stop: 44,
-                                y_stop: 1,
+                                x_start: 1,
+                                y_start: 2,
+                                x_stop: 34,
+                                y_stop: 2,
                                 root_element: 'record',
                                 source_type: 'kaplan',
                                 z: 1 )

@@ -17,7 +17,7 @@ module AutomatedWorkflows
 
 
       def initialize
-        @owner = ENV['KAPLAN_OWNER'] || AutomatedWorkflows.config['openn']['csv']['owner']
+        @owner = ENV['KAPLAN_OWNER'] || AutomatedWorkflows.config['kaplan']['csv']['owner']
         @description = ENV['KAPLAN_DESCRIPTION'] || AutomatedWorkflows.config['kaplan']['csv']['description']
         @initial_stop = ENV['KAPLAN_INITIAL_STOP'] || AutomatedWorkflows.config['kaplan']['csv']['initial_stop']
         @endpoint = ENV['KAPLAN_HARVESTING_ENDPOINT_REMOTE'] || ''

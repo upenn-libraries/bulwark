@@ -21,17 +21,19 @@ module AutomatedWorkflows
           preservation_filename = AutomatedWorkflows::Constants::DEFAULTS[repo_type][:preservation_filename]
 
           repo = Repo.where(:human_readable_name => human_readable_name).first_or_create do |param|
-            param.owner = owner,
-            param.description = description,
-            param.metadata_subdirectory = metadata_subdirectory,
-            param.assets_subdirectory = assets_subdirectory,
-            param.file_extensions = file_extensions,
-            param.metadata_source_extensions = metadata_source_extensions,
-            param.preservation_filename = preservation_filename,
-            param.last_external_update = last_external_update,
-            param.initial_stop = initial_stop
+            param.metadata_subdirectory = metadata_subdirectory
+            param.assets_subdirectory = assets_subdirectory
+            param.file_extensions = file_extensions
+            param.metadata_source_extensions = metadata_source_extensions
+            param.preservation_filename = preservation_filename
             param.unique_identifier = options[:unique_identifier] if options[:unique_identifier].present?
           end
+
+          repo.update_attributes(
+            owner: owner,
+            description: description,
+            last_external_update: last_external_update,
+            initial_stop: initial_stop)
           repo
           end
         end

@@ -376,8 +376,8 @@ class MetadataSource < ActiveRecord::Base
     self.view_type = 'horizontal'
     self.y_start = 1
     self.y_stop = 1
-    self.x_start = 18
-    self.x_stop = 44
+    self.x_start = 1
+    self.x_stop = 34
     structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'kaplan_structural'} ? MetadataSource.find(self.children.first) : initialize_kaplan_structural(self)
     sanitized = "#{working_path}/" unless working_path.ends_with?('/')
     full_path = "#{sanitized}#{self.path}"
@@ -438,14 +438,14 @@ class MetadataSource < ActiveRecord::Base
     (x_start..x_stop).each_with_index do |i, index|
       val = workbook[z][y_start+1][x_start+index].present? ? workbook[z][y_start+1][x_start+index].value : ''
       header = headers[i]
-      mappings[header] = val
+      mappings[header] = [] if mappings[header].nil?
+      split_multivalued(val).each { |v| mappings[header] << v if v.present? }
     end
 
     self.original_mappings = mappings
     mappings['collection'] = 'Arnold and Deanne Kaplan Collection of Americana'
     mappings = xml_sanitized(mappings)
     mappings = crosswalk_to_pqc(mappings, self.source_type)
-    mappings['title'] = mappings['description']  #Only needed while there is no explicit title field for this source type
     self.user_defined_mappings = mappings
   end
 
@@ -482,10 +482,17 @@ class MetadataSource < ActiveRecord::Base
     return pqc_mappings
   end
 
+  def split_multivalued(value)
+    return value.split('|')
+  end
+
   def xml_sanitized(mappings)
     sanitized = {}
     mappings.each do |key, value|
-      sanitized[key.to_s.valid_xml_tag] = value.to_s.valid_xml_text
+      value = [value] unless value.respond_to?(:each)
+      value.reject(&:empty?).each do |v|
+        sanitized[key.to_s.valid_xml_tag] = v.to_s.valid_xml_text
+      end
     end
     return sanitized
   end
@@ -517,9 +524,9 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def generate_kaplan_struct_md(mappings)
-    return {} unless mappings['tiff_locat'].present?
+    return {} unless mappings['filenames'].present?
     structural_mappings = {}
-    file_names = mappings['tiff_locat'].split(';').uniq.each{|x| x.strip!}
+    file_names = mappings['filenames'].split(';').uniq.each{|x| x.strip!}
     file_names.each_with_index do |file, i|
       side = ''
       if File.basename(file, ".*").ends_with?('r')
