@@ -70,7 +70,26 @@ module ApplicationHelper
     reading_direction = repo.images_to_render['iiif'].present? ? repo.images_to_render['iiif']['reading_direction'] : legacy_reading_direction(repo)
     return 'ltr' unless reading_direction.present?
     return 'ltr' if %w[left-to-right ltr].include?(reading_direction)
-    return 'rtl' if %w[right-to-left rtl].include?(reading_direction)
+  end
+
+  def render_reviewed_queue
+    a = ''
+    ids = Repo.where('queued' => 'ingest').pluck(:id, :human_readable_name)
+    a = 'Nothing approved waiting for batching' if ids.length == 0
+    ids.each do |id|
+      a << content_tag(:li,link_to(id[1], "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{id[0]}/ingest"))
+    end
+    return content_tag(:ul, a.html_safe)
+  end
+
+  def render_fedora_queue
+    a = ''
+    ids = Repo.where('queued' => 'fedora').pluck(:id, :human_readable_name)
+    a = 'Nothing in the queue' if ids.length == 0
+    ids.each do |id|
+      a << content_tag(:li,link_to(id[1], "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{id[0]}/ingest"))
+    end
+    return content_tag(:ul, a.html_safe)
   end
 
   def flash_class(level)

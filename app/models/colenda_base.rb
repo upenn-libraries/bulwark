@@ -12,6 +12,10 @@ class ColendaBase < ActiveFedora::Base
     index.as :stored_searchable, :facetable
   end
 
+  def self.af_models
+    %w[Manuscript PrintedWork]
+  end
+
   def mint_uuid
     yield
     self.mint_identifier

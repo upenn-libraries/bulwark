@@ -139,15 +139,25 @@ class MetadataSource < ActiveRecord::Base
           self.root_element = 'pages'
           self.parent_element = 'page'
           self.file_field = 'file_name'
-          self.user_defined_mappings = _set_voyager_structural_metadata(working_path)
+          self.user_defined_mappings = _set_marmite_structural_metadata(working_path)
           self.identifier = self.original_mappings['bibid']
         when 'voyager'
           self.root_element = MetadataSchema.config[:voyager][:root_element] || 'record'
-          self.user_defined_mappings = _set_voyager_data(working_path)
+          self.user_defined_mappings = _set_marmite_data(working_path)
           self.identifier = self.original_mappings['bibid']
         when 'bibliophilly'
           self.set_bibliophilly_data(working_path)
           self.identifier = self.original_mappings['Call Number/ID'].first
+        when 'pap'
+          self.root_element = MetadataSchema.config[:voyager][:root_element] || 'record'
+          self.user_defined_mappings = _set_marmite_data(working_path)
+          self.identifier = self.original_mappings['bibid']
+        when 'pap_structural'
+          self.root_element = 'pages'
+          self.parent_element = 'page'
+          self.file_field = 'file_name'
+          self.user_defined_mappings = _set_marmite_structural_metadata(working_path)
+          self.identifier = self.original_mappings['bibid']
       end
     end
     self.metadata_builder.repo.update_steps(:metadata_extracted)
@@ -170,7 +180,7 @@ class MetadataSource < ActiveRecord::Base
     self.generate_and_build_individual_xml(working_path)
     self.children.each do |child|
       source = MetadataSource.find(child)
-      source.generate_and_build_individual_xml(working_path, source.path) unless source.source_type == 'bibliophilly_structural'
+      source.generate_and_build_individual_xml(working_path, source.path) unless %w[bibliophilly_structural].include?(source.source_type)
     end
     self.generate_preservation_xml(working_path)
     self.generate_pqc_xml(working_path)
@@ -204,12 +214,12 @@ class MetadataSource < ActiveRecord::Base
       case self.source_type
         when 'custom'
           @xml_content_final_copy = xml_from_custom(working_path, fname)
-        when 'voyager'
+        when 'voyager', 'pap'
           @xml_content_final_copy = xml_from_voyager
-        when 'structural_bibid'
+        when 'structural_bibid', 'pap_structural'
           @xml_content_final_copy = xml_from_structural_bibid
         when 'bibliophilly'
-          @xml_content_final_copy = xml_from_bibliophilly
+          @xml_content_final_copy = xml_from_flat_mappings
       end
       $jettison_files.add(xml_fname)
       _fetch_write_save_preservation_xml(working_path, xml_fname, @xml_content_final_copy)
@@ -217,7 +227,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def generate_preservation_xml(working_path)
-    if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'bibliophilly'
+    if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'bibliophilly' && self.source_type != 'kaplan'
       @xml_content_final = parent_id.present? ? MetadataSource.find(parent_id).generate_parent_child_xml(working_path) : self.generate_parent_child_xml(working_path)
     else
       file = File.new(_reconcile_working_path_slashes(working_path, "#{self.path}.xml"))
@@ -282,7 +292,7 @@ class MetadataSource < ActiveRecord::Base
     wrapped_content
   end
 
-  def xml_from_bibliophilly
+  def xml_from_flat_mappings
     parent_content = ''
     child_content = ''
     self.user_defined_mappings.each do |mapping|
@@ -434,7 +444,7 @@ class MetadataSource < ActiveRecord::Base
     case self.source_type
       when 'custom'
         self.original_mappings['file_name'].present? ? self.original_mappings['file_name'].first : nil
-      when 'structural_bibid', 'bibliophilly_structural'
+      when 'structural_bibid', 'bibliophilly_structural', 'pap_structural'
         pages_with_files = []
         self.user_defined_mappings.select {|key, map| pages_with_files << map if map['file_name'].present?}
         pages_with_files.present? ? pages_with_files.sort_by.first {|p| p['serial_num']}['file_name'] : nil
@@ -449,7 +459,7 @@ class MetadataSource < ActiveRecord::Base
           orig = value if key == self.file_field
         end
         return orig
-      when 'structural_bibid', 'bibliophilly_structural'
+      when 'structural_bibid', 'bibliophilly_structural', 'pap_structural'
         filenames = []
         self.user_defined_mappings.each do |key, value|
           filenames << value[self.file_field] if value[self.file_field].present?
@@ -461,7 +471,11 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def self.structural_types
-    %w[custom structural_bibid bibliophilly_structural]
+    %w[custom structural_bibid bibliophilly_structural pap_structural]
+  end
+
+  def validate_bib_id(bib_id)
+    return bib_id.to_s.length <= 7 ? "99#{bib_id}3503681" : bib_id.to_s
   end
 
   private
@@ -469,13 +483,13 @@ class MetadataSource < ActiveRecord::Base
   def _set_voyager_data(working_path)
     _refresh_bibid(working_path)
     mapped_values = {}
-    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}"
+    voyager_source = reconcile_metadata_lookup_source(self.source_type, validate_bib_id(self.original_mappings['bibid']))
     data = Nokogiri::XML(open(voyager_source))
     nodeset = data.xpath('//page/response/result/doc/xml[@name="marcrecord"]').children.first
     nodeset.children.each do |child|
       if child.name == 'datafield' && CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value].present?
         if CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value]['*'].present?
-          header = _fetch_header_from_voyager(child)
+          header = _fetch_header_from_marc21(child)
           mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
           child.children.each do |c|
             mapped_values["#{header}"] << c.text
@@ -483,7 +497,7 @@ class MetadataSource < ActiveRecord::Base
         else
           child.children.each do |c|
             if c.name == 'subfield'
-              header = _fetch_header_from_subfield_voyager(child.attributes['tag'].value, c)
+              header = _fetch_header_from_subfield_catalog(child.attributes['tag'].value, c)
               if header.present?
                 mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
                 c.children.each do |s|
@@ -495,16 +509,16 @@ class MetadataSource < ActiveRecord::Base
         end
       end
     end
-    mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{self.original_mappings['bibid']}"] unless mapped_values.keys.include?('identifier')
-    mapped_values['collection'] = [_get_voyager_collection(self.original_mappings['bibid'])]
+    mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{validate_bib_id(self.original_mappings['bibid'])}"] unless mapped_values.keys.include?('identifier')
+    mapped_values['collection'] = [_get_catalog_collection(self.source_type, self.original_mappings['bibid'])]
     mapped_values.each do |entry|
       mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
     end
-    mapped_values = _voyager_cleanup(mapped_values)
+    mapped_values = _catalog_xml_cleanup(mapped_values)
     mapped_values
   end
 
-  def _voyager_cleanup(mappings)
+  def _catalog_xml_cleanup(mappings)
     mappings.each do |key, value|
       value = [value] unless value.respond_to?(:each)
       value.each{|v| v.strip!}
@@ -513,21 +527,27 @@ class MetadataSource < ActiveRecord::Base
     end
   end
 
-  def _get_voyager_collection(bib_id)
-    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}/#{bib_id}"
+  def _get_catalog_collection(source_type, bib_id)
+    voyager_source = reconcile_metadata_lookup_source(source_type, bib_id)
     data = Nokogiri::XML(open(voyager_source))
     data.remove_namespaces!
     collection_name = data.xpath('//page/collection/name').children.first.text
     return collection_name
   end
 
+  def reconcile_metadata_lookup_source(source_type, bib_id)
+    return nil unless source_type.present?
+    return "#{MetadataSchema.config[:pap][:http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:http_lookup_suffix]}" if %w[voyager pap].include?(source_type)
+    return "#{MetadataSchema.config[:pap][:structural_http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:structural_lookup_suffix]}" if %w[structural_bibid pap_structural].include?(source_type)
+  end
+
   #TODO: Refactor to use config variables
   def _set_voyager_structural_metadata(working_path)
     mapped_values = {}
     _refresh_bibid(working_path)
-    voyager_source = "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}"
+    voyager_source = reconcile_metadata_lookup_source(self.source_type, validate_bib_id(self.original_mappings['bibid']))
     data = Nokogiri::XML(open(voyager_source))
-    reading_direction = _get_reading_direction(voyager_source)
+    reading_direction = _get_catalog_reading_direction(voyager_source)
     data.xpath('//xml/page').each_with_index do |page, index|
       mapped_values[index+1] = {
           'page_number' => page['number'],
@@ -544,6 +564,105 @@ class MetadataSource < ActiveRecord::Base
     mapped_values
   end
 
+  def _set_marmite_data(working_path)
+    _refresh_bibid(working_path)
+    mapped_values = {}
+    catalog_source = reconcile_metadata_lookup_source(self.source_type, self.original_mappings['bibid'])
+    data = Nokogiri::XML(open(catalog_source))
+    data.remove_namespaces!
+    nodeset = data.xpath('//records/record').children
+    nodeset.each do |child|
+      if child.name == 'datafield' && CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value].present?
+        if CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value]['*'].present?
+          if CustomEncodings::Marc21::Constants::ROLLUP_FIELDS[child.attributes['tag'].value].present?
+            rollup_values = []
+            header = _fetch_header_from_marc21(child)
+            mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
+            child.children.each do |c|
+              rollup_values << c.text unless c.text.strip.empty?
+            end
+            mapped_values["#{header}"] << rollup_values.join(CustomEncodings::Marc21::Constants::ROLLUP_FIELDS[child.attributes['tag'].value]['separator']) if rollup_values.present?
+          else
+            header = _fetch_header_from_marc21(child)
+            mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
+            child.children.each do |c|
+              mapped_values["#{header}"] << c.text
+            end
+          end
+        else
+
+          if CustomEncodings::Marc21::Constants::ROLLUP_FIELDS[child.attributes['tag'].value].present?
+            rollup_values = []
+            header = ''
+            child.children.each do |c|
+              if c.name == 'subfield'
+                header = _fetch_header_from_subfield_catalog(child.attributes['tag'].value, c)
+                if header.present?
+                  mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
+                  c.children.each do |s|
+                    rollup_values << s.text unless s.text.strip.empty?
+                  end
+                end
+              end
+            end
+            mapped_values["#{header}"] << rollup_values.join(CustomEncodings::Marc21::Constants::ROLLUP_FIELDS[child.attributes['tag'].value]['separator']) if rollup_values.present?
+          else
+            child.children.each do |c|
+              if c.name == 'subfield'
+                header = _fetch_header_from_subfield_catalog(child.attributes['tag'].value, c)
+                if header.present?
+                  mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
+                  c.children.each do |s|
+                    mapped_values["#{header}"] << s.text
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+    mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{self.original_mappings['bibid']}"] unless mapped_values.keys.include?('identifier')
+    mapped_values['display_call_number'] = [_marmite_call_number(nodeset)]
+    mapped_values.each do |entry|
+      mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
+    end
+    mapped_values = _catalog_xml_cleanup(mapped_values)
+    mapped_values
+  end
+
+  def _set_marmite_structural_metadata(working_path)
+    mapped_values = {}
+    _refresh_bibid(working_path)
+
+    catalog_source = reconcile_metadata_lookup_source(self.source_type, self.original_mappings['bibid'])
+    data = Nokogiri::XML(open(catalog_source))
+    data.remove_namespaces!
+    reading_direction = _get_marmite_reading_direction(catalog_source)
+    data.xpath('//record/pages/page').each_with_index do |page, index|
+      mapped_values[index+1] = {
+          'page_number' => page['number'],
+          'sequence' => page['seq'],
+          'reading_direction' => reading_direction,
+          'side' => page['side'],
+          'tocentry' => _get_tocentry(page),
+          'identifier' => page['id'],
+          'file_name' => "#{page['image']}.tif",
+          'description' => page['visiblepage']
+
+      }
+    end
+    mapped_values
+  end
+
+  def _marmite_call_number(nodeset)
+    call_numbers = []
+    nodeset.xpath('//holdings/holding/call_number').each do |holding|
+      call_numbers << holding.text if holding.text.present?
+    end
+    return call_numbers
+  end
+
   def _get_tocentry(page)
     return {} unless page.children.present?
     tocentry = {}
@@ -554,11 +673,24 @@ class MetadataSource < ActiveRecord::Base
     return tocentry
   end
 
-  def _get_reading_direction(xml_document)
+  def _get_catalog_reading_direction(xml_document)
     reading_direction = 'left-to-right'
     doc = Nokogiri::XML(open(xml_document))
     doc.remove_namespaces!
     doc_s = doc.xpath('//xml/record/datafield[@tag="996"]')
+    if doc_s.present? && doc_s.length == 1
+      d = doc_s.first
+      element = _sanitize_elements(d).first
+      reading_direction = 'right-to-left' if element.children.first.text == 'hinge-right'
+    end
+    return reading_direction
+  end
+
+  def _get_marmite_reading_direction(xml_document)
+    reading_direction = 'left-to-right'
+    doc = Nokogiri::XML(open(xml_document))
+    doc.remove_namespaces!
+    doc_s = doc.xpath('//records/record/datafield[@tag="996"]')
     if doc_s.present? && doc_s.length == 1
       d = doc_s.first
       element = _sanitize_elements(d).first
@@ -576,26 +708,31 @@ class MetadataSource < ActiveRecord::Base
     self.metadata_builder.repo.version_control_agent.get({:location => full_path}, working_path)
     worksheet = RubyXL::Parser.parse(full_path)
     case self.source_type
-      when 'voyager'
+      when 'voyager', 'pap'
         page = 0
         x = 0
         y = 1
-      when 'structural_bibid'
+      when 'structural_bibid', 'pap_structural'
         page = 0
         x = 0
         y = 0
       else
         raise I18n.t('colenda.errors.metadata_sources.illegal_source_type')
     end
-    self.original_mappings = {'bibid' => worksheet[page][y][x].value}
+    bib_id = _legacy_bib_id_check(worksheet[page][y][x].value)
+    self.original_mappings = {'bibid' => bib_id}
   end
 
-  def _fetch_header_from_voyager(voyager_field)
-    CustomEncodings::Marc21::Constants::TAGS[voyager_field.attributes['tag'].value]['*']
+  def _legacy_bib_id_check(bib_to_check)
+    return bib_to_check.to_s.start_with?("99") && bib_to_check.to_s.end_with?("3503681") ? bib_to_check : "99#{bib_to_check}3503681"
   end
 
-  def _fetch_header_from_subfield_voyager(tag_value, voyager_child_field)
-    CustomEncodings::Marc21::Constants::TAGS[tag_value][voyager_child_field.attributes['code'].value]
+  def _fetch_header_from_marc21(marc_field)
+    CustomEncodings::Marc21::Constants::TAGS[marc_field.attributes['tag'].value]['*']
+  end
+
+  def _fetch_header_from_subfield_catalog(tag_value, marc_subfield)
+    CustomEncodings::Marc21::Constants::TAGS[tag_value][marc_subfield.attributes['code'].value]
   end
 
   def _convert_metadata(working_path)
@@ -775,7 +912,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def self.source_types
-    source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.catalog_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.bibliophilly'), 'bibliophilly'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
+    source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.catalog_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.pap_structural'), 'pap_structural'], [I18n.t('colenda.metadata_sources.describe.source_type.list.bibliophilly'), 'bibliophilly'], [I18n.t('colenda.metadata_sources.describe.source_type.list.pap'), 'pap'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
   end
 
   def self.settings_fields

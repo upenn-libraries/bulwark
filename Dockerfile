@@ -1,4 +1,4 @@
-FROM codeforkjeff/passenger-ruby23:0.9.19-ruby-build
+FROM pennlib/passenger-ruby23:0.9.23-ruby-build
 
 MAINTAINER Katherine Lynch <katherly@upenn.edu>
 
@@ -52,6 +52,8 @@ RUN mkdir -p /fs/priv
 RUN mkdir -p /fs/priv/workspace
 
 RUN mkdir -p /fs/automate
+
+RUN mkdir -p /fs/automate_pap
 
 RUN mkdir -p /home/app/webapp/string_exts
 
