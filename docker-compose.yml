@@ -40,6 +40,7 @@ services:
       - 'web:/home/app/webapp'
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
+      - '${PAP_HARVESTING_ENDPOINT_LOCAL}:${PAP_HARVESTING_ENDPOINT_REMOTE}'
       - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
   sidekiq:
     restart: 'unless-stopped'

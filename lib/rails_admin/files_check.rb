@@ -17,7 +17,7 @@ module RailsAdmin
         end
 
         register_instance_option :link_icon do
-          'fa fa-check-circle-o'
+          'fa fa-object-ungroup'
         end
 
         register_instance_option :http_methods do

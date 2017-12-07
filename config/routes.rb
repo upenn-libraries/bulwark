@@ -12,10 +12,17 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :batches do
+    member do
+      post :batch_new
+    end
+  end
+
   resources :metadata_builders do
     member do
       post :update
-      post :ingest
+      post :queue_for_ingest
+      post :remove_from_queue
       post :preserve
       post :set_source
       post :clear_files

@@ -42,6 +42,15 @@ en:
         metadata_extraction:
           subject: 'Metadata Extraction completed'
           body: 'Metadata extraction complete for %{uuid}.  Review at: %{root_url}admin_repo/repo/%{link_fragment}/generate_metadata'
+        batch_created:
+          subject: 'Batch ready for Fedora'
+          body: 'Batch %{uuid} ready for Fedora, queue list: %{queue_list}.'
+        batch_removed:
+          subject: 'Batch removed from queue for Fedora'
+          body: 'Batch %{uuid} removed from queue for Fedora, queue list: %{queue_list}.'
+        batch_processed:
+          subject: 'Batch processed into Fedora'
+          body: 'Batch %{uuid} processed in Fedora.  See report for %{queue_list} - %{report_blob}'
     validators:
       xml_tags:
         starts_with_xml: 'Invalid tag "%{value}" specified for "%{key}" - valid XML tags cannot start with %{xml}'
@@ -92,9 +101,12 @@ en:
           first_time: 'Save source types'
           additional_times: 'Update source types'
         files_checked: 'Check for missing or invalid files'
+        queued_for_ingest:
+          first_time: 'Approve and add to ingest queue'
+          additional_times: 'Re-approve and re-add to ingest queue'
         publish_preview:
           first_time: 'Publish preview'
-          additional_times: 'Republish preview'
+          additional_times: 'Re-publish preview'
     repos:
       create_remote_link_text: 'Create Remote'
       preservation_xml_link_text: 'Create Preservation XML'
@@ -114,6 +126,22 @@ en:
             heading: 'Admin Actions'
           status:
             heading: 'Review Status'
+          queued:
+            heading: 'Review for Ingestion'
+            fieldset: 'Add to queue?'
+            label: 'Add %{name} to ingest queue'
+          in_queue:
+            heading: 'Object Queued for Ingest'
+            fieldset: '%{uuid} is queued but has not yet begun ingestion.  Remove from queue?'
+            label: 'Remove %{name} from ingest queue'
+            submit: 'Remove now'
+          processing:
+            heading: 'Object in batch to Fedora'
+            message: 'You will receive an email when the batch is complete.'
+          process_batch:
+            heading: 'Sign Off on this Batch'
+            label: 'The objects listed below are ready for processing in Fedora.  Once begun, this processing job must complete before new representations can be added to Fedora.'
+            submit: 'Submit'
           problem_files:
             heading: 'File Issues Detected for %{human_readable_name}'
             li: 'Filename: %{filename} - %{problem}'
@@ -178,6 +206,12 @@ en:
           field_separator: ':'
         bibliophilly_structural:
           heading: 'Sample structural metadata fetched from Page 2 of BiblioPhilly spreadsheet'
+          field_separator: ':'
+        pap:
+          heading: 'Descriptive metadata fetched from Catalog Lookup'
+          field_separator: ':'
+        pap_structural:
+          heading: 'Sample of structural metadata fetched from Catalog Lookup'
           field_separator: ':'
         custom:
           field:
