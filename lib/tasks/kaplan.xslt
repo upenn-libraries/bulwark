@@ -64,8 +64,14 @@
           <sv:property sv:name="ns004:uniqueIdentifier" sv:type="String" sv:multiple="false">
             <sv:value><xsl:value-of select="$uuid" /></sv:value>
           </sv:property>
+          <sv:property sv:name="ns004:displayCallNumber" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="call_number" />
+          </sv:property>
           <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="identifier" />
+          </sv:property>
+          <sv:property sv:name="ns002:rights" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="rights" />
           </sv:property>
           <sv:property sv:name="ns002:language" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="language" />
@@ -144,6 +150,14 @@
     </xsl:template>
 
     <xsl:template match="description">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="call_number">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="rights">
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
 
