@@ -487,11 +487,11 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def xml_sanitized(mappings)
-    sanitized = {}
+    sanitized = Hash.new{|k, v| k[v] = []}
     mappings.each do |key, value|
       value = [value] unless value.respond_to?(:each)
       value.reject(&:empty?).each do |v|
-        sanitized[key.to_s.valid_xml_tag] = v.to_s.valid_xml_text
+        sanitized[key.to_s.valid_xml_tag] << v.to_s.valid_xml_text
       end
     end
     return sanitized
@@ -526,7 +526,7 @@ class MetadataSource < ActiveRecord::Base
   def generate_kaplan_struct_md(mappings)
     return {} unless mappings['filenames'].present?
     structural_mappings = {}
-    file_names = mappings['filenames'].split(';').uniq.each{|x| x.strip!}
+    file_names = mappings['filenames'].first.split(';').uniq.each{|x| x.strip!}
     file_names.each_with_index do |file, i|
       side = ''
       if File.basename(file, ".*").ends_with?('r')
