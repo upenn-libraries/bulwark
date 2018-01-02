@@ -81,6 +81,7 @@ class CatalogController < ApplicationController
     #   The ordering of the field names is the order of the display
 
     # PQC
+    config.add_index_field solr_name('title', :stored_searchable, type: :string), :label => 'Title', helper_method: 'html_entity'
     config.add_index_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject', helper_method: 'html_entity'
     config.add_index_field solr_name('description', :stored_searchable, type: :string), :label => 'Description', helper_method: 'html_entity'
     config.add_index_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name', helper_method: 'html_entity'
@@ -101,7 +102,7 @@ class CatalogController < ApplicationController
     #   The ordering of the field names is the order of the display
 
     # PQC
-    config.add_show_field solr_name('title', :stored_searchable, type: :string), :label => 'Title'
+    config.add_show_field solr_name('title', :stored_searchable, type: :string), :label => 'Title', helper_method: 'html_entity'
     config.add_show_field solr_name('abstract', :stored_searchable, type: :string), :label => 'Abstract'
     config.add_show_field solr_name('contributor', :stored_searchable, type: :string), :label => 'Contributor'
     config.add_show_field solr_name('coverage', :stored_searchable, type: :string), :label => 'Coverage'

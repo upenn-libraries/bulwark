@@ -50,46 +50,37 @@ module Utils
 
     def attach_files(oid = @oid, repo, working_path)
       repo.images_to_render = {}
-      children = []
-      parent = Finder.fedora_find(oid)
-      object_uri = ActiveFedora::Base.id_to_uri(oid)
-      children_uris = ActiveFedora::Base.descendant_uris(object_uri)
-      children_uris.delete_if { |c| c == object_uri }
-      children_uris.each do |child_uri|
-        child = Finder.fedora_find(ActiveFedora::Base.uri_to_id(child_uri))
-        next unless child.present?
-        children << child
-        if child.file_name.present?
-          width, height = attach_file(repo, working_path, child, child.file_name, 'imageFile')
-          parent.members << child
-          file_print = child.imageFile.uri
-          repo.images_to_render[file_print.to_s.html_safe] = {'width' => width, 'height' => height}
+      source_file =  "#{working_path}/#{repo.metadata_subdirectory}/#{repo.preservation_filename}"
+      source_blob = File.read(source_file)
+      reader = Nokogiri::XML(source_blob) do |config|
+        config.options = Nokogiri::XML::ParseOptions::NOBLANKS
+      end
+      pages = reader.xpath('//pages/page')
+      pages.each do |page|
+        serialized_attributes = {}
+        key_child = page.children.select{|x| x.name == 'file_name'}.last
+        file_key = key_child.children.first.text
+        file_link = "#{working_path}/#{repo.assets_subdirectory}/#{file_key}"
+
+        repo.version_control_agent.get({:location => file_link}, working_path)
+        repo.version_control_agent.unlock({:content => file_link}, working_path)
+        validation_state = validate_file(file_link)
+        if validation_state.nil?
+          derivative_link = "#{working_path}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
+          file_print = attachable_url(repo, working_path, derivative_link)
+          page.children.each do |p|
+            serialized_attributes[p.name] = p.children.first.present? ? p.children.first.text : ''
+          end
+          width, height = FastImage.size(file_print)
+          dimensions = { 'width' => width, 'height' => height }
+          serialized_attributes.merge!(dimensions)
+          repo.images_to_render[file_print.to_s.html_safe] = serialized_attributes
+        else
+          repo.images_to_render[file_print.to_s.html_safe] = {}
+          repo.log_problem_file(file_link.gsub(working_path,''), validation_state)
         end
       end
-
-      children_sorted = children.sort_by! { |c| c.page_number }
-      children_sorted.each do |child_sorted|
-        file_print = child_sorted.imageFile.uri
-        repo.images_to_render[file_print.to_s.html_safe] = repo.images_to_render[file_print.to_s.html_safe].present? ? repo.images_to_render[file_print.to_s.html_safe].merge(child_sorted.serialized_attributes) : {}
-      end
-      parent.save
-    end
-
-    def attach_file(repo, working_path, parent, file_name, child_container = 'child')
-      file_link = "#{working_path}/#{repo.assets_subdirectory}/#{file_name}"
-      repo.version_control_agent.get({:location => file_link}, working_path)
-      repo.version_control_agent.unlock({:content => file_link}, working_path)
-      validation_state = validate_file(file_link)
-      if validation_state.nil?
-        derivative_link = "#{working_path}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
-        file_url = attachable_url(repo, working_path, derivative_link)
-        execute_curl(_build_command('file_attach', :file => file_url, :fid => parent.id, :child_container => child_container))
-        return FastImage.size(derivative_link)
-      else
-        @@status_type = :warning
-        repo.log_problem_file(file_link.gsub(working_path,''), validation_state)
-        return nil
-      end
+      repo.save!
     end
 
     def generate_thumbnail(repo, working_path)
