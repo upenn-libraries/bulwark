@@ -113,7 +113,6 @@
           <sv:property sv:name="ns004:provenance" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="provenance" />
           </sv:property>
-          <xsl:apply-templates select="pages/page" />
           </sv:node>
         </exsl:document>
       </xsl:copy>

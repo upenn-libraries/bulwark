@@ -148,10 +148,10 @@ class Repo < ActiveRecord::Base
       Utils::Process.generate_thumbnail(self, working_path) if self.thumbnail.present?
       self.package_metadata_info(working_path)
       self.generate_logs(working_path)
-      self.version_control_agent.add({:content => "#{working_path}/#{self.derivatives_subdirectory}"}, working_path)
       self.version_control_agent.add({:content => "#{working_path}/#{self.admin_subdirectory}"}, working_path)
-      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives'), working_path)
-      self.version_control_agent.push(working_path)
+      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'), working_path)
+      self.version_control_agent.lock(working_path)
+      self.version_control_agent.push({:content => "#{working_path}/#{self.admin_subdirectory}"}, working_path)
       self.metadata_builder.last_file_checks = DateTime.now
       self.metadata_builder.save!
     rescue => exception

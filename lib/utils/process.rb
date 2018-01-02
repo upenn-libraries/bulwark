@@ -22,19 +22,9 @@ module Utils
       delete_duplicate(af_object) if af_object.present?
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
       FileUtils.rm(file)
-      repo.problem_files = {}
-      repo.version_control_agent.get(working_path)
-      repo.version_control_agent.unlock({:content => '.'}, working_path)
       attach_files(@oid, repo, working_path)
       update_index(@oid)
       repo.save!
-      jhove = characterize_files(working_path, repo)
-      repo.version_control_agent.add({:content => "#{repo.metadata_subdirectory}/#{jhove.filename}"}, working_path)
-      repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_preservation_metadata', :object_id => repo.names.fedora), working_path)
-      repo.version_control_agent.add({:content => repo.derivatives_subdirectory}, working_path)
-      repo.lock_keep_files(working_path)
-      repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives', :object_id => repo.names.fedora), working_path)
-      repo.version_control_agent.push(working_path)
       @@status_type = :success
       @@status_message = I18n.t('colenda.utils.process.success.ingest_complete')
       Repo.update(repo.id, :ingested => true, :queued => false)
@@ -60,25 +50,18 @@ module Utils
         serialized_attributes = {}
         key_child = page.children.select{|x| x.name == 'file_name'}.last
         file_key = key_child.children.first.text
-        file_link = "#{working_path}/#{repo.assets_subdirectory}/#{file_key}"
 
-        repo.version_control_agent.get({:location => file_link}, working_path)
-        repo.version_control_agent.unlock({:content => file_link}, working_path)
-        validation_state = validate_file(file_link)
-        if validation_state.nil?
-          derivative_link = "#{working_path}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Access.generate_copy(file_link, @@derivatives_working_destination)}"
-          file_print = attachable_url(repo, working_path, derivative_link)
-          page.children.each do |p|
-            serialized_attributes[p.name] = p.children.first.present? ? p.children.first.text : ''
-          end
-          width, height = FastImage.size(file_print)
-          dimensions = { 'width' => width, 'height' => height }
-          serialized_attributes.merge!(dimensions)
-          repo.images_to_render[file_print.to_s.html_safe] = serialized_attributes
-        else
-          repo.images_to_render[file_print.to_s.html_safe] = {}
-          repo.log_problem_file(file_link.gsub(working_path,''), validation_state)
+        k = repo.file_display_attributes.select{|k, v| v[:file_name].end_with?("#{file_key}.jpeg")}.first
+        file_print = read_storage_link(k.first, repo)
+
+        page.children.each do |p|
+          serialized_attributes[p.name] = p.children.first.present? ? p.children.first.text : ''
         end
+        width, height = FastImage.size(file_print)
+        dimensions = { 'width' => width, 'height' => height }
+        serialized_attributes.merge!(dimensions)
+        repo.images_to_render[file_print.to_s.html_safe] = serialized_attributes
+
       end
       repo.save!
     end

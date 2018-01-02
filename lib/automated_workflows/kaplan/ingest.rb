@@ -6,7 +6,6 @@ module AutomatedWorkflows
         preservation = "#{repo.metadata_subdirectory}/#{repo.preservation_filename}"
         params = { preservation => preservation }
         repo.metadata_builder.ingest(working_path,params)
-        Utils::Process.refresh_assets(working_path, repo)
       end
 
     end

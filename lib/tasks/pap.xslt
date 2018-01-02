@@ -112,7 +112,6 @@
           <sv:property sv:name="ns004:provenance" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="provenance" />
           </sv:property>
-          <xsl:apply-templates select="pages/page" />
         </sv:node>
       </exsl:document>
     </xsl:copy>
@@ -174,70 +173,12 @@
     <sv:value><xsl:apply-templates /></sv:value>
   </xsl:template>
 
-  <xsl:template match="file_list/file">
-    <sv:value><xsl:apply-templates /></sv:value>
-  </xsl:template>
-
   <xsl:template match="title">
     <sv:value><xsl:apply-templates /></sv:value>
   </xsl:template>
 
   <xsl:template match="date">
     <sv:value><xsl:apply-templates /></sv:value>
-  </xsl:template>
-
-  <xsl:template match="pages/page">
-    <sv:node>
-      <xsl:attribute name="sv:name">
-        <xsl:value-of select="format-number(page_number, '00000')" />
-      </xsl:attribute>
-      <sv:property sv:name="jcr:primaryType" sv:type="Name">
-        <sv:value>nt:folder</sv:value>
-      </sv:property>
-      <sv:property sv:name="jcr:mixinTypes" sv:type="Name" sv:multiple="false">
-        <sv:value>fedora:Container</sv:value>
-        <sv:value>fedora:Resource</sv:value>
-      </sv:property>
-      <sv:property sv:name="jcr:lastModifiedBy" sv:type="String">
-        <sv:value>bypassAdmin</sv:value>
-      </sv:property>
-      <sv:property sv:name="ns001:hasModel" sv:type="String" sv:multiple="false">
-        <sv:value>Image</sv:value>
-      </sv:property>
-      <sv:property sv:name="jcr:createdBy" sv:type="String">
-        <sv:value>bypassAdmin</sv:value>
-      </sv:property>
-      <sv:property sv:name="ns004:uniqueIdentifier" sv:type="String" sv:multiple="false">
-        <sv:value><xsl:value-of select="concat($uuid, '/', format-number(page_number, '00000'))" /></sv:value>
-      </sv:property>
-      <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="false">
-        <sv:value><xsl:value-of select="identifier" /></sv:value>
-      </sv:property>
-      <sv:property sv:name="ns004:fileName" sv:type="String" sv:multiple="false">
-        <sv:value><xsl:value-of select="file_name" /></sv:value>
-      </sv:property>
-      <sv:property sv:name="ns004:pageNumber" sv:type="Long" sv:multiple="false">
-        <sv:value><xsl:value-of select="page_number" /></sv:value>
-      </sv:property>
-      <sv:property sv:name="ns004:sequence" sv:type="Long" sv:multiple="false">
-        <sv:value><xsl:value-of select="sequence" /></sv:value>
-      </sv:property>
-      <sv:property sv:name="ns004:readingDirection" sv:type="String" sv:multiple="false">
-        <sv:value><xsl:value-of select="reading_direction" /></sv:value>
-      </sv:property>
-      <sv:property sv:name="ns004:side" sv:type="String" sv:multiple="false">
-        <sv:value><xsl:value-of select="side" /></sv:value>
-      </sv:property>
-      <sv:property sv:name="ns004:tocEntry" sv:type="String" sv:multiple="false">
-        <sv:value><xsl:value-of select="toc_entry" /></sv:value>
-      </sv:property>
-      <sv:property sv:name="ns004:pageText" sv:type="String" sv:multiple="false">
-        <sv:value><xsl:value-of select="ocr_text" /></sv:value>
-      </sv:property>
-      <sv:property sv:name="ns002:type" sv:type="String" sv:multiple="false">
-        <sv:value>Page</sv:value>
-      </sv:property>
-    </sv:node>
   </xsl:template>
 
 </xsl:stylesheet>
