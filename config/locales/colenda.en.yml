@@ -248,6 +248,7 @@ en:
         write_preservation_xml: 'Generated unified XML'
         write_xlsx_from_csv: 'Generated XSLX from CSV'
         generated_previews: 'Generated previews'
+        generated_thumbnail: 'Generated thumbnail'
         ingest_complete: 'Ingest complete'
         automated:
           added_metadata: 'Added metadata through automated workflow'

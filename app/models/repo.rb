@@ -145,7 +145,14 @@ class Repo < ActiveRecord::Base
       @status = Utils::Process.import(file, self, working_path)
       self.thumbnail = default_thumbnail
       self.save!
-      Utils::Process.generate_thumbnail(self, working_path) if self.thumbnail.present?
+      if self.thumbnail.present?
+        thumbnail_path = "#{self.assets_subdirectory}/#{self.thumbnail}"
+        self.version_control_agent.get({:location => "#{working_path}/#{thumbnail_path}"}, working_path)
+        self.version_control_agent.unlock({:content => "#{working_path}/#{thumbnail_path}"}, working_path)
+        self.version_control_agent.add({:content => "#{working_path}/#{thumbnail_path}"}, working_path)
+        self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_previews'), working_path)
+        Utils::Process.generate_thumbnail(self, working_path)
+      end
       self.package_metadata_info(working_path)
       self.generate_logs(working_path)
       self.version_control_agent.add({:content => "#{working_path}/#{self.admin_subdirectory}"}, working_path)
