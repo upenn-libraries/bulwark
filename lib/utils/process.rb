@@ -23,6 +23,7 @@ module Utils
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
       FileUtils.rm(file)
       attach_files(@oid, repo, working_path)
+      af_object.save
       update_index(@oid)
       repo.save!
       @@status_type = :success
