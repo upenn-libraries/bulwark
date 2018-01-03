@@ -23,7 +23,6 @@ module Utils
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
       FileUtils.rm(file)
       attach_files(@oid, repo, working_path)
-      af_object.save
       update_index(@oid)
       repo.save!
       @@status_type = :success
@@ -41,6 +40,7 @@ module Utils
 
     def attach_files(oid = @oid, repo, working_path)
       repo.images_to_render = {}
+      af_object = Finder.fedora_find(@oid)
       source_file =  "#{working_path}/#{repo.metadata_subdirectory}/#{repo.preservation_filename}"
       source_blob = File.read(source_file)
       reader = Nokogiri::XML(source_blob) do |config|
@@ -62,8 +62,8 @@ module Utils
         dimensions = { 'width' => width, 'height' => height }
         serialized_attributes.merge!(dimensions)
         repo.images_to_render[file_print.to_s.html_safe] = serialized_attributes
-
       end
+      af_object.save
       repo.save!
     end
 
