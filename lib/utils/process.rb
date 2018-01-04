@@ -53,6 +53,7 @@ module Utils
         file_key = key_child.children.first.text
 
         k = repo.file_display_attributes.select{|k, v| v[:file_name].end_with?("#{file_key}.jpeg")}.first
+        next if k.nil?
         file_print = read_storage_link(k.first, repo)
 
         page.children.each do |p|
