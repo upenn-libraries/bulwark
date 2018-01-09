@@ -176,6 +176,7 @@ class Repo < ActiveRecord::Base
   end
 
   def package_metadata_info(working_path)
+    self.version_control_agent.get({:location => self.admin_subdirectory}, working_path)
     self.version_control_agent.unlock({:content => self.admin_subdirectory}, working_path)
     File.open("#{working_path}/#{self.admin_subdirectory}/#{self.names.directory}", 'w+') do |f|
       self.metadata_builder.metadata_source.each do |source|
