@@ -21,6 +21,7 @@ module Utils
       af_object = Finder.fedora_find(@oid)
       delete_duplicate(af_object) if af_object.present?
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
+      delete_members(@oid)
       FileUtils.rm(file)
       attach_files(@oid, repo, working_path)
       update_index(@oid)
@@ -36,6 +37,12 @@ module Utils
       execute_curl(_build_command('delete', :object_uri => af_object.translate_id_to_uri.call(object_id)))
       execute_curl(_build_command('delete_tombstone', :object_uri => af_object.translate_id_to_uri.call(object_id)))
       clear_af_cache(object_id)
+    end
+
+    def delete_members(object_id)
+      members_id = ActiveFedora::Base.id_to_uri("#{object_id}/members")
+      execute_curl(_build_command('delete', :object_uri => members_id))
+      execute_curl(_build_command('delete_tombstone', :object_uri => members_id))
     end
 
     def attach_files(oid = @oid, repo, working_path)
