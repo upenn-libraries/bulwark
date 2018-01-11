@@ -103,6 +103,52 @@
           <sv:property sv:name="ns004:collection" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="collection" />
           </sv:property>
+            <sv:node xmlns:premis="http://www.loc.gov/premis/rdf/v1#" xmlns:image="http://www.modeshape.org/images/1.0"
+                     xmlns:sv="http://www.jcp.org/jcr/sv/1.0" xmlns:test="info:fedora/test/"
+                     xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+                     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+                     xmlns:ns004="http://library.upenn.edu/pqc/ns/"
+                     xmlns:ns003="http://pcdm.org/models#" xmlns:ns002="http://purl.org/dc/terms/"
+                     xmlns:space="preserve" xmlns:ns001="http://www.openarchives.org/ore/terms/"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xmlns:mode="http://www.modeshape.org/1.0"
+                     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                     xmlns:fedora="http://fedora.info/definitions/v4/repository#"
+                     xmlns:jcr="http://www.jcp.org/jcr/1.0"
+                     xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#"
+                     xmlns:ldp="http://www.w3.org/ns/ldp#"
+                     xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                     xmlns:fedoraconfig="http://fedora.info/definitions/v4/config#"
+                     xmlns:mix="http://www.jcp.org/jcr/mix/1.0"
+                     xmlns:foaf="http://xmlns.com/foaf/0.1/"
+                     xmlns:dc="http://purl.org/dc/elements/1.1/" sv:name="members">
+              <sv:property sv:name="jcr:primaryType" sv:type="Name">
+                <sv:value>nt:folder</sv:value>
+              </sv:property>
+              <sv:property sv:name="jcr:mixinTypes" sv:type="Name" sv:multiple="true">
+                <sv:value>fedora:Container</sv:value>
+                <sv:value>fedora:Resource</sv:value>
+                <sv:value>ldp:IndirectContainer</sv:value>
+              </sv:property>
+              <sv:property sv:name="jcr:lastModifiedBy" sv:type="String">
+                <sv:value>bypassAdmin</sv:value>
+              </sv:property>
+              <sv:property sv:name="jcr:createdBy" sv:type="String">
+                <sv:value>bypassAdmin</sv:value>
+              </sv:property>
+              <sv:property sv:name="ldp:membershipResource" sv:type="Reference">
+                <sv:value></sv:value>
+              </sv:property>
+              <sv:property sv:name="ldp:insertedContentRelation" sv:type="URI">
+                <sv:value>http://www.openarchives.org/ore/terms/proxyFor</sv:value>
+              </sv:property>
+              <sv:property sv:name="ns001:hasModel" sv:type="String" sv:multiple="true">
+                <sv:value>ActiveFedora::IndirectContainer</sv:value>
+              </sv:property>
+              <sv:property sv:name="ldp:hasMemberRelation" sv:type="URI">
+                <sv:value>http://pcdm.org/models#hasMember</sv:value>
+              </sv:property>
+            </sv:node>
           </sv:node>
         </exsl:document>
       </xsl:copy>
