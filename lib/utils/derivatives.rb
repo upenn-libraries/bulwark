@@ -22,7 +22,6 @@ module Utils
         File.chmod(0644, write_path)
         return "#{derivative_path}/#{copy_type}#{image.signature}.#{extension}".gsub("#{directory}/",'')
       rescue => exception
-        binding.pry
         return
       end
     end
