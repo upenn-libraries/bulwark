@@ -62,7 +62,6 @@ module Utils
         next if k.nil?
         file_print = read_storage_link(k.first, repo)
         page.children.each do |p|
-          
           serialized_attributes[p.name] = p.children.first.present? ? p.children.first.text : ''
         end
         width, height = FastImage.size(file_print)
@@ -95,11 +94,9 @@ module Utils
     end
 
     def refresh_assets(working_path, repo)
-      
       repo.file_display_attributes = {}
       Dir.chdir(working_path)
       entries = Dir.entries("#{working_path}/#{repo.derivatives_subdirectory}").reject { |f| File.directory?("#{working_path}/#{repo.derivatives_subdirectory}/#{f}") }
-      
       entries.each do |file|
         file_path = "#{working_path}/#{repo.derivatives_subdirectory}/#{file}"
         width, height = FastImage.size(file_path)
@@ -108,7 +105,6 @@ module Utils
                                                                                         :height => height}
       end
       repo.save!
-      
     end
 
     def jettison_originals(repo, working_path, commit_message)
