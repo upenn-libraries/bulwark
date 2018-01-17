@@ -1,3 +1,5 @@
+require 'htmlentities'
+
 module CatalogHelper
 
   include Blacklight::CatalogHelperBehavior
@@ -15,6 +17,24 @@ module CatalogHelper
 
   def current_user?
     current_user != nil
+  end
+
+  def html_entity(options={})
+    option_vals = []
+    options[:value].each do |val|
+      option_vals << html_decode(val)
+    end
+    return option_vals.reject(&:blank?).join(',')
+  end
+
+  def html_facet(facet_string)
+    return html_decode(facet_string)
+  end
+
+  def html_decode(string_to_decode)
+    decoder = HTMLEntities.new
+    return decoder.decode(string_to_decode)
+
   end
 
 end

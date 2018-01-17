@@ -173,6 +173,7 @@ en:
             catalog_bibid: 'Catalog BibID Lookup Spreadsheet (XLSX)'
             structural_bibid: 'Structural Metadata from BibID Lookup Spreadsheet (XLSX)'
             bibliophilly: 'BiblioPhilly (XLSX)'
+            kaplan: 'Kaplan (XLSX)'
             custom: 'Custom Structural Metadata Spreadsheet (XLSX)'
         orientation:
           vertical: 'Vertical'
@@ -207,6 +208,12 @@ en:
         bibliophilly_structural:
           heading: 'Sample structural metadata fetched from Page 2 of BiblioPhilly spreadsheet'
           field_separator: ':'
+        kaplan:
+          heading: 'Sample metadata fetched from Kaplan spreadsheet'
+          field_separator: ':'
+        kaplan_structural:
+          heading: 'Sample structural metadata fetched from Kaplan spreadsheet'
+          field_separator: ':'
         pap:
           heading: 'Descriptive metadata fetched from Catalog Lookup'
           field_separator: ':'
@@ -234,12 +241,14 @@ en:
         catalog_derivative_spreadsheet: 'Created derivative spreadsheet of catalog metadata'
         generated_derivative: 'Generated derivative for %{file_name}'
         generated_thumbnail: 'Generated thumbnail for %{object_id}'
-        generated_all_derivatives: 'Generated all derivatives for %{object_id}'
+        generated_admin_metadata: 'Generated admin metadata'
         generated_preservation_metadata: 'Generated JHOVE XML for %{object_id}'
         jettison_metadata: 'Removed files not identified as metadata source and/or for long-term preservation'
         jettison_assets: 'Removed original asset files per metadata source type directive'
         write_preservation_xml: 'Generated unified XML'
+        write_xlsx_from_csv: 'Generated XSLX from CSV'
         generated_previews: 'Generated previews'
+        generated_thumbnail: 'Generated thumbnail'
         ingest_complete: 'Ingest complete'
         automated:
           added_metadata: 'Added metadata through automated workflow'

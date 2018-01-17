@@ -4,10 +4,10 @@ module ApplicationHelper
 
   def render_image_list
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
-    return '' unless repo.images_to_render.present?
+    return '' unless repo.present? && repo.images_to_render.present?
     rendered_keys = []
     repo.images_to_render.each do |key, value|
-      rendered_keys << "#{public_fedora_path(key)}?width=#{value['width']}&height=#{value['height']}"
+      rendered_keys << "#{key}?width=#{value['width']}&height=#{value['height']}" if key.present?
     end
     content_tag(:div, '', id: 'pages', data: rendered_keys.to_json )
   end
