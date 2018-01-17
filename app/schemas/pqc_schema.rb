@@ -56,6 +56,10 @@ class PqcSchema < ActiveTriples::Schema
     index.as :stored_searchable
   end
 
+  property :language, predicate: ::RDF::Vocab::DC.language, multiple: true do |index|
+    index.as :stored_searchable, :facetable
+  end
+
   property :publisher, predicate: ::RDF::Vocab::DC.publisher, multiple: true do |index|
     index.as :stored_searchable, :facetable
   end
@@ -80,7 +84,7 @@ class PqcSchema < ActiveTriples::Schema
     index.as :stored_searchable, :facetable
   end
 
-  property :includes, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/includes'), multiple: false do |index|
+  property :includes, predicate: ::RDF::Vocab::DC.hasPart, multiple: false do |index|
     index.as :stored_searchable
   end
 

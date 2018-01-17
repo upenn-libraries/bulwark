@@ -51,7 +51,10 @@ Rails.application.routes.draw do
     end
   end
 
-  mount Qa::Engine => '/qa'
-  mount Sidekiq::Web => '/sidekiq'
+  authenticate :user do
+    mount Qa::Engine => '/qa'
+    mount Sidekiq::Web => '/sidekiq'
+  end
+
 
 end
