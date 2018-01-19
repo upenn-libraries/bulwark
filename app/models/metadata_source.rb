@@ -483,7 +483,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def split_multivalued(value)
-    return value.split('|')
+    return value.split('|').map(&:strip)
   end
 
   def xml_sanitized(mappings)
