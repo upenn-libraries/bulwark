@@ -146,8 +146,7 @@ class CatalogController < ApplicationController
     # since we aren't specifying it otherwise.
 
     config.add_search_field 'all_fields', :label => 'All Fields'
-
-
+    
     # Now we see how to over-ride Solr request handler defaults, in this
     # case for a BL "search field", which is really a dismax aggregate
     # of Solr search fields.
@@ -160,27 +159,6 @@ class CatalogController < ApplicationController
       field.solr_local_parameters = {
         :qf => '$title_qf',
         :pf => '$title_pf'
-      }
-    end
-
-    config.add_search_field('description') do |field|
-      field.solr_local_parameters = {
-          :qf => '$description_qf',
-          :pf => '$description_pf'
-      }
-    end
-
-    config.add_search_field('personal_name') do |field|
-      field.solr_local_parameters = {
-          :qf => '$personal_name_qf',
-          :pf => '$personal_name_pf'
-      }
-    end
-
-    config.add_search_field('corporate_name') do |field|
-      field.solr_local_parameters = {
-          :qf => '$corporate_name_qf',
-          :pf => '$corporate_name_pf'
       }
     end
 
