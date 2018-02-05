@@ -5,12 +5,15 @@ class CatalogController < ApplicationController
 
   include Hydra::Catalog
 
+  def default_url_options
+    { :protocol => ENV['CATALOG_CONTROLLER_PROTOCOL'] }
+  end
+
   # These before_filters apply the hydra access controls
   #before_filter :enforce_show_permissions, :only=>:show
   # This applies appropriate access controls to all solr queries
 
   add_nav_action 'admin_repo/admin_menu', if: :current_user?
-
 
   CatalogController.search_params_logic += [:exclude_unwanted_models]#, :exclude_unwanted_terms]
 
@@ -147,7 +150,6 @@ class CatalogController < ApplicationController
 
     config.add_search_field 'all_fields', :label => 'All Fields'
 
-
     # Now we see how to over-ride Solr request handler defaults, in this
     # case for a BL "search field", which is really a dismax aggregate
     # of Solr search fields.
@@ -160,27 +162,6 @@ class CatalogController < ApplicationController
       field.solr_local_parameters = {
         :qf => '$title_qf',
         :pf => '$title_pf'
-      }
-    end
-
-    config.add_search_field('description') do |field|
-      field.solr_local_parameters = {
-          :qf => '$description_qf',
-          :pf => '$description_pf'
-      }
-    end
-
-    config.add_search_field('personal_name') do |field|
-      field.solr_local_parameters = {
-          :qf => '$personal_name_qf',
-          :pf => '$personal_name_pf'
-      }
-    end
-
-    config.add_search_field('corporate_name') do |field|
-      field.solr_local_parameters = {
-          :qf => '$corporate_name_qf',
-          :pf => '$corporate_name_pf'
       }
     end
 
