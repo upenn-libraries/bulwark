@@ -35,6 +35,26 @@ module MetadataSourceHelper
     return "#{mappings[file_field_key]}", "<a name=\"#{mappings[file_field_key]}\" href= \"#\" title=\"Anchor tag for #{mappings[file_field_key]}\"></a>"
   end
 
+  def render_raw_images
+    raw_images = ''
+    images_hash = @object.file_display_attributes
+    #images_hash.delete_if{|k,v| k.end_with?('.tif.jpeg') == false }
+    sorted_hash = images_hash.sort_by{|k,v| v[:file_name]}
+    sorted_hash.each do |key,value|
+      next unless value[:file_name].end_with?('.tif.jpeg')
+      preview_link = Utils::Process.read_storage_link(key,@object)
+      thumbnail_link = Utils::Process.read_storage_link(get_key_by_filename(value[:file_name].gsub('.tif.jpeg','.tif.thumb.jpeg')),@object)
+      file_name = value[:file_name].gsub("#{@object.derivatives_subdirectory}/",'')
+      file_div = "<div class=\"file-name\">#{file_name}</div>".html_safe
+      derivative = link_to(image_tag(thumbnail_link, :alt => file_name,  :title => file_name), preview_link)
+      raw_images << "<li>#{derivative + file_div}</li>"
+    end
+
+    raw_images = "<ul><li id=\"spacer\" class=\"hide\"><span class=\"screenreader\">Spacer item to facilitate off-by-one</span><span id=\"note\">Spacer image</span></li>#{raw_images}</ul>"
+    return raw_images.present? ? "<div id=\"preview-thumbnails\"><ul>#{raw_images}</ul></div>".html_safe : ""
+
+  end
+
   def render_files_preview(source)
     return unless @object.metadata_builder.last_file_checks.present?
     return unless prepared_structural?(source)
