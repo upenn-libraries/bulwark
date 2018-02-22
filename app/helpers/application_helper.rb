@@ -59,16 +59,8 @@ module ApplicationHelper
   def render_image_list
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
     return '' unless repo.present? && repo.images_to_render.present?
-    if repo.images_to_render['iiif'].present?
-      images_list = repo.images_to_render['iiif'].present? ? repo.images_to_render['iiif']['images'] : legacy_image_list(repo)
-      return content_tag(:div, '', id: 'pages', data: images_list.to_json ) + render_openseadragon(repo)
-    else
-      rendered_keys = []
-      repo.images_to_render.each do |key, value|
-        rendered_keys << "#{public_fedora_path(key)}?width=#{value['width']}&height=#{value['height']}" if key.present?
-      end
-      return content_tag(:div, '', id: 'pages', data: rendered_keys.to_json)
-    end
+    images_list = repo.images_to_render['iiif'].present? ? repo.images_to_render['iiif']['images'] : legacy_image_list(repo)
+    return content_tag(:div, '', id: 'pages', data: images_list.to_json ) + render_openseadragon(repo)
   end
 
   def render_openseadragon(repo)
