@@ -35,7 +35,10 @@ Rails.application.routes.draw do
 
   resources :metadata_sources
 
+  mount Blacklight::Engine => '/'
+
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
+
   root to: "catalog#index"
   blacklight_for :catalog
 
@@ -51,7 +54,10 @@ Rails.application.routes.draw do
     end
   end
 
-  mount Qa::Engine => '/qa'
-  mount Sidekiq::Web => '/sidekiq'
+  authenticate :user do
+    mount Qa::Engine => '/qa'
+    mount Sidekiq::Web => '/sidekiq'
+  end
+
 
 end

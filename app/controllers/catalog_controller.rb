@@ -5,12 +5,15 @@ class CatalogController < ApplicationController
 
   include Hydra::Catalog
 
+  def default_url_options
+    { :protocol => ENV['CATALOG_CONTROLLER_PROTOCOL'] }
+  end
+
   # These before_filters apply the hydra access controls
   #before_filter :enforce_show_permissions, :only=>:show
   # This applies appropriate access controls to all solr queries
 
   add_nav_action 'admin_repo/admin_menu', if: :current_user?
-
 
   CatalogController.search_params_logic += [:exclude_unwanted_models]#, :exclude_unwanted_terms]
 
@@ -49,22 +52,25 @@ class CatalogController < ApplicationController
     # facet bar
 
     # PQC
-    config.add_facet_field solr_name('subject', :facetable), :label => 'Subject'
-    config.add_facet_field solr_name('language', :facetable), :label => 'Language'
-    config.add_facet_field solr_name('contributor', :facetable), :label => 'Contributor'
-    config.add_facet_field solr_name('creator', :facetable), :label => 'Creator'
-    config.add_facet_field solr_name('publisher', :facetable), :label => 'Publisher'
-    config.add_facet_field solr_name('coverage', :facetable), :label => 'Coverage'
-    config.add_facet_field solr_name('date', :facetable), :label => 'Date'
-    config.add_facet_field solr_name('relation', :facetable), :label => 'Relation'
-    config.add_facet_field solr_name('source', :facetable), :label => 'Source'
-    config.add_facet_field solr_name('item_type', :facetable), :label => 'Type'
-    config.add_facet_field solr_name('personal_name', :facetable), :label => 'Personal Name'
-    config.add_facet_field solr_name('corporate_name', :facetable), :label => 'Corporate Name'
-    config.add_facet_field solr_name('geographic_subject', :facetable), :label => 'Geographic Subject'
+    config.add_facet_field solr_name('subject', :facetable), :label => 'Subject', :limit => 5, :collapse => false
+    config.add_facet_field solr_name('language', :facetable), :label => 'Language', :limit => 5, :collapse => false
+    config.add_facet_field solr_name('date', :facetable), :label => 'Date', :limit => 5, :collapse => false
+    config.add_facet_field solr_name('contributor', :facetable), :label => 'Contributor', :limit => 5, :collapse => true
+    config.add_facet_field solr_name('creator', :facetable), :label => 'Creator', :limit => 5, :collapse => true
+    config.add_facet_field solr_name('publisher', :facetable), :label => 'Publisher', :limit => 5, :collapse => true
+    config.add_facet_field solr_name('coverage', :facetable), :label => 'Coverage', :limit => 5, :collapse => true
+    config.add_facet_field solr_name('format', :facetable), :label => 'Format', :limit => 5, :collapse => true
+    config.add_facet_field solr_name('item_type', :facetable), :label => 'Type', :limit => 5, :collapse => true
+    config.add_facet_field solr_name('relation', :facetable), :label => 'Relation', :limit => 5, :collapse => true
+    config.add_facet_field solr_name('source', :facetable), :label => 'Source', :limit => 5, :collapse => true
+    config.add_facet_field solr_name('personal_name', :facetable), :label => 'Personal Name', :limit => 5, :collapse => true, helper_method: 'html_facet'
+    config.add_facet_field solr_name('corporate_name', :facetable), :label => 'Corporate Name',:limit => 5, :collapse => true,  helper_method: 'html_facet'
+    config.add_facet_field solr_name('geographic_subject', :facetable), :label => 'Geographic Subject', :limit => 5, :collapse => true
 
     # Catalog
-    config.add_facet_field solr_name('collection', :facetable), :label => 'Collection'
+    config.add_facet_field solr_name('collection', :facetable), :label => 'Collection', :limit => 5, :collapse => true
+
+    config.add_facet_fields_to_solr_request!
 
     # Have BL send all facet field names to Solr, which has been the default
     # previously. Simply remove these lines if you'd rather use Solr request
@@ -78,13 +84,18 @@ class CatalogController < ApplicationController
     #   The ordering of the field names is the order of the display
 
     # PQC
-    config.add_index_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject'
-    config.add_index_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
+    config.add_index_field solr_name('title', :stored_searchable, type: :string), :label => 'Title', helper_method: 'html_entity'
+    config.add_index_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject', helper_method: 'html_entity'
+    config.add_index_field solr_name('description', :stored_searchable, type: :string), :label => 'Description', helper_method: 'html_entity'
+    config.add_index_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name', helper_method: 'html_entity'
+    config.add_index_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name', helper_method: 'html_entity'
+    config.add_index_field solr_name('date', :stored_searchable, type: :string), :label => 'Date'
     config.add_index_field solr_name('language', :stored_searchable, type: :string), :label => 'Language'
     config.add_index_field solr_name('creator', :stored_searchable, type: :string), :label => 'Creator'
     config.add_index_field solr_name('publisher', :stored_searchable, type: :string), :label => 'Publisher'
     config.add_index_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
     config.add_index_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
+    config.add_index_field solr_name('format_type', :stored_searchable, type: :string), :label => 'Type'
 
     # Catalog
     config.add_index_field solr_name('collection', :stored_searchable), :label => 'Collection'
@@ -94,26 +105,27 @@ class CatalogController < ApplicationController
     #   The ordering of the field names is the order of the display
 
     # PQC
+    config.add_show_field solr_name('title', :stored_searchable, type: :string), :label => 'Title', helper_method: 'html_entity'
     config.add_show_field solr_name('abstract', :stored_searchable, type: :string), :label => 'Abstract'
     config.add_show_field solr_name('contributor', :stored_searchable, type: :string), :label => 'Contributor'
-    config.add_show_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name'
     config.add_show_field solr_name('coverage', :stored_searchable, type: :string), :label => 'Coverage'
     config.add_show_field solr_name('creator', :stored_searchable, type: :string), :label => 'Creator'
-    config.add_show_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
     config.add_show_field solr_name('date', :stored_searchable, type: :string), :label => 'Date'
+    config.add_show_field solr_name('description', :stored_searchable, type: :string), :label => 'Description', helper_method: 'html_entity'
     config.add_show_field solr_name('format', :stored_searchable, type: :string), :label => 'Format'
-    config.add_show_field solr_name('geographic_subject', :stored_searchable, type: :string), :label => 'Geographic Subject'
     config.add_show_field solr_name('identifier', :stored_searchable, type: :string), :label => 'Identifier'
     config.add_show_field solr_name('language', :stored_searchable, type: :string), :label => 'Language'
-    config.add_show_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name'
     config.add_show_field solr_name('provenance', :stored_searchable, type: :string), :label => 'Provenance'
     config.add_show_field solr_name('publisher', :stored_searchable, type: :string), :label => 'Publisher'
     config.add_show_field solr_name('relation', :stored_searchable, type: :string), :label => 'Relation'
-    config.add_show_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
     config.add_show_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
-    config.add_show_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject'
-    config.add_show_field solr_name('title', :stored_searchable, type: :string), :label => 'Title'
-
+    config.add_show_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject', helper_method: 'html_entity'
+    config.add_show_field solr_name('item_type', :stored_searchable, type: :string), :label => 'Type'
+    config.add_show_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name', helper_method: 'html_entity'
+    config.add_show_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name', helper_method: 'html_entity'
+    config.add_show_field solr_name('geographic_subject', :stored_searchable, type: :string), :label => 'Geographic Subject'
+    config.add_show_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
+    
     # Catalog
     config.add_show_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number'
     config.add_show_field solr_name('collection', :stored_searchable, type: :string), :label => 'Collection'
@@ -138,7 +150,6 @@ class CatalogController < ApplicationController
 
     config.add_search_field 'all_fields', :label => 'All Fields'
 
-
     # Now we see how to over-ride Solr request handler defaults, in this
     # case for a BL "search field", which is really a dismax aggregate
     # of Solr search fields.
@@ -151,13 +162,6 @@ class CatalogController < ApplicationController
       field.solr_local_parameters = {
         :qf => '$title_qf',
         :pf => '$title_pf'
-      }
-    end
-
-    config.add_search_field('author') do |field|
-      field.solr_local_parameters = {
-        :qf => '$author_qf',
-        :pf => '$author_pf'
       }
     end
 

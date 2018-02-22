@@ -99,19 +99,19 @@ module MetadataSourceHelper
   end
 
   def prepared_metadata?(source)
-    accepted_types = %w(voyager structural_bibid bibliophilly bibliophilly_structural pap pap_structural)
+    accepted_types = %w(voyager structural_bibid bibliophilly bibliophilly_structural pap pap_structural kaplan kaplan_structural)
     return true if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
     return false
   end
 
   def prepared_descriptive?(source)
-    accepted_types = %w(voyager bibliophilly pap)
+    accepted_types = %w(voyager bibliophilly pap kaplan)
     return true if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
     return false
   end
 
   def prepared_structural?(source)
-    accepted_types = %w(structural_bibid bibliophilly_structural pap_structural)
+    accepted_types = %w(structural_bibid bibliophilly_structural pap_structural kaplan_structural)
     return true if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
     return false
   end

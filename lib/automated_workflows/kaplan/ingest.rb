@@ -1,5 +1,5 @@
 module AutomatedWorkflows
-  module Pap
+  module Kaplan
     class Ingest
 
       def ingest_and_index(working_path, repo)

@@ -13,6 +13,7 @@ renderViewer = function() {
         defaultZoomLevel:   1.05,
         sequenceMode:       true,
         showReferenceStrip: true,
+        showRotationControl: true,
         referenceStripScroll: "horizontal",
         tileSources: imagesArray,
         navImages: assetsHash

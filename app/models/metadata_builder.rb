@@ -108,8 +108,12 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.save!
     self.last_file_checks = DateTime.now
     self.save!
+    jhove = characterize_files(working_path, self.repo)
+    self.repo.version_control_agent.add({:content => "#{repo.metadata_subdirectory}/#{jhove.filename}"}, working_path)
+    self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_preservation_metadata', :object_id => repo.names.fedora), working_path)
     self.repo.version_control_agent.add({:content => "#{working_path}/#{self.repo.derivatives_subdirectory}"}, working_path)
-    self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_previews'), working_path)
+    self.repo.lock_keep_files(working_path)
+    self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives', :object_id => repo.names.fedora), working_path)
     self.repo.version_control_agent.push(working_path)
   end
 
@@ -145,20 +149,13 @@ class MetadataBuilder < ActiveRecord::Base
       File.open(transformed_xml, 'w') {|f| f.puts fedora_xml }
       self.repo.ingest(transformed_xml, working_path)
     end
-
-    self.repo.version_control_agent.add(working_path)
-    self.repo.version_control_agent.add({:content => "#{working_path}/#{self.repo.derivatives_subdirectory}"}, working_path)
-    self.repo.version_control_agent.add({:content => "#{working_path}/#{self.repo.admin_subdirectory}"}, working_path)
-    self.repo.version_control_agent.add({:content => "#{working_path}/#{self.repo.assets_subdirectory}"}, working_path)
-    self.repo.version_control_agent.add({:content => "#{working_path}/#{self.repo.metadata_subdirectory}"}, working_path)
-    self.repo.version_control_agent.lock(working_path)
-    self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'), working_path)
-    self.repo.version_control_agent.push(working_path)
   end
 
   def xslt_file_select
     if self.metadata_source.any?{|ms| ms.source_type == 'bibliophilly'}
       return 'bibliophilly'
+    elsif self.metadata_source.any?{|ms| ms.source_type == 'kaplan'}
+      return 'kaplan'
     elsif self.metadata_source.any?{|ms| ms.source_type == 'pap'}
       return 'pap'
     else

@@ -41,7 +41,7 @@ class Repo < ActiveRecord::Base
 
   def set_defaults
     self[:owner] = User.current
-    self[:unique_identifier] = mint_ezid
+    self[:unique_identifier] = mint_ezid unless self[:unique_identifier].present?
     self[:derivatives_subdirectory] = "#{Utils.config[:object_derivatives_path]}"
     self[:admin_subdirectory] = "#{Utils.config[:object_admin_path]}"
     self[:ingested] = false
@@ -145,13 +145,20 @@ class Repo < ActiveRecord::Base
       @status = Utils::Process.import(file, self, working_path)
       self.thumbnail = default_thumbnail
       self.save!
-      Utils::Process.generate_thumbnail(self, working_path) if self.thumbnail.present?
+      if self.thumbnail.present?
+        thumbnail_path = "#{self.assets_subdirectory}/#{self.thumbnail}"
+        self.version_control_agent.get({:location => "#{working_path}/#{thumbnail_path}"}, working_path)
+        self.version_control_agent.unlock({:content => "#{working_path}/#{thumbnail_path}"}, working_path)
+        self.version_control_agent.add({:content => "#{working_path}/#{thumbnail_path}"}, working_path)
+        self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_previews'), working_path)
+        Utils::Process.generate_thumbnail(self, working_path)
+      end
       self.package_metadata_info(working_path)
       self.generate_logs(working_path)
-      self.version_control_agent.add({:content => "#{working_path}/#{self.derivatives_subdirectory}"}, working_path)
       self.version_control_agent.add({:content => "#{working_path}/#{self.admin_subdirectory}"}, working_path)
-      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives'), working_path)
-      self.version_control_agent.push(working_path)
+      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'), working_path)
+      self.version_control_agent.lock(working_path)
+      self.version_control_agent.push({:content => "#{working_path}/#{self.admin_subdirectory}"}, working_path)
       self.metadata_builder.last_file_checks = DateTime.now
       self.metadata_builder.save!
     rescue => exception
@@ -169,6 +176,7 @@ class Repo < ActiveRecord::Base
   end
 
   def package_metadata_info(working_path)
+    self.version_control_agent.get({:location => self.admin_subdirectory}, working_path)
     self.version_control_agent.unlock({:content => self.admin_subdirectory}, working_path)
     File.open("#{working_path}/#{self.admin_subdirectory}/#{self.names.directory}", 'w+') do |f|
       self.metadata_builder.metadata_source.each do |source|
@@ -205,7 +213,7 @@ class Repo < ActiveRecord::Base
 
   #TODO: Eventually offload to metadata source subclasses
   def default_thumbnail
-    structural_types = %w[structural_bibid custom bibliophilly_structural pap_structural]
+    structural_types = %w[structural_bibid custom bibliophilly_structural kaplan_structural pap_structural]
     single_structural_source = MetadataSource.where('metadata_builder_id = ? AND source_type IN (?)', self.metadata_builder, structural_types).pluck(:id)
     single_structural_source.length == 1 ? MetadataSource.find(single_structural_source.first).thumbnail : nil
   end
