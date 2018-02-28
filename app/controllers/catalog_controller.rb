@@ -87,7 +87,7 @@ class CatalogController < ApplicationController
     config.add_index_field solr_name('title', :stored_searchable, type: :string), :label => 'Title', helper_method: 'html_entity'
     config.add_index_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject', helper_method: 'html_entity'
     config.add_index_field solr_name('description', :stored_searchable, type: :string), :label => 'Description', helper_method: 'html_entity'
-    config.add_index_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name', helper_method: 'html_entity'
+    config.add_index_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name', helper_method: 'html_entity', :link_to_search => true
     config.add_index_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name', helper_method: 'html_entity'
     config.add_index_field solr_name('date', :stored_searchable, type: :string), :label => 'Date'
     config.add_index_field solr_name('language', :stored_searchable, type: :string), :label => 'Language'

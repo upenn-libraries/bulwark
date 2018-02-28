@@ -65,6 +65,8 @@ RUN mkdir -p /etc/my_init.d
 
 ADD docker/gitannex.sh /etc/my_init.d/gitannex.sh
 
+ADD docker/imaging.sh /etc/my_init.d/imaging.sh
+
 ADD docker/ssh_service.sh /etc/my_init.d/ssh_service.sh
 
 RUN chown -R app:app /fs
