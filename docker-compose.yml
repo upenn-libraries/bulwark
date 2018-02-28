@@ -24,7 +24,7 @@ services:
     image: 'colenda_web:latest'
     ports:
       - '80:80'
-      - '1234:22'
+      - '${SSH_PORT}:22'
     env_file:
       - '.env'
     links:

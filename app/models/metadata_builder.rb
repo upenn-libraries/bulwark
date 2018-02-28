@@ -86,9 +86,8 @@ class MetadataBuilder < ActiveRecord::Base
 
   def file_checks_previews(working_path)
     self.repo.version_control_agent.get({:location => "#{working_path}/#{self.repo.assets_subdirectory}"}, working_path)
-    self.metadata_source.where(:source_type => MetadataSource.structural_types).each do |ms|
-      ms.filenames.each do |file|
-        file_path = "#{working_path}/#{self.repo.assets_subdirectory}/#{file}"
+    if self.metadata_source.where(:source_type => MetadataSource.structural_types).empty?
+      Dir.glob("#{working_path}/#{self.repo.assets_subdirectory}/*.{#{self.repo.file_extensions.join(",")}}").each do |file_path|
         self.repo.version_control_agent.unlock({:content => file_path}, working_path)
         validation_state = validate_file(file_path)
         self.repo.log_problem_file(file_path.gsub(working_path,''), validation_state) if validation_state.present?
@@ -97,10 +96,25 @@ class MetadataBuilder < ActiveRecord::Base
         self.repo.version_control_agent.add({:content => file_path}, working_path)
         self.repo.version_control_agent.lock(file_path, working_path)
       end
+    else
+      self.metadata_source.where(:source_type => MetadataSource.structural_types).each do |ms|
+        ms.filenames.each do |file|
+          file_path = "#{working_path}/#{self.repo.assets_subdirectory}/#{file}"
+          self.repo.version_control_agent.unlock({:content => file_path}, working_path)
+          validation_state = validate_file(file_path)
+          self.repo.log_problem_file(file_path.gsub(working_path,''), validation_state) if validation_state.present?
+          self.repo.version_control_agent.unlock({:content => self.repo.derivatives_subdirectory}, working_path)
+          generate_preview(file_path,"#{working_path}/#{self.repo.derivatives_subdirectory}") unless validation_state.present?
+          self.repo.version_control_agent.add({:content => file_path}, working_path)
+          self.repo.version_control_agent.lock(file_path, working_path)
+        end
+      end
     end
+
     self.repo.save!
     self.last_file_checks = DateTime.now
     self.save!
+    self.repo.version_control_agent.get({:location => "#{working_path}/."}, working_path)
     jhove = characterize_files(working_path, self.repo)
     self.repo.version_control_agent.add({:content => "#{repo.metadata_subdirectory}/#{jhove.filename}"}, working_path)
     self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_preservation_metadata', :object_id => repo.names.fedora), working_path)
@@ -131,6 +145,7 @@ class MetadataBuilder < ActiveRecord::Base
       transformed_xml = "#{working_path}/#{Utils.config[:fedora_xml_derivative]}"
       fedora_xml = File.read(transformed_xml).gsub(self.repo.unique_identifier, repo.names.fedora)
       File.open(transformed_xml, 'w') {|f| f.puts fedora_xml }
+      self.repo.version_control_agent.lock(file_path, working_path)
       self.repo.ingest(transformed_xml, working_path)
     end
   end
