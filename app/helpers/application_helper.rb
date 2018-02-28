@@ -137,7 +137,7 @@ module ApplicationHelper
       entry = repo.file_display_attributes.select{|key, hash| hash[:file_name].split('/').last == "#{filename}.jpeg"}
       display_array << entry.keys.first
     end
-    return display_array.map{|k|"#{Display.config['iiif']['image_server']}/#{repo.names.bucket}%2F#{k}/info.json"}
+    return display_array.map{|k|"#{Display.config['iiif']['image_server']}#{repo.names.bucket}%2F#{k}/info.json"}
 
   end
 
