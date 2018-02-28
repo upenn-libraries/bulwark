@@ -38,7 +38,6 @@ module MetadataSourceHelper
   def render_raw_images
     raw_images = ''
     images_hash = @object.file_display_attributes
-    #images_hash.delete_if{|k,v| k.end_with?('.tif.jpeg') == false }
     sorted_hash = images_hash.sort_by{|k,v| v[:file_name]}
     sorted_hash.each do |key,value|
       next unless value[:file_name].end_with?('.tif.jpeg')
