@@ -24,7 +24,7 @@ module CatalogHelper
     options[:value].each do |val|
       option_vals << html_decode(val)
     end
-    return option_vals.reject(&:blank?).map { |term| term.end_with?(';') ? "#{term} " : "#{term}; " }.flatten
+    return option_vals.reject(&:blank?).join('; ')
   end
 
   def html_facet(facet_string)
