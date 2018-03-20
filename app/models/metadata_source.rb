@@ -436,7 +436,7 @@ class MetadataSource < ActiveRecord::Base
       headers << c.value
     end
     (x_start..x_stop).each_with_index do |i, index|
-      val = workbook[z][y_start+1][x_start+index].present? ? workbook[z][y_start+1][x_start+index].value : ''
+      val = (workbook[z][y_start+1][x_start+index].present? && workbook[z][y_start+1][x_start+index].value.present?) ? workbook[z][y_start+1][x_start+index].value : ''
       header = headers[i]
       mappings[header] = [] if mappings[header].nil?
       split_multivalued(val).each { |v| mappings[header] << v if v.present? }
