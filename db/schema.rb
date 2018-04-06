@@ -11,17 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171020190251) do
+ActiveRecord::Schema.define(version: 20171204194529) do
 
   create_table "batches", force: :cascade do |t|
-    t.string   "queue_list",      limit: 255
-    t.string   "directive_names", limit: 255
+    t.text     "queue_list",      limit: 4294967295
+    t.text     "directive_names", limit: 4294967295
     t.string   "email",           limit: 255
     t.datetime "start"
     t.datetime "end"
     t.string   "status",          limit: 255
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
   end
 
   create_table "bookmarks", force: :cascade do |t|

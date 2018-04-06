@@ -153,6 +153,7 @@ class Repo < ActiveRecord::Base
         self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_previews'), working_path)
         Utils::Process.generate_thumbnail(self, working_path)
       end
+      self.version_control_agent.lock(thumbnail_path, working_path)
       self.package_metadata_info(working_path)
       self.generate_logs(working_path)
       self.version_control_agent.add({:content => "#{working_path}/#{self.admin_subdirectory}"}, working_path)
