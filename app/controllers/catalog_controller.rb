@@ -123,7 +123,7 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('item_type', :stored_searchable, type: :string), :label => 'Type'
     config.add_show_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name', helper_method: 'html_entity'
     config.add_show_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name', helper_method: 'html_entity'
-    config.add_show_field solr_name('geographic_subject', :stored_searchable, type: :string), :label => 'Geographic Subject'
+    config.add_show_field solr_name('geographic_subject', :stored_searchable, type: :string), :label => 'Geographic Subject', helper_method: 'html_entity'
     config.add_show_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
     
     # Catalog
@@ -173,6 +173,17 @@ class CatalogController < ApplicationController
       field.solr_local_parameters = {
         :qf => '$subject_qf',
         :pf => '$subject_pf'
+      }
+    end
+
+    # Specifying a :qt only to show it's possible, and so our internal automated
+    # tests can test it. In this case it's the same as
+    # config[:default_solr_parameters][:qt], so isn't actually neccesary.
+    config.add_search_field('geographic_subject') do |field|
+      field.qt = 'search'
+      field.solr_local_parameters = {
+          :qf => '$geographic_subject_qf',
+          :pf => '$geographic_subject_pf'
       }
     end
 
