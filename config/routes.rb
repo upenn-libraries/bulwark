@@ -46,12 +46,7 @@ Rails.application.routes.draw do
   devise_scope :user do
     resource :registration,
              only: [:edit, :update],
-             path: 'users',
-             path_names: { new: 'sign_up' },
-             controller: 'devise/registrations',
-             as: :user_registration do
-      get :cancel
-    end
+             path: 'users'
   end
 
   authenticate :user do
