@@ -3,14 +3,13 @@ module Utils
 
     extend self
 
-    def generate_copy(file, directory, options = {})
+    def generate_copy(image, directory, options = {})
       begin
         copy_type = options[:type] || 'default'
         width = Utils::Derivatives::Constants::COPY_TYPES[copy_type][:width]
         height = Utils::Derivatives::Constants::COPY_TYPES[copy_type][:height]
         extension = Utils::Derivatives::Constants::COPY_TYPES[copy_type][:extension]
         quality = Utils::Derivatives::Constants::COPY_TYPES[copy_type][:quality]
-        image = MiniMagick::Image.open(file)
         image.quality quality
         image.resize "#{width}x#{height}"
         image.format "#{extension}"

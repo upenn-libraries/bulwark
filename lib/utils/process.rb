@@ -133,8 +133,8 @@ module Utils
 
     def validate_file(file)
       begin
-        MiniMagick::Image.open(file)
-        return nil
+        f = MiniMagick::Image.open(file)
+        return f, nil
       rescue => exception
         return 'missing' if exception.inspect.downcase =~ /no such file/
         return 'invalid' if exception.inspect.downcase =~ /minimagick::invalid/
