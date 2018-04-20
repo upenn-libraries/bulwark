@@ -3,8 +3,9 @@ module Utils
 
     extend self
 
-    def generate_copy(image, directory, options = {})
+    def generate_copy(file, image, directory, options = {})
       begin
+        image = MiniMagick::Image.open(file) unless image.present?
         copy_type = options[:type] || 'default'
         width = Utils::Derivatives::Constants::COPY_TYPES[copy_type][:width]
         height = Utils::Derivatives::Constants::COPY_TYPES[copy_type][:height]
