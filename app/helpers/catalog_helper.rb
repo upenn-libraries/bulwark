@@ -8,6 +8,23 @@ module CatalogHelper
     render :partial => 'catalog/show_main_content_preview'
   end
 
+  def render_document_heading(*args)
+    options = args.extract_options!
+
+    tag_or_document = args.first
+
+    if tag_or_document.is_a? String or tag_or_document.is_a? Symbol
+      Deprecation.warn(Blacklight::BlacklightHelperBehavior, "#render_document_heading with a tag argument is deprecated; pass e.g. `tag: :h4` instead")
+      tag = tag_or_document
+      document = @document
+    else
+      tag = options.fetch(:tag, :h4)
+      document = tag_or_document || @document
+    end
+
+    content_tag(tag, html_decode(presenter(document).document_heading), itemprop: "name")
+  end
+
   def thumbnail(document, options)
     default = content_tag(:div, '', :class => 'glyphicon glyphicon-book', 'aria-hidden' => 'true').html_safe
     return default unless ActiveFedora::Base.where(:id => document.id).first.present?
@@ -34,7 +51,6 @@ module CatalogHelper
   def html_decode(string_to_decode)
     decoder = HTMLEntities.new
     return decoder.decode(string_to_decode)
-
   end
 
 end
