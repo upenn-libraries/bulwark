@@ -22,8 +22,15 @@ module CatalogHelper
       document = tag_or_document || @document
     end
 
-    content_tag(tag, html_decode(presenter(document).document_heading), itemprop: "name")
+    display_title = html_decode(presenter(document).document_heading.gsub(',,',','))
+    content_tag(tag, display_title, itemprop: "name")
   end
+
+  def document_heading document=nil
+    document ||= @document
+    presenter(document).document_heading
+  end
+
 
   def thumbnail(document, options)
     default = content_tag(:div, '', :class => 'glyphicon glyphicon-book', 'aria-hidden' => 'true').html_safe
@@ -36,12 +43,18 @@ module CatalogHelper
     current_user != nil
   end
 
+  def multivalue_no_separator(options={})
+    options[:separator] = ' '
+    html_entity(options)
+  end
+
   def html_entity(options={})
+    separator = options[:separator].nil? ? '; ' : "#{options[:separator]}"
     option_vals = []
     options[:value].each do |val|
       option_vals << html_decode(val)
     end
-    return option_vals.reject(&:blank?).join('; ')
+    return option_vals.reject(&:blank?).join(separator)
   end
 
   def html_facet(facet_string)

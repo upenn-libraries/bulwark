@@ -105,7 +105,7 @@ class CatalogController < ApplicationController
     #   The ordering of the field names is the order of the display
 
     # PQC
-    config.add_show_field solr_name('title', :stored_searchable, type: :string), :label => 'Title', helper_method: 'html_entity'
+    config.add_show_field solr_name('title', :stored_searchable, type: :string), :label => 'Title', helper_method: 'multivalue_no_separator'
     config.add_show_field solr_name('abstract', :stored_searchable, type: :string), :label => 'Abstract'
     config.add_show_field solr_name('contributor', :stored_searchable, type: :string), :label => 'Contributor'
     config.add_show_field solr_name('coverage', :stored_searchable, type: :string), :label => 'Coverage'
