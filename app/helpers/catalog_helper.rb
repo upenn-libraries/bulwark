@@ -8,29 +8,9 @@ module CatalogHelper
     render :partial => 'catalog/show_main_content_preview'
   end
 
-  def render_document_heading(*args)
-    options = args.extract_options!
-
-    tag_or_document = args.first
-
-    if tag_or_document.is_a? String or tag_or_document.is_a? Symbol
-      Deprecation.warn(Blacklight::BlacklightHelperBehavior, "#render_document_heading with a tag argument is deprecated; pass e.g. `tag: :h4` instead")
-      tag = tag_or_document
-      document = @document
-    else
-      tag = options.fetch(:tag, :h4)
-      document = tag_or_document || @document
-    end
-
-    display_title = html_decode(presenter(document).document_heading.gsub(',,',','))
-    content_tag(tag, display_title, itemprop: "name")
+  def presenter_class
+    BulwarkPresenter::DocumentPresenter
   end
-
-  def document_heading document=nil
-    document ||= @document
-    presenter(document).document_heading
-  end
-
 
   def thumbnail(document, options)
     default = content_tag(:div, '', :class => 'glyphicon glyphicon-book', 'aria-hidden' => 'true').html_safe
