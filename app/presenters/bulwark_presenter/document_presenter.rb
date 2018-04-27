@@ -41,7 +41,7 @@ module BulwarkPresenter
     end
 
     def display_render(string)
-      string.gsub(',,', ',').gsub('&amp;','&').html_safe
+      string.gsub(',,', ',').gsub(':,', ':').gsub('&amp;','&').html_safe
     end
 
     def html_decode(string_to_decode)
