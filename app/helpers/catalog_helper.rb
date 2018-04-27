@@ -8,6 +8,10 @@ module CatalogHelper
     render :partial => 'catalog/show_main_content_preview'
   end
 
+  def presenter_class
+    BulwarkPresenter::DocumentPresenter
+  end
+
   def thumbnail(document, options)
     default = content_tag(:div, '', :class => 'glyphicon glyphicon-book', 'aria-hidden' => 'true').html_safe
     return default unless ActiveFedora::Base.where(:id => document.id).first.present?
@@ -19,12 +23,18 @@ module CatalogHelper
     current_user != nil
   end
 
+  def multivalue_no_separator(options={})
+    options[:separator] = ' '
+    html_entity(options)
+  end
+
   def html_entity(options={})
+    separator = options[:separator].nil? ? '; ' : "#{options[:separator]}"
     option_vals = []
     options[:value].each do |val|
       option_vals << html_decode(val)
     end
-    return option_vals.reject(&:blank?).join('; ')
+    return option_vals.reject(&:blank?).join(separator)
   end
 
   def html_facet(facet_string)
@@ -34,7 +44,6 @@ module CatalogHelper
   def html_decode(string_to_decode)
     decoder = HTMLEntities.new
     return decoder.decode(string_to_decode)
-
   end
 
 end

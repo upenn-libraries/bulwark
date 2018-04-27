@@ -89,10 +89,10 @@ class MetadataBuilder < ActiveRecord::Base
     if self.metadata_source.where(:source_type => MetadataSource.structural_types).empty?
       Dir.glob("#{working_path}/#{self.repo.assets_subdirectory}/*.{#{self.repo.file_extensions.join(",")}}").each do |file_path|
         self.repo.version_control_agent.unlock({:content => file_path}, working_path)
-        validation_state = validate_file(file_path)
+        valid_file, validation_state = validate_file(file_path)
         self.repo.log_problem_file(file_path.gsub(working_path,''), validation_state) if validation_state.present?
         self.repo.version_control_agent.unlock({:content => self.repo.derivatives_subdirectory}, working_path)
-        generate_preview(file_path,"#{working_path}/#{self.repo.derivatives_subdirectory}") unless validation_state.present?
+        generate_preview(file_path, valid_file,"#{working_path}/#{self.repo.derivatives_subdirectory}") unless validation_state.present?
         self.repo.version_control_agent.add({:content => file_path}, working_path)
         self.repo.version_control_agent.lock(file_path, working_path)
       end
@@ -101,10 +101,10 @@ class MetadataBuilder < ActiveRecord::Base
         ms.filenames.each do |file|
           file_path = "#{working_path}/#{self.repo.assets_subdirectory}/#{file}"
           self.repo.version_control_agent.unlock({:content => file_path}, working_path)
-          validation_state = validate_file(file_path)
+          valid_file, validation_state = validate_file(file_path)
           self.repo.log_problem_file(file_path.gsub(working_path,''), validation_state) if validation_state.present?
           self.repo.version_control_agent.unlock({:content => self.repo.derivatives_subdirectory}, working_path)
-          generate_preview(file_path,"#{working_path}/#{self.repo.derivatives_subdirectory}") unless validation_state.present?
+          generate_preview(file_path, valid_file,"#{working_path}/#{self.repo.derivatives_subdirectory}") unless validation_state.present?
           self.repo.version_control_agent.add({:content => file_path}, working_path)
           self.repo.version_control_agent.lock(file_path, working_path)
         end
@@ -174,9 +174,9 @@ class MetadataBuilder < ActiveRecord::Base
     _available_files
   end
 
-  def generate_preview(file_name, derivatives_directory)
-    preview = Utils::Derivatives::Preview.generate_copy(file_name, derivatives_directory)
-    thumbnail = Utils::Derivatives::PreviewThumbnail.generate_copy(file_name, derivatives_directory)
+  def generate_preview(original_file, file, derivatives_directory)
+    preview = Utils::Derivatives::Preview.generate_copy(original_file, file, derivatives_directory)
+    thumbnail = Utils::Derivatives::PreviewThumbnail.generate_copy(original_file, file, derivatives_directory)
     return [preview, thumbnail]
   end
 
