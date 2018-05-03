@@ -13,13 +13,12 @@
 }
 
 #search-navbar .search-query-form {
-  width: 70%;
+  width: 90%;
 }
 
 .site-name {
   width: 800px;
   height: 100px;
-  float: right;
   font-family: $header-font-family;
   padding-top: 30px;
    a {
@@ -169,4 +168,35 @@ span.site-name {
 
 #openseadragon {
   background-color: $background-black;
+}
+
+
+/*************
+*
+* Staying responsive
+*
+**************/
+
+@media screen and (max-width: 600px) {
+
+  .site-name {
+    a {
+      font-size: 24px;
+    }
+  }
+
+  #header-navbar {
+    .navbar-brand {
+      width: 120px;
+      margin-right: 0px;
+    }
+  }
+
+  #footer {
+    .footer-text {
+      display: block;
+      margin-left: 10px;
+    }
+  }
+
 }
