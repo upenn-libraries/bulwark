@@ -138,6 +138,29 @@ span.site-name {
   background-color: $upenn-blue;
 }
 
+#footer {
+  font-family: "Source Sans Pro","Arial Unicode MS",Helvetica,sans-serif;
+  background-color: #dfdfdf;
+  min-height: 30px;
+  font-size: 12px;
+  padding: 10px 0px;
+  margin-top: 30px;
+  a.branding {
+    color: $text-black;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    line-height: 100%;
+    text-align: left;
+    text-transform: uppercase;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 30px;
+    margin-top: 0;
+    padding-left: 10px;
+  }
+}
+
 /*************
 *
 * Overriding BookReader styles
