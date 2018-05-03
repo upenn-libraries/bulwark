@@ -7,11 +7,6 @@
           <li class="nav-item">
             <%= link_to t('blacklight.header_links.logout'), destroy_user_session_path, class: 'nav-link' %>
           </li>
-          <% unless current_user.to_s.blank? -%>
-              <li class="nav-item">
-                <%= link_to current_user, edit_user_registration_path, class: 'nav-link' %>
-              </li>
-          <% end %>
       <% end %>
   <% end %>
 </ul>

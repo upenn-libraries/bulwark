@@ -80,7 +80,8 @@ module Utils
         repo.version_control_agent.get({:location => thumbnail_link}, working_path)
         repo.version_control_agent.unlock({:content => thumbnail_link}, working_path)
       end
-      thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{working_path}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, @@derivatives_working_destination)}" : ''
+
+      thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{working_path}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, '', @@derivatives_working_destination)}" : ''
       execute_curl(_build_command('file_attach', :file => attachable_url(repo, working_path, thumbnail_link), :fid => repo.names.fedora, :child_container => 'thumbnail'))
       repo.version_control_agent.lock(thumbnail_link, working_path)
       refresh_assets(working_path, repo)
@@ -144,12 +145,12 @@ module Utils
 
     def validate_file(file)
       begin
-        MiniMagick::Image.open(file)
-        return nil
+        f = MiniMagick::Image.open(file)
+        return f, nil
       rescue => exception
-        return 'missing' if exception.inspect.downcase =~ /no such file/
-        return 'invalid' if exception.inspect.downcase =~ /minimagick::invalid/
-        return 'unknown file issue'
+        return nil, 'missing' if exception.inspect.downcase =~ /no such file/
+        return nil, 'invalid' if exception.inspect.downcase =~ /minimagick::invalid/
+        return nil, "#{exception.inspect.downcase}"
       end
     end
 

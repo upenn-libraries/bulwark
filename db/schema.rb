@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171204194529) do
+ActiveRecord::Schema.define(version: 20180419151403) do
 
   create_table "batches", force: :cascade do |t|
     t.text     "queue_list",      limit: 4294967295
@@ -166,6 +166,9 @@ ActiveRecord::Schema.define(version: 20171204194529) do
     t.datetime "updated_at",                                                null: false
     t.boolean  "guest",                                     default: false
     t.text     "job_activity",           limit: 4294967295
+    t.integer  "failed_attempts",        limit: 4,          default: 0
+    t.string   "unlock_token",           limit: 255
+    t.datetime "locked_at"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
