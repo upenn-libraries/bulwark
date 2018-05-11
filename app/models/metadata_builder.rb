@@ -46,6 +46,13 @@ class MetadataBuilder < ActiveRecord::Base
     end
   end
 
+  def determine_reading_direction
+    default_direction = 'ltr'
+    structural_source = self.metadata_source.where(:source_type => MetadataSource.structural_types).pluck(:user_defined_mappings).first
+    lookup_key = structural_source.keys.first
+    return structural_source[lookup_key]['reading_direction'].present? ? structural_source[lookup_key]['reading_direction'] : default_direction
+  end
+
   def set_source(source_files)
     #TODO: Consider removing from MetadataBuilder
     self.source = source_files
@@ -122,6 +129,15 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.lock_keep_files(working_path)
     self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives', :object_id => repo.names.fedora), working_path)
     self.repo.version_control_agent.push(working_path)
+  end
+
+  def get_structural_filenames
+    filenames = []
+    ms = self.metadata_source.where(:source_type => MetadataSource.structural_types).first
+    ms.user_defined_mappings.each do |key,value|
+      filenames << value[ms.file_field]
+    end
+    return filenames
   end
 
   def transform_and_ingest(array)

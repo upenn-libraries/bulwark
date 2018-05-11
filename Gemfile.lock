@@ -351,6 +351,8 @@ GEM
       activesupport
       nokogiri (>= 1.4.2)
       solrizer (~> 3.3)
+    openseadragon (0.3.3)
+      rails (> 3.2.0)
     orm_adapter (0.5.0)
     pry (0.10.4)
       coderay (~> 1.1.0)
@@ -614,6 +616,7 @@ DEPENDENCIES
   letter_opener
   mini_magick
   mysql2
+  openseadragon
   pry-rails (~> 0.3.4)
   qa
   rails (= 4.2.5)
