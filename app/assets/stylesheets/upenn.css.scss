@@ -13,13 +13,12 @@
 }
 
 #search-navbar .search-query-form {
-  width: 70%;
+  width: 90%;
 }
 
 .site-name {
   width: 800px;
   height: 100px;
-  float: right;
   font-family: $header-font-family;
   padding-top: 30px;
    a {
@@ -163,102 +162,41 @@ span.site-name {
 
 /*************
 *
-* Overriding BookReader styles
+* Overriding OpenSeaDragon styles
 *
 **************/
 
-body {
-  font-size: 14px;
+#openseadragon {
+  background-color: $background-black;
 }
 
-#BookReader {
-  margin-left: auto;
-  margin-right: auto;
-}
 
-#BookReader, #BRcontainer, div#BRnav {
-  position: relative;
-}
+/*************
+*
+* Staying responsive
+*
+**************/
 
-#BookReader, #BRcontainer, #BRtoolbar, div#BRnav {
-  width: 600px;
-}
+@media screen and (max-width: 600px) {
 
-#BRcontainer {
-  height: 800px;
-  z-index: 0;
-}
+  .site-name {
+    a {
+      font-size: 24px;
+    }
+  }
 
-div#BRpage {
-  width: 350px;
-}
+  #header-navbar {
+    .navbar-brand {
+      width: 120px;
+      margin-right: 0px;
+    }
+  }
 
-#BRtoolbar, div#BRnav {
-  background-color: $background-white;
-}
+  #footer {
+    .footer-text {
+      display: block;
+      margin-left: 10px;
+    }
+  }
 
-#BRpageview, #BRcontainer {
-  background-color: $reader-background;
-}
-
-div#BRnavpos, div#BRpager, div#BRnavline {
-  width: 200px;
-}
-
-/* Fixes assets loading in CSS in production */
-
-.BRicon {
-  background-image: asset-url('BRicons.png');
-}
-
-#BRbookcover, .BRleafEdgeR, .BRleafEdgeL, .BRleafEdgeTmp {
-  background-image: asset-url('back_pages.png');
-}
-
-#BRgutter {
-  background-image: asset-url('booksplit.png');
-}
-
-.BRfliparea {
-  background-image: asset-url('transparent.png');
-}
-
-#BRpager .ui-slider-handle, div#pager {
-  background-image: asset-url('slider.png');
-}
-
-div.chapter {
-  background: asset-url('marker_chap-off.png');
-}
-
-div.chapter.front {
-  background: asset-url('marker_chap-on.png');
-}
-
-div.search {
-  background-image: asset-url('marker_srch-off.png');
-}
-
-div.search.front, div.search div.pointer {
-  background-image: asset-url('marker_srch-on.png');
-}
-
-div#BRzoombtn {
-  background-image: asset-url('icon_zoomer.png');
-}
-
-.BRprogressbar {
-  background-image: asset-url('progressbar.gif');
-}
-
-.BRup {
-  background-image: asset-url('nav_control-up.png');
-}
-.BRdn {
-  background-image: asset-url('nav_control-dn.png');
-}
-
-/* Hide everything we don't need */
-#BRreturn, #BRtoolbarbuttons, #BRnavCntlBtm, #BRtoolbar .logo {
-  display: none;
 }

@@ -281,6 +281,7 @@ en:
         warnings:
           missing_identifier: 'Object(s) missing identifier.  Please check metadata source.'
           invalid_curl_command: 'Invalid command type specified.  Command not built.'
+          multiple_structural_files: 'Multiple structural entries with same filename.'
           object_method_missing: 'No %{method_name} method defined for this object.'
         success:
           ingest_complete: 'Ingestion complete.  See link(s) below to preview ingested items associated with this repo.'

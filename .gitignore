@@ -24,6 +24,7 @@ config/*.yml
 
 # Ignore containerizing ENV file
 .env
+.env_phalt
 
 # Ignore custom git instructions
 /app/views/repos/_git_instructions_custom.html.erb

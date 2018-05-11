@@ -41,6 +41,7 @@ gem 'fastimage'
 gem 'sanitize'
 gem 'awesome_print'
 gem 'htmlentities'
+gem 'openseadragon'
 
 gem 'bunny'
 gem 'sidekiq'
