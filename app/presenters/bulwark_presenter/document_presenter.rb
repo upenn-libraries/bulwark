@@ -41,7 +41,7 @@ module BulwarkPresenter
     end
 
     def display_render(string)
-      transformations = { ',,' => ',', '&amp;' => '&', ':,' => ':'}
+      transformations = { ',,' => ',', '&amp;' => '&', ':,' => ':', ' ;' => ';'}
       transformations.each_pair {|d,t| string = string.gsub(d, t)}
       string.html_safe
     end
