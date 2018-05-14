@@ -32,13 +32,19 @@ module CatalogHelper
     separator = options[:separator].nil? ? '; ' : "#{options[:separator]}"
     option_vals = []
     options[:value].each do |val|
-      option_vals << html_decode(val)
+      option_vals << html_decode(display_render(val))
     end
     return option_vals.reject(&:blank?).join(separator)
   end
 
   def html_facet(facet_string)
     return html_decode(facet_string)
+  end
+
+  def display_render(string)
+    transformations = { ',,' => ',', '&amp;' => '&', ':,' => ':', ' ;' => ';'}
+    transformations.each_pair {|d,t| string = string.gsub(d, t)}
+    string.html_safe
   end
 
   def html_decode(string_to_decode)
