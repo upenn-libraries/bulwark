@@ -2,9 +2,13 @@ en:
   colenda:
     static:
       homepage:
-        blurb_html: "<p>Colenda is a system for long-term preservation and access to digital assets stewarded by %{institution_link}.  It is a project of the Libraries, developed using the Samvera software framework.  At this time, content accessible to the public in this application is in the public domain and is therefore available for public use.</p>"
+        blurb_html: "<p>Colenda is a system for long-term preservation and access to digital assets stewarded by %{institution_link}.  It is a project of the Libraries, developed using the Samvera software framework.  At this time, content accessible to the public in this application is in the %{public_domain_link} and is therefore available for public use, or where indicated, is of %{undetermined_copyright_link}.</p>"
         institution_link_href: 'http://www.library.upenn.edu'
         institution_link_text: 'Penn Libraries'
+        public_domain_link_href: 'https://creativecommons.org/publicdomain/mark/1.0/'
+        public_domain_link_text: 'public domain'
+        undetermined_copyright_link_href: 'http://rightsstatements.org/page/UND/1.0/'
+        undetermined_copyright_link_text: 'undetermined copyright'
         beta_html: '<div class="alert alert-warning"><p>This site is currently in beta and may be periodically unavailable as we make improvements to the service.</p></div>'
     controllers:
       repos:
