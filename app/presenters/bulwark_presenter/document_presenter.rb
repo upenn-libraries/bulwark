@@ -12,6 +12,16 @@ module BulwarkPresenter
       end
     end
 
+    def render_field_value value=nil, field_config=nil
+      safe_values = Array(value).collect { |x| x.respond_to?(:force_encoding) ? x.force_encoding("UTF-8") : x }
+
+      if field_config and field_config.itemprop
+        safe_values = safe_values.map { |x| content_tag :span, x, :itemprop => field_config.itemprop }
+      end
+
+      display_render(safe_join(safe_values, (field_config.separator if field_config) || field_value_separator))
+    end
+
     def render_document_index_label field, opts ={}
       if field.is_a? Hash
         Deprecation.warn DocumentPresenter, "Calling render_document_index_label with a hash is deprecated"
@@ -27,6 +37,10 @@ module BulwarkPresenter
               end
 
       render_display_field_value label || @document.id
+    end
+
+    def field_value_separator
+      '; '
     end
 
     protected
