@@ -111,7 +111,7 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('coverage', :stored_searchable, type: :string), :label => 'Coverage'
     config.add_show_field solr_name('creator', :stored_searchable, type: :string), :label => 'Creator'
     config.add_show_field solr_name('date', :stored_searchable, type: :string), :label => 'Date'
-    config.add_show_field solr_name('description', :stored_searchable, type: :string), :label => 'Description', helper_method: 'html_entity'
+    config.add_show_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
     config.add_show_field solr_name('format', :stored_searchable, type: :string), :label => 'Format'
     config.add_show_field solr_name('identifier', :stored_searchable, type: :string), :label => 'Identifier'
     config.add_show_field solr_name('language', :stored_searchable, type: :string), :label => 'Language'
@@ -119,11 +119,11 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('publisher', :stored_searchable, type: :string), :label => 'Publisher'
     config.add_show_field solr_name('relation', :stored_searchable, type: :string), :label => 'Relation'
     config.add_show_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
-    config.add_show_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject', helper_method: 'html_entity'
+    config.add_show_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject', :link_to_search => 'subject_sim'
     config.add_show_field solr_name('item_type', :stored_searchable, type: :string), :label => 'Type'
-    config.add_show_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name', helper_method: 'html_entity'
-    config.add_show_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name', helper_method: 'html_entity'
-    config.add_show_field solr_name('geographic_subject', :stored_searchable, type: :string), :label => 'Geographic Subject', helper_method: 'html_entity'
+    config.add_show_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name'
+    config.add_show_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name'
+    config.add_show_field solr_name('geographic_subject', :stored_searchable, type: :string), :label => 'Geographic Subject'
     config.add_show_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
     
     # Catalog
@@ -165,6 +165,14 @@ class CatalogController < ApplicationController
       }
     end
 
+    config.add_search_field('description') do |field|
+      field.qt = 'search'
+      field.solr_local_parameters = {
+          :qf => '$description_qf',
+          :pf => '$description_pf'
+      }
+    end
+
     # Specifying a :qt only to show it's possible, and so our internal automated
     # tests can test it. In this case it's the same as
     # config[:default_solr_parameters][:qt], so isn't actually neccesary.
@@ -184,6 +192,14 @@ class CatalogController < ApplicationController
       field.solr_local_parameters = {
           :qf => '$geographic_subject_qf',
           :pf => '$geographic_subject_pf'
+      }
+    end
+
+    config.add_search_field('identifier') do |field|
+      field.qt = 'search'
+      field.solr_local_parameters = {
+          :qf => '$identifier_qf',
+          :pf => '$identifier_pf'
       }
     end
 
