@@ -24,19 +24,22 @@ module AutomatedWorkflows
         repo = Repo.find_by(:unique_identifier => obj)
         steps_to_complete = determine_steps(repo.initial_stop, self.workflow)
         steps_to_complete = steps_to_complete - options[:steps_to_skip] if options[:steps_to_skip].present?
-        metadata = self.instantiate_worker('Metadata') if (steps_to_complete & %w[fetch extract]).present?
-        assets = self.instantiate_worker('Assets') if (steps_to_complete & %w[fetch file_check]).present?
+        metadata = self.instantiate_worker('Metadata') if (steps_to_complete & %w[fetch_metadata extract]).present?
+        assets = self.instantiate_worker('Assets') if (steps_to_complete & %w[fetch_assets file_check]).present?
         xml = self.instantiate_worker('XML') if (steps_to_complete & %w[xml]).present?
         ingest = self.instantiate_worker('Ingest') if (steps_to_complete & %w[ingest]).present?
 
         working_path = repo.version_control_agent.clone
 
-        if steps_to_complete.include?('fetch')
+        if steps_to_complete.include?('fetch_metadata')
           unless metadata.fetch(working_path, repo)
             repo.version_control_agent.delete_clone(working_path)
             repo.update_last_action(action_description[:fetch_metadata])
             next
           end
+        end
+
+        if steps_to_complete.include?('fetch_assets')
           unless assets.fetch(working_path, repo)
             repo.version_control_agent.delete_clone(working_path)
             repo.update_last_action(action_description[:fetch_assets])
@@ -73,12 +76,12 @@ module AutomatedWorkflows
     end
 
     def determine_steps(repo_stop, workflow)
-      return self.steps('fetch', AutomatedWorkflows.config['ingest_only']['initial_stop']) if workflow == AutomatedWorkflows::IngestOnly
-      return self.steps('fetch', repo_stop)
+      return self.steps('create', AutomatedWorkflows.config['ingest_only']['initial_stop']) if workflow == AutomatedWorkflows::IngestOnly
+      return self.steps('create', repo_stop)
     end
 
     def steps(start = 'create', stop = 'create')
-      steps = ['create','fetch','extract','file_check','xml','ingest']
+      steps = %w[create fetch_metadata fetch_assets extract file_check xml ingest]
       return steps[steps.index(start)..steps.index(stop)]
     end
 
