@@ -58,7 +58,7 @@ module CustomEncodings
 
       }
       TAGS['700'] = { 'a' => 'personal_name' }
-      TAGS['710'] = { 'a' => 'collection' }
+      TAGS['773'] = { 't' => 'collection' }
       TAGS['730'] = { '*' => 'relation' }
       TAGS['740'] = { '*' => 'relation' }
       TAGS['752'] = { '*' => 'geographic_subject' }
