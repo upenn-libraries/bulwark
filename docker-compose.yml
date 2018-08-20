@@ -1,4 +1,4 @@
-version: '2'
+version: '3.1'
 
 services:
 
@@ -32,10 +32,10 @@ services:
       - '${SSH_PORT}:22'
     env_file:
       - '.env'
-    links:
-      - 'db'
-      - 'redis'
-      - 'phalt_app:phalt_app'
+    networks:
+      default:
+        aliases:
+          - 'web'
     volumes:
       - 'web:/home/app/webapp'
       - '${LOCAL_DATA}:${REMOTE_DATA}'
@@ -52,9 +52,6 @@ services:
       - '25:25'
     env_file:
       - '.env'
-    links:
-      - 'redis'
-      - 'web'
     command: 'bundle exec sidekiq -C config/sidekiq.yml'
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
