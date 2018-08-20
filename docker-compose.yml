@@ -1,5 +1,9 @@
 version: '3.1'
 
+configs:
+  authorized_keys:
+    file: 'authorized_keys'
+
 services:
 
   redis:
@@ -26,6 +30,9 @@ services:
     depends_on:
       - 'db'
       - 'redis'
+    config:
+      - source: 'authorized_keys'
+      target: '/home/gitannex/.ssh/authorized_keys'
     image: 'colenda_web:latest'
     ports:
       - '80:80'
