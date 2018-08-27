@@ -15,5 +15,7 @@
 //= require jquery_ujs
 //= require blacklight/blacklight
 //= require blacklight_range_limit
+//= require js.cookie
+//= require modernizr.custom
 //= require openseadragon
 //= require colenda
