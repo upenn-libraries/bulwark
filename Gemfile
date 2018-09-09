@@ -43,6 +43,7 @@ gem 'awesome_print'
 gem 'htmlentities'
 gem 'openseadragon'
 gem 'high_voltage', '~> 3.1'
+gem 'bxslider-rails'
 
 gem 'bunny'
 gem 'sidekiq'

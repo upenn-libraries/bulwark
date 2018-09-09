@@ -13,6 +13,8 @@
 
 //= require jquery
 //= require jquery_ujs
+//= require bxslider
+//= require_tree .
 //= require blacklight/blacklight
 //= require blacklight_range_limit
 //= require openseadragon

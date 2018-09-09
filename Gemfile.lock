@@ -141,6 +141,7 @@ GEM
     builder (3.2.2)
     bunny (2.6.0)
       amq-protocol (>= 2.0.1)
+    bxslider-rails (4.2.5.1)
     cancancan (1.15.0)
     capybara (2.10.1)
       addressable
@@ -593,6 +594,7 @@ DEPENDENCIES
   blacklight_range_limit
   bootstrap-sass (= 3.3.4.1)
   bunny
+  bxslider-rails
   capybara
   coffee-rails (~> 4.0.0)
   colorize
