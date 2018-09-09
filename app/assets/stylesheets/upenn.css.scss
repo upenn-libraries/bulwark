@@ -173,6 +173,22 @@ span.site-name {
 
 /*************
 *
+* Overriding OpenSeaDragon styles
+*
+**************/
+
+.bx-wrapper .bx-caption span {
+  font-size: 18px;
+  font-weight: bold;
+  font-family: $font-family;
+  a {
+    color: $text-white
+  }
+}
+
+
+/*************
+*
 * Staying responsive
 *
 **************/
