@@ -30,7 +30,7 @@ config/*.yml
 /app/views/repos/_git_instructions_custom.html.erb
 
 # Ignore featured objects directory
-/app/assets/images/featured
+/public/assets/featured
 
 # Ignore bash script
 repo.sh

@@ -65,10 +65,10 @@ module ApplicationHelper
 
   def render_featured_list
     items = ''
-    Dir.glob("#{Rails.root}/app/assets/images/featured/manifests/*.yml").each do |manifest|
+    Dir.glob("#{Rails.root}/public/assets/featured/manifests/*.yml").each do |manifest|
       data = YAML.load(File.read(manifest))
       text_link = link_to(data[:title], data[:link])
-      image = image_tag("featured/#{data[:filename]}", :alt => data[:title])
+      image = image_tag("/assets/featured/#{data[:filename]}", :alt => data[:title])
       image_link =  link_to(image.html_safe, data[:link])
       span = content_tag(:span, text_link)
       link_div = content_tag(:div, span, {:class => 'bx-caption'})
