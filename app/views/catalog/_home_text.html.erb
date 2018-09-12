@@ -1,3 +1,42 @@
 <%= t('colenda.static.homepage.blurb_html', :institution_link => link_to(t('colenda.static.homepage.institution_link_text'), t('colenda.static.homepage.institution_link_href')), :public_domain_link => link_to(t('colenda.static.homepage.public_domain_link_text'), t('colenda.static.homepage.public_domain_link_href')), :undetermined_copyright_link => link_to(t('colenda.static.homepage.undetermined_copyright_link_text'), t('colenda.static.homepage.undetermined_copyright_link_href'))) %>
 
 <%= t('colenda.static.homepage.beta_html') %>
+
+<%= t('colenda.static.homepage.featured_title_html') %>
+<ul class="bxslider">
+  <%= render_featured_list %>
+</ul>
+
+<script type="text/javascript">
+
+  $(document).ready(function($) {
+    var slider = $('.bxslider').bxSlider({
+      captions: true,
+      speed: 1000,
+      ariaHidden: true,
+      ariaLive: true,
+      auto: true,
+      autoHover: true,
+      stopAutoOnClick: true,
+      pause: 8000
+    });
+
+    // set keyboard listener
+    $(document).keydown(function(e){
+      if (e.keyCode == 39) // Right arrow
+      {
+        slider.goToNextSlide();
+        return false;
+      }
+      else if (e.keyCode == 37) // left arrow
+      {
+        slider.goToPrevSlide();
+        return false;
+      }
+    });
+
+
+  });
+</script>
+
+

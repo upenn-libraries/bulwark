@@ -50,6 +50,7 @@ services:
       - '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
       - '${PAP_HARVESTING_ENDPOINT_LOCAL}:${PAP_HARVESTING_ENDPOINT_REMOTE}'
       - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
+      - '${LOCAL_FEATURED}:/home/app/webapp/public/assets/featured'
   sidekiq:
     restart: 'unless-stopped'
     depends_on:
