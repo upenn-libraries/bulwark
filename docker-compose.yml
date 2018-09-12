@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.7'
 
 configs:
   authorized_keys:
@@ -30,9 +30,9 @@ services:
     depends_on:
       - 'db'
       - 'redis'
-    config:
+    configs:
       - source: 'authorized_keys'
-      target: '/home/gitannex/.ssh/authorized_keys'
+        target: '/home/gitannex/.ssh/authorized_keys'
     image: 'colenda_web:latest'
     ports:
       - '80:80'
@@ -50,6 +50,7 @@ services:
       - '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
       - '${PAP_HARVESTING_ENDPOINT_LOCAL}:${PAP_HARVESTING_ENDPOINT_REMOTE}'
       - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
+      - '${LOCAL_FEATURED}:/home/app/webapp/public/assets/featured'
   sidekiq:
     restart: 'unless-stopped'
     depends_on:

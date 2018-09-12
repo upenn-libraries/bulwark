@@ -29,6 +29,9 @@ config/*.yml
 # Ignore custom git instructions
 /app/views/repos/_git_instructions_custom.html.erb
 
+# Ignore featured objects directory
+/public/featured
+
 # Ignore bash script
 repo.sh
 just_jetty.sh

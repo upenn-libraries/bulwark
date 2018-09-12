@@ -1,4 +1,7 @@
 <ul class="nav navbar-nav">
+  <li class="nav-item">
+    <%= link_to 'About Colenda', page_path('about') %>
+  </li>
   <% if has_user_authentication_provider? %>
       <% if current_user %>
           <li class="nav-item">
