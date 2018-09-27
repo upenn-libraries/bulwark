@@ -33,7 +33,7 @@ services:
     configs:
       - source: 'authorized_keys'
         target: '/home/gitannex/.ssh/authorized_keys'
-    image: 'colenda_web:latest'
+    image: 'quay.io/upennlibraries/bulwark:latest'
     ports:
       - '80:80'
       - '${SSH_PORT}:22'
@@ -55,7 +55,7 @@ services:
     restart: 'unless-stopped'
     depends_on:
       - 'redis'
-    image: 'colenda_web:latest'
+    image: 'quay.io/upennlibraries/bulwark:latest'
     ports:
       - '25:25'
     env_file:
@@ -77,4 +77,3 @@ volumes:
   redis:
   db:
   web:
-
