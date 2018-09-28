@@ -36,6 +36,9 @@ just_jetty.sh
 # Ignore rdf
 *.rdf
 
+# Ignore featured
+/public/featured
+
 #Ignore docker
 /docker
 
