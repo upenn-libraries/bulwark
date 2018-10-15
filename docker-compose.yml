@@ -49,7 +49,7 @@ services:
       - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
       - '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
       - '${PAP_HARVESTING_ENDPOINT_LOCAL}:${PAP_HARVESTING_ENDPOINT_REMOTE}'
-      - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
+      - 'colenda_workspace:${REMOTE_WORKSPACE}'
       - '${LOCAL_FEATURED}:/home/app/webapp/public/assets/featured'
   sidekiq:
     restart: 'unless-stopped'
@@ -65,7 +65,7 @@ services:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
       - '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
-      - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
+      - 'colenda_workspace:${REMOTE_WORKSPACE}'
   rabbitmq:
     restart: 'unless-stopped'
     image: 'rabbitmq:3-management'
@@ -74,6 +74,8 @@ services:
       - '15672:15672'
 
 volumes:
+  colenda_workspace:
+    external: true
   redis:
   db:
   web:
