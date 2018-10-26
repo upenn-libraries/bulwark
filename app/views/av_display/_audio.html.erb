@@ -1,5 +1,5 @@
-<audio id="audio" preload="auto" data-able-player data-include-transcript="false">
-  <source src="ogg" type="audio/ogg" />
-  <source src="mp3" type="audio/mpeg" />
+<% binding.pry %>
+<audio id="<%= streaming_id %>" data-able-player preload="auto">
+  <source type="audio/mpeg" src="<%= streaming_url %>" />
   Your browser does not support the HTML5 audio tag.
 </audio>
