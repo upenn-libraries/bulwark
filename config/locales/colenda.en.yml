@@ -183,6 +183,10 @@ en:
             bibliophilly: 'BiblioPhilly (XLSX)'
             kaplan: 'Kaplan (XLSX)'
             custom: 'Custom Structural Metadata Spreadsheet (XLSX)'
+            pap: 'Print at Penn Lookup Spreadsheet (XLSX)'
+            pap_structural: 'Print at Penn Structural (XLSX)'
+            pqc: 'Penn Qualified Core Descriptive (XLSX)'
+            pqc_structural: 'Penn Qualified Core Structural (XLSX)'
         orientation:
           vertical: 'Vertical'
           horizontal: 'Horizontal'
@@ -227,6 +231,12 @@ en:
           field_separator: ':'
         pap_structural:
           heading: 'Sample of structural metadata fetched from Catalog Lookup'
+          field_separator: ':'
+        pqc:
+          heading: 'Sample metadata fetched from Penn Qualified Core (PQC) spreadsheet'
+          field_separator: ':'
+        pqc_structural:
+          heading: 'Sample structural metadata fetched from Penn Qualified Core (PQC) structural spreadsheet'
           field_separator: ':'
         custom:
           field:

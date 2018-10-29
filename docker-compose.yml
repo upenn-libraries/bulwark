@@ -44,7 +44,6 @@ services:
         aliases:
           - 'web'
     volumes:
-      - 'web:/home/app/webapp'
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
       - '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
@@ -76,5 +75,4 @@ services:
 volumes:
   redis:
   db:
-  web:
 
