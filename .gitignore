@@ -39,9 +39,6 @@ just_jetty.sh
 # Ignore rdf
 *.rdf
 
-#Ignore docker
-/docker
-
 # Other stuff
 *.rdb
 /.idea
