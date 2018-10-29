@@ -75,11 +75,12 @@ module ApplicationHelper
 
   def render_ableplayer
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
+    partials = ''
     return '' unless repo.present?
     repo.file_display_attributes.each do |key, value|
-      # TODO: pass local variables to view
-      render :partial => 'av_display/audio', :locals => {:streaming_id => key, :streaming_url => value[:streaming_url]}
+       partials += render :partial => 'av_display/audio', :locals => {:streaming_id => key, :streaming_url => value[:streaming_url]}
     end
+    return partials.html_safe
 
   end
 
