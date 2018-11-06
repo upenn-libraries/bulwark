@@ -103,7 +103,7 @@ ADD webapp.conf /etc/nginx/sites-enabled/webapp.conf
 
 ADD rails-env.conf /etc/nginx/main.d/rails-env.conf
 
-CMD curl https://www.incommon.org/certificates/repository/sha384%20Intermediate%20cert.txt > /etc/ssl/certs/InCommon.pem
+RUN wget https://www.incommon.org/certificates/repository/sha384%20Intermediate%20cert.txt --output-document=/etc/ssl/certs/InCommon.pem
 
 # Clean up APT and bundler when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
