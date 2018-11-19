@@ -1,0 +1,6 @@
+development:
+  email: <%= ENV['BATCH_OPS_EMAIL'] %>
+test:
+  email: <%= ENV['BATCH_OPS_EMAIL'] %>
+production:
+  email: <%= ENV['BATCH_OPS_EMAIL'] %>

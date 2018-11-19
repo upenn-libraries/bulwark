@@ -19,9 +19,6 @@
 /imports
 .DS_Store
 
-# Ignore config yml files
-config/*.yml
-
 # Ignore containerizing ENV file
 .env
 .env_phalt
