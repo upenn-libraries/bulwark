@@ -39,8 +39,8 @@ development:
     default_who: <%= ENV['ERC_DEFAULT_WHO'] %>
   voyager:
     root_element: record
-    http_lookup: <%= ENV['VOYAGER_HTTP_LOOKUP_URL'] %>
-    structural_http_lookup: <%= ENV['VOYAGER_HTTP_LOOKUP_URL'] %>
+    http_lookup: <%= ENV['VOYAGER_HTTP_LOOKUP'] %>
+    structural_http_lookup: <%= ENV['VOYAGER_STRUCTURAL_HTTP_LOOKUP'] %>
     structural_identifier_prefix: MEDREN_
     multivalue_fields:
       - abstract
@@ -66,9 +66,9 @@ development:
       - geographic_subject
       - provenance
   pap:
-    http_lookup: http://localhost:9292/records
+    http_lookup: <%= ENV['PAP_HTTP_LOOKUP'] %>
     http_lookup_suffix: show?format=marc21
-    structural_http_lookup: http://localhost:9292/records
+    structural_http_lookup: <%= ENV['PAP_STRUCTURAL_HTTP_LOOKUP'] %>
     structural_lookup_suffix: show?format=structural
   ead_xml:
     root_element: record
@@ -124,8 +124,8 @@ production:
     default_who: <%= ENV['ERC_DEFAULT_WHO'] %>
   voyager:
     root_element: record
-    http_lookup: <%= ENV['VOYAGER_HTTP_LOOKUP_URL'] %>
-    structural_http_lookup: <%= ENV['VOYAGER_HTTP_LOOKUP_URL'] %>
+    http_lookup: <%= ENV['VOYAGER_HTTP_LOOKUP'] %>
+    structural_http_lookup: <%= ENV['VOYAGER_STRUCTURAL_HTTP_LOOKUP'] %>
     structural_identifier_prefix: MEDREN_
     multivalue_fields:
       - abstract
@@ -151,7 +151,7 @@ production:
       - geographic_subject
       - provenance
   pap:
-    http_lookup: <%= ENV['PAP_HTTP_LOOKUP_URL'] %>
+    http_lookup: <%= ENV['PAP_HTTP_LOOKUP'] %>
     http_lookup_suffix: create?format=marc21
-    structural_http_lookup: <%= ENV['PAP_HTTP_LOOKUP_URL'] %>
+    structural_http_lookup: <%= ENV['PAP_STRUCTURAL_HTTP_LOOKUP'] %>
     structural_lookup_suffix: create?format=structural
