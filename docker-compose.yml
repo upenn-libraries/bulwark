@@ -30,8 +30,10 @@ services:
     restart: 'unless-stopped'
     image: 'mysql:5.7'
     environment:
+      MYSQL_DATABASE: ${DATABASE_NAME}
       MYSQL_PASSWORD_FILE: /run/secrets/bulwark_database_password
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/bulwark_database_root_password
+      MYSQL_USER: ${DATABASE_USERNAME}
     secrets:
       - bulwark_database_password
       - bulwark_database_root_password
