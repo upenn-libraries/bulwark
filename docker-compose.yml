@@ -17,9 +17,7 @@ secrets:
     external: true
 
 services:
-
   redis:
-    restart: 'unless-stopped'
     image: 'redis:3.2-alpine'
     command: 'redis-server'
     ports:
@@ -27,7 +25,6 @@ services:
     volumes:
       - 'redis:/var/lib/redis/data'
   db:
-    restart: 'unless-stopped'
     image: 'mysql:5.7'
     environment:
       MYSQL_DATABASE: ${DATABASE_NAME}
@@ -41,27 +38,23 @@ services:
       - 'db:/var/lib/mysql'
   phalt_app:
     image: 'phalt:latest'
+    env_file: '.env_phalt'
     ports:
       - '9292'
-    env_file: '.env_phalt'
   web:
-    restart: 'unless-stopped'
-    depends_on:
-      - 'db'
-      - 'redis'
+    image: 'quay.io/upennlibraries/bulwark:latest'
     configs:
       - source: 'authorized_keys'
         target: '/home/gitannex/.ssh/authorized_keys'
-    image: 'quay.io/upennlibraries/bulwark:latest'
-    ports:
-      - '80:80'
-      - '${SSH_PORT}:22'
     env_file:
       - '.env'
     networks:
       default:
         aliases:
           - 'web'
+    ports:
+      - '80:80'
+      - '${SSH_PORT}:22'
     secrets:
       - source: bulwark_database_config
         target: /home/app/webapp/config/database.yml
@@ -78,22 +71,18 @@ services:
       - 'colenda_workspace:${REMOTE_WORKSPACE}'
       - '${LOCAL_FEATURED}:/home/app/webapp/public/assets/featured'
   sidekiq:
-    restart: 'unless-stopped'
-    depends_on:
-      - 'redis'
     image: 'quay.io/upennlibraries/bulwark:latest'
-    ports:
-      - '25:25'
+    command: 'bundle exec sidekiq -C config/sidekiq.yml'
     env_file:
       - '.env'
-    command: 'bundle exec sidekiq -C config/sidekiq.yml'
+    ports:
+      - '25:25'
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
       - '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
       - 'colenda_workspace:${REMOTE_WORKSPACE}'
   rabbitmq:
-    restart: 'unless-stopped'
     image: 'rabbitmq:3-management'
     hostname: 'rabbitmq'
     ports:
