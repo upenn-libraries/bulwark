@@ -63,13 +63,10 @@ services:
     secrets:
       - source: bulwark_database_config
         target: /home/app/webapp/config/database.yml
-        mode: 0440
       - source: bulwark_fedora_config
         target: /home/app/webapp/config/fedora.yml
-        mode: 0440
       - source: bulwark_secrets_config
         target: /home/app/webapp/config/secrets.yml
-        mode: 0440
     volumes:
       - 'web:/home/app/webapp'
       - '${LOCAL_DATA}:${REMOTE_DATA}'
