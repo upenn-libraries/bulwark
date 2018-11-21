@@ -46,6 +46,32 @@ services:
     configs:
       - source: 'authorized_keys'
         target: '/home/gitannex/.ssh/authorized_keys'
+    environment:
+      BATCH_OPS_EMAIL:
+      CACHE_URL:
+      ERC_DEFAULT_WHO:
+      IIIF_IMAGE_SERVER:
+      KAPLAN_HARVESTING_ENDPOINT_LOCAL:
+      KAPLAN_HARVESTING_ENDPOINT_REMOTE:
+      KAPLAN_INITIAL_STOP:
+      KAPLAN_OWNER:
+      OPENN_DESCRIPTION:
+      OPENN_HARVESTING_ENDPOINT_LOCAL:
+      OPENN_HARVESTING_ENDPOINT_REMOTE:
+      OPENN_INITIAL_STOP:
+      OPENN_OWNER:
+      PAP_DESCRIPTION:
+      PAP_HARVESTING_ENDPOINT_LOCAL:
+      PAP_HARVESTING_ENDPOINT_REMOTE:
+      PAP_HTTP_LOOKUP:
+      PAP_STRUCTURAL_HTTP_LOOKUP:
+      PAP_INITIAL_STOP:
+      PAP_OWNER:
+      PROD_FEDORA_URL:
+      PROD_FEDORA_USER:
+      PROD_SOLR_URL:
+      VOYAGER_HTTP_LOOKUP:
+      VOYAGER_STRUCTURAL_HTTP_LOOKUP:
     env_file:
       - '.env'
     networks:
