@@ -109,7 +109,6 @@ services:
       - source: bulwark_secrets_config
         target: /home/app/webapp/config/secrets.yml
     volumes:
-      - 'web:/home/app/webapp'
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
       - '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
@@ -190,4 +189,3 @@ volumes:
     external: true
   redis:
   db:
-  web:
