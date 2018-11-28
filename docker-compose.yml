@@ -38,7 +38,12 @@ services:
       - 'db:/var/lib/mysql'
   phalt_app:
     image: 'phalt:latest'
-    env_file: '.env_phalt'
+    environment:
+      IIIF:
+      IIIF_BASE:
+      OAI_PMH:
+      VIRTUAL_HOST:
+      VIRTUAL_URL:
     ports:
       - '9292'
   web:
