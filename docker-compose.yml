@@ -47,33 +47,55 @@ services:
       - source: 'authorized_keys'
         target: '/home/gitannex/.ssh/authorized_keys'
     environment:
+      AWS_ACCESS_KEY_ID:
+      AWS_SECRET_ACCESS_KEY:
       BATCH_OPS_EMAIL:
       CACHE_URL:
+      CATALOG_CONTROLLER_PROTOCOL:
+      DATABASE_NAME:
+      DATABASE_USERNAME:
       ERC_DEFAULT_WHO:
+      EZID_DEFAULT_SHOULDER:
+      EZID_PASSWORD:
+      EZID_USER:
+      GIT_USER:
+      GIT_USER_PASS:
       IIIF_IMAGE_SERVER:
-      KAPLAN_HARVESTING_ENDPOINT_LOCAL:
+      IMAGING_USER:
+      IMAGING_USER_PASS:
       KAPLAN_HARVESTING_ENDPOINT_REMOTE:
       KAPLAN_INITIAL_STOP:
       KAPLAN_OWNER:
       OPENN_DESCRIPTION:
-      OPENN_HARVESTING_ENDPOINT_LOCAL:
       OPENN_HARVESTING_ENDPOINT_REMOTE:
       OPENN_INITIAL_STOP:
       OPENN_OWNER:
       PAP_DESCRIPTION:
-      PAP_HARVESTING_ENDPOINT_LOCAL:
       PAP_HARVESTING_ENDPOINT_REMOTE:
       PAP_HTTP_LOOKUP:
       PAP_STRUCTURAL_HTTP_LOOKUP:
       PAP_INITIAL_STOP:
       PAP_OWNER:
+      PROD_FEDORA_PW:
       PROD_FEDORA_URL:
       PROD_FEDORA_USER:
       PROD_SOLR_URL:
+      PUBLIC_FEDORA_URL:
+      REQUEST_STYLE:
+      SMTP_ADDRESS:
+      SMTP_DOMAIN:
+      SMTP_PORT:
+      SPECIAL_REMOTE_NAME:
+      STORAGE_ENCRYPTION:
+      STORAGE_HOST:
+      STORAGE_PORT:
+      STORAGE_PROTOCOL:
+      STORAGE_PUBLIC:
+      STORAGE_READ_HOST:
+      STORAGE_READ_PROTOCOL:
+      STORAGE_TYPE:
       VOYAGER_HTTP_LOOKUP:
       VOYAGER_STRUCTURAL_HTTP_LOOKUP:
-    env_file:
-      - '.env'
     networks:
       default:
         aliases:
@@ -84,8 +106,6 @@ services:
     secrets:
       - source: bulwark_database_config
         target: /home/app/webapp/config/database.yml
-      - source: bulwark_fedora_config
-        target: /home/app/webapp/config/fedora.yml
       - source: bulwark_secrets_config
         target: /home/app/webapp/config/secrets.yml
     volumes:
@@ -99,6 +119,8 @@ services:
   sidekiq:
     image: 'quay.io/upennlibraries/bulwark:latest'
     command: 'bundle exec sidekiq -C config/sidekiq.yml'
+    environment:
+      REDIS_URL:
     env_file:
       - '.env'
     ports:
