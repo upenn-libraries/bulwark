@@ -169,8 +169,6 @@ services:
       STORAGE_TYPE:
       VOYAGER_HTTP_LOOKUP:
       VOYAGER_STRUCTURAL_HTTP_LOOKUP:
-    env_file:
-      - '.env'
     ports:
       - '25:25'
     volumes:
