@@ -178,6 +178,9 @@ services:
       VOYAGER_STRUCTURAL_HTTP_LOOKUP:
     ports:
       - '25:25'
+    secrets:
+      - source: bulwark_secrets_config
+        target: /home/app/webapp/config/secrets.yml
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
