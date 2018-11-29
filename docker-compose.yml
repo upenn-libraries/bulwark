@@ -86,6 +86,7 @@ services:
       PROD_FEDORA_USER:
       PROD_SOLR_URL:
       PUBLIC_FEDORA_URL:
+      RAILS_ENV:
       REQUEST_STYLE:
       SMTP_ADDRESS:
       SMTP_DOMAIN:
@@ -158,6 +159,7 @@ services:
       PROD_FEDORA_USER:
       PROD_SOLR_URL:
       PUBLIC_FEDORA_URL:
+      RAILS_ENV:
       REDIS_URL:
       REQUEST_STYLE:
       SMTP_ADDRESS:
