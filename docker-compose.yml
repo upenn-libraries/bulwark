@@ -88,6 +88,7 @@ services:
       PUBLIC_FEDORA_URL:
       RAILS_ENV:
       REQUEST_STYLE:
+      SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE:
       SMTP_ADDRESS:
       SMTP_DOMAIN:
       SMTP_PORT:
@@ -119,6 +120,7 @@ services:
       #- '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
       #- '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
       #- '${PAP_HARVESTING_ENDPOINT_LOCAL}:${PAP_HARVESTING_ENDPOINT_REMOTE}'
+      - 'sceti_completed_2:${SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE}'
       - 'colenda_workspace:${REMOTE_WORKSPACE}'
       - '${LOCAL_FEATURED}:/home/app/webapp/public/assets/featured'
   sidekiq:
@@ -162,6 +164,7 @@ services:
       RAILS_ENV:
       REDIS_URL:
       REQUEST_STYLE:
+      SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE:
       SMTP_ADDRESS:
       SMTP_DOMAIN:
       SMTP_PORT:
@@ -185,6 +188,7 @@ services:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       #- '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
       #- '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
+      - 'sceti_completed_2:${SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE}'
       - 'colenda_workspace:${REMOTE_WORKSPACE}'
   rabbitmq:
     image: 'rabbitmq:3-management'
@@ -194,6 +198,8 @@ services:
 
 volumes:
   colenda_workspace:
+    external: true
+  sceti_completed_2:
     external: true
   redis:
   db:
