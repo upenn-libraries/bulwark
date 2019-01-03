@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -qq -y --no-install-recommends \
         git-core \
         imagemagick \
         libmysqlclient-dev \
+        netbase \
         nodejs \
         openssh-server \
         sudo \
