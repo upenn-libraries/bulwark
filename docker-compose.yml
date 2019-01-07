@@ -51,6 +51,10 @@ services:
     configs:
       - source: 'authorized_keys'
         target: '/home/gitannex/.ssh/authorized_keys'
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
     environment:
       AWS_ACCESS_KEY_ID:
       AWS_SECRET_ACCESS_KEY:
