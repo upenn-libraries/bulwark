@@ -187,6 +187,8 @@ services:
     ports:
       - '25:25'
     secrets:
+      - source: bulwark_database_config
+        target: /home/app/webapp/config/database.yml
       - source: bulwark_secrets_config
         target: /home/app/webapp/config/secrets.yml
     volumes:
