@@ -1,0 +1,13 @@
+# Display mechanisms settings
+
+development:
+  iiif:
+    image_server: <%= ENV['IIIF_IMAGE_SERVER'] %>
+
+test:
+  iiif:
+    image_server: <%= ENV['IIIF_IMAGE_SERVER'] %>
+
+production:
+  iiif:
+    image_server: <%= ENV['IIIF_IMAGE_SERVER'] %>

@@ -4,10 +4,20 @@ configs:
   authorized_keys:
     file: 'authorized_keys'
 
-services:
+secrets:
+  bulwark_database_password:
+    external: true
+  bulwark_database_root_password:
+    external: true
+  bulwark_database_config:
+    external: true
+  bulwark_fedora_config:
+    external: true
+  bulwark_secrets_config:
+    external: true
 
+services:
   redis:
-    restart: 'unless-stopped'
     image: 'redis:3.2-alpine'
     command: 'redis-server'
     ports:
@@ -15,65 +25,188 @@ services:
     volumes:
       - 'redis:/var/lib/redis/data'
   db:
-    restart: 'unless-stopped'
-    image: 'mysql/mysql-server:5.7'
-    env_file: '.env'
+    image: 'mysql:5.7'
+    environment:
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_PASSWORD_FILE: /run/secrets/bulwark_database_password
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/bulwark_database_root_password
+      MYSQL_USER: ${DATABASE_USERNAME}
+    secrets:
+      - bulwark_database_password
+      - bulwark_database_root_password
     volumes:
       - 'db:/var/lib/mysql'
   phalt_app:
     image: 'phalt:latest'
+    environment:
+      IIIF:
+      IIIF_BASE:
+      OAI_PMH:
+      VIRTUAL_HOST:
+      VIRTUAL_URL:
     ports:
       - '9292'
-    env_file: '.env_phalt'
   web:
-    restart: 'unless-stopped'
-    depends_on:
-      - 'db'
-      - 'redis'
+    image: 'quay.io/upennlibraries/bulwark:${BULWARK_IMAGE_TAG}'
     configs:
       - source: 'authorized_keys'
         target: '/home/gitannex/.ssh/authorized_keys'
-    image: 'quay.io/upennlibraries/bulwark:latest'
-    ports:
-      - '80:80'
-      - '${SSH_PORT}:22'
-    env_file:
-      - '.env'
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+    environment:
+      AWS_ACCESS_KEY_ID:
+      AWS_SECRET_ACCESS_KEY:
+      BATCH_OPS_EMAIL:
+      CACHE_URL:
+      CATALOG_CONTROLLER_PROTOCOL:
+      DATABASE_NAME:
+      DATABASE_USERNAME:
+      ERC_DEFAULT_WHO:
+      EZID_DEFAULT_SHOULDER:
+      EZID_PASSWORD:
+      EZID_USER:
+      GIT_USER:
+      GIT_USER_PASS:
+      IIIF_IMAGE_SERVER:
+      IMAGING_USER:
+      IMAGING_USER_PASS:
+      KAPLAN_HARVESTING_ENDPOINT_REMOTE:
+      KAPLAN_INITIAL_STOP:
+      KAPLAN_OWNER:
+      OPENN_DESCRIPTION:
+      OPENN_HARVESTING_ENDPOINT_REMOTE:
+      OPENN_INITIAL_STOP:
+      OPENN_OWNER:
+      PAP_DESCRIPTION:
+      PAP_HARVESTING_ENDPOINT_REMOTE:
+      PAP_HTTP_LOOKUP:
+      PAP_STRUCTURAL_HTTP_LOOKUP:
+      PAP_INITIAL_STOP:
+      PAP_OWNER:
+      PROD_FEDORA_PW:
+      PROD_FEDORA_URL:
+      PROD_FEDORA_USER:
+      PROD_SOLR_URL:
+      PUBLIC_FEDORA_URL:
+      RAILS_ENV:
+      REDIS_URL:
+      REQUEST_STYLE:
+      SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE:
+      SMTP_ADDRESS:
+      SMTP_DOMAIN:
+      SMTP_PORT:
+      SPECIAL_REMOTE_NAME:
+      STORAGE_ENCRYPTION:
+      STORAGE_HOST:
+      STORAGE_PORT:
+      STORAGE_PROTOCOL:
+      STORAGE_PUBLIC:
+      STORAGE_READ_HOST:
+      STORAGE_READ_PROTOCOL:
+      STORAGE_TYPE:
+      VOYAGER_HTTP_LOOKUP:
+      VOYAGER_STRUCTURAL_HTTP_LOOKUP:
     networks:
       default:
         aliases:
           - 'web'
+    ports:
+      - '80:80'
+      - '${SSH_PORT}:22'
+    secrets:
+      - source: bulwark_database_config
+        target: /home/app/webapp/config/database.yml
+      - source: bulwark_secrets_config
+        target: /home/app/webapp/config/secrets.yml
     volumes:
-      - 'web:/home/app/webapp'
       - '${LOCAL_DATA}:${REMOTE_DATA}'
-      - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
-      - '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
-      - '${PAP_HARVESTING_ENDPOINT_LOCAL}:${PAP_HARVESTING_ENDPOINT_REMOTE}'
-      - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
+      #- '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
+      #- '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
+      #- '${PAP_HARVESTING_ENDPOINT_LOCAL}:${PAP_HARVESTING_ENDPOINT_REMOTE}'
+      - 'sceti_completed_2:${SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE}'
+      - 'colenda_workspace:${REMOTE_WORKSPACE}'
       - '${LOCAL_FEATURED}:/home/app/webapp/public/assets/featured'
   sidekiq:
-    restart: 'unless-stopped'
-    depends_on:
-      - 'redis'
-    image: 'quay.io/upennlibraries/bulwark:latest'
+    image: 'quay.io/upennlibraries/bulwark:${BULWARK_IMAGE_TAG}'
+    command: 'bundle exec sidekiq -C config/sidekiq.yml'
+    environment:
+      AWS_ACCESS_KEY_ID:
+      AWS_SECRET_ACCESS_KEY:
+      BATCH_OPS_EMAIL:
+      CACHE_URL:
+      CATALOG_CONTROLLER_PROTOCOL:
+      DATABASE_NAME:
+      DATABASE_USERNAME:
+      ERC_DEFAULT_WHO:
+      EZID_DEFAULT_SHOULDER:
+      EZID_PASSWORD:
+      EZID_USER:
+      GIT_USER:
+      GIT_USER_PASS:
+      IIIF_IMAGE_SERVER:
+      IMAGING_USER:
+      IMAGING_USER_PASS:
+      KAPLAN_HARVESTING_ENDPOINT_REMOTE:
+      KAPLAN_INITIAL_STOP:
+      KAPLAN_OWNER:
+      OPENN_DESCRIPTION:
+      OPENN_HARVESTING_ENDPOINT_REMOTE:
+      OPENN_INITIAL_STOP:
+      OPENN_OWNER:
+      PAP_DESCRIPTION:
+      PAP_HARVESTING_ENDPOINT_REMOTE:
+      PAP_HTTP_LOOKUP:
+      PAP_STRUCTURAL_HTTP_LOOKUP:
+      PAP_INITIAL_STOP:
+      PAP_OWNER:
+      PROD_FEDORA_PW:
+      PROD_FEDORA_URL:
+      PROD_FEDORA_USER:
+      PROD_SOLR_URL:
+      PUBLIC_FEDORA_URL:
+      RAILS_ENV:
+      REDIS_URL:
+      REQUEST_STYLE:
+      SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE:
+      SMTP_ADDRESS:
+      SMTP_DOMAIN:
+      SMTP_PORT:
+      SPECIAL_REMOTE_NAME:
+      STORAGE_ENCRYPTION:
+      STORAGE_HOST:
+      STORAGE_PORT:
+      STORAGE_PROTOCOL:
+      STORAGE_PUBLIC:
+      STORAGE_READ_HOST:
+      STORAGE_READ_PROTOCOL:
+      STORAGE_TYPE:
+      VOYAGER_HTTP_LOOKUP:
+      VOYAGER_STRUCTURAL_HTTP_LOOKUP:
     ports:
       - '25:25'
-    env_file:
-      - '.env'
-    command: 'bundle exec sidekiq -C config/sidekiq.yml'
+    secrets:
+      - source: bulwark_database_config
+        target: /home/app/webapp/config/database.yml
+      - source: bulwark_secrets_config
+        target: /home/app/webapp/config/secrets.yml
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
-      - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
-      - '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
-      - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
+      #- '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
+      #- '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
+      - 'sceti_completed_2:${SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE}'
+      - 'colenda_workspace:${REMOTE_WORKSPACE}'
   rabbitmq:
-    restart: 'unless-stopped'
     image: 'rabbitmq:3-management'
     hostname: 'rabbitmq'
     ports:
       - '15672:15672'
 
 volumes:
+  colenda_workspace:
+    external: true
+  sceti_completed_2:
+    external: true
   redis:
   db:
-  web:

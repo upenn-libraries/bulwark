@@ -1,0 +1,112 @@
+development:
+  openn:
+    csv:
+     owner: <%= ENV['OPENN_OWNER'] %>
+     description: <%= ENV['OPENN_DESCRIPTION'] || 'Generated from CSV through automated workflow' %>
+     initial_stop: <%= ENV['OPENN_INITIAL_STOP'] || 'create' %>
+     metadata_suffix: <%= ENV['OPENN_METADATA_SUFFIX'] || '' %>
+     assets_suffix: <%= ENV['OPENN_ASSETS_SUFFIX'] || 'data/' %>
+     endpoints:
+       metadata_fetch_method: rsync
+       metadata_protocol: smb
+       assets_fetch_method: rsync
+       assets_protocol: smb
+     metadata:
+       descriptive_filename: MM_Metadata.xlsx
+       structural_filename: MM_struct_metadata.xlsx
+  pap:
+      csv:
+       owner: <%= ENV['PAP_OWNER'] %>
+       description: <%= ENV['PAP_DESCRIPTION'] || 'Generated from CSV through automated workflow' %>
+       initial_stop: <%= ENV['PAP_INITIAL_STOP'] || 'create' %>
+       metadata_suffix: <%= ENV['PAP_METADATA_SUFFIX'] || '' %>
+       assets_suffix: <%= ENV['PAP_ASSETS_SUFFIX'] || 'data/' %>
+       endpoints:
+         metadata_fetch_method: rsync
+         metadata_protocol: smb
+         assets_fetch_method: rsync
+         assets_protocol: smb
+       metadata:
+         descriptive_filename: MM_Metadata.xlsx
+         structural_filename: MM_struct_metadata.xlsx
+  kaplan:
+    csv:
+     owner: <%= ENV['KAPLAN_OWNER'] %>
+     description: <%= ENV['KAPLAN_DESCRIPTION'] || 'Generated from CSV through automated workflow' %>
+     initial_stop: <%= ENV['KAPLAN_INITIAL_STOP'] || 'create' %>
+     metadata_suffix: <%= ENV['KAPLAN_METADATA_SUFFIX'] || '' %>
+     assets_suffix: <%= ENV['KAPLAN_ASSETS_SUFFIX'] || 'data/' %>
+     endpoints:
+       metadata_fetch_method: rsync
+       metadata_protocol: smb
+       assets_fetch_method: rsync
+       assets_protocol: smb
+     metadata:
+       descriptive_filename: metadata.xlsx
+       structural_filename: struct_metadata.xlsx
+  ingest_only:
+     initial_stop: <%= ENV['INGEST_INITIAL_STOP'] || 'ingest' %>
+     steps_to_skip: <%= ENV['INGEST_STEPS_TO_SKIP'] || ['fetch_metadata','fetch_assets','extract','file_check','xml'] %>
+test:
+  openn:
+    csv:
+      owner: user@email.edu
+      description: X
+      initial_stop: create
+      metadata_suffix: X
+      assets_suffix: X
+      endpoints:
+        metadata_fetch_method: X
+        metadata_protocol: X
+        assets_fetch_method: X
+        assets_protocol: X
+
+production:
+  openn:
+    csv:
+     owner: <%= ENV['OPENN_OWNER'] %>
+     description: <%= ENV['OPENN_DESCRIPTION'] || 'Generated from CSV through automated workflow' %>
+     initial_stop: <%= ENV['OPENN_INITIAL_STOP'] || 'create' %>
+     metadata_suffix: <%= ENV['OPENN_METADATA_SUFFIX'] || '' %>
+     assets_suffix: <%= ENV['OPENN_ASSETS_SUFFIX'] || 'data/' %>
+     endpoints:
+       metadata_fetch_method: rsync
+       metadata_protocol: smb
+       assets_fetch_method: rsync
+       assets_protocol: smb
+     metadata:
+       descriptive_filename: MM_Metadata.xlsx
+       structural_filename: MM_struct_metadata.xlsx
+  pap:
+    csv:
+     owner: <%= ENV['PAP_OWNER'] %>
+     description: <%= ENV['PAP_DESCRIPTION'] || 'Generated from CSV through automated workflow' %>
+     initial_stop: <%= ENV['PAP_INITIAL_STOP'] || 'create' %>
+     metadata_suffix: <%= ENV['PAP_METADATA_SUFFIX'] || '' %>
+     assets_suffix: <%= ENV['PAP_ASSETS_SUFFIX'] || 'data/' %>
+     endpoints:
+       metadata_fetch_method: rsync
+       metadata_protocol: smb
+       assets_fetch_method: rsync
+       assets_protocol: smb
+     metadata:
+       descriptive_filename: MM_Metadata.xlsx
+       structural_filename: MM_struct_metadata.xlsx
+  kaplan:
+    csv:
+     owner: <%= ENV['KAPLAN_OWNER'] %>
+     description: <%= ENV['KAPLAN_DESCRIPTION'] || 'Generated from CSV through automated workflow' %>
+     initial_stop: <%= ENV['KAPLAN_INITIAL_STOP'] || 'create' %>
+     metadata_suffix: <%= ENV['KAPLAN_METADATA_SUFFIX'] || '' %>
+     assets_suffix: <%= ENV['KAPLAN_ASSETS_SUFFIX'] || 'data/' %>
+     endpoints:
+       metadata_fetch_method: rsync
+       metadata_protocol: smb
+       assets_fetch_method: rsync
+       assets_protocol: smb
+     metadata:
+       descriptive_filename: metadata.xlsx
+       structural_filename: struct_metadata.xlsx
+  ingest_only:
+    initial_stop: <%= ENV['INGEST_INITIAL_STOP'] || 'ingest' %>
+    steps_to_skip: <%= ENV['INGEST_STEPS_TO_SKIP'] || ['fetch_metadata','fetch_assets','extract','file_check','xml'] %>
