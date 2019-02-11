@@ -3,6 +3,8 @@ version: '3.7'
 configs:
   authorized_keys:
     file: 'authorized_keys'
+  webapp_conf:
+    file: 'webapp.conf'
 
 secrets:
   bulwark_database_password:
@@ -51,6 +53,8 @@ services:
     configs:
       - source: 'authorized_keys'
         target: '/home/gitannex/.ssh/authorized_keys'
+      - source: 'webapp_conf'
+        target: '/etc/nginx/sites-enabled/webapp.conf'
     deploy:
       replicas: 2
       update_config:
