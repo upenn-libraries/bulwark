@@ -135,6 +135,9 @@ services:
   sidekiq:
     image: 'quay.io/upennlibraries/bulwark:${BULWARK_IMAGE_TAG}'
     command: 'bundle exec sidekiq -C config/sidekiq.yml'
+    configs:
+      - source: 'webapp_conf'
+        target: '/etc/nginx/sites-enabled/webapp.conf'
     environment:
       AWS_ACCESS_KEY_ID:
       AWS_SECRET_ACCESS_KEY:
