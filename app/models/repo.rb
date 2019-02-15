@@ -20,6 +20,10 @@ class Repo < ActiveRecord::Base
   validates :metadata_source_extensions, presence: true
   validates :preservation_filename, presence: true
 
+  validates_format_of :unique_identifier, :with => /ark:\/[a-zA-Z0-9]{5,}\/[a-zA-Z0-9]{5,}/, :allow_blank => true
+
+  validates_uniqueness_of :unique_identifier, :allow_blank => true
+
   serialize :file_extensions, Array
   serialize :metadata_source_extensions, Array
   serialize :metadata_sources, Array
@@ -138,6 +142,42 @@ class Repo < ActiveRecord::Base
       self.version_control_agent.set_remote_permissions
     end
     self.update_last_action(action_description[:git_remote_initialized])
+  end
+
+  def set_metadata_from_ark
+    structural_mappings, bib_id = _set_structural_metadata_ark(self.unique_identifier)
+    desc = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => 'url').first_or_create
+    desc.update_attributes( view_type: 'horizontal',
+                            num_objects: 1,
+                            x_start: 1,
+                            y_start: 2,
+                            x_stop: 34,
+                            y_stop: 2,
+                            root_element: 'record',
+                            source_type: 'voyager',
+                            z: 1 )
+
+    _set_descriptive_metadata_ark(bib_id, desc)
+
+    desc.save!
+
+    struct = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => 'url2').first_or_create
+    struct.update_attributes( view_type: 'horizontal',
+                              num_objects: 1,
+                              x_start: 1,
+                              y_start: 1,
+                              x_stop: 1,
+                              y_stop: 1,
+                              root_element: 'pages',
+                              parent_element: 'page',
+                              source_type: 'pqc_ark',
+                              file_field: 'file_name',
+                              z: 1 )
+    struct.original_mappings = structural_mappings
+    struct.user_defined_mappings = structural_mappings
+    struct.save!
+    self.metadata_builder.metadata_source = [desc, struct]
+    self.metadata_builder.save!
   end
 
   def ingest(file, working_path)
@@ -348,6 +388,44 @@ class Repo < ActiveRecord::Base
     self.version_control_agent.drop(working_path)
     self.version_control_agent.delete_clone(working_path)
     exist_status
+  end
+
+  def _set_descriptive_metadata_ark(bib_id, metadata_source)
+    url = "#{MetadataSchema.config[:pap][:http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:http_lookup_suffix]}"
+    begin
+      data = Nokogiri::XML(open(url))
+    rescue Exception => e
+      return {}, '' if e.message.include?('404')
+    end
+    metadata_source.original_mappings['bibid'] = bib_id
+    metadata_source.set_metadata_mappings
+  end
+
+  def _set_structural_metadata_ark(ark_id)
+    mapped_values = {}
+    url = "#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{ark_id.tr(':/','+=')}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}"
+    begin
+      data = Nokogiri::XML(open(url))
+    rescue Exception => e
+      return {}, '' if e.message.include?('404')
+    end
+
+    reading_direction = data.xpath('//record/pages/page').first['side'] == 'verso' ? 'right-to-left' : 'left-to-right'
+    data.xpath('//record/pages/page').each_with_index do |page, index|
+      mapped_values[index+1] = {
+          'page_number' => page['number'],
+          'sequence' => page['seq'],
+          'reading_direction' => reading_direction,
+          'side' => page['side'],
+          'tocentry' => page['tocentry'],
+          'identifier' => "#{ark_id.tr(':/','+=')}#{page[:image]}",
+          'file_name' => "#{page['image']}.tif",
+          'description' => page['visiblepage']
+
+      }
+    end
+    bib_id = data.at_xpath('//record/bib_id').children.first.text
+    return mapped_values, bib_id
   end
 
   def action_description

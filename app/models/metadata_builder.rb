@@ -134,6 +134,7 @@ class MetadataBuilder < ActiveRecord::Base
   def get_structural_filenames
     filenames = []
     ms = self.metadata_source.where(:source_type => MetadataSource.structural_types).first
+    return nil if ms.nil?
     ms.user_defined_mappings.each do |key,value|
       filenames << value[ms.file_field]
     end

@@ -126,7 +126,7 @@ class MetadataSource < ActiveRecord::Base
     end
   end
 
-  def set_metadata_mappings(working_path)
+  def set_metadata_mappings(working_path = '')
     if self.source_type.present?
       case self.source_type
         when 'custom'
@@ -142,7 +142,7 @@ class MetadataSource < ActiveRecord::Base
           self.file_field = 'file_name'
           self.user_defined_mappings = _set_marmite_structural_metadata(working_path)
           self.identifier = self.original_mappings['bibid']
-        when 'voyager'
+      when 'voyager'
           self.root_element = MetadataSchema.config[:voyager][:root_element] || 'record'
           self.user_defined_mappings = _set_marmite_data(working_path)
           self.identifier = self.original_mappings['bibid']
@@ -161,8 +161,11 @@ class MetadataSource < ActiveRecord::Base
           self.file_field = 'file_name'
           self.user_defined_mappings = _set_marmite_structural_metadata(working_path)
           self.identifier = self.original_mappings['bibid']
-      end
+        when 'pqc_ark'
+
+        end
     end
+
     self.metadata_builder.repo.update_steps(:metadata_extracted)
     self.save!
   end
@@ -607,7 +610,7 @@ class MetadataSource < ActiveRecord::Base
           orig = value if key == self.file_field
         end
         return orig
-      when 'structural_bibid', 'bibliophilly_structural', 'pap_structural', 'kaplan_structural'
+      when 'structural_bibid', 'bibliophilly_structural', 'pap_structural', 'kaplan_structural', 'pqc_ark'
         filenames = []
         self.user_defined_mappings.each do |key, value|
           filenames << value[self.file_field] if value[self.file_field].present?
@@ -619,7 +622,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def self.structural_types
-    %w[custom structural_bibid bibliophilly_structural pap_structural kaplan_structural]
+    %w[custom structural_bibid bibliophilly_structural pap_structural kaplan_structural pqc_ark]
   end
 
   def validate_bib_id(bib_id)
@@ -720,7 +723,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def _set_marmite_data(working_path)
-    _refresh_bibid(working_path)
+    _refresh_bibid(working_path) unless working_path.empty?
     mapped_values = {}
     catalog_source = reconcile_metadata_lookup_source(self.source_type, self.original_mappings['bibid'])
     data = Nokogiri::XML(open(catalog_source))

@@ -122,6 +122,12 @@ RailsAdmin.config do |config|
         %{#{value}}.html_safe
       end
     end
+    field :unique_identifier do
+      visible true
+      label I18n.t('colenda.rails_admin.new_repo.labels.unique_identifier')
+      help I18n.t('colenda.rails_admin.new_repo.unique_identifier.help')
+      required(false)
+    end
     field :description do
       required(false)
     end

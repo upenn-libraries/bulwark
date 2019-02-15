@@ -111,15 +111,18 @@ module Utils
                                                                                         :height => height}
       end
 
-      repo.metadata_builder.get_structural_filenames.each do |filename|
-        entry = repo.file_display_attributes.select{|key, hash| hash[:file_name].split('/').last == "#{filename}.jpeg"}
-        raise I18n.t('colenda.utils.process.warnings.multiple_structural_files') if entry.length > 1
-        display_array << entry.keys.first
+      unless repo.metadata_builder.metadata_source.where(:source_type => MetadataSource.structural_types).empty?
+        repo.metadata_builder.get_structural_filenames.each do |filename|
+          entry = repo.file_display_attributes.select{|key, hash| hash[:file_name].split('/').last == "#{filename}.jpeg"}
+          raise I18n.t('colenda.utils.process.warnings.multiple_structural_files') if entry.length > 1
+          display_array << entry.keys.first
+        end
+
+        repo.images_to_render['iiif'] = { 'reading_direction' => repo.metadata_builder.determine_reading_direction,
+                                          'images' => display_array.map{ |s| "#{Display.config['iiif']['image_server']}#{repo.names.bucket}%2F#{s}/info.json" }
+        }
       end
 
-      repo.images_to_render['iiif'] = { 'reading_direction' => repo.metadata_builder.determine_reading_direction,
-                                        'images' => display_array.map{ |s| "#{Display.config['iiif']['image_server']}#{repo.names.bucket}%2F#{s}/info.json" }
-      }
       repo.save!
     end
 

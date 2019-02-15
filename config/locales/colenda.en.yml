@@ -71,6 +71,7 @@ en:
         labels:
           human_readable_name: 'Name'
           directory: 'Directory'
+          unique_identifier: 'Ark ID (if available)'
         metadata_subdirectory:
           help: 'Required - subdirectory within the directory specified above that will serve as the location for the metadata to be processed by the application.'
         assets_subdirectory:
@@ -81,6 +82,8 @@ en:
           help: 'Required - comma-separated list of accepted file extensions for metadata source files to be served from the metadata subdirectory.'
         preservation_filename:
           help: 'Required - Filename for long-term preservation XML file'
+        unique_identifier:
+          help: 'Optional - the ARK ID pre-minted for this repo'
       dashboard_link_text: 'Admin Dashboard'
       links:
         front_end: 'Front End'
