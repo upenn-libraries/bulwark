@@ -47,7 +47,7 @@ services:
     ports:
       - '9292'
   web:
-    image: 'bulwark:hotfix_26'
+    image: 'quay.io/upennlibraries/bulwark:${BULWARK_IMAGE_TAG}'
     configs:
       - source: 'authorized_keys'
         target: '/home/gitannex/.ssh/authorized_keys'
