@@ -47,7 +47,7 @@ services:
     ports:
       - '9292'
   web:
-    image: 'quay.io/upennlibraries/bulwark:${BULWARK_IMAGE_TAG}'
+    image: 'bulwark:hotfix_26'
     configs:
       - source: 'authorized_keys'
         target: '/home/gitannex/.ssh/authorized_keys'
@@ -193,8 +193,8 @@ services:
         target: /home/app/webapp/config/secrets.yml
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
-      #- '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
-      #- '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
+      - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
+      - '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_2:${SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE}'
       - 'colenda_workspace:${REMOTE_WORKSPACE}'
   rabbitmq:
