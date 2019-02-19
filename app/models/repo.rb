@@ -146,7 +146,7 @@ class Repo < ActiveRecord::Base
 
   def set_metadata_from_ark
     structural_mappings, bib_id = _set_structural_metadata_ark(self.unique_identifier)
-    desc = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => 'url').first_or_create
+    desc = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:pap][:http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:http_lookup_suffix]}").first_or_create
     desc.update_attributes( view_type: 'horizontal',
                             num_objects: 1,
                             x_start: 1,
@@ -161,7 +161,7 @@ class Repo < ActiveRecord::Base
 
     desc.save!
 
-    struct = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => 'url2').first_or_create
+    struct = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}").first_or_create
     struct.update_attributes( view_type: 'horizontal',
                               num_objects: 1,
                               x_start: 1,
