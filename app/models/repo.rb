@@ -418,7 +418,7 @@ class Repo < ActiveRecord::Base
           'reading_direction' => reading_direction,
           'side' => page['side'],
           'tocentry' => page['tocentry'],
-          'identifier' => "#{ark_id.tr(':/','+=')}#{page[:image]}",
+          'identifier' => "#{ark_id.tr(':/','+=')}_#{page[:image]}",
           'file_name' => "#{page['image']}.tif",
           'description' => page['visiblepage']
 

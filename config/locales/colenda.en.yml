@@ -231,6 +231,9 @@ en:
         pap_structural:
           heading: 'Sample of structural metadata fetched from Catalog Lookup'
           field_separator: ':'
+        pqc_ark:
+          heading: 'Structural metadata fetched from marmite'
+          field_separator: ':'
         custom:
           field:
             label: '"%{field}" should map to:'

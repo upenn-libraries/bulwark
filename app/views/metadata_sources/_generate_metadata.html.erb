@@ -1,5 +1,7 @@
 <% render_warning_if_out_of_sync %>
 
+<% binding.pry %>
+
 <%= render :partial => "metadata_sources/fetch_metadata" %>
 
 <%= render :partial => "metadata_sources/custom_metadata_mapping" if mappings_present?(:original_mappings) %>

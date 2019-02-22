@@ -161,7 +161,8 @@ class MetadataSource < ActiveRecord::Base
           self.file_field = 'file_name'
           self.user_defined_mappings = _set_marmite_structural_metadata(working_path)
           self.identifier = self.original_mappings['bibid']
-        when 'pqc_ark'
+      when 'pqc_ark'
+        binding.pry
 
         end
     end
