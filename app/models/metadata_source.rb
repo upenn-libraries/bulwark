@@ -879,7 +879,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def _legacy_bib_id_check(bib_to_check)
-    return bib_to_check.to_s.start_with?("99") && bib_to_check.to_s.end_with?("3503681") ? bib_to_check : "99#{bib_to_check}3503681"
+    return bib_to_check.to_s.start_with?("99") && bib_to_check.to_s.end_with?("3681") ? bib_to_check : "99#{bib_to_check}3681"
   end
 
   def _fetch_header_from_marc21(marc_field)
