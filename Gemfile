@@ -16,7 +16,7 @@ gem 'therubyracer',  platforms: :ruby
 
 gem 'tzinfo-data'
 
-gem 'mysql2'
+gem 'mysql2', '~> 0.4.0'
 gem 'hydra', git: 'https://github.com/projecthydra/hydra.git', branch: 'pcdm'
 gem 'hydra-works'
 gem 'hydra-pcdm'

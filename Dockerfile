@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -qq -y --no-install-recommends \
         git-core \
         imagemagick \
         libmysqlclient-dev \
+        netbase \
         nodejs \
         openssh-server \
         sudo \
@@ -68,6 +69,11 @@ ADD docker/gitannex.sh /etc/my_init.d/gitannex.sh
 ADD docker/imaging.sh /etc/my_init.d/imaging.sh
 
 ADD docker/ssh_service.sh /etc/my_init.d/ssh_service.sh
+
+RUN chmod 0700 \
+  /etc/my_init.d/gitannex.sh \
+  /etc/my_init.d/imaging.sh \
+  /etc/my_init.d/ssh_service.sh
 
 RUN chown -R app:app /fs
 

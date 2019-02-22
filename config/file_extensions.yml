@@ -1,0 +1,16 @@
+# Config file for defining allowed/restricted file types
+
+development:
+  allowed_extensions:
+    assets: 'tif,tiff,jpeg,jpg'
+    metadata_sources: 'xlsx,csv'
+
+test:
+  allowed_extensions:
+    assets: "comma,separated,file,extensions"
+    metadata_sources: "comma,separated,file,extensions"
+
+production:
+  allowed_extensions:
+    assets: 'tif,tiff,jpeg,jpg'
+    metadata_sources: 'xlsx,csv'
