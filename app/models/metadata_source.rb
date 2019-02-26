@@ -117,12 +117,12 @@ class MetadataSource < ActiveRecord::Base
     case source_type
       when 'custom', 'bibliophilly'
         self.path
-      when 'voyager'
-        "#{MetadataSchema.config[:voyager][:http_lookup]}/#{self.original_mappings['bibid']}.xml"
-      when 'structural_bibid'
-        "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}"
-      else
-        nil
+    when 'voyager'
+      reconcile_metadata_lookup_source(source_type, self.original_mappings['bibid'])
+    when 'structural_bibid'
+      reconcile_metadata_lookup_source(source_type, self.original_mappings['bibid'])
+    else
+      nil
     end
   end
 
