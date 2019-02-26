@@ -154,7 +154,7 @@ class Repo < ActiveRecord::Base
                             x_stop: 34,
                             y_stop: 2,
                             root_element: 'record',
-                            source_type: 'voyager',
+                            source_type: 'pqc_desc',
                             z: 1 )
 
     _set_descriptive_metadata_ark(bib_id, desc)
@@ -177,6 +177,27 @@ class Repo < ActiveRecord::Base
     struct.user_defined_mappings = structural_mappings
     struct.save!
     self.metadata_builder.metadata_source = [desc, struct]
+    self.metadata_builder.save!
+  end
+
+  def update_ark_struct_metadata
+    structural_mappings, bib_id = _set_structural_metadata_ark(self.unique_identifier)
+    struct = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}").first_or_create
+    struct.update_attributes( view_type: 'horizontal',
+                              num_objects: 1,
+                              x_start: 1,
+                              y_start: 1,
+                              x_stop: 1,
+                              y_stop: 1,
+                              root_element: 'pages',
+                              parent_element: 'page',
+                              source_type: 'pqc_ark',
+                              file_field: 'file_name',
+                              z: 1 )
+
+    struct.original_mappings = structural_mappings
+    struct.user_defined_mappings = structural_mappings
+    struct.save!
     self.metadata_builder.save!
   end
 

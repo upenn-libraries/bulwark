@@ -142,7 +142,7 @@ class MetadataSource < ActiveRecord::Base
           self.file_field = 'file_name'
           self.user_defined_mappings = _set_marmite_structural_metadata(working_path)
           self.identifier = self.original_mappings['bibid']
-      when 'voyager'
+        when 'voyager'
           self.root_element = MetadataSchema.config[:voyager][:root_element] || 'record'
           self.user_defined_mappings = _set_marmite_data(working_path)
           self.identifier = self.original_mappings['bibid']
@@ -161,9 +161,12 @@ class MetadataSource < ActiveRecord::Base
           self.file_field = 'file_name'
           self.user_defined_mappings = _set_marmite_structural_metadata(working_path)
           self.identifier = self.original_mappings['bibid']
-      when 'pqc_ark'
-        binding.pry
-
+        when 'pqc_ark'
+          self.metadata_builder.repo.update_ark_struct_metadata
+        when 'pqc_desc'
+          self.root_element = MetadataSchema.config[:voyager][:root_element] || 'record'
+          self.user_defined_mappings = _set_marmite_data(working_path)
+          self.identifier = self.original_mappings['bibid']
         end
     end
 
@@ -216,14 +219,15 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def generate_and_build_individual_xml(working_path, fname = self.path)
+    fname = self.source_type if %w[pqc_desc pqc_ark].include?(self.source_type)
     xml_fname = "#{fname}.xml"
     if self.user_defined_mappings.present? && self.root_element.present?
       case self.source_type
         when 'custom'
           @xml_content_final_copy = xml_from_custom(working_path, fname)
-        when 'voyager', 'pap'
+      when 'voyager', 'pap', 'pqc_desc'
           @xml_content_final_copy = xml_from_voyager
-        when 'structural_bibid', 'pap_structural'
+      when 'structural_bibid', 'pap_structural', 'pqc_ark'
           @xml_content_final_copy = xml_from_structural_bibid
         when 'bibliophilly', 'kaplan'
           @xml_content_final_copy = xml_from_flat_mappings
@@ -239,7 +243,9 @@ class MetadataSource < ActiveRecord::Base
     if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'bibliophilly' && self.source_type != 'kaplan'
       @xml_content_final = parent_id.present? ? MetadataSource.find(parent_id).generate_parent_child_xml(working_path) : self.generate_parent_child_xml(working_path)
     else
-      file = File.new(_reconcile_working_path_slashes(working_path, "#{self.path}.xml"))
+      xml_fname = %w[pqc_desc pqc_ark].include?(self.source_type) ? "#{self.source_type}.xml" : "#{self.path.xml}"
+      file = File.new(_reconcile_working_path_slashes(working_path, "#{xml_fname}.xml"))
+      binding.pry
       @xml_content_final = file.readline
     end
     _fetch_write_save_preservation_xml(working_path, @xml_content_final)
@@ -696,7 +702,7 @@ class MetadataSource < ActiveRecord::Base
 
   def reconcile_metadata_lookup_source(source_type, bib_id)
     return nil unless source_type.present?
-    return "#{MetadataSchema.config[:pap][:http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:http_lookup_suffix]}" if %w[voyager pap].include?(source_type)
+    return "#{MetadataSchema.config[:pap][:http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:http_lookup_suffix]}" if %w[voyager pap pqc_desc].include?(source_type)
     return "#{MetadataSchema.config[:pap][:structural_http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:structural_lookup_suffix]}" if %w[structural_bibid pap_structural].include?(source_type)
   end
 
@@ -724,7 +730,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def _set_marmite_data(working_path)
-    _refresh_bibid(working_path) unless working_path.empty?
+    _refresh_bibid(working_path) unless %w[pqc_desc pqc_ark].include?(self.source_type)
     mapped_values = {}
     catalog_source = reconcile_metadata_lookup_source(self.source_type, self.original_mappings['bibid'])
     data = Nokogiri::XML(open(catalog_source))
@@ -1049,7 +1055,9 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def _fetch_write_save_preservation_xml(working_path, file_path = "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}", xml_content)
+    binding.pry
     file_path = _reconcile_working_path_slashes(working_path, file_path)
+    binding.pry
     self.metadata_builder.repo.version_control_agent.unlock({:content => file_path}, working_path) if File.exists?(file_path)
     _build_preservation_xml(working_path, file_path, xml_content)
     self.metadata_builder.save!

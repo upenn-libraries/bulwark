@@ -1,6 +1,7 @@
 <div class="mapping-dashboard">
   <% if @object.metadata_builder.get_structural_filenames.present? %>
     <%= render :partial => "metadata_sources/generate_metadata" %>
-  <% end %>
-  <%= render :partial => "repos/fetch_by_ark" %>
+  <% else %>
+    <%= render :partial => "repos/fetch_by_ark" %>
+<% end %>
 </div>
