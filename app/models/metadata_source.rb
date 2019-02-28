@@ -874,7 +874,7 @@ class MetadataSource < ActiveRecord::Base
       else
         raise I18n.t('colenda.errors.metadata_sources.illegal_source_type')
     end
-    bib_id = _legacy_bib_id_check(worksheet[page][y][x].value)
+    bib_id = validate_bib_id(worksheet[page][y][x].value)
     self.original_mappings = {'bibid' => bib_id}
   end
 
