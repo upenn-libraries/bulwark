@@ -117,12 +117,12 @@ class MetadataSource < ActiveRecord::Base
     case source_type
       when 'custom', 'bibliophilly'
         self.path
-      when 'voyager'
-        "#{MetadataSchema.config[:voyager][:http_lookup]}/#{self.original_mappings['bibid']}.xml"
-      when 'structural_bibid'
-        "#{MetadataSchema.config[:voyager][:structural_http_lookup]}#{MetadataSchema.config[:voyager][:structural_identifier_prefix]}#{self.original_mappings['bibid']}"
-      else
-        nil
+    when 'voyager'
+      reconcile_metadata_lookup_source(source_type, self.original_mappings['bibid'])
+    when 'structural_bibid'
+      reconcile_metadata_lookup_source(source_type, self.original_mappings['bibid'])
+    else
+      nil
     end
   end
 
@@ -884,12 +884,12 @@ class MetadataSource < ActiveRecord::Base
       else
         raise I18n.t('colenda.errors.metadata_sources.illegal_source_type')
     end
-    bib_id = _legacy_bib_id_check(worksheet[page][y][x].value)
+    bib_id = validate_bib_id(worksheet[page][y][x].value)
     self.original_mappings = {'bibid' => bib_id}
   end
 
   def _legacy_bib_id_check(bib_to_check)
-    return bib_to_check.to_s.start_with?("99") && bib_to_check.to_s.end_with?("3503681") ? bib_to_check : "99#{bib_to_check}3503681"
+    return bib_to_check.to_s.start_with?("99") && bib_to_check.to_s.end_with?("3681") ? bib_to_check : "99#{bib_to_check}3681"
   end
 
   def _fetch_header_from_marc21(marc_field)
