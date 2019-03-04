@@ -159,8 +159,6 @@ class Repo < ActiveRecord::Base
 
     _set_descriptive_metadata_ark(bib_id, desc)
 
-    desc.save!
-
     struct = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}").first_or_create
     struct.update_attributes( view_type: 'horizontal',
                               num_objects: 1,
@@ -175,8 +173,10 @@ class Repo < ActiveRecord::Base
                               z: 1 )
     struct.original_mappings = structural_mappings
     struct.user_defined_mappings = structural_mappings
+    desc.children << struct
     struct.save!
-    self.metadata_builder.metadata_source = [desc, struct]
+    desc.save!
+    self.metadata_builder.metadata_source << desc
     self.metadata_builder.save!
   end
 
@@ -275,7 +275,7 @@ class Repo < ActiveRecord::Base
 
   #TODO: Eventually offload to metadata source subclasses
   def default_thumbnail
-    structural_types = %w[structural_bibid custom bibliophilly_structural kaplan_structural pap_structural]
+    structural_types = %w[structural_bibid custom bibliophilly_structural kaplan_structural pap_structural pqc_ark]
     single_structural_source = MetadataSource.where('metadata_builder_id = ? AND source_type IN (?)', self.metadata_builder, structural_types).pluck(:id)
     single_structural_source.length == 1 ? MetadataSource.find(single_structural_source.first).thumbnail : nil
   end

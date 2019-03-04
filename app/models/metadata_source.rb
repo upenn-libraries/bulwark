@@ -189,7 +189,11 @@ class MetadataSource < ActiveRecord::Base
   def generate_all_xml(working_path)
     self.generate_and_build_individual_xml(working_path)
     self.children.each do |child|
-      source = MetadataSource.find(child)
+      begin
+        source = MetadataSource.find(child)
+      rescue
+        source = MetadataSource.find(child.id)
+      end
       source.generate_and_build_individual_xml(working_path, source.path) unless %w[bibliophilly_structural kaplan_structural].include?(source.source_type)
     end
     self.generate_preservation_xml(working_path)
@@ -243,9 +247,9 @@ class MetadataSource < ActiveRecord::Base
     if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'bibliophilly' && self.source_type != 'kaplan'
       @xml_content_final = parent_id.present? ? MetadataSource.find(parent_id).generate_parent_child_xml(working_path) : self.generate_parent_child_xml(working_path)
     else
-      xml_fname = %w[pqc_desc pqc_ark].include?(self.source_type) ? "#{self.source_type}.xml" : "#{self.path.xml}"
-      file = File.new(_reconcile_working_path_slashes(working_path, "#{xml_fname}.xml"))
-      binding.pry
+      xml_fname = %w[pqc_desc pqc_ark].include?(self.source_type) ? "#{self.source_type}" : "#{self.path.xml}"
+      xml_fname = xml_fname.ends_with?('.xml') ? xml_fname : "#{xml_fname}.xml"
+      file = File.new(_reconcile_working_path_slashes(working_path, xml_fname))
       @xml_content_final = file.readline
     end
     _fetch_write_save_preservation_xml(working_path, @xml_content_final)
@@ -329,11 +333,11 @@ class MetadataSource < ActiveRecord::Base
 
   def generate_parent_child_xml(working_path)
     content = ''
-    key_path = _reconcile_working_path_slashes(working_path, "#{self.path}.xml")
+    key_path = %w[pqc_desc pqc_ark].include?(self.source_type) ? _reconcile_working_path_slashes(working_path, "#{self.source_type}.xml") : _reconcile_working_path_slashes(working_path, "#{self.path}.xml")
     self.generate_and_build_individual_xml(working_path)
     self.children.each do |child|
       child_path = MetadataSource.where(:id => child).pluck(:path).first
-      child_content_path = _reconcile_working_path_slashes(working_path, "#{child_path}.xml")
+      child_content_path = %w[pqc_desc pqc_ark].include?(child.source_type) ? _reconcile_working_path_slashes(working_path, "#{child.source_type}.xml") : _reconcile_working_path_slashes(working_path, "#{child_path}.xml")
       self.metadata_builder.repo.version_control_agent.get({:location => key_path}, working_path)
       self.metadata_builder.repo.version_control_agent.get({:location => child_content_path}, working_path)
       content = File.open(key_path, 'r'){|io| io.read}
@@ -602,7 +606,7 @@ class MetadataSource < ActiveRecord::Base
     case self.source_type
       when 'custom'
         self.original_mappings['file_name'].present? ? self.original_mappings['file_name'].first : nil
-      when 'structural_bibid', 'bibliophilly_structural', 'pap_structural', 'kaplan_structural'
+      when 'structural_bibid', 'bibliophilly_structural', 'pap_structural', 'kaplan_structural', 'pqc_ark'
         pages_with_files = []
         self.user_defined_mappings.select {|key, map| pages_with_files << map if map['file_name'].present?}
         pages_with_files.present? ? pages_with_files.sort_by.first {|p| p['serial_num']}['file_name'] : nil
@@ -994,6 +998,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def xml_value(key,value)
+    value = value.nil? ? '' : value
     return '' unless [key, value].reject(&:empty?).present?
     return "<#{key.valid_xml_tag}>#{value.valid_xml_text}</#{key.valid_xml_tag}>" if value.is_a?(String)
     if value.is_a?(Hash)
@@ -1055,9 +1060,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def _fetch_write_save_preservation_xml(working_path, file_path = "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}", xml_content)
-    binding.pry
     file_path = _reconcile_working_path_slashes(working_path, file_path)
-    binding.pry
     self.metadata_builder.repo.version_control_agent.unlock({:content => file_path}, working_path) if File.exists?(file_path)
     _build_preservation_xml(working_path, file_path, xml_content)
     self.metadata_builder.save!
