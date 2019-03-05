@@ -174,6 +174,8 @@ class MetadataBuilder < ActiveRecord::Base
       return 'kaplan'
     elsif self.metadata_source.any?{|ms| ms.source_type == 'pap'}
       return 'pap'
+    elsif self.metadata_source.any?{|ms| ms.source_type == 'pqc_desc'}
+      return 'pap'
     else
       return 'pqc'
     end
