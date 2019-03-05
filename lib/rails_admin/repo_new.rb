@@ -53,7 +53,7 @@ module RailsAdmin
                   end
                 end
               else
-                handle_save_error
+                handle_save_error(:repo_new)
               end
 
             end

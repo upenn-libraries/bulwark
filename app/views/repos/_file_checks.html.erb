@@ -20,7 +20,7 @@
   </form>
 </div>
 
-<%= render_raw_images unless @object.metadata_builder.metadata_source.present? %>
+<%= render_raw_images unless @object.metadata_builder.get_structural_filenames.present? %>
 
 <% @object.metadata_builder.metadata_source.each do |ms| %>
     <%= render_files_preview(ms) %>

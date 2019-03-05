@@ -1,5 +1,5 @@
 class ReposController < ApplicationController
-  before_action :set_repo, only: [:show, :update, :checksum_log, :review_status, :detect_metadata, :preview_xml_preview]
+  before_action :set_repo, only: [:show, :update, :checksum_log, :review_status, :detect_metadata, :preview_xml_preview, :fetch_by_ark]
 
   def new
   end
@@ -41,10 +41,10 @@ class ReposController < ApplicationController
     redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/map_metadata", :flash => { @message.keys.first => @message.values.first }
   end
 
-  def in_queue
-    binding.pry
+  def fetch_by_ark
+    @repo.set_metadata_from_ark
+    redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/generate_metadata"
   end
-
 
   private
     def set_repo
@@ -53,7 +53,7 @@ class ReposController < ApplicationController
 
     def repo_params
       params[:repo][:review_status] = format_review_status(params[:repo][:review_status]) if params[:repo][:review_status].present?
-      params.require(:repo).permit(:title, :description, :metadata_subdirectory, :assets_subdirectory, :metadata_filename, :file_extensions, :version_control_agent, :preservation_filename, :review_status, :owner)
+      params.require(:repo).permit(:title, :unique_identifier, :description, :metadata_subdirectory, :assets_subdirectory, :metadata_filename, :file_extensions, :version_control_agent, :preservation_filename, :review_status, :owner)
     end
 
     def format_review_status(message)

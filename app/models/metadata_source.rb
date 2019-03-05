@@ -126,7 +126,7 @@ class MetadataSource < ActiveRecord::Base
     end
   end
 
-  def set_metadata_mappings(working_path)
+  def set_metadata_mappings(working_path = '')
     if self.source_type.present?
       case self.source_type
         when 'custom'
@@ -161,8 +161,15 @@ class MetadataSource < ActiveRecord::Base
           self.file_field = 'file_name'
           self.user_defined_mappings = _set_marmite_structural_metadata(working_path)
           self.identifier = self.original_mappings['bibid']
-      end
+        when 'pqc_ark'
+          self.metadata_builder.repo.update_ark_struct_metadata
+        when 'pqc_desc'
+          self.root_element = MetadataSchema.config[:voyager][:root_element] || 'record'
+          self.user_defined_mappings = _set_marmite_data(working_path)
+          self.identifier = self.original_mappings['bibid']
+        end
     end
+
     self.metadata_builder.repo.update_steps(:metadata_extracted)
     self.save!
   end
@@ -182,7 +189,11 @@ class MetadataSource < ActiveRecord::Base
   def generate_all_xml(working_path)
     self.generate_and_build_individual_xml(working_path)
     self.children.each do |child|
-      source = MetadataSource.find(child)
+      begin
+        source = MetadataSource.find(child)
+      rescue
+        source = MetadataSource.find(child.id)
+      end
       source.generate_and_build_individual_xml(working_path, source.path) unless %w[bibliophilly_structural kaplan_structural].include?(source.source_type)
     end
     self.generate_preservation_xml(working_path)
@@ -212,14 +223,15 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def generate_and_build_individual_xml(working_path, fname = self.path)
+    fname = self.source_type if %w[pqc_desc pqc_ark].include?(self.source_type)
     xml_fname = "#{fname}.xml"
     if self.user_defined_mappings.present? && self.root_element.present?
       case self.source_type
         when 'custom'
           @xml_content_final_copy = xml_from_custom(working_path, fname)
-        when 'voyager', 'pap'
+      when 'voyager', 'pap', 'pqc_desc'
           @xml_content_final_copy = xml_from_voyager
-        when 'structural_bibid', 'pap_structural'
+      when 'structural_bibid', 'pap_structural', 'pqc_ark'
           @xml_content_final_copy = xml_from_structural_bibid
         when 'bibliophilly', 'kaplan'
           @xml_content_final_copy = xml_from_flat_mappings
@@ -235,7 +247,9 @@ class MetadataSource < ActiveRecord::Base
     if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'bibliophilly' && self.source_type != 'kaplan'
       @xml_content_final = parent_id.present? ? MetadataSource.find(parent_id).generate_parent_child_xml(working_path) : self.generate_parent_child_xml(working_path)
     else
-      file = File.new(_reconcile_working_path_slashes(working_path, "#{self.path}.xml"))
+      xml_fname = %w[pqc_desc pqc_ark].include?(self.source_type) ? "#{self.source_type}" : "#{self.path.xml}"
+      xml_fname = xml_fname.ends_with?('.xml') ? xml_fname : "#{xml_fname}.xml"
+      file = File.new(_reconcile_working_path_slashes(working_path, xml_fname))
       @xml_content_final = file.readline
     end
     _fetch_write_save_preservation_xml(working_path, @xml_content_final)
@@ -319,11 +333,11 @@ class MetadataSource < ActiveRecord::Base
 
   def generate_parent_child_xml(working_path)
     content = ''
-    key_path = _reconcile_working_path_slashes(working_path, "#{self.path}.xml")
+    key_path = %w[pqc_desc pqc_ark].include?(self.source_type) ? _reconcile_working_path_slashes(working_path, "#{self.source_type}.xml") : _reconcile_working_path_slashes(working_path, "#{self.path}.xml")
     self.generate_and_build_individual_xml(working_path)
     self.children.each do |child|
       child_path = MetadataSource.where(:id => child).pluck(:path).first
-      child_content_path = _reconcile_working_path_slashes(working_path, "#{child_path}.xml")
+      child_content_path = %w[pqc_desc pqc_ark].include?(child.source_type) ? _reconcile_working_path_slashes(working_path, "#{child.source_type}.xml") : _reconcile_working_path_slashes(working_path, "#{child_path}.xml")
       self.metadata_builder.repo.version_control_agent.get({:location => key_path}, working_path)
       self.metadata_builder.repo.version_control_agent.get({:location => child_content_path}, working_path)
       content = File.open(key_path, 'r'){|io| io.read}
@@ -592,7 +606,7 @@ class MetadataSource < ActiveRecord::Base
     case self.source_type
       when 'custom'
         self.original_mappings['file_name'].present? ? self.original_mappings['file_name'].first : nil
-      when 'structural_bibid', 'bibliophilly_structural', 'pap_structural', 'kaplan_structural'
+      when 'structural_bibid', 'bibliophilly_structural', 'pap_structural', 'kaplan_structural', 'pqc_ark'
         pages_with_files = []
         self.user_defined_mappings.select {|key, map| pages_with_files << map if map['file_name'].present?}
         pages_with_files.present? ? pages_with_files.sort_by.first {|p| p['serial_num']}['file_name'] : nil
@@ -607,7 +621,7 @@ class MetadataSource < ActiveRecord::Base
           orig = value if key == self.file_field
         end
         return orig
-      when 'structural_bibid', 'bibliophilly_structural', 'pap_structural', 'kaplan_structural'
+      when 'structural_bibid', 'bibliophilly_structural', 'pap_structural', 'kaplan_structural', 'pqc_ark'
         filenames = []
         self.user_defined_mappings.each do |key, value|
           filenames << value[self.file_field] if value[self.file_field].present?
@@ -619,7 +633,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def self.structural_types
-    %w[custom structural_bibid bibliophilly_structural pap_structural kaplan_structural]
+    %w[custom structural_bibid bibliophilly_structural pap_structural kaplan_structural pqc_ark]
   end
 
   def validate_bib_id(bib_id)
@@ -692,7 +706,7 @@ class MetadataSource < ActiveRecord::Base
 
   def reconcile_metadata_lookup_source(source_type, bib_id)
     return nil unless source_type.present?
-    return "#{MetadataSchema.config[:pap][:http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:http_lookup_suffix]}" if %w[voyager pap].include?(source_type)
+    return "#{MetadataSchema.config[:pap][:http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:http_lookup_suffix]}" if %w[voyager pap pqc_desc].include?(source_type)
     return "#{MetadataSchema.config[:pap][:structural_http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:structural_lookup_suffix]}" if %w[structural_bibid pap_structural].include?(source_type)
   end
 
@@ -720,7 +734,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def _set_marmite_data(working_path)
-    _refresh_bibid(working_path)
+    _refresh_bibid(working_path) unless %w[pqc_desc pqc_ark].include?(self.source_type)
     mapped_values = {}
     catalog_source = reconcile_metadata_lookup_source(self.source_type, self.original_mappings['bibid'])
     data = Nokogiri::XML(open(catalog_source))
@@ -984,6 +998,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def xml_value(key,value)
+    value = value.nil? ? '' : value
     return '' unless [key, value].reject(&:empty?).present?
     return "<#{key.valid_xml_tag}>#{value.valid_xml_text}</#{key.valid_xml_tag}>" if value.is_a?(String)
     if value.is_a?(Hash)

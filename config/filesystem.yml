@@ -8,12 +8,12 @@ development:
   object_derivatives_path: .derivs
   object_semantics_location: fs_semantics
   remote_repo_permissions: =rx,ug+rwx
-  init_script_path: /path/to/init.sh
+  init_script_path: /Users/kate/Documents/Projects/bulwark/docker/init.sh
   init_script_permissions: a+x
   object_data_path: data
-  workspace: /path/to/scratch
-  assets_path: /path/to/colenda_dirs/fs/pub/data
-  assets_display_path: /path/to/colenda_dirs/fs/pub/display
+  workspace: /Users/kate/Documents/colenda_dirs/fs/priv/scratch
+  assets_path: /Users/kate/Documents/colenda_dirs/fs/pub/data
+  assets_display_path: /Users/kate/Documents/colenda_dirs/fs/pub/display
   metadata_path_label: METADATA_PATH
   file_path_label: ASSETS_PATH
   repository_prefix: UPENNLIB
