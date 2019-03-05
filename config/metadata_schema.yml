@@ -159,3 +159,6 @@ production:
     http_lookup_suffix: create?format=marc21
     structural_http_lookup: <%= ENV['PAP_STRUCTURAL_HTTP_LOOKUP'] %>
     structural_lookup_suffix: create?format=structural
+  pqc_ark:
+    structural_http_lookup: <%= ENV['PAP_STRUCTURAL_HTTP_LOOKUP'] %>
+    structural_lookup_suffix: show?format=structural_ark
