@@ -117,7 +117,7 @@ module Utils
           display_array << entry.keys.first
         end
         repo.images_to_render['iiif'] = { 'reading_direction' => repo.metadata_builder.determine_reading_direction,
-                                          'images' => display_array.map{ |s| "#{Display.config['iiif']['image_server']}/#{repo.names.bucket}%2F#{s}/info.json" }
+                                          'images' => display_array.map{ |s| "#{Display.config['iiif']['image_server']}#{repo.names.bucket}%2F#{s}/info.json" }
         }
       end
 
