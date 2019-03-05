@@ -66,10 +66,14 @@ development:
       - geographic_subject
       - provenance
   pap:
-    http_lookup: <%= ENV['PAP_HTTP_LOOKUP'] %>
+    http_lookup:  <%= ENV['PAP_HTTP_LOOKUP'] %>
     http_lookup_suffix: show?format=marc21
     structural_http_lookup: <%= ENV['PAP_STRUCTURAL_HTTP_LOOKUP'] %>
     structural_lookup_suffix: show?format=structural
+  pqc_ark:
+    structural_http_lookup: <%= ENV['PAP_STRUCTURAL_HTTP_LOOKUP'] %>
+    structural_lookup_suffix: show?format=structural_ark
+
   ead_xml:
     root_element: record
 test:

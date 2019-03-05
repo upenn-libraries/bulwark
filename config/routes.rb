@@ -9,6 +9,7 @@ Rails.application.routes.draw do
       post :ingest
       post :review_status
       post :detect_metadata
+      post :fetch_by_ark
     end
   end
 

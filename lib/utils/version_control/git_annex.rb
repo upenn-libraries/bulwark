@@ -150,6 +150,7 @@ module Utils
 
       def look_up_key(path, dir)
         change_dir_working(dir) unless Dir.pwd == dir
+        dir = dir.ends_with?('/') ? dir : "#{dir}/"
         `git annex lookupkey #{path.gsub(dir, '')}`.chomp
       end
 

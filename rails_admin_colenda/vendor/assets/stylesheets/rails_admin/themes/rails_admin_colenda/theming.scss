@@ -229,6 +229,12 @@ pre.debug_dump kbd {
   position: relative;
   width: 75%;
   background-color: $background-black;
+  h2 {
+    font-size: 20px;
+    color: $text-white;
+    text-align: center;
+    padding: 10px;
+  }
   #spacer {
     width: 120px;
     height:120px;

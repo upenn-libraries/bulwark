@@ -50,7 +50,7 @@ module MetadataSourceHelper
     end
 
     raw_images = "<ul><li id=\"spacer\" class=\"hide\"><span class=\"screenreader\">Spacer item to facilitate off-by-one</span><span id=\"note\">Spacer image</span></li>#{raw_images}</ul>"
-    return raw_images.present? ? "<div id=\"preview-thumbnails\"><ul>#{raw_images}</ul></div>".html_safe : ""
+    return raw_images.present? ? "<div id=\"preview-thumbnails\"><h2>Alphanumeric sorted files (no structural metadata present)</h2><ul>#{raw_images}</ul></div>".html_safe : ""
 
   end
 
@@ -118,19 +118,19 @@ module MetadataSourceHelper
   end
 
   def prepared_metadata?(source)
-    accepted_types = %w(voyager structural_bibid bibliophilly bibliophilly_structural pap pap_structural kaplan kaplan_structural)
+    accepted_types = %w(voyager structural_bibid bibliophilly bibliophilly_structural pap pap_structural kaplan kaplan_structural pqc_ark pqc_desc)
     return true if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
     return false
   end
 
   def prepared_descriptive?(source)
-    accepted_types = %w(voyager bibliophilly pap kaplan)
+    accepted_types = %w(voyager bibliophilly pap kaplan pqc_desc)
     return true if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
     return false
   end
 
   def prepared_structural?(source)
-    accepted_types = %w(structural_bibid bibliophilly_structural pap_structural kaplan_structural)
+    accepted_types = %w(structural_bibid bibliophilly_structural pap_structural kaplan_structural pqc_ark)
     return true if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
     return false
   end
