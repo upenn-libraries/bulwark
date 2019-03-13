@@ -247,7 +247,7 @@ class MetadataSource < ActiveRecord::Base
     if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'bibliophilly' && self.source_type != 'kaplan'
       @xml_content_final = parent_id.present? ? MetadataSource.find(parent_id).generate_parent_child_xml(working_path) : self.generate_parent_child_xml(working_path)
     else
-      xml_fname = %w[pqc_desc pqc_ark].include?(self.source_type) ? "#{self.source_type}" : "#{self.path.xml}"
+      xml_fname = %w[pqc_desc pqc_ark].include?(self.source_type) ? "#{self.source_type}" : "#{self.path}.xml"
       xml_fname = xml_fname.ends_with?('.xml') ? xml_fname : "#{xml_fname}.xml"
       file = File.new(_reconcile_working_path_slashes(working_path, xml_fname))
       @xml_content_final = file.readline
