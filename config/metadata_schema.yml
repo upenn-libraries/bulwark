@@ -73,7 +73,9 @@ development:
   pqc_ark:
     structural_http_lookup: <%= ENV['PAP_STRUCTURAL_HTTP_LOOKUP'] %>
     structural_lookup_suffix: show?format=structural_ark
-
+  combined:
+    http_lookup: <%= ENV['COMBINED_HTTP_LOOKUP'] %>
+    http_lookup_suffix: show?format=combined_ark
   ead_xml:
     root_element: record
 test:
@@ -162,3 +164,6 @@ production:
   pqc_ark:
     structural_http_lookup: <%= ENV['PAP_STRUCTURAL_HTTP_LOOKUP'] %>
     structural_lookup_suffix: show?format=structural_ark
+  combined:
+    http_lookup: <%= ENV['COMBINED_HTTP_LOOKUP'] %>
+    http_lookup_suffix: show?format=combined_ark
