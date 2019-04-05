@@ -107,6 +107,12 @@
           <sv:property sv:name="ns004:corporateName" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="corporate_name" />
           </sv:property>
+          <sv:property sv:name="ns002:contributor" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="contributor" />
+          </sv:property>
+          <sv:property sv:name="ns002:contributing_institution" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="contributing_institution" />
+          </sv:property>
           <sv:property sv:name="ns004:geographicSubject" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="geographic_subject" />
           </sv:property>
@@ -205,6 +211,14 @@
   </xsl:template>
 
   <xsl:template match="corporate_name">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
+
+  <xsl:template match="contributor">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
+
+  <xsl:template match="contributing_institution">
     <sv:value><xsl:apply-templates /></sv:value>
   </xsl:template>
 
