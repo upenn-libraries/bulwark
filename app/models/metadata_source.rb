@@ -300,6 +300,7 @@ class MetadataSource < ActiveRecord::Base
     else
       self.num_objects = self.user_defined_mappings.size
       self.save!
+
       inner_content << _child_values_voyager
     end
     if self.root_element.present?
@@ -340,11 +341,13 @@ class MetadataSource < ActiveRecord::Base
       self.metadata_builder.repo.version_control_agent.get({:location => key_path}, working_path)
       self.metadata_builder.repo.version_control_agent.get({:location => child_content_path}, working_path)
       content = File.open(key_path, 'r'){|io| io.read}
-      child_inner_content = File.open(child_content_path, 'r'){|io| io.read}
-      _strip_headers(content) && _strip_headers(child_inner_content)
-      end_tag = "</#{self.root_element}>"
-      insert_index = content.index(end_tag)
-      content.insert(insert_index, child_inner_content)
+      unless self.source_type == 'pqc_combined_desc'
+        child_inner_content = File.open(child_content_path, 'r'){|io| io.read}
+        _strip_headers(content) && _strip_headers(child_inner_content)
+        end_tag = "</#{self.root_element}>"
+        insert_index = content.index(end_tag)
+        content.insert(insert_index, child_inner_content)
+      end
     end
     content
   end
@@ -524,7 +527,7 @@ class MetadataSource < ActiveRecord::Base
     case self.source_type
       when 'custom'
         self.original_mappings['file_name'].present? ? self.original_mappings['file_name'].first : nil
-      when 'structural_bibid', 'pap_structural', 'kaplan_structural', 'pqc_ark', 'pqc_combined_struct'
+      when 'structural_bibid', 'pap_structural', 'kaplan_structural', 'pqc_ark', 'pqc_combined_struct', 'pqc_combined_desc'
         pages_with_files = []
         self.user_defined_mappings.select {|key, map| pages_with_files << map if map['file_name'].present?}
         pages_with_files.present? ? pages_with_files.sort_by.first {|p| p['serial_num']}['file_name'] : nil
@@ -539,7 +542,7 @@ class MetadataSource < ActiveRecord::Base
           orig = value if key == self.file_field
         end
         return orig
-      when 'structural_bibid', 'pap_structural', 'kaplan_structural', 'pqc_ark', 'pqc_combined_struct'
+      when 'structural_bibid', 'pap_structural', 'kaplan_structural', 'pqc_ark', 'pqc_combined_struct', 'pqc_combined_desc'
         filenames = []
         self.user_defined_mappings.each do |key, value|
           filenames << value[self.file_field] if value[self.file_field].present?
