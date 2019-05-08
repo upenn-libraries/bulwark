@@ -1,3 +1,31 @@
 <h2>Welcome to your new repo!</h2>
 
-<p>Override this template at app/views/repos/_git_instructions.html.erb with instructions for how to begin using it.</p>
+<% full_path = "#{Utils.config[:assets_path]}/#{@object.names.directory}" %>
+<div class="git-directions">
+  <h2>Using this Repo</h2>
+  <p>Your git remote has been initialized at <%= "#{full_path}" %>.  To begin using this remote, run the following command from the terminal:</p>
+  <pre>git clone gitannex@colenda.library.upenn.edu:2222<%= "#{full_path}\ncd #{(@object.names.directory).gsub(".git","")}" %>
+    ceph
+    ./.repoadmin/bin/init.sh
+git annex add *.tif data/assets/.
+git commit -a -m "COMMIT_MESSAGE"
+git push origin master git-annex
+git annex copy --to ceph01</pre>
+  <p>Replace <span class="inline-pre">COMMIT_MESSAGE</span> with a short message describing the changes you're making.</p>
+  <p>View the <a href="#">Using Colenda</a> guide to learn more.</p>
+</div>
+
+<div class="about-repo">
+  <h2>About this Repo</h2>
+  <ul>
+    <li><strong>Name:</strong> <%= @object.human_readable_name %></li>
+    <li><strong>Owner Email:</strong> <%= @object.owner %></li>
+    <li><strong>Directory:</strong> <%= @object.names.directory %></li>
+    <li><strong>Description:</strong> <%= @object.description %></li>
+    <li><strong>Metadata Subdirectory:</strong> <%= @object.metadata_subdirectory %></li>
+    <li><strong>Assets Subdirectory:</strong> <%= @object.assets_subdirectory %></li>
+    <li><strong>Accepted File Extension(s) for Metadata:</strong> <%= @object.metadata_source_extensions.join(", ") %></li>
+    <li><strong>Accepted File Extension(s) for Assets:</strong> <%= @object.file_extensions %></li>
+    <li><strong>Preservation XML Filename:</strong> <%= @object.preservation_filename %></li>
+  </ul>
+</div>

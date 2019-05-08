@@ -24,6 +24,10 @@ class PqcSchema < ActiveTriples::Schema
     index.as :stored_searchable, :facetable
   end
 
+  property :contributing_institution, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/contributingInstitution'), multiple: true do |index|
+    index.as :stored_searchable, :facetable
+  end
+
   property :personal_name, predicate: ::RDF::URI.new('http://library.upenn.edu/pqc/ns/personalName'), multiple: true do |index|
     index.as :stored_searchable, :facetable
   end

@@ -88,7 +88,7 @@ class MetadataSource < ActiveRecord::Base
     self[:user_defined_mappings] = nil
     self[:original_mappings] = nil
     self.update_last_used_settings
-    self.metadata_builder.repo.update_steps(:metadata_source_type_specified)
+    self.metadata_builder.repo.update_steps(:metadata_source_type_specified) if self.metadata_builder.present?
   end
 
   def view_type=(view_type)
@@ -115,7 +115,7 @@ class MetadataSource < ActiveRecord::Base
 
   def input_source_path(source_type)
     case source_type
-      when 'custom', 'bibliophilly'
+      when 'custom'
         self.path
     when 'voyager'
       reconcile_metadata_lookup_source(source_type, self.original_mappings['bibid'])
@@ -146,9 +146,6 @@ class MetadataSource < ActiveRecord::Base
           self.root_element = MetadataSchema.config[:voyager][:root_element] || 'record'
           self.user_defined_mappings = _set_marmite_data(working_path)
           self.identifier = self.original_mappings['bibid']
-        when 'bibliophilly'
-          self.set_bibliophilly_data(working_path)
-          self.identifier = self.original_mappings['Call Number/ID'].first
         when 'kaplan'
           self.set_kaplan_data(working_path)
         when 'pap'
@@ -167,6 +164,8 @@ class MetadataSource < ActiveRecord::Base
           self.root_element = MetadataSchema.config[:voyager][:root_element] || 'record'
           self.user_defined_mappings = _set_marmite_data(working_path)
           self.identifier = self.original_mappings['bibid']
+      when 'pqc_combined_desc', 'pqc_combined_struct'
+          self.user_defined_mappings = _set_marmite_combined_metadata(working_path, self.source_type)
         end
     end
 
@@ -194,7 +193,7 @@ class MetadataSource < ActiveRecord::Base
       rescue
         source = MetadataSource.find(child.id)
       end
-      source.generate_and_build_individual_xml(working_path, source.path) unless %w[bibliophilly_structural kaplan_structural].include?(source.source_type)
+      source.generate_and_build_individual_xml(working_path, source.path) unless %w[kaplan_structural].include?(source.source_type)
     end
     self.generate_preservation_xml(working_path)
     self.generate_pqc_xml(working_path)
@@ -223,7 +222,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def generate_and_build_individual_xml(working_path, fname = self.path)
-    fname = self.source_type if %w[pqc_desc pqc_ark].include?(self.source_type)
+    fname = self.source_type if %w[pqc_desc pqc_ark pqc_combined_desc pqc_combined_struct].include?(self.source_type)
     xml_fname = "#{fname}.xml"
     if self.user_defined_mappings.present? && self.root_element.present?
       case self.source_type
@@ -231,9 +230,9 @@ class MetadataSource < ActiveRecord::Base
           @xml_content_final_copy = xml_from_custom(working_path, fname)
       when 'voyager', 'pap', 'pqc_desc'
           @xml_content_final_copy = xml_from_voyager
-      when 'structural_bibid', 'pap_structural', 'pqc_ark'
+      when 'structural_bibid', 'pap_structural', 'pqc_ark', 'pqc_combined_struct'
           @xml_content_final_copy = xml_from_structural_bibid
-        when 'bibliophilly', 'kaplan'
+        when 'kaplan', 'pqc_combined_desc'
           @xml_content_final_copy = xml_from_flat_mappings
         else
           return
@@ -244,10 +243,10 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def generate_preservation_xml(working_path)
-    if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'bibliophilly' && self.source_type != 'kaplan'
+    if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'kaplan'
       @xml_content_final = parent_id.present? ? MetadataSource.find(parent_id).generate_parent_child_xml(working_path) : self.generate_parent_child_xml(working_path)
     else
-      xml_fname = %w[pqc_desc pqc_ark].include?(self.source_type) ? "#{self.source_type}" : "#{self.path}.xml"
+      xml_fname = %w[pqc_desc pqc_ark pqc_combined_desc pqc_combined_struct].include?(self.source_type) ? "#{self.source_type}" : "#{self.path}.xml"
       xml_fname = xml_fname.ends_with?('.xml') ? xml_fname : "#{xml_fname}.xml"
       file = File.new(_reconcile_working_path_slashes(working_path, xml_fname))
       @xml_content_final = file.readline
@@ -301,6 +300,7 @@ class MetadataSource < ActiveRecord::Base
     else
       self.num_objects = self.user_defined_mappings.size
       self.save!
+
       inner_content << _child_values_voyager
     end
     if self.root_element.present?
@@ -333,19 +333,21 @@ class MetadataSource < ActiveRecord::Base
 
   def generate_parent_child_xml(working_path)
     content = ''
-    key_path = %w[pqc_desc pqc_ark].include?(self.source_type) ? _reconcile_working_path_slashes(working_path, "#{self.source_type}.xml") : _reconcile_working_path_slashes(working_path, "#{self.path}.xml")
+    key_path = %w[pqc_desc pqc_ark pqc_combined_desc pqc_combined_ark].include?(self.source_type) ? _reconcile_working_path_slashes(working_path, "#{self.source_type}.xml") : _reconcile_working_path_slashes(working_path, "#{self.path}.xml")
     self.generate_and_build_individual_xml(working_path)
     self.children.each do |child|
       child_path = MetadataSource.where(:id => child).pluck(:path).first
-      child_content_path = %w[pqc_desc pqc_ark].include?(child.source_type) ? _reconcile_working_path_slashes(working_path, "#{child.source_type}.xml") : _reconcile_working_path_slashes(working_path, "#{child_path}.xml")
+      child_content_path = %w[pqc_desc pqc_ark pqc_combined_desc pqc_combined_struct].include?(child.source_type) ? _reconcile_working_path_slashes(working_path, "#{child.source_type}.xml") : _reconcile_working_path_slashes(working_path, "#{child_path}.xml")
       self.metadata_builder.repo.version_control_agent.get({:location => key_path}, working_path)
       self.metadata_builder.repo.version_control_agent.get({:location => child_content_path}, working_path)
       content = File.open(key_path, 'r'){|io| io.read}
-      child_inner_content = File.open(child_content_path, 'r'){|io| io.read}
-      _strip_headers(content) && _strip_headers(child_inner_content)
-      end_tag = "</#{self.root_element}>"
-      insert_index = content.index(end_tag)
-      content.insert(insert_index, child_inner_content)
+      unless self.source_type == 'pqc_combined_desc'
+        child_inner_content = File.open(child_content_path, 'r'){|io| io.read}
+        _strip_headers(content) && _strip_headers(child_inner_content)
+        end_tag = "</#{self.root_element}>"
+        insert_index = content.index(end_tag)
+        content.insert(insert_index, child_inner_content)
+      end
     end
     content
   end
@@ -370,19 +372,6 @@ class MetadataSource < ActiveRecord::Base
   def update_last_used_settings
     self.last_settings_updated = DateTime.now
     self.save!
-  end
-
-  def set_bibliophilly_data(working_path)
-    self.root_element = 'record'
-    self.view_type = 'vertical'
-    self.y_start = 6
-    self.y_stop = 72
-    self.x_start = 2
-    structural = self.metadata_builder.metadata_source.any? {|a| a.source_type == 'bibliophilly_structural'} ? MetadataSource.find(self.children.first) : initialize_bibliophilly_structural(self)
-    full_path = "#{working_path}#{self.path}"
-    self.metadata_builder.repo.version_control_agent.get({:location => full_path}, working_path)
-    self.generate_bibliophilly_descrip_md(full_path)
-    structural.generate_bibliophilly_struct_md(full_path)
   end
 
   def set_kaplan_data(working_path)
@@ -416,29 +405,6 @@ class MetadataSource < ActiveRecord::Base
       else
         return
     end
-  end
-
-  def generate_bibliophilly_descrip_md(full_path)
-    mappings = {}
-    iterator = 0
-    x_start, y_start, x_stop, y_stop, z = _offset
-    workbook = RubyXL::Parser.parse(full_path)
-    (y_start..y_stop).each do |i|
-      if workbook[z][y_start+iterator].present? && workbook[z][y_start+iterator][x_start].present?
-        header = workbook[z][y_start+iterator][x_start].value
-        vals = []
-        vals_iterator = 2
-        while workbook[z][y_start+iterator].present? && workbook[z][y_start+iterator][x_start+vals_iterator].present? do
-          vals << workbook[z][y_start+iterator][x_start+vals_iterator].value.to_s.encode(:xml => :text) if workbook[z][y_start+iterator][x_start+vals_iterator].value.present?
-          vals_iterator += 1
-        end
-        mappings[header] = vals if header.present? && vals.present?
-      end
-      iterator += 1
-    end
-    self.original_mappings = mappings
-    self.user_defined_mappings = mappings
-    self.save!
   end
 
   def generate_kaplan_descrip_md(full_path)
@@ -511,31 +477,6 @@ class MetadataSource < ActiveRecord::Base
     return sanitized
   end
 
-  def generate_bibliophilly_struct_md(full_path)
-    mappings = {}
-    headers = []
-    x_start, y_start, x_stop, y_stop, z = _offset
-    workbook = RubyXL::Parser.parse(full_path)
-    iterator = 1
-    workbook[z][y_start].cells.each do |c|
-      headers << c.value
-    end
-    while workbook[z][y_start+iterator].present? && workbook[z][y_start+iterator][x_start+1].present? && workbook[z][y_start+iterator][x_start+1].value.present? do
-      iterator += 1
-    end
-    num_pages = iterator - 1
-    (1..(num_pages)).each do |i|
-      mapped_values = {}
-      workbook[z][y_start+i].cells.each do |c|
-        xml_value = c.present? ? (c.value.is_a?(Float) && headers[c.column].downcase == 'serial_num') ? c.value.to_i : c.value.to_s : ''
-        mapped_values[headers[c.column].downcase] = xml_value.to_s.valid_xml_text if xml_value.present?
-      end
-      mappings[i] = mapped_values
-    end
-    self.original_mappings = mappings
-    self.user_defined_mappings = mappings
-    self.save!
-  end
 
   def generate_kaplan_struct_md(mappings)
     return {} unless mappings['filenames'].present?
@@ -559,26 +500,6 @@ class MetadataSource < ActiveRecord::Base
     end
     self.original_mappings = structural_mappings
     self.user_defined_mappings = structural_mappings
-  end
-
-
-  def initialize_bibliophilly_structural(parent)
-    struct = MetadataSource.create({
-                                       :metadata_builder => self.metadata_builder,
-                                       :source_type => 'bibliophilly_structural',
-                                       :root_element => 'pages',
-                                       :parent_element => 'page',
-                                       :view_type => 'horizontal',
-                                       :path => "#{parent.path} Page 2 (Structural)",
-                                       :file_field => 'file_name',
-                                       :z => 2,
-                                       :y_start => 3,
-                                       :y_stop => 3,
-                                       :x_start => 1,
-                                       :x_stop => 3 })
-    parent.children << struct
-    parent.save!
-    struct
   end
 
   def initialize_kaplan_structural(parent)
@@ -606,7 +527,7 @@ class MetadataSource < ActiveRecord::Base
     case self.source_type
       when 'custom'
         self.original_mappings['file_name'].present? ? self.original_mappings['file_name'].first : nil
-      when 'structural_bibid', 'bibliophilly_structural', 'pap_structural', 'kaplan_structural', 'pqc_ark'
+      when 'structural_bibid', 'pap_structural', 'kaplan_structural', 'pqc_ark', 'pqc_combined_struct', 'pqc_combined_desc'
         pages_with_files = []
         self.user_defined_mappings.select {|key, map| pages_with_files << map if map['file_name'].present?}
         pages_with_files.present? ? pages_with_files.sort_by.first {|p| p['serial_num']}['file_name'] : nil
@@ -621,7 +542,7 @@ class MetadataSource < ActiveRecord::Base
           orig = value if key == self.file_field
         end
         return orig
-      when 'structural_bibid', 'bibliophilly_structural', 'pap_structural', 'kaplan_structural', 'pqc_ark'
+      when 'structural_bibid', 'pap_structural', 'kaplan_structural', 'pqc_ark', 'pqc_combined_struct', 'pqc_combined_desc'
         filenames = []
         self.user_defined_mappings.each do |key, value|
           filenames << value[self.file_field] if value[self.file_field].present?
@@ -633,7 +554,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def self.structural_types
-    %w[custom structural_bibid bibliophilly_structural pap_structural kaplan_structural pqc_ark]
+    %w[custom structural_bibid pap_structural kaplan_structural pqc_ark pqc_combined_struct]
   end
 
   def validate_bib_id(bib_id)
@@ -820,6 +741,34 @@ class MetadataSource < ActiveRecord::Base
           'description' => page['visiblepage']
 
       }
+    end
+    mapped_values
+  end
+
+  def _set_marmite_combined_metadata(working_path, source_type)
+    mapped_values = {}
+    marmite_source = "#{MetadataSchema.config[:combined][:http_lookup]}/#{self.metadata_builder.repo.unique_identifier.tr(":/", "+=")}/#{MetadataSchema.config[:combined][:http_lookup_suffix]}"
+    data = Nokogiri::XML(open(marmite_source))
+    data.remove_namespaces!
+    if source_type == 'pqc_combined_desc'
+      data.xpath('//record/descriptive').children.each do |child|
+        (mapped_values[child.name] ||= []) << child.text unless child.name == 'text'
+      end
+    elsif source_type == 'pqc_combined_struct'
+      reading_direction = _get_marmite_reading_direction(marmite_source)
+      data.xpath('//record/pages/page').each_with_index do |page, index|
+        mapped_values[index+1] = {
+            'page_number' => page['number'],
+            'sequence' => page['seq'],
+            'reading_direction' => reading_direction,
+            'side' => page['side'],
+            'tocentry' => _get_tocentry(page),
+            'identifier' => page['id'],
+            'file_name' => "#{page['image']}.tif",
+            'description' => page['visiblepage']
+
+        }
+      end
     end
     mapped_values
   end
@@ -1084,7 +1033,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def self.source_types
-    source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.catalog_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.pap_structural'), 'pap_structural'], [I18n.t('colenda.metadata_sources.describe.source_type.list.bibliophilly'), 'bibliophilly'], [I18n.t('colenda.metadata_sources.describe.source_type.list.pap'), 'pap'], [I18n.t('colenda.metadata_sources.describe.source_type.list.kaplan'), 'kaplan'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
+    source_types = [[I18n.t('colenda.metadata_sources.describe.source_type.list.catalog_bibid'), 'voyager'], [I18n.t('colenda.metadata_sources.describe.source_type.list.structural_bibid'), 'structural_bibid'], [I18n.t('colenda.metadata_sources.describe.source_type.list.pap_structural'), 'pap_structural'], [I18n.t('colenda.metadata_sources.describe.source_type.list.pap'), 'pap'], [I18n.t('colenda.metadata_sources.describe.source_type.list.kaplan'), 'kaplan'], [I18n.t('colenda.metadata_sources.describe.source_type.list.custom'), 'custom']]
   end
 
   def self.settings_fields
