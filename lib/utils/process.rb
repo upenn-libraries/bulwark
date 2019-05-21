@@ -23,7 +23,9 @@ module Utils
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
       delete_members(@oid)
       FileUtils.rm(file)
-      attach_files(@oid, repo, working_path)
+      file_extensions = { :images => %w[ tif tiff jpeg jpg ], :av => %w[ wav mp3 ] }
+      attach_images(@oid, repo, working_path) if repo.file_extensions.any? { |ext| file_extensions[:images].include?(ext) }
+      attach_av(repo, working_path) if repo.file_extensions.any? { |ext| file_extensions[:av].include?(ext) }
       update_index(@oid)
       repo.save!
       @@status_type = :success
@@ -45,7 +47,7 @@ module Utils
       execute_curl(_build_command('delete_tombstone', :object_uri => members_id))
     end
 
-    def attach_files(oid = @oid, repo, working_path)
+    def attach_images(oid = @oid, repo, working_path)
       repo.images_to_render = {}
       af_object = Finder.fedora_find(@oid)
       source_file =  "#{working_path}/#{repo.metadata_subdirectory}/#{repo.preservation_filename}"
@@ -72,6 +74,19 @@ module Utils
       af_object.save
       repo.save!
     end
+
+    def attach_av(repo, working_path)
+      audio_derivative = 'mp3'
+      repo.file_display_attributes = {}
+      repo.file_extensions.each do |ext|
+        Dir.glob("#{working_path}/#{repo.assets_subdirectory}/*.#{audio_derivative}").each do |deriv|
+          repo.file_display_attributes[File.basename(attachable_url(repo, working_path, deriv))] = { :content_type => audio_derivative,
+                                                                                                       :streaming_url => attachable_url(repo, working_path, deriv) }
+        end
+      end
+      repo.save!
+    end
+
 
     def generate_thumbnail(repo, working_path)
       unencrypted_thumbnail_path = "#{working_path}/#{repo.assets_subdirectory}/#{repo.thumbnail}"

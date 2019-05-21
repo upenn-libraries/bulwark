@@ -16,9 +16,7 @@
  *= require bxslider
  *= require_tree .
  *= require upenn
+ *= require ableplayer
 
- *
- * Used by blacklight_range_limit
- *= require  'blacklight_range_limit'
- *
+*
 */

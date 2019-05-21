@@ -118,7 +118,7 @@ module MetadataSourceHelper
   end
 
   def prepared_metadata?(source)
-    accepted_types = %w(voyager structural_bibid bibliophilly bibliophilly_structural pap pap_structural kaplan kaplan_structural pqc_ark pqc_desc)
+    accepted_types = %w(voyager structural_bibid bibliophilly bibliophilly_structural pap pap_structural kaplan kaplan_structural pqc_ark pqc_desc pqc pqc_structural)
     return true if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
     return false
   end

@@ -71,7 +71,7 @@
             <xsl:apply-templates select="normalized_call_number" />
           </sv:property>
           <sv:property sv:name="ns004:collection" sv:type="String" sv:multiple="false">
-            <sv:value>Penn in Hand: Selected Manuscripts</sv:value>
+            <xsl:apply-templates select="collection" />
           </sv:property>
           <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="identifier" />
@@ -88,9 +88,6 @@
           <sv:property sv:name="ns002:publisher" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="publisher" />
           </sv:property>
-          <sv:property sv:name="ns002:type" sv:type="String" sv:multiple="false">
-            <sv:value>Manuscript</sv:value>
-          </sv:property>
           <sv:property sv:name="ns002:title" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="title" />
           </sv:property>
@@ -100,7 +97,9 @@
           <sv:property sv:name="ns002:format" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="format" />
           </sv:property>
-
+          <sv:property sv:name="ns002:type" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="item_type" />
+          </sv:property>
           <sv:property sv:name="ns004:personalName" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="personal_name" />
           </sv:property>
@@ -173,6 +172,10 @@
   </xsl:template>
 
   <xsl:template match="identifier">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
+
+  <xsl:template match="item_type">
     <sv:value><xsl:apply-templates /></sv:value>
   </xsl:template>
 
