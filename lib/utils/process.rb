@@ -23,9 +23,11 @@ module Utils
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
       delete_members(@oid)
       FileUtils.rm(file)
-      file_extensions = { :images => %w[ tif tiff jpeg jpg ], :av => %w[ wav mp3 ] }
+      file_extensions = { :images => %w[ tif tiff jpeg jpg ], :av => %w[ wav mp3 mp4 ] }
       attach_images(@oid, repo, working_path) if repo.file_extensions.any? { |ext| file_extensions[:images].include?(ext) }
-      attach_av(repo, working_path) if repo.file_extensions.any? { |ext| file_extensions[:av].include?(ext) }
+      file_extensions[:av].each do |ext|
+          attach_av(repo, working_path, ext)
+      end
       update_index(@oid)
       repo.save!
       @@status_type = :success
@@ -75,12 +77,11 @@ module Utils
       repo.save!
     end
 
-    def attach_av(repo, working_path)
-      audio_derivative = 'mp3'
+    def attach_av(repo, working_path, derivative)
       repo.file_display_attributes = {}
       repo.file_extensions.each do |ext|
-        Dir.glob("#{working_path}/#{repo.assets_subdirectory}/*.#{audio_derivative}").each do |deriv|
-          repo.file_display_attributes[File.basename(attachable_url(repo, working_path, deriv))] = { :content_type => audio_derivative,
+        Dir.glob("#{working_path}/#{repo.assets_subdirectory}/*.#{derivative}").each do |deriv|
+          repo.file_display_attributes[File.basename(attachable_url(repo, working_path, deriv))] = { :content_type => derivative,
                                                                                                        :streaming_url => attachable_url(repo, working_path, deriv) }
         end
       end

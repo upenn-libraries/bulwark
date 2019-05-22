@@ -95,6 +95,7 @@ module ApplicationHelper
     return '' unless repo.present?
     repo.file_display_attributes.each do |key, value|
        partials += render :partial => 'av_display/audio', :locals => {:streaming_id => key, :streaming_url => value[:streaming_url]} if value[:content_type] == 'mp3'
+       partials += render :partial => 'av_display/video', :locals => {:streaming_id => key, :streaming_url => value[:streaming_url]} if value[:content_type] == 'mp4'
     end
     return partials.html_safe
 
