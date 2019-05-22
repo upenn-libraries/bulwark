@@ -110,6 +110,16 @@ module ApplicationHelper
     return partials.html_safe
   end
 
+  def render_pdf
+    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
+    partials = ''
+    return '' unless repo.present?
+    repo.file_display_attributes.each do |key, value|
+      partials += render :partial => 'other_display/pdf', :locals => {:pdf_url => value[:pdf_url]} if value[:content_type] == 'pdf'
+    end
+    return partials.html_safe
+  end
+
     def render_reviewed_queue
     a = ''
     ids = Repo.where('queued' => 'ingest').pluck(:id, :human_readable_name)

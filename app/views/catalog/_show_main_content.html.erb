@@ -15,11 +15,14 @@
 
 <%= render_image_list %>
 
+<script type="text/javascript">renderViewer();</script>
+
 <%= render_ableplayer %>
 
 <%= render_warc %>
 
-<script type="text/javascript">renderViewer();</script>
+<%= render_pdf %>
+
 
 <% if @document.respond_to?(:export_as_openurl_ctx_kev) %>
   <span class="Z3988" title="<%= @document.export_as_openurl_ctx_kev(document_partial_name(@document)) %>"></span>

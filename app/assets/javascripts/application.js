@@ -22,3 +22,4 @@
 //= require js.cookie
 //= require modernizr.custom
 //= require ableplayer
+//= require pdfobject.min
