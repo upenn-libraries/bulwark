@@ -98,7 +98,26 @@ module ApplicationHelper
        partials += render :partial => 'av_display/video', :locals => {:streaming_id => key, :streaming_url => value[:streaming_url]} if value[:content_type] == 'mp4'
     end
     return partials.html_safe
+  end
 
+  def render_warc
+    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
+    partials = ''
+    return '' unless repo.present?
+    repo.file_display_attributes.each do |key, value|
+      partials += render :partial => 'other_display/warc', :locals => {:download_url => value[:download_url], :filename => value[:filename]} if value[:content_type] == 'gz'
+    end
+    return partials.html_safe
+  end
+
+  def render_pdf
+    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
+    partials = ''
+    return '' unless repo.present?
+    repo.file_display_attributes.each do |key, value|
+      partials += render :partial => 'other_display/pdf', :locals => {:pdf_url => value[:pdf_url]} if value[:content_type] == 'pdf'
+    end
+    return partials.html_safe
   end
 
     def render_reviewed_queue
