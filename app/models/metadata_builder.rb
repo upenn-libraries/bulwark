@@ -168,14 +168,14 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def xslt_file_select
-    if self.metadata_source.any?{|ms| ms.source_type == 'bibliophilly'}
-      return 'bibliophilly'
-    elsif self.metadata_source.any?{|ms| ms.source_type == 'kaplan'}
+    if self.metadata_source.any?{|ms| ms.source_type == 'kaplan'}
       return 'kaplan'
     elsif self.metadata_source.any?{|ms| ms.source_type == 'pap'}
       return 'pap'
     elsif self.metadata_source.any?{|ms| ms.source_type == 'pqc_desc'}
       return 'pap'
+    elsif self.metadata_source.any?{|ms| ms.source_type == 'pqc_combined_desc'}
+      return 'pqc_combined'
     else
       return 'pqc'
     end

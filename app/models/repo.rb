@@ -1,3 +1,4 @@
+require "net/http"
 require 'sanitize'
 
 class Repo < ActiveRecord::Base
@@ -145,38 +146,79 @@ class Repo < ActiveRecord::Base
   end
 
   def set_metadata_from_ark
-    structural_mappings, bib_id = _set_structural_metadata_ark(self.unique_identifier)
-    desc = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:pap][:http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:http_lookup_suffix]}").first_or_create
-    desc.update_attributes( view_type: 'horizontal',
-                            num_objects: 1,
-                            x_start: 1,
-                            y_start: 2,
-                            x_stop: 34,
-                            y_stop: 2,
-                            root_element: 'record',
-                            source_type: 'pqc_desc',
-                            z: 1 )
-
-    _set_descriptive_metadata_ark(bib_id, desc)
-
-    struct = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}").first_or_create
-    struct.update_attributes( view_type: 'horizontal',
+    url = URI.parse("#{MetadataSchema.config[:combined][:http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:combined][:http_lookup_suffix]}")
+    req = Net::HTTP.new(url.host, url.port)
+    res = req.request_head(url.path)
+    if res.code == '200'
+      desc = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:combined][:http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:combined][:http_lookup_suffix]}", :source_type => 'pqc_combined_desc').first_or_create
+      desc.update_attributes( view_type: 'horizontal',
                               num_objects: 1,
                               x_start: 1,
-                              y_start: 1,
-                              x_stop: 1,
-                              y_stop: 1,
-                              root_element: 'pages',
-                              parent_element: 'page',
-                              source_type: 'pqc_ark',
-                              file_field: 'file_name',
+                              y_start: 2,
+                              x_stop: 34,
+                              y_stop: 2,
+                              root_element: 'record',
+                              source_type: 'pqc_combined_desc',
                               z: 1 )
-    struct.original_mappings = structural_mappings
-    struct.user_defined_mappings = structural_mappings
-    desc.children << struct
-    struct.save!
-    desc.save!
-    self.metadata_builder.metadata_source << desc
+
+      _set_combined_metadata_ark(desc)
+      desc.original_mappings = desc.user_defined_mappings
+
+      struct = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:combined][:http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:combined][:http_lookup_suffix]}", :source_type => 'pqc_combined_struct').first_or_create
+      struct.update_attributes( view_type: 'horizontal',
+                                num_objects: 1,
+                                x_start: 1,
+                                y_start: 1,
+                                x_stop: 1,
+                                y_stop: 1,
+                                root_element: 'pages',
+                                parent_element: 'page',
+                                source_type: 'pqc_combined_struct',
+                                file_field: 'file_name',
+                                z: 1 )
+
+      _set_combined_metadata_ark(struct)
+
+      struct.original_mappings = struct.user_defined_mappings
+
+      desc.children << struct
+      struct.save!
+      desc.save!
+      desc.metadata_builder.repo.update_steps(:metadata_source_type_specified)
+    else
+      structural_mappings, bib_id = _set_structural_metadata_ark(self.unique_identifier)
+      desc = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:pap][:http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:http_lookup_suffix]}").first_or_create
+      desc.update_attributes( view_type: 'horizontal',
+                              num_objects: 1,
+                              x_start: 1,
+                              y_start: 2,
+                              x_stop: 34,
+                              y_stop: 2,
+                              root_element: 'record',
+                              source_type: 'pqc_desc',
+                              z: 1 )
+
+      _set_descriptive_metadata_ark(bib_id, desc)
+
+      struct = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}").first_or_create
+      struct.update_attributes( view_type: 'horizontal',
+                                num_objects: 1,
+                                x_start: 1,
+                                y_start: 1,
+                                x_stop: 1,
+                                y_stop: 1,
+                                root_element: 'pages',
+                                parent_element: 'page',
+                                source_type: 'pqc_ark',
+                                file_field: 'file_name',
+                                z: 1 )
+      struct.original_mappings = structural_mappings
+      struct.user_defined_mappings = structural_mappings
+      desc.children << struct
+      struct.save!
+      desc.save!
+      self.metadata_builder.metadata_source << desc
+    end
     self.metadata_builder.save!
   end
 
@@ -275,7 +317,7 @@ class Repo < ActiveRecord::Base
 
   #TODO: Eventually offload to metadata source subclasses
   def default_thumbnail
-    structural_types = %w[structural_bibid custom bibliophilly_structural kaplan_structural pap_structural pqc_ark]
+    structural_types = %w[structural_bibid custom kaplan_structural pap_structural pqc_ark pqc_combined_struct]
     single_structural_source = MetadataSource.where('metadata_builder_id = ? AND source_type IN (?)', self.metadata_builder, structural_types).pluck(:id)
     single_structural_source.length == 1 ? MetadataSource.find(single_structural_source.first).thumbnail : nil
   end
@@ -409,6 +451,10 @@ class Repo < ActiveRecord::Base
     self.version_control_agent.drop(working_path)
     self.version_control_agent.delete_clone(working_path)
     exist_status
+  end
+
+  def _set_combined_metadata_ark(metadata_source)
+    metadata_source.set_metadata_mappings
   end
 
   def _set_descriptive_metadata_ark(bib_id, metadata_source)

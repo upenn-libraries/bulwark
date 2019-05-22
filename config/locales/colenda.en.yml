@@ -246,6 +246,12 @@ en:
         pqc_structural:
           heading: 'Sample structural metadata fetched from Penn Qualified Core (PQC) structural spreadsheet'
           field_separator: ':'
+        pqc_combined_desc:
+          heading: 'Combined descriptive metadata fetched from marmite'
+          field_separator: ':'
+        pqc_combined_struct:
+          heading: 'Combined structural metadata fetched from marmite'
+          field_separator: ':'
         custom:
           field:
             label: '"%{field}" should map to:'
