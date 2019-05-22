@@ -89,8 +89,19 @@ module ApplicationHelper
     return 'ltr' if %w[left-to-right ltr].include?(reading_direction)
   end
 
+  def render_ableplayer
+    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
+    partials = ''
+    return '' unless repo.present?
+    repo.file_display_attributes.each do |key, value|
+       partials += render :partial => 'av_display/audio', :locals => {:streaming_id => key, :streaming_url => value[:streaming_url]} if value[:content_type] == 'mp3'
+       partials += render :partial => 'av_display/video', :locals => {:streaming_id => key, :streaming_url => value[:streaming_url]} if value[:content_type] == 'mp4'
+    end
+    return partials.html_safe
 
-  def render_reviewed_queue
+  end
+
+    def render_reviewed_queue
     a = ''
     ids = Repo.where('queued' => 'ingest').pluck(:id, :human_readable_name)
     a = 'Nothing approved waiting for batching' if ids.length == 0
