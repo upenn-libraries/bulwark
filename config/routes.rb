@@ -10,6 +10,7 @@ Rails.application.routes.draw do
       post :review_status
       post :detect_metadata
       post :fetch_by_ark
+      get :download
     end
   end
 
@@ -39,6 +40,7 @@ Rails.application.routes.draw do
   mount Blacklight::Engine => '/'
 
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
+
 
   root to: "catalog#index"
   blacklight_for :catalog

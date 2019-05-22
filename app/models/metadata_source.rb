@@ -106,6 +106,13 @@ class MetadataSource < ActiveRecord::Base
     self.metadata_builder.repo.update_steps(:metadata_mappings_generated) if user_defined_mappings.present?
   end
 
+  def check_parentage
+    sibling_ids = MetadataSource.where('metadata_builder_id = ? AND id != ?', self.metadata_builder, self.id).pluck(:id)
+    sibling_ids.each do |sid|
+      return MetadataSource.find(sid).children.any?{|child| child == "#{self.id}"} ? sid : nil
+    end
+  end
+
   def check_siblings
     sibling_ids = MetadataSource.where('metadata_builder_id = ? AND id != ?', self.metadata_builder, self.id).pluck(:id)
     sibling_ids.each do |sid|
@@ -587,7 +594,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def true_root_element(metadata_source)
-    parent_id = metadata_source.check_siblings
+    parent_id = metadata_source.check_parentage
     parent_id.present? ? MetadataSource.find(parent_id).root_element : metadata_source.root_element
   end
 

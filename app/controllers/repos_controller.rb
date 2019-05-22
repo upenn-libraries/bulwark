@@ -46,6 +46,10 @@ class ReposController < ApplicationController
     redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/generate_metadata"
   end
 
+  def download
+    send_data(params[:download_url], filename: params[:filename])
+  end
+
   private
     def set_repo
       @repo = Repo.find(params[:id])

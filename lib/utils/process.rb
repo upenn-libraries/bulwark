@@ -23,10 +23,13 @@ module Utils
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
       delete_members(@oid)
       FileUtils.rm(file)
-      file_extensions = { :images => %w[ tif tiff jpeg jpg ], :av => %w[ wav mp3 mp4 ] }
+      file_extensions = { :images => %w[ tif tiff jpeg jpg ], :av => %w[ wav mp3 mp4 ], :downloadable => %w[ zip gz ] }
       attach_images(@oid, repo, working_path) if repo.file_extensions.any? { |ext| file_extensions[:images].include?(ext) }
       file_extensions[:av].each do |ext|
-          attach_av(repo, working_path, ext)
+        attach_av(repo, working_path, ext)
+      end
+      file_extensions[:downloadable].each do |ext|
+        attach_downloadable(repo, working_path, ext)
       end
       update_index(@oid)
       repo.save!
@@ -88,6 +91,17 @@ module Utils
       repo.save!
     end
 
+    def attach_downloadable(repo, working_path, derivative)
+      repo.file_display_attributes = {}
+      repo.file_extensions.each do |ext|
+        Dir.glob("#{working_path}/#{repo.assets_subdirectory}/*.#{derivative}").each do |deriv|
+          repo.file_display_attributes[File.basename(attachable_url(repo, working_path, deriv))] = { :content_type => derivative,
+                                                                                                     :download_url => attachable_url(repo, working_path, deriv),
+                                                                                                     :filename => File.basename(deriv) }
+        end
+      end
+      repo.save!
+    end
 
     def generate_thumbnail(repo, working_path)
       unencrypted_thumbnail_path = "#{working_path}/#{repo.assets_subdirectory}/#{repo.thumbnail}"

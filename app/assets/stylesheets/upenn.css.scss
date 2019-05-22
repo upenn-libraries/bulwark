@@ -216,3 +216,40 @@ span.site-name {
   }
 
 }
+
+
+
+
+/*************
+*
+* WARC support
+*
+**************/
+
+.warc-download {
+  margin-left: auto;
+  margin-right: auto;
+  width: 230px;
+  margin-bottom: 40px;
+
+  a {
+    @include rounded-corners;
+    background-color: $upenn-red;
+    box-shadow: 0 5px 0 $upenn-blue;
+    color: white;
+    padding: 1em 1.5em;
+    position: relative;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  a:hover {
+    background-color: $upenn-lighter-red;
+    cursor: pointer;
+  }
+
+  a:active {
+    box-shadow: none;
+    top: 5px;
+  }
+}

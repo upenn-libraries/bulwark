@@ -2,7 +2,7 @@
 
 development:
   allowed_extensions:
-    assets: 'tif,tiff,jpeg,jpg,wav,mp3,mp4'
+    assets: 'tif,tiff,jpeg,jpg,wav,mp3,mp4,zip,gz'
     metadata_sources: 'xlsx,csv'
 
 test:
@@ -12,5 +12,5 @@ test:
 
 production:
   allowed_extensions:
-    assets: 'tif,tiff,jpeg,jpg,wav,mp3,mp4'
+    assets: 'tif,tiff,jpeg,jpg,wav,mp3,mp4,zip,gz'
     metadata_sources: 'xlsx,csv'
