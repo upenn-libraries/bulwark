@@ -105,7 +105,7 @@ module ApplicationHelper
     partials = ''
     return '' unless repo.present?
     repo.file_display_attributes.each do |key, value|
-      partials += render :partial => 'other_display/warc', :locals => {:download_url => value[:download_url], :filename => value[:filename]} if value[:content_type] == 'gz'
+      partials += render :partial => 'other_display/warc', :locals => {:download_url => value[:download_url].gsub("#{Utils::Storage::Ceph.config.protocol}#{Utils::Storage::Ceph.config.host}",''), :filename => value[:filename]} if value[:content_type] == 'gz'
     end
     return partials.html_safe
   end

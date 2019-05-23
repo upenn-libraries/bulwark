@@ -1,3 +1,5 @@
+require 'open-uri'
+
 class ReposController < ApplicationController
   before_action :set_repo, only: [:show, :update, :checksum_log, :review_status, :detect_metadata, :preview_xml_preview, :fetch_by_ark]
 
@@ -47,7 +49,7 @@ class ReposController < ApplicationController
   end
 
   def download
-    send_data(params[:download_url], filename: params[:filename])
+    redirect_to "http://localhost:9292/files/#{params[:filename]}?filename=#{params[:download_url]}"
   end
 
   private
