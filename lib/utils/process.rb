@@ -14,10 +14,12 @@ module Utils
 
     def import(file, repo, working_path)
       Repo.update(repo.id, :ingested => false)
+      repo.file_display_attributes = {}
       @@working_path = working_path
       @oid = repo.names.fedora
       @@derivatives_working_destination = "#{@@working_path}/#{repo.derivatives_subdirectory}"
       @@status_type = :error
+      repo.file_display_attributes = {}
       af_object = Finder.fedora_find(@oid)
       delete_duplicate(af_object) if af_object.present?
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
@@ -25,6 +27,7 @@ module Utils
       FileUtils.rm(file)
       file_extensions = { :images => %w[ tif tiff jpeg jpg ], :av => %w[ wav mp3 mp4 ], :downloadable => %w[ zip gz ], :pdf => %w[ pdf ] }
       attach_images(@oid, repo, working_path) if repo.file_extensions.any? { |ext| file_extensions[:images].include?(ext) }
+
       file_extensions[:av].each do |ext|
         attach_av(repo, working_path, ext)
       end
@@ -56,7 +59,6 @@ module Utils
     end
 
     def attach_images(oid = @oid, repo, working_path)
-      repo.images_to_render = {}
       af_object = Finder.fedora_find(@oid)
       source_file =  "#{working_path}/#{repo.metadata_subdirectory}/#{repo.preservation_filename}"
       source_blob = File.read(source_file)
@@ -84,7 +86,6 @@ module Utils
     end
 
     def attach_av(repo, working_path, derivative)
-      repo.file_display_attributes = {}
       repo.file_extensions.each do |ext|
         Dir.glob("#{working_path}/#{repo.assets_subdirectory}/*.#{derivative}").each do |deriv|
           repo.file_display_attributes[File.basename(attachable_url(repo, working_path, deriv))] = { :content_type => derivative,
@@ -95,7 +96,6 @@ module Utils
     end
 
     def attach_pdf(repo, working_path, derivative)
-      repo.file_display_attributes = {}
       repo.file_extensions.each do |ext|
         Dir.glob("#{working_path}/#{repo.assets_subdirectory}/*.#{derivative}").each do |deriv|
           repo.file_display_attributes[File.basename(attachable_url(repo, working_path, deriv))] = { :content_type => derivative,
@@ -106,7 +106,6 @@ module Utils
     end
 
     def attach_downloadable(repo, working_path, derivative)
-      repo.file_display_attributes = {}
       repo.file_extensions.each do |ext|
         Dir.glob("#{working_path}/#{repo.assets_subdirectory}/*.#{derivative}").each do |deriv|
           repo.file_display_attributes[File.basename(attachable_url(repo, working_path, deriv))] = { :content_type => derivative,
