@@ -46,6 +46,8 @@ services:
       OAI_PMH:
       VIRTUAL_HOST:
       VIRTUAL_URL:
+      DOWNLOAD_LINK:
+      DOWNLOAD_PORT:
     ports:
       - '9292'
   web:
