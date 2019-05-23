@@ -186,6 +186,16 @@ class CatalogController < ApplicationController
       }
     end
 
+    config.add_search_field('abstract') do |field|
+      field.qt = 'search'
+      field.solr_local_parameters = {
+          :qf => '$abstract_qf',
+          :pf => '$abstract_pf'
+      }
+    end
+
+
+
     # Specifying a :qt only to show it's possible, and so our internal automated
     # tests can test it. In this case it's the same as
     # config[:default_solr_parameters][:qt], so isn't actually neccesary.
