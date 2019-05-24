@@ -226,12 +226,25 @@ span.site-name {
 *
 **************/
 
+.warc-container {
+  width: 100%;
+  height: 100px;
+
+  hr {
+    border: $upenn-darkest-blue 1px solid;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+}
+
 .warc-download {
+  width: 230px;
+  height: 50px;
   margin-left: auto;
   margin-right: auto;
-  width: 230px;
-  margin-bottom: 40px;
-
   a {
     @include rounded-corners;
     background-color: $upenn-red;
@@ -252,6 +265,12 @@ span.site-name {
     box-shadow: none;
     top: 5px;
   }
+}
+
+.warc-filename {
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 
