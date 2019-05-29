@@ -1,3 +1,5 @@
+require 'open-uri'
+
 class ReposController < ApplicationController
   before_action :set_repo, only: [:show, :update, :checksum_log, :review_status, :detect_metadata, :preview_xml_preview, :fetch_by_ark]
 
@@ -44,6 +46,10 @@ class ReposController < ApplicationController
   def fetch_by_ark
     @repo.set_metadata_from_ark
     redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/generate_metadata"
+  end
+
+  def download
+    redirect_to "http://localhost:9292/files/#{params[:filename]}?filename=#{params[:download_url]}"
   end
 
   private

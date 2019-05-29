@@ -14,16 +14,29 @@ module Utils
 
     def import(file, repo, working_path)
       Repo.update(repo.id, :ingested => false)
+      repo.file_display_attributes = {}
       @@working_path = working_path
       @oid = repo.names.fedora
       @@derivatives_working_destination = "#{@@working_path}/#{repo.derivatives_subdirectory}"
       @@status_type = :error
+      repo.file_display_attributes = {}
       af_object = Finder.fedora_find(@oid)
       delete_duplicate(af_object) if af_object.present?
       @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
       delete_members(@oid)
       FileUtils.rm(file)
-      attach_files(@oid, repo, working_path)
+      file_extensions = { :images => %w[ tif tiff jpeg jpg ], :av => %w[ wav mp3 mp4 ], :downloadable => %w[ zip gz ], :pdf => %w[ pdf ] }
+      attach_images(@oid, repo, working_path) if repo.file_extensions.any? { |ext| file_extensions[:images].include?(ext) }
+
+      file_extensions[:av].each do |ext|
+        attach_av(repo, working_path, ext)
+      end
+      file_extensions[:downloadable].each do |ext|
+        attach_downloadable(repo, working_path, ext)
+      end
+      file_extensions[:pdf].each do |ext|
+        attach_pdf(repo, working_path, ext)
+      end
       update_index(@oid)
       repo.save!
       @@status_type = :success
@@ -45,8 +58,7 @@ module Utils
       execute_curl(_build_command('delete_tombstone', :object_uri => members_id))
     end
 
-    def attach_files(oid = @oid, repo, working_path)
-      repo.images_to_render = {}
+    def attach_images(oid = @oid, repo, working_path)
       af_object = Finder.fedora_find(@oid)
       source_file =  "#{working_path}/#{repo.metadata_subdirectory}/#{repo.preservation_filename}"
       source_blob = File.read(source_file)
@@ -73,6 +85,37 @@ module Utils
       repo.save!
     end
 
+    def attach_av(repo, working_path, derivative)
+      repo.file_extensions.each do |ext|
+        Dir.glob("#{working_path}/#{repo.assets_subdirectory}/*.#{derivative}").each do |deriv|
+          repo.file_display_attributes[File.basename(attachable_url(repo, working_path, deriv))] = { :content_type => derivative,
+                                                                                                     :streaming_url => attachable_url(repo, working_path, deriv) }
+        end
+      end
+      repo.save!
+    end
+
+    def attach_pdf(repo, working_path, derivative)
+      repo.file_extensions.each do |ext|
+        Dir.glob("#{working_path}/#{repo.assets_subdirectory}/*.#{derivative}").each do |deriv|
+          repo.file_display_attributes[File.basename(attachable_url(repo, working_path, deriv))] = { :content_type => derivative,
+                                                                                                     :pdf_url => attachable_url(repo, working_path, deriv) }
+        end
+      end
+      repo.save!
+    end
+
+    def attach_downloadable(repo, working_path, derivative)
+      repo.file_extensions.each do |ext|
+        Dir.glob("#{working_path}/#{repo.assets_subdirectory}/*.#{derivative}").each do |deriv|
+          repo.file_display_attributes[File.basename(attachable_url(repo, working_path, deriv))] = { :content_type => derivative,
+                                                                                                     :download_url => attachable_url(repo, working_path, deriv),
+                                                                                                     :filename => File.basename(deriv) }
+        end
+      end
+      repo.save!
+    end
+
     def generate_thumbnail(repo, working_path)
       unencrypted_thumbnail_path = "#{working_path}/#{repo.assets_subdirectory}/#{repo.thumbnail}"
       thumbnail_link = Dir.glob("#{working_path}/#{repo.derivatives_subdirectory}/**/**/**/thumbnail*").first
@@ -88,9 +131,9 @@ module Utils
     end
 
     def attachable_url(repo, working_path, file_path)
-      repo.version_control_agent.add({:content => file_path}, working_path)
-      repo.version_control_agent.copy({:content => file_path, :to => Utils::Storage::Ceph.config.special_remote_name}, working_path)
-      lookup_key = repo.version_control_agent.look_up_key(file_path, working_path)
+      repo.version_control_agent.add({:content => "#{file_path}"}, working_path)
+      repo.version_control_agent.copy({:content => "#{file_path}", :to => Utils::Storage::Ceph.config.special_remote_name}, working_path)
+      lookup_key = repo.version_control_agent.look_up_key(Shellwords.shellescape(file_path), working_path)
       read_storage_link(lookup_key, repo)
     end
 

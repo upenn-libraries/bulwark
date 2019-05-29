@@ -4,7 +4,7 @@
 <div class="git-directions">
   <h2>Using this Repo</h2>
   <p>Your git remote has been initialized at <%= "#{full_path}" %>.  To begin using this remote, run the following command from the terminal:</p>
-  <pre>git clone gitannex@colenda.library.upenn.edu:2222<%= "#{full_path}\ncd #{(@object.names.directory).gsub(".git","")}" %>
+  <pre>git clone ssh://sceti@colenda.library.upenn.edu:2222<%= "#{full_path}\ncd #{(@object.names.directory).gsub(".git","")}" %>
     ceph
     ./.repoadmin/bin/init.sh
 git annex add *.tif data/assets/.

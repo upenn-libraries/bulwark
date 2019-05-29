@@ -19,3 +19,7 @@
 //= require blacklight_range_limit
 //= require openseadragon
 //= require colenda
+//= require js.cookie
+//= require modernizr.custom
+//= require ableplayer
+//= require pdfobject.min

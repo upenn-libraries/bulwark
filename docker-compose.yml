@@ -46,6 +46,8 @@ services:
       OAI_PMH:
       VIRTUAL_HOST:
       VIRTUAL_URL:
+      DOWNLOAD_LINK:
+      DOWNLOAD_PORT:
     ports:
       - '9292'
   web:
@@ -88,6 +90,7 @@ services:
       PAP_STRUCTURAL_HTTP_LOOKUP:
       PAP_INITIAL_STOP:
       PAP_OWNER:
+      PHALT_ENDPOINT:
       PROD_FEDORA_PW:
       PROD_FEDORA_URL:
       PROD_FEDORA_USER:
@@ -164,6 +167,7 @@ services:
       PAP_STRUCTURAL_HTTP_LOOKUP:
       PAP_INITIAL_STOP:
       PAP_OWNER:
+      PHALT_ENDPOINT:
       PROD_FEDORA_PW:
       PROD_FEDORA_URL:
       PROD_FEDORA_USER:

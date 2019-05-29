@@ -1,0 +1,7 @@
+<div id="pdf-viewer">
+  <object data="<%= pdf_url %>" type="application/pdf" width="100%" height="100%">
+    <p>Your browser does not support embedded PDF files. <%= link_to("Download the PDF to view", pdf_url) %></p>
+  </object>
+</div>
+
+<script type="text/javascript">PDFObject.embed("<%= pdf_url %>", "#pdf-viewer");</script>
