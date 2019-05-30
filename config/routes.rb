@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       post :detect_metadata
       post :fetch_by_ark
       get :download
+      get :fetch_image_ids, :defaults => { :format => 'json' }
     end
   end
 
