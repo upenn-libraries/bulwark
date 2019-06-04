@@ -53,8 +53,8 @@ class ReposController < ApplicationController
   end
 
   def fetch_image_ids
-    result = Repo.find(params[:id])
-    ids = result.images_to_render['iiif']['images']
+    result = Repo.where(:unique_identifier => "ark:/#{params[:id].tr('-','/')}").first
+    ids = result.nil? ? [] : result.images_to_render['iiif']['images']
     ids.map! { |id| id.gsub(ENV['IIIF_IMAGE_SERVER'], '').gsub('/info.json', '') }
 
     render :json => ids
