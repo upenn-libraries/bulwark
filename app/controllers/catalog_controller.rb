@@ -127,7 +127,8 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name'
     config.add_show_field solr_name('geographic_subject', :stored_searchable, type: :string), :label => 'Geographic Subject'
     config.add_show_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
-    
+    config.add_show_field solr_name('notes', :stored_searchable, type: :string), :label => 'Notes'
+
     # Catalog
     config.add_show_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number'
     config.add_show_field solr_name('collection', :stored_searchable, type: :string), :label => 'Collection'

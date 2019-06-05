@@ -149,6 +149,11 @@ class Repo < ActiveRecord::Base
     url = URI.parse("#{MetadataSchema.config[:combined][:http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:combined][:http_lookup_suffix]}")
     req = Net::HTTP.new(url.host, url.port)
     res = req.request_head(url.path)
+
+    data = Nokogiri::XML(open(url.to_s))
+    data.remove_namespaces!
+    source_type = data.xpath('//record/bib_id').children.present? ? 'pqc_desc' : 'pqc_combined_desc'
+
     if res.code == '200'
       desc = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:combined][:http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:combined][:http_lookup_suffix]}", :source_type => 'pqc_combined_desc').first_or_create
       desc.update_attributes( view_type: 'horizontal',
@@ -158,7 +163,8 @@ class Repo < ActiveRecord::Base
                               x_stop: 34,
                               y_stop: 2,
                               root_element: 'record',
-                              source_type: 'pqc_combined_desc',
+                              source_type: source_type,
+                              original_mappings: {'bibid' => data.xpath('//record/bib_id').children.first.text},
                               z: 1 )
 
       _set_combined_metadata_ark(desc)

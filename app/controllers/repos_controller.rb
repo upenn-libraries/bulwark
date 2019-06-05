@@ -52,6 +52,14 @@ class ReposController < ApplicationController
     redirect_to "http://localhost:9292/files/#{params[:filename]}?filename=#{params[:download_url]}"
   end
 
+  def fetch_image_ids
+    result = Repo.find(params[:id])
+    ids = result.images_to_render['iiif']['images']
+    ids.map! { |id| id.gsub(ENV['IIIF_IMAGE_SERVER'], '').gsub('/info.json', '') }
+
+    render :json => ids
+  end
+
   private
     def set_repo
       @repo = Repo.find(params[:id])

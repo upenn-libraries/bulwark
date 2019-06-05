@@ -167,7 +167,7 @@ class MetadataSource < ActiveRecord::Base
           self.identifier = self.original_mappings['bibid']
         when 'pqc_ark'
           self.metadata_builder.repo.update_ark_struct_metadata
-        when 'pqc_desc'
+      when 'pqc_desc'
           self.root_element = MetadataSchema.config[:voyager][:root_element] || 'record'
           self.user_defined_mappings = _set_marmite_data(working_path)
           self.identifier = self.original_mappings['bibid']
@@ -861,7 +861,8 @@ class MetadataSource < ActiveRecord::Base
     tocentry = {}
     toc_entries = _sanitize_elements(page)
     toc_entries.each do |te|
-      tocentry[te.attributes['name'].value] = te.children.first.text
+      key = te.attributes['name'].present? ? te.attributes['name'].value : te.name
+      tocentry[key] = te.children.first.text
     end
     return tocentry
   end
