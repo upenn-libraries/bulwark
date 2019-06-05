@@ -97,6 +97,15 @@
           <sv:property sv:name="ns002:format" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="format" />
           </sv:property>
+          <sv:property sv:name="ns002:source" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="source" />
+          </sv:property>
+          <sv:property sv:name="ns002:relation" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="relation" />
+          </sv:property>
+          <sv:property sv:name="ns002:notes" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="notes" />
+          </sv:property>
           <sv:property sv:name="ns002:type" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="item_type" />
           </sv:property>
@@ -108,9 +117,6 @@
           </sv:property>
           <sv:property sv:name="ns004:geographicSubject" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="geographic_subject" />
-          </sv:property>
-          <sv:property sv:name="ns004:provenance" sv:type="String" sv:multiple="false">
-            <xsl:apply-templates select="provenance" />
           </sv:property>
           <sv:node xmlns:premis="http://www.loc.gov/premis/rdf/v1#" xmlns:image="http://www.modeshape.org/images/1.0"
                    xmlns:sv="http://www.jcp.org/jcr/sv/1.0" xmlns:test="info:fedora/test/"
@@ -244,6 +250,18 @@
   </xsl:template>
 
   <xsl:template match="date">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
+
+  <xsl:template match="source">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
+
+  <xsl:template match="relation">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
+
+  <xsl:template match="notes">
     <sv:value><xsl:apply-templates /></sv:value>
   </xsl:template>
 
