@@ -120,6 +120,10 @@ module ApplicationHelper
     return partials.html_safe
   end
 
+  def universal_viewer_path(identifier)
+    "/uv/uv#?manifest=uv/uv#?manifest=https://colenda-dev.library.upenn.edu/phalt/iiif/2/99999-fk4tf12c33/manifest&config=/uv/uv-config.json"
+  end
+
     def render_reviewed_queue
     a = ''
     ids = Repo.where('queued' => 'ingest').pluck(:id, :human_readable_name)
