@@ -48,6 +48,8 @@ services:
       VIRTUAL_URL:
       DOWNLOAD_LINK:
       DOWNLOAD_PORT:
+      MARMITE_BASE:
+      MARMITE_FORMAT:
     ports:
       - '9292'
   web:
