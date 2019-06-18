@@ -1,0 +1,50 @@
+{
+  "options":
+  {
+    "allowStealFocus": false,
+    "authAPIVersion": 1,
+    "bookmarkThumbHeight": 150,
+    "bookmarkThumbWidth": 90,
+    "dropEnabled": true,
+    "footerPanelEnabled": true,
+    "headerPanelEnabled": true,
+    "leftPanelEnabled": true,
+    "limitLocales": false,
+    "multiSelectionMimeType": "application/zip",
+    "navigatorEnabled": true,
+    "openTemplate": "http://universalviewer.io?manifest={0}",
+    "overrideFullScreen": false,
+    "pagingEnabled": true,
+    "pagingOptionEnabled": true,
+    "pessimisticAccessControl": false,
+    "preserveViewport": false,
+    "rightPanelEnabled": true,
+    "saveUserSettings": false,
+    "clickToZoomEnabled": true,
+    "searchWithinEnabled": true,
+    "termsOfUseEnabled": true,
+    "theme": "uv-en-GB-theme",
+    "tokenStorage": "session",
+    "useArrowKeysToNavigate": false,
+    "zoomToSearchResultEnabled": true,
+    "zoomToBoundsEnabled": false
+  },
+  "modules":
+  {
+    "contentLeftPanel":
+    {
+      "options":
+      {
+        "branchNodesSelectable": true,
+        "defaultToTreeEnabled": true
+      }
+    },
+    "footerPanel":
+    {
+      "options":
+      {
+        "shareEnabled": false
+      }
+    }
+  }
+}
