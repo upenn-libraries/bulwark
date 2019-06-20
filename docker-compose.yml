@@ -114,6 +114,7 @@ services:
       STORAGE_READ_HOST:
       STORAGE_READ_PROTOCOL:
       STORAGE_TYPE:
+      UV_URL:
       VOYAGER_HTTP_LOOKUP:
       VOYAGER_STRUCTURAL_HTTP_LOOKUP:
     networks:
