@@ -53,11 +53,18 @@ class ReposController < ApplicationController
   end
 
   def fetch_image_ids
-    result = Repo.where(:unique_identifier => "ark:/#{params[:id].tr('-','/')}").first
-    ids = result.nil? ? [] : result.images_to_render['iiif']['images']
-    ids.map! { |id| id.gsub(ENV['IIIF_IMAGE_SERVER'], '').gsub('/info.json', '') }
+    repo = Repo.where(:unique_identifier => "ark:/#{params[:id].tr('-','/')}").first
+    result = {}
 
-    render :json => ids
+    unless repo.nil?
+      ids = repo.images_to_render['iiif']['images']
+      ids.map! { |id| id.gsub(ENV['IIIF_IMAGE_SERVER'], '').gsub('/info.json', '') }
+
+      title = repo.metadata_builder.metadata_source.first.user_defined_mappings['title'].join("; ")
+      result = { :id => params[:id], :title => title, :image_ids => ids }
+    end
+
+    render :json => result
   end
 
   private
