@@ -124,7 +124,7 @@ module ApplicationHelper
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
     partials = ''
     partials += render :partial => 'other_display/uv'
-    return partials.html_safe if repo.images_to_render['iiif']['images'].present?
+    return partials.html_safe if repo.images_to_render.present?
   end
 
   def universal_viewer_path(identifier)
