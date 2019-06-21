@@ -22,5 +22,5 @@
   <span class="Z3988" title="<%= @document.export_as_openurl_ctx_kev(document_partial_name(@document)) %>"></span>
 <% end %>
 
-<iframe id="uv-iframe" src="<%= universal_viewer_path(@document.id) %>" allowfullscreen="true"></iframe>
 
+<%= render_uv %>

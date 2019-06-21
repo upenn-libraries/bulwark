@@ -120,6 +120,13 @@ module ApplicationHelper
     return partials.html_safe
   end
 
+  def render_uv
+    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
+    partials = ''
+    partials += render :partial => 'other_display/uv'
+    return partials.html_safe if repo.images_to_render['iiif']['images'].present?
+  end
+
   def universal_viewer_path(identifier)
     "/uv/uv#?manifest=uv/uv#?manifest=#{ENV['UV_URL']}/#{identifier}/manifest&config=/uv/uv-config.json"
   end
