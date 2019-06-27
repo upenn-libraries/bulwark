@@ -6,6 +6,7 @@ Colenda is a Hydra head providing administrative digital asset and metadata gene
 * [Git-annex](git-annex.branchable.com) - A git library that allows large binaries to be safely and robustly managed by git without being checked into the git repository.
 * [xsltproc](http://xmlsoft.org/XSLT/xsltproc.html) - Command-line XSLT processor for transforming base XML into other formats for ingest/review.
 * [ImageMagick](http://www.imagemagick.org/script/index.php) - Software suite for creating and editing binary images, relied upon by the [minimagick](https://github.com/minimagick/minimagick) gem, used to create image derivatives.
+* [NPM](https://www.npmjs.com/)
 
 ## Installation
 ###Configuration Files

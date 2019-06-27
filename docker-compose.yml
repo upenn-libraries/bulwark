@@ -48,6 +48,8 @@ services:
       VIRTUAL_URL:
       DOWNLOAD_LINK:
       DOWNLOAD_PORT:
+      MARMITE_BASE:
+      MARMITE_FORMAT:
     ports:
       - '9292'
   web:
@@ -112,6 +114,7 @@ services:
       STORAGE_READ_HOST:
       STORAGE_READ_PROTOCOL:
       STORAGE_TYPE:
+      UV_URL:
       VOYAGER_HTTP_LOOKUP:
       VOYAGER_STRUCTURAL_HTTP_LOOKUP:
     networks:

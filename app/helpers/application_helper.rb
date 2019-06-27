@@ -2,60 +2,6 @@ module ApplicationHelper
 
   include RailsAdmin::ApplicationHelper
 
-  def osd_nav_images
-    nav_images = {
-        zoomIn: {
-            REST:      image_path('openseadragon/zoomin_rest.png'),
-            GROUP:     image_path('openseadragon/zoomin_grouphover.png'),
-            HOVER:     image_path('openseadragon/zoomin_hover.png'),
-            DOWN:      image_path('openseadragon/zoomin_pressed.png')
-        },
-        zoomOut: {
-            REST:    image_path('openseadragon/zoomout_rest.png'),
-            GROUP:   image_path('openseadragon/zoomout_grouphover.png'),
-            HOVER:   image_path('openseadragon/zoomout_hover.png'),
-            DOWN:    image_path('openseadragon/zoomout_pressed.png')
-        },
-        home: {
-            REST:    image_path('openseadragon/home_rest.png'),
-            GROUP:   image_path('openseadragon/home_grouphover.png'),
-            HOVER:   image_path('openseadragon/home_hover.png'),
-            DOWN:    image_path('openseadragon/home_pressed.png')
-        },
-        fullpage: {
-            REST:    image_path('openseadragon/fullpage_rest.png'),
-            GROUP:   image_path('openseadragon/fullpage_grouphover.png'),
-            HOVER:   image_path('openseadragon/fullpage_hover.png'),
-            DOWN:    image_path('openseadragon/fullpage_pressed.png')
-        },
-        rotateleft: {
-            REST:    image_path('openseadragon/rotateleft_rest.png'),
-            GROUP:   image_path('openseadragon/rotateleft_grouphover.png'),
-            HOVER:   image_path('openseadragon/rotateleft_hover.png'),
-            DOWN:    image_path('openseadragon/rotateleft_pressed.png')
-        },
-        rotateright: {
-            REST:    image_path('openseadragon/rotateright_rest.png'),
-            GROUP:   image_path('openseadragon/rotateright_grouphover.png'),
-            HOVER:   image_path('openseadragon/rotateright_hover.png'),
-            DOWN:    image_path('openseadragon/rotateright_pressed.png')
-        },
-        previous: {
-            REST:    image_path('openseadragon/previous_rest.png'),
-            GROUP:   image_path('openseadragon/previous_grouphover.png'),
-            HOVER:   image_path('openseadragon/previous_hover.png'),
-            DOWN:    image_path('openseadragon/previous_pressed.png')
-        },
-        next: {
-            REST:    image_path('openseadragon/next_rest.png'),
-            GROUP:   image_path('openseadragon/next_grouphover.png'),
-            HOVER:   image_path('openseadragon/next_hover.png'),
-            DOWN:    image_path('openseadragon/next_pressed.png')
-        }
-    }
-    return content_tag(:div, '', id: 'navImages', data: nav_images.to_json)
-  end
-
   def render_image_list
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
     return '' unless repo.present? && repo.images_to_render.present?
@@ -77,10 +23,6 @@ module ApplicationHelper
       items << featured_item
     end
     return items.html_safe
-  end
-
-  def render_openseadragon(repo)
-    return "<div id=\"openseadragon\" dir=\"#{resolve_reading_direction(repo)}\" style=\"width: 800px; height: 600px;\"></div>".html_safe
   end
 
   def resolve_reading_direction(repo)
@@ -118,6 +60,33 @@ module ApplicationHelper
       partials += render :partial => 'other_display/pdf', :locals => {:pdf_url => value[:pdf_url]} if value[:content_type] == 'pdf'
     end
     return partials.html_safe
+  end
+
+  def render_uv
+    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
+    partials = ''
+    partials += render :partial => 'other_display/uv'
+    return partials.html_safe if repo.images_to_render.present?
+  end
+
+  def render_iiif_manifest_link
+    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
+    return repo.images_to_render.present? ? link_to("IIIF presentation manifest", "#{ENV['UV_URL']}/#{@document.id}/manifest") : ''
+  end
+
+  def render_catalog_link
+    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
+    return repo.metadata_builder.metadata_source.first.original_mappings["bibid"].present? ? link_to("Franklin record", "https://franklin.library.upenn.edu/catalog/FRANKLIN_#{repo.metadata_builder.metadata_source.first.original_mappings["bibid"]}") : ''
+  end
+
+  def additional_resources
+    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
+    return true if repo.metadata_builder.metadata_source.first.original_mappings["bibid"].present? ||
+        repo.images_to_render.present?
+  end
+
+  def universal_viewer_path(identifier)
+    "/uv/uv#?manifest=uv/uv#?manifest=#{ENV['UV_URL']}/#{identifier}/manifest&config=/uv/uv-config.json"
   end
 
     def render_reviewed_queue

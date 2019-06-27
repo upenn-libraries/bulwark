@@ -7,15 +7,8 @@
 <div id="document" class="document <%= render_document_class %>" itemscope  itemtype="<%= @document.itemtype %>">
   <div id="doc_<%= @document.id.to_s.parameterize %>">
     <%= render_document_partials @document, blacklight_config.view_config(:show).partials %>
-
   </div>
 </div>
-
-<%= osd_nav_images %>
-
-<%= render_image_list %>
-
-<script type="text/javascript">renderViewer();</script>
 
 <%= render_ableplayer %>
 
@@ -27,3 +20,5 @@
 <% if @document.respond_to?(:export_as_openurl_ctx_kev) %>
   <span class="Z3988" title="<%= @document.export_as_openurl_ctx_kev(document_partial_name(@document)) %>"></span>
 <% end %>
+
+<%= render_uv %>
