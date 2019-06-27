@@ -70,7 +70,7 @@ module ApplicationHelper
   end
 
   def render_iiif_manifest_link
-    return link_to("IIIF presentation manifest", "#{ENV['UV_URL']}/#{@document.id}/manifest")
+    return  if repo.images_to_render.present? ? link_to("IIIF presentation manifest", "#{ENV['UV_URL']}/#{@document.id}/manifest") : ''
   end
 
   def render_catalog_link
