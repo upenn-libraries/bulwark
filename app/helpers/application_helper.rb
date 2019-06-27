@@ -70,12 +70,19 @@ module ApplicationHelper
   end
 
   def render_iiif_manifest_link
-    return  if repo.images_to_render.present? ? link_to("IIIF presentation manifest", "#{ENV['UV_URL']}/#{@document.id}/manifest") : ''
+    return repo.images_to_render.present? ? link_to("IIIF presentation manifest", "#{ENV['UV_URL']}/#{@document.id}/manifest") : ''
   end
 
   def render_catalog_link
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
     return repo.metadata_builder.metadata_source.first.original_mappings["bibid"].present? ? link_to("Franklin record", "https://franklin.library.upenn.edu/catalog/FRANKLIN_#{repo.metadata_builder.metadata_source.first.original_mappings["bibid"]}") : ''
+  end
+
+  def additional_resources
+    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
+
+    return true if repo.metadata_builder.metadata_source.first.original_mappings["bibid"].present? ||
+        repo.images_to_render.present?
   end
 
   def universal_viewer_path(identifier)

@@ -7,18 +7,22 @@
   # functions by default only on detail.
 
 -%>
-<div class="panel panel-default show-resources">
-  <div class="panel-heading">
-    Additional resources
-  </div>
 
-  <div class="panel-body">
-    <ul class="nav">
-      <li><%= render_iiif_manifest_link %></li>
-      <li><%= render_catalog_link %></li>
-    </ul>
+<% if additional_resources %>
+  <div class="panel panel-default show-resources">
+    <div class="panel-heading">
+      Additional resources
+    </div>
+
+    <div class="panel-body">
+      <ul class="nav">
+        <li><%= render_iiif_manifest_link %></li>
+        <li><%= render_catalog_link %></li>
+      </ul>
+    </div>
   </div>
-</div>
+<% end %>
+
 
 <div class="panel panel-default show-tools">
   <div class="panel-heading">
