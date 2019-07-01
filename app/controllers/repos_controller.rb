@@ -58,7 +58,7 @@ class ReposController < ApplicationController
 
     unless repo.nil?
       ids = repo.images_to_render['iiif']['images']
-      ids.map! { |id| id.gsub(ENV['IIIF_IMAGE_SERVER'], '').gsub('/info.json', '') }
+      ids.map! { |id| id.gsub(/^[^=]*=/, '').gsub('/info.json', '') }
 
       title = repo.metadata_builder.metadata_source.first.user_defined_mappings['title'].join("; ")
       result = { :id => params[:id], :title => title, :image_ids => ids }
