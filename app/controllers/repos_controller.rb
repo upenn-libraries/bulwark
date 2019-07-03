@@ -57,10 +57,15 @@ class ReposController < ApplicationController
     result = {}
 
     unless repo.nil?
-      ids = repo.images_to_render['iiif']['images']
-      ids.map! { |id| id.gsub(ENV['IIIF_IMAGE_SERVER'], '').gsub('/info.json', '') }
+      if repo.images_to_render.key?('iiif')
+        ids = repo.images_to_render['iiif']['images']
+      else
+        ids = legacy_image_list(repo)
+      end
 
-      title = repo.metadata_builder.metadata_source.first.user_defined_mappings['title'].join("; ")
+      ids.map! { |id| id.gsub(ENV['IIIF_IMAGE_SERVER'], '').gsub(/^[^=]*=/, '').gsub('/info.json', '') }
+
+      title = [repo.metadata_builder.metadata_source.first.user_defined_mappings['title']].flatten.join("; ")
       result = { :id => params[:id], :title => title, :image_ids => ids }
     end
 
@@ -80,6 +85,16 @@ class ReposController < ApplicationController
     def format_review_status(message)
       message << t('colenda.controllers.repos.review_status.suffix', :email => current_user.email, :timestamp => Time.now)
       message
+    end
+
+    def legacy_image_list(repo)
+      display_array = []
+      repo.metadata_builder.get_structural_filenames.each do |filename|
+        entry = repo.file_display_attributes.select{|key, hash| hash[:file_name].split('/').last == "#{filename}.jpeg"}
+        display_array << entry.keys.first
+      end
+
+      return display_array.map{|k|"#{Display.config['iiif']['image_server']}#{repo.names.bucket}%2F#{k}/info.json"}
     end
 
 end
