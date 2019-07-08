@@ -14,9 +14,6 @@ secrets:
   bulwark_database_config:
     external: true
     name: colenda_bulwark_database_config
-  bulwark_fedora_config:
-    external: true
-    name: colenda_bulwark_fedora_config
   bulwark_secrets_config:
     external: true
     name: colenda_bulwark_secrets_config
