@@ -2,19 +2,24 @@ version: '3.7'
 
 configs:
   authorized_keys:
-    file: 'authorized_keys'
+    file: authorized_keys
 
 secrets:
   bulwark_database_password:
     external: true
+    name: colenda_bulwark_database_password
   bulwark_database_root_password:
     external: true
+    name: colenda_bulwark_database_root_password
   bulwark_database_config:
     external: true
+    name: colenda_bulwark_database_config
   bulwark_fedora_config:
     external: true
+    name: colenda_bulwark_fedora_config
   bulwark_secrets_config:
     external: true
+    name: colenda_bulwark_secrets_config
 
 services:
   redis:
