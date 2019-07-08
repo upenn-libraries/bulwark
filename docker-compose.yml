@@ -17,6 +17,9 @@ secrets:
   bulwark_secrets_config:
     external: true
     name: colenda_bulwark_secrets_config
+  bulwark_ssh_host_ecdsa_key:
+    external: true
+    name: colenda_bulwark_ssh_host_ecdsa_key
 
 services:
   redis:
@@ -131,6 +134,9 @@ services:
         target: /home/app/webapp/config/database.yml
       - source: bulwark_secrets_config
         target: /home/app/webapp/config/secrets.yml
+      - source: bulwark_ssh_host_ecdsa_key
+        target: /etc/ssh/ssh_host_ecdsa_key
+        mode: 0400
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
