@@ -50,7 +50,7 @@ module AutomatedWorkflows
           other_flags = '--exclude="*"'
           extensions.each{|ext| formatted_extensions << " --include=*.#{ext}"}
           fetch_path = "#{source}".gsub('//','/')
-          Rsync.run(fetch_path, destination, "-av #{formatted_extensions} #{other_flags}") do |result|
+          Rsync.run(fetch_path, destination, "-rlv --no-owner #{formatted_extensions} #{other_flags}") do |result|
             if result.success?
               result.changes.each do |change|
                 Rails.logger.info "#{change.filename} (#{change.summary})"
