@@ -146,7 +146,8 @@ class Repo < ActiveRecord::Base
   end
 
   def set_metadata_from_ark
-    url = URI.parse("#{MetadataSchema.config[:combined][:http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:combined][:http_lookup_suffix]}")
+    # TODO: may need to extend here eventually to account for combined_ark format data
+    url = URI.parse("#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}")
     req = Net::HTTP.new(url.host, url.port)
     res = req.request_head(url.path)
 
