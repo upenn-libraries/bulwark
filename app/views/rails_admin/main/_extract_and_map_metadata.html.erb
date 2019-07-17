@@ -1,5 +1,5 @@
 <div class="mapping-dashboard">
-  <% if @object.metadata_builder.get_structural_filenames.present? || @object.metadata_builder.metadata_source.any? { |ms| ms.source_type == 'pqc' } %>
+  <% if @object.metadata_builder.get_structural_filenames.present? || @object.metadata_builder.metadata_source.any? { |ms| %w[pqc kaplan].include? ms.source_type  } %>
     <%= render :partial => "metadata_sources/generate_metadata" %>
   <% else %>
     <%= render :partial => "repos/fetch_by_ark" %>
