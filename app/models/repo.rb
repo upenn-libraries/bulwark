@@ -155,7 +155,8 @@ class Repo < ActiveRecord::Base
     source_type = data.xpath('//record/bib_id').children.present? ? 'pqc_desc' : 'pqc_combined_desc'
 
     if res.code == '200'
-      desc = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:combined][:http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:combined][:http_lookup_suffix]}", :source_type => 'pqc_combined_desc').first_or_create
+      # TODO: may need to extend here eventually to account for combined_ark format data
+      desc = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}", :source_type => 'pqc_combined_desc').first_or_create
       desc.update_attributes( view_type: 'horizontal',
                               num_objects: 1,
                               x_start: 1,
@@ -170,7 +171,8 @@ class Repo < ActiveRecord::Base
       _set_combined_metadata_ark(desc)
       desc.original_mappings = desc.user_defined_mappings
 
-      struct = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:combined][:http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:combined][:http_lookup_suffix]}", :source_type => 'pqc_combined_struct').first_or_create
+      # TODO: may need to extend here eventually to account for combined_ark format data
+      struct = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}", :source_type => 'pqc_combined_struct').first_or_create
       struct.update_attributes( view_type: 'horizontal',
                                 num_objects: 1,
                                 x_start: 1,
