@@ -4,12 +4,12 @@ require 'rails_admin/config/actions/base'
 module RailsAdmin
   module Config
     module Actions
-      class FilesCheck < RailsAdmin::Config::Actions::Base
+      class FileChecks < RailsAdmin::Config::Actions::Base
 
         RailsAdmin::Config::Actions.register(self)
 
         register_instance_option :route_fragment do
-          'files_check'
+          'file_checks'
         end
 
         register_instance_option :member? do
