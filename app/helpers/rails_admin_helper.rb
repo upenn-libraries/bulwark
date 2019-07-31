@@ -113,6 +113,8 @@ module RailsAdminHelper
       partial = 'rails_admin/main/extract_and_map_metadata'
     when 'generate_xml'
       partial = 'rails_admin/main/preview_xml'
+    when 'file_checks'
+      partial = 'rails_admin/main/file_checks'
     else
       partial = 'shared/generic_error'
     end

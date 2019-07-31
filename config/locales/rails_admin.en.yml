@@ -28,7 +28,7 @@ en:
         title: 'Extract Metadata'
         menu: '3. Extract Metadata'
         breadcrumb: 'Extract Metadata'
-      files_check:
+      file_checks:
         title: 'Check Files'
         menu: '4. Check Files'
         breadcrumb: 'Check Files'
