@@ -75,6 +75,8 @@ module Utils
           `git annex sync --content`
         end
 
+        `chown -R #{IMAGING_USER} #{REMOTE_DATA}/#{repo.names.git}`
+
       end
 
       def pull(dir)
