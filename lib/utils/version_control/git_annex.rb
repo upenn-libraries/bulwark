@@ -74,9 +74,6 @@ module Utils
         else
           `git annex sync --content`
         end
-
-        `chown -R #{ENV["IMAGING_USER"]} #{ENV["REMOTE_DATA"]}/#{repo.names.git}`
-
       end
 
       def pull(dir)
