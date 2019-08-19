@@ -9,6 +9,7 @@ class FileChecksJob < ActiveJobStatus::TrackableJob
     @root_url = root_url
     @user_email = user_email
     @metadata_builder.perform_file_checks_and_generate_previews
+    `sudo chown -R sceti /fs/pub/data/#{metadata_builder.repo.names.git}`
   end
 
   private
