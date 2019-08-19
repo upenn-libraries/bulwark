@@ -18,7 +18,7 @@ module Utils
       end
 
       def initialize_bare_remote
-        `git init --bare #{@remote_repo_path}`
+        `git init --bare --shared=group #{@remote_repo_path}`
         Dir.chdir(@remote_repo_path)
         `git annex init origin`
         `git config annex.largefiles 'not (include=.repoadmin/bin/*.sh)'`
