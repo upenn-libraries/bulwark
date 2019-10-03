@@ -177,7 +177,7 @@ class MetadataSource < ActiveRecord::Base
         when 'pqc_structural'
           self.root_element = 'pages'
           self.parent_element = 'page'
-          self.file_field = 'file_name'
+          self.file_field = 'filename'
           self.user_defined_mappings = set_pqc_struct_md(working_path)
           self.identifier = self.original_mappings['bibid']
         when 'pqc_combined_desc', 'pqc_combined_struct'
@@ -448,6 +448,36 @@ class MetadataSource < ActiveRecord::Base
     mappings
   end
 
+  def set_pqc_struct_md(working_path)
+    self.y_start = 1
+    self.y_stop = 1
+    self.x_start = 1
+    self.x_stop = 6
+    sanitized = "#{working_path}/" unless working_path.ends_with?('/')
+    full_path = "#{sanitized}#{self.path}"
+    self.metadata_builder.repo.version_control_agent.get({:location => full_path}, working_path)
+    mappings = {}
+    headers = []
+    x_start, y_start, x_stop, y_stop, z = _offset
+    workbook = RubyXL::Parser.parse(full_path)
+    workbook[z][y_start].cells.each do |c|
+      headers << c.value
+    end
+    headers.reject!(&:blank?)
+    multirow = ["PAGE SEQUENCE", "VISIBLE PAGE", "TOC ENTRY", "FILENAME", "NOTES"]
+      workbook.worksheets[z].drop(1).each_with_index do |row, index|
+        next if row.cells.all?{|x| x.nil? == true || x.value.nil? == true}
+        page_hash = {}
+        multirow.each do |row_m|
+          page_hash[row_m.downcase.gsub(" ","_")] = row[headers.find_index(row_m)].value.nil? ? {} : row[headers.find_index(row_m)].value
+        end
+        mappings[index] = page_hash
+      end
+    self.original_mappings = mappings
+    #mappings = xml_sanitized(mappings)
+    mappings
+  end
+
   # Only gets called if the metadata source file is a CSV
   def update_source_path(source_path, source_type = '')
     case source_type
@@ -469,7 +499,11 @@ class MetadataSource < ActiveRecord::Base
     x_start, y_start, x_stop, y_stop, z = _offset
     workbook = RubyXL::Parser.parse(full_path)
     workbook[z][y_start].cells.each do |c|
-      headers << c.value
+      if c.present?
+        headers << c.value
+      else
+        headers << "Blank"
+      end
     end
     (x_start..x_stop).each_with_index do |i, index|
       val = (workbook[z][y_start+1][x_start+index].present? && workbook[z][y_start+1][x_start+index].value.present?) ? workbook[z][y_start+1][x_start+index].value : ''
@@ -571,10 +605,6 @@ class MetadataSource < ActiveRecord::Base
     end
     self.original_mappings = structural_mappings
     self.user_defined_mappings = structural_mappings
-  end
-
-  def generate_pqc_struct_md
-    # TODO: address when payloads are available
   end
 
   def initialize_kaplan_structural(parent)

@@ -38,6 +38,7 @@ module Utils
         attach_pdf(repo, working_path, ext)
       end
       update_index(@oid)
+
       repo.save!
       @@status_type = :success
       @@status_message = I18n.t('colenda.utils.process.success.ingest_complete')
@@ -82,6 +83,7 @@ module Utils
         repo.images_to_render[file_print.to_s.html_safe] = serialized_attributes
       end
       af_object.save
+      `curl http://mdproc.library.upenn.edu:9292/records/#{repo.names.fedora}/create?format=iiif_presentation`
       repo.save!
     end
 

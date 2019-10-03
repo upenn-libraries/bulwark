@@ -29,8 +29,10 @@ class MetadataBuildersController < ApplicationController
   end
 
   def refresh_metadata
-    @job = MetadataExtractionJob.perform_later(@metadata_builder, root_url, current_user.email)
-    initialize_job_activity('metadata_extraction')
+    #@job = MetadataExtractionJob.perform_later(@metadata_builder, root_url, current_user.email)
+    #initialize_job_activity('metadata_extraction')
+    @metadata_builder.refresh_metadata
+
     redirect_to "#{root_url}admin_repo/repo/#{@metadata_builder.repo.id}/generate_metadata"
     @metadata_builder.repo.update_last_action(action_description[:metadata_extracted])
   end
