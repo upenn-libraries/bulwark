@@ -39,9 +39,6 @@ just_jetty.sh
 # Ignore featured
 /public/featured
 
-#Ignore docker
-/docker
-
 # Other stuff
 *.rdb
 /.idea
