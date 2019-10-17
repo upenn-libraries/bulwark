@@ -2,19 +2,33 @@ version: '3.7'
 
 configs:
   authorized_keys:
-    file: 'authorized_keys'
+    file: authorized_keys
 
 secrets:
   bulwark_database_password:
     external: true
+    name: colenda_bulwark_database_password
   bulwark_database_root_password:
     external: true
+    name: colenda_bulwark_database_root_password
   bulwark_database_config:
     external: true
-  bulwark_fedora_config:
-    external: true
+    name: colenda_bulwark_database_config
   bulwark_secrets_config:
     external: true
+    name: colenda_bulwark_secrets_config
+  bulwark_ssh_host_dsa_key:
+    external: true
+    name: colenda_bulwark_ssh_host_dsa_key
+  bulwark_ssh_host_ecdsa_key:
+    external: true
+    name: colenda_bulwark_ssh_host_ecdsa_key
+  bulwark_ssh_host_ed25519_key:
+    external: true
+    name: colenda_bulwark_ssh_host_ed25519_key
+  bulwark_ssh_host_rsa_key:
+    external: true
+    name: colenda_bulwark_ssh_host_rsa_key
 
 services:
   redis:
@@ -130,6 +144,18 @@ services:
         target: /home/app/webapp/config/database.yml
       - source: bulwark_secrets_config
         target: /home/app/webapp/config/secrets.yml
+      - source: bulwark_ssh_host_dsa_key
+        target: /etc/ssh/ssh_host_dsa_key
+        mode: 0400
+      - source: bulwark_ssh_host_ecdsa_key
+        target: /etc/ssh/ssh_host_ecdsa_key
+        mode: 0400
+      - source: bulwark_ssh_host_ed25519_key
+        target: /etc/ssh/ssh_host_ed25519_key
+        mode: 0400
+      - source: bulwark_ssh_host_rsa_key
+        target: /etc/ssh/ssh_host_rsa_key
+        mode: 0400
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
