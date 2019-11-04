@@ -178,7 +178,7 @@ class MetadataSource < ActiveRecord::Base
           self.root_element = 'pages'
           self.parent_element = 'page'
           self.file_field = 'file_name'
-          self.user_defined_mappings = set_pqc_struct_md(working_path)
+          self.set_pqc_struct_md(working_path)
           self.identifier = self.original_mappings['bibid']
         when 'pqc_combined_desc', 'pqc_combined_struct'
           self.user_defined_mappings = _set_marmite_combined_metadata(working_path, self.source_type)
@@ -238,20 +238,20 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def generate_and_build_individual_xml(working_path, fname = self.path)
-    fname = self.source_type if %w[pqc_desc pqc_ark pqc_combined_desc pqc_combined_struct].include?(self.source_type)
+    fname = self.source_type if %w[pqc_desc pqc_ark pqc_combined_desc pqc_combined_struct pqc_structural].include?(self.source_type)
     xml_fname = "#{fname}.xml"
     if self.user_defined_mappings.present? && self.root_element.present?
       case self.source_type
-        when 'custom'
+      when 'custom'
           @xml_content_final_copy = xml_from_custom(working_path, fname)
       when 'voyager', 'pap', 'pqc_desc'
           @xml_content_final_copy = xml_from_voyager
       when 'structural_bibid', 'pap_structural', 'pqc_ark', 'pqc_combined_struct'
           @xml_content_final_copy = xml_from_structural_bibid
-        when 'kaplan', 'pqc'
+      when 'kaplan', 'pqc', 'pqc_structural'
           @xml_content_final_copy = xml_from_flat_mappings
-        else
-          return
+      else
+        return
       end
       $jettison_files.add(xml_fname)
       xml_fname = "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}" if self.source_type == 'pqc'  # TODO: refactor for structural
@@ -260,13 +260,13 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def generate_preservation_xml(working_path)
-    if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'kaplan'
+    if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'kaplan' && self.source_type != 'pqc_structural'
       @xml_content_final = parent_id.present? ? MetadataSource.find(parent_id).generate_parent_child_xml(working_path) : self.generate_parent_child_xml(working_path)
     elsif self.source_type == 'pqc'  # TODO: refactor when structural payload is available
       file = File.new(_reconcile_working_path_slashes(working_path, "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"))
       @xml_content_final = file.readline
     else
-      xml_fname = %w[pqc_desc pqc_ark pqc_combined_desc pqc_combined_struct].include?(self.source_type) ? "#{self.source_type}" : "#{self.path}.xml"
+      xml_fname = %w[pqc_desc pqc_ark pqc_combined_desc pqc_combined_struct pqc_structural].include?(self.source_type) ? "#{self.source_type}" : "#{self.path}.xml"
       xml_fname = xml_fname.ends_with?('.xml') ? xml_fname : "#{xml_fname}.xml"
       file = File.new(_reconcile_working_path_slashes(working_path, xml_fname))
       @xml_content_final = file.readline
@@ -335,15 +335,19 @@ class MetadataSource < ActiveRecord::Base
     parent_content = ''
     child_content = ''
     xml_content = ''
-    self.user_defined_mappings.each do |mapping|
+
+    # To circumvent bug in assuming implicit ordering of metadata sources for all descriptive to come before structural
+    m = self.metadata_builder.metadata_source.sort { |a,b| b.children.length <=> a.children.length }.first
+
+    m.user_defined_mappings.each do |mapping|
       tag = mapping.first.valid_xml_tag
       mapping.last.each do |value|
         parent_content << "<#{tag}>#{value.to_s.valid_xml_text}</#{tag}>"
       end
       xml_content = "<#{self.root_element}>#{parent_content}</#{self.root_element}>"
     end
-    if self.children.present?
-      structural = MetadataSource.find(self.children.first)
+    if m.children.present?
+      structural = MetadataSource.find(m.children.first)
       structural.user_defined_mappings.each do |mapping|
         child_content << "<#{structural.parent_element}>"
         mapping.last.each do |key, value|
@@ -351,7 +355,7 @@ class MetadataSource < ActiveRecord::Base
         end
         child_content << "</#{structural.parent_element}>"
       end
-      xml_content = "<#{self.root_element}>#{parent_content}<#{structural.root_element}>#{child_content}</#{structural.root_element}></#{self.root_element}>"
+      xml_content = "<#{m.root_element}>#{parent_content}<#{structural.root_element}>#{child_content}</#{structural.root_element}></#{m.root_element}>"
     end
     return xml_content
   end
@@ -362,6 +366,7 @@ class MetadataSource < ActiveRecord::Base
     self.generate_and_build_individual_xml(working_path)
     self.children.each do |child|
       child_path = MetadataSource.where(:id => child).pluck(:path).first
+      child = child.is_a?(String) ? MetadataSource.find(child) : child
       child_content_path = %w[pqc_desc pqc_ark pqc_combined_desc pqc_combined_struct].include?(child.source_type) ? _reconcile_working_path_slashes(working_path, "#{child.source_type}.xml") : _reconcile_working_path_slashes(working_path, "#{child_path}.xml")
       self.metadata_builder.repo.version_control_agent.get({:location => key_path}, working_path)
       self.metadata_builder.repo.version_control_agent.get({:location => child_content_path}, working_path)
@@ -448,6 +453,36 @@ class MetadataSource < ActiveRecord::Base
     mappings
   end
 
+  def set_pqc_struct_md(working_path)
+    self.y_start = 1
+    self.y_stop = 1
+    self.x_start = 1
+    self.x_stop = 6
+    sanitized = "#{working_path}/" unless working_path.ends_with?('/')
+    full_path = "#{sanitized}#{self.path}"
+    self.metadata_builder.repo.version_control_agent.get({:location => full_path}, working_path)
+    mappings = {}
+    headers = []
+    x_start, y_start, x_stop, y_stop, z = _offset
+    workbook = RubyXL::Parser.parse(full_path)
+    workbook[z][y_start].cells.each do |c|
+      headers << c.value
+    end
+    headers.reject!(&:blank?)
+    multirow = ["PAGE SEQUENCE", "VISIBLE PAGE", "TOC ENTRY", "FILENAME", "NOTES"]
+      workbook.worksheets[z].drop(1).each_with_index do |row, index|
+        next if row.cells.all?{|x| x.nil? == true || x.value.nil? == true}
+        page_hash = {}
+        multirow.each do |row_m|
+          row_key = row_m == "FILENAME" ? 'file_name' : row_m.downcase.gsub(" ","_")
+          page_hash[row_key] = row[headers.find_index(row_m)].value.nil? ? {} : row[headers.find_index(row_m)].value
+        end
+        mappings[index] = page_hash
+      end
+    self.original_mappings = mappings
+    self.user_defined_mappings = mappings
+  end
+
   # Only gets called if the metadata source file is a CSV
   def update_source_path(source_path, source_type = '')
     case source_type
@@ -469,7 +504,11 @@ class MetadataSource < ActiveRecord::Base
     x_start, y_start, x_stop, y_stop, z = _offset
     workbook = RubyXL::Parser.parse(full_path)
     workbook[z][y_start].cells.each do |c|
-      headers << c.value
+      if c.present?
+        headers << c.value
+      else
+        headers << "Blank"
+      end
     end
     (x_start..x_stop).each_with_index do |i, index|
       val = (workbook[z][y_start+1][x_start+index].present? && workbook[z][y_start+1][x_start+index].value.present?) ? workbook[z][y_start+1][x_start+index].value : ''
@@ -573,10 +612,6 @@ class MetadataSource < ActiveRecord::Base
     self.user_defined_mappings = structural_mappings
   end
 
-  def generate_pqc_struct_md
-    # TODO: address when payloads are available
-  end
-
   def initialize_kaplan_structural(parent)
 
     struct = MetadataSource.create({
@@ -602,7 +637,7 @@ class MetadataSource < ActiveRecord::Base
     case self.source_type
       when 'custom'
         self.original_mappings['file_name'].present? ? self.original_mappings['file_name'].first : nil
-      when 'structural_bibid', 'pap_structural', 'kaplan_structural', 'pqc_ark', 'pqc_combined_struct', 'pqc_combined_desc'
+      when 'structural_bibid', 'pap_structural', 'kaplan_structural', 'pqc_ark', 'pqc_combined_struct', 'pqc_combined_desc', 'pqc_structural'
         pages_with_files = []
         self.user_defined_mappings.select {|key, map| pages_with_files << map if map['file_name'].present?}
         pages_with_files.present? ? pages_with_files.sort_by.first {|p| p['serial_num']}['file_name'] : nil
@@ -617,7 +652,7 @@ class MetadataSource < ActiveRecord::Base
           orig = value if key == self.file_field
         end
         return orig
-      when 'structural_bibid', 'pap_structural', 'kaplan_structural', 'pqc_ark', 'pqc_combined_struct', 'pqc_combined_desc'
+      when 'structural_bibid', 'pap_structural', 'kaplan_structural', 'pqc_ark', 'pqc_combined_struct', 'pqc_combined_desc', 'pqc_structural'
         filenames = []
         self.user_defined_mappings.each do |key, value|
           filenames << value[self.file_field] if value[self.file_field].present?
@@ -629,7 +664,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   def self.structural_types
-    %w[custom structural_bibid pap_structural kaplan_structural pqc_ark pqc_combined_struct]
+    %w[custom structural_bibid pap_structural kaplan_structural pqc_ark pqc_combined_struct pqc_structural]
   end
 
   def validate_bib_id(bib_id)
@@ -1081,6 +1116,7 @@ class MetadataSource < ActiveRecord::Base
   def _manage_canonical_identifier(xml_content)
     minted_identifier = "<#{MetadataSchema.config[:unique_identifier_field]}>#{self.metadata_builder.repo.unique_identifier}</#{MetadataSchema.config[:unique_identifier_field]}>"
     root_element = "<#{true_root_element(self)}>"
+
     xml_content.insert((xml_content.index(root_element)+root_element.length), minted_identifier)
   end
 

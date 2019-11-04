@@ -96,6 +96,7 @@ services:
       KAPLAN_HARVESTING_ENDPOINT_REMOTE:
       KAPLAN_INITIAL_STOP:
       KAPLAN_OWNER:
+      KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE:
       OPENN_DESCRIPTION:
       OPENN_HARVESTING_ENDPOINT_REMOTE:
       OPENN_INITIAL_STOP:
@@ -161,6 +162,7 @@ services:
       - '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
       - '${PAP_HARVESTING_ENDPOINT_LOCAL}:${PAP_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_2:${SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE}'
+      - 'kaplan_rescue:${KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
       - 'colenda_workspace:${REMOTE_WORKSPACE}'
       - '${LOCAL_FEATURED}:/home/app/webapp/public/assets/featured'
   sidekiq:
@@ -232,6 +234,7 @@ services:
       - '${OPENN_HARVESTING_ENDPOINT_LOCAL}:${OPENN_HARVESTING_ENDPOINT_REMOTE}'
       - '${KAPLAN_HARVESTING_ENDPOINT_LOCAL}:${KAPLAN_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_2:${SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE}'
+      - 'kaplan_rescue:${KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
       - 'colenda_workspace:${REMOTE_WORKSPACE}'
   rabbitmq:
     image: 'rabbitmq:3-management'
@@ -243,6 +246,8 @@ volumes:
   colenda_workspace:
     external: true
   sceti_completed_2:
+    external: true
+  kaplan_rescue:
     external: true
   redis:
   db:
