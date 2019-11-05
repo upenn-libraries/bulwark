@@ -14,6 +14,8 @@ git clone ssh://sceti@colenda.library.upenn.edu:2222<%= "#{full_path}" %>
 
 ./.repoadmin/bin/init.sh
 
+echo ".nfs*" > .gitignore
+
   </pre>
 
   Add your assets to <%= @object.assets_subdirectory %> and spreadsheet of metadata to <%= @object.metadata_subdirectory %>.
