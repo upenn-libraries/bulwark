@@ -38,6 +38,7 @@ module Utils
         attach_pdf(repo, working_path, ext)
       end
       update_index(@oid)
+
       repo.save!
       @@status_type = :success
       @@status_message = I18n.t('colenda.utils.process.success.ingest_complete')
@@ -68,7 +69,7 @@ module Utils
       pages = reader.xpath('//pages/page')
       pages.each do |page|
         serialized_attributes = {}
-        key_child = page.children.select{|x| x.name == 'file_name'}.last
+        key_child = page.children.select{|x| x.name == 'file_name' }.last
         file_key = key_child.children.first.text
         k = repo.file_display_attributes.select{|k, v| v[:file_name].end_with?("#{file_key}.jpeg")}.first
         next if k.nil?
@@ -82,6 +83,7 @@ module Utils
         repo.images_to_render[file_print.to_s.html_safe] = serialized_attributes
       end
       af_object.save
+      `curl http://mdproc.library.upenn.edu:9292/records/#{repo.names.fedora}/create?format=iiif_presentation`
       repo.save!
     end
 
@@ -160,7 +162,7 @@ module Utils
           display_array << entry.keys.first
         end
         repo.images_to_render['iiif'] = { 'reading_direction' => repo.metadata_builder.determine_reading_direction,
-                                          'images' => display_array.map{ |s| "#{Display.config['iiif']['image_server']}#{repo.names.bucket}%2F#{s}/info.json" }
+                                          'images' => display_array.map{ |s| "#{Display.config['iiif']['image_server']}/#{repo.names.bucket}%2F#{s}/info.json" }
         }
       end
 

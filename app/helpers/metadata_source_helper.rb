@@ -130,7 +130,7 @@ module MetadataSourceHelper
   end
 
   def prepared_structural?(source)
-    accepted_types = %w(structural_bibid bibliophilly_structural pap_structural kaplan_structural pqc_ark pqc_combined_struct)
+    accepted_types = %w(structural_bibid bibliophilly_structural pap_structural kaplan_structural pqc_ark pqc_combined_struct pqc_structural)
     return true if (accepted_types.include? source.source_type) && (source.user_defined_mappings.present?)
     return false
   end
