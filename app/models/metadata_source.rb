@@ -262,7 +262,7 @@ class MetadataSource < ActiveRecord::Base
   def generate_preservation_xml(working_path)
     if (self.children.present? || (parent_id = check_parentage).present?) && self.source_type != 'kaplan' && self.source_type != 'pqc_structural'
       @xml_content_final = parent_id.present? ? MetadataSource.find(parent_id).generate_parent_child_xml(working_path) : self.generate_parent_child_xml(working_path)
-    elsif self.source_type == 'pqc'  # TODO: refactor when structural payload is available
+    elsif self.source_type == 'pqc'
       file = File.new(_reconcile_working_path_slashes(working_path, "#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"))
       @xml_content_final = file.readline
     else
@@ -367,7 +367,7 @@ class MetadataSource < ActiveRecord::Base
     self.children.each do |child|
       child_path = MetadataSource.where(:id => child).pluck(:path).first
       child = child.is_a?(String) ? MetadataSource.find(child) : child
-      child_content_path = %w[pqc_desc pqc_ark pqc_combined_desc pqc_combined_struct].include?(child.source_type) ? _reconcile_working_path_slashes(working_path, "#{child.source_type}.xml") : _reconcile_working_path_slashes(working_path, "#{child_path}.xml")
+      child_content_path = %w[pqc_desc pqc_ark pqc_combined_desc pqc_combined_struct pqc_structural].include?(child.source_type) ? _reconcile_working_path_slashes(working_path, "#{child.source_type}.xml") : _reconcile_working_path_slashes(working_path, "#{child_path}.xml")
       self.metadata_builder.repo.version_control_agent.get({:location => key_path}, working_path)
       self.metadata_builder.repo.version_control_agent.get({:location => child_content_path}, working_path)
       content = File.open(key_path, 'r'){|io| io.read}
