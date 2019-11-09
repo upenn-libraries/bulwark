@@ -150,7 +150,6 @@ class Repo < ActiveRecord::Base
     url = URI.parse("#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}")
     req = Net::HTTP.new(url.host, url.port)
     res = req.request_head(url.path)
-
     data = Nokogiri::XML(open(url.to_s))
     data.remove_namespaces!
     source_type = data.xpath('//record/bib_id').children.present? ? 'pqc_desc' : 'pqc_combined_desc'
