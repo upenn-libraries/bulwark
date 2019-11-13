@@ -83,7 +83,10 @@ module Utils
         repo.images_to_render[file_print.to_s.html_safe] = serialized_attributes
       end
       af_object.save
-      `curl http://mdproc.library.upenn.edu:9292/records/#{repo.names.fedora}/create?format=iiif_presentation`
+
+      # Remove, increases ingest time exponentially for larger objects
+      #`curl http://mdproc.library.upenn.edu:9292/records/#{repo.names.fedora}/create?format=iiif_presentation`
+
       repo.save!
     end
 
