@@ -475,7 +475,7 @@ class MetadataSource < ActiveRecord::Base
         page_hash = {}
         multirow.each do |row_m|
           row_key = row_m == "FILENAME" ? 'file_name' : row_m.downcase.gsub(" ","_")
-          page_hash[row_key] = row[headers.find_index(row_m)].value.nil? ? {} : row[headers.find_index(row_m)].value
+          page_hash[row_key] = (row[headers.find_index(row_m)].nil? || row[headers.find_index(row_m)].value.nil?) ? {} : row[headers.find_index(row_m)].value
         end
         mappings[index] = page_hash
       end
