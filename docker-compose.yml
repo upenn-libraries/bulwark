@@ -294,7 +294,7 @@ services:
       VOYAGER_HTTP_LOOKUP:
       VOYAGER_STRUCTURAL_HTTP_LOOKUP:
     ports:
-      - '25:26'
+      - '26:25'
     secrets:
       - source: bulwark_database_config
         target: /home/app/webapp/config/database.yml
