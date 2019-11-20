@@ -1,0 +1,5 @@
+:concurrency: 1
+:logfile: ./log/sidekiq_metadata.log
+:queues:
+  - [metadata_extraction, 1]
+:retry: 1
