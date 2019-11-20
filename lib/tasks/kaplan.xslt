@@ -91,6 +91,9 @@
           <sv:property sv:name="ns002:date" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="date" />
           </sv:property>
+          <sv:property sv:name="ns002:format" sv:type="String" sv:multiple="false">
+            <xsl:apply-templates select="format" />
+          </sv:property>
           <sv:property sv:name="ns004:personalName" sv:type="String" sv:multiple="false">
             <xsl:apply-templates select="personal_name" />
           </sv:property>
@@ -171,6 +174,10 @@
     </xsl:template>
 
     <xsl:template match="language">
+      <sv:value><xsl:apply-templates /></sv:value>
+    </xsl:template>
+
+    <xsl:template match="format">
       <sv:value><xsl:apply-templates /></sv:value>
     </xsl:template>
 
