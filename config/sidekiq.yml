@@ -3,6 +3,5 @@
 :queues:
   - [metadata_extraction, 1]
   - [file_checks, 1]
-  - [xml, 1]
   - [ingest, 1]
 :retry: 2
