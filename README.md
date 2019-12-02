@@ -1,7 +1,17 @@
-# Colenda
-Colenda is a Hydra head providing administrative digital asset and metadata generation, management, review, and ingest to a repository with a public facing capability.  It leverages Hydra-PCDM, is based on Hydra 9.1.0 and Fedora 4.5.0, and currently relies on hydra-jetty in development.  
+# README for `bulwark`
 
-## System Dependencies for the Application
+Bulwark is a Hydra head providing administrative digital asset and metadata generation, management, review, and ingest to a repository with a public facing capability.
+
+## Table of contents
+
+* [System dependencies](system-dependencies)
+* [Installation](installation)
+* [Contributing](contributing)
+* [License](license)
+* [Acknowledgments](acknowledgments)
+
+## System dependencies
+
 * [Git](https://git-scm.com/) - The application supports robust versioning of content and metadata through the use of git for version control.
 * [Git-annex](git-annex.branchable.com) - A git library that allows large binaries to be safely and robustly managed by git without being checked into the git repository.
 * [xsltproc](http://xmlsoft.org/XSLT/xsltproc.html) - Command-line XSLT processor for transforming base XML into other formats for ingest/review.
@@ -9,8 +19,10 @@ Colenda is a Hydra head providing administrative digital asset and metadata gene
 * [NPM](https://www.npmjs.com/)
 
 ## Installation
-###Configuration Files
-####filesystem.yml
+
+### Configuration Files
+
+#### filesystem.yml
 This configuration file specifies semantic information about the filesystem and filesystem behaviors that the application will use for asset lookup.
 
 Run the following command from within your application's root directory:
@@ -48,7 +60,7 @@ Edit the config file to reflect your local settings for the fields as follows:
 * `working_dir` - Absolute path on the file system where the application will clone git repositories for objects and perform operations on the content.
 * `transformed_dir` - Absolute path on the file system where the application will look for transformed XML files.  NOTE: This should be different from the `working_dir` location.
 
-####file_extensions.yml
+#### file_extensions.yml
 This configuration file specifies which file types will be accepted as digital assets by the application, and which file types will be accepted as potential metadata sources, based on their extensions.
 Run the following command from within your application's root directory:
 ```bash
@@ -64,7 +76,7 @@ development:
     metadata_sources: "xlsx"
 ```
 
-####manifest.txt
+#### manifest.txt
 Below is an example of the manifest file that the application uses to populate its semantic knowledge base of where git repositories are stored, which in turn contain additional semantic information.  This file should be a flat text file.  Its full path on the filesystem, including filename and extension, must be reflected accurately in the value of `manifest_location` in `filesystem.yml` in order for the application to function.
 
 An example of contents should look like the following:
@@ -76,7 +88,7 @@ email: name@organization.org
 * `assets_path` - This is the absolute path on the filesystem where the preservation-worthy git repositories are stored.  
 * `email` - An email address that can be used to communicate semantic errors, preservation concerns, dead ends, etc to a human.  This should be an email that the application developer/owner has access to.
 
-###Setup
+### Setup
 From within the repository's directory, run the following commands:
 ```bash
 rake jetty:clean
@@ -88,14 +100,18 @@ Check that Solr and Fedora are running at the port number defined in your jetty 
 rake db:migrate
 rails s
 ```
-## Tests
-Test suite relies upon the following:
-* Rspec
-* FactoryGirl
-* Fakr
 
-Test run, install, and deployment instructions coming soon (as soon as they're ready!).
+## Contributing
 
-##Acknowledgments
+Bug reports and pull requests are welcome on GitHub at [https://github.com/upenn-libraries/bulwark](https://github.com/upenn-libraries/bulwark).
 
-This software is powered by Hydra, which is supported and developed by the Hydra community. Learn more at the [Project Hydra website](http://projecthydra.org/).
+## License
+
+This code is available as open source under the terms of the [Apache 2.0 License](https://opensource.org/licenses/Apache-2.0).
+
+## Acknowledgments
+
+This software is brought to you by the Samvera community.  Learn more at the
+[Samvera website](http://samvera.org/).
+
+![Samvera Logo](https://wiki.duraspace.org/download/thumbnails/87459292/samvera-fall-font2-200w.png?version=1&modificationDate=1498550535816&api=v2)
