@@ -4,11 +4,11 @@ Bulwark is a Hydra head providing administrative digital asset and metadata gene
 
 ## Table of contents
 
-* [System dependencies](system-dependencies)
-* [Installation](installation)
-* [Contributing](contributing)
-* [License](license)
-* [Acknowledgments](acknowledgments)
+* [System dependencies](#system-dependencies)
+* [Installation](#installation)
+* [Contributing](#contributing)
+* [License](#license)
+* [Acknowledgments](#acknowledgments)
 
 ## System dependencies
 
