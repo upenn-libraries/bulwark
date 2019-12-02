@@ -133,6 +133,7 @@ module Utils
         change_dir_working(dir)
         drop = options[:content].present? ? options[:content] : '.'
         `git annex drop #{Shellwords.escape(options[:content])}`
+        change_perms(File.basename(dir)) if ENV['IMAGING_USER'].present?
       end
 
       def unlock(options, dir)
@@ -243,6 +244,9 @@ module Utils
         "#{Utils.config[:workspace]}/#{path_seed}"
       end
 
+      def change_perms(repo)
+        FileUtils.chown_R(ENV['IMAGING_USER'], ENV['IMAGING_USER'], "#{Utils.config['assets_path']}/#{repo}")
+      end
 
     end
   end
