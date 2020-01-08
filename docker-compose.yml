@@ -167,7 +167,7 @@ services:
       - '${LOCAL_FEATURED}:/home/app/webapp/public/assets/featured'
   sidekiq:
     image: 'quay.io/upennlibraries/bulwark:${BULWARK_IMAGE_TAG}'
-    command: '/sbin/my_init --skip-runit -- bundle exec sidekiq -C config/sidekiq.yml'
+    command: '/sbin/my_init --skip-runit -- /etc/my_init.d/gitannex.sh && /etc/my_init.d/imaging.sh && bundle exec sidekiq -C config/sidekiq.yml'
     environment:
       AWS_ACCESS_KEY_ID:
       AWS_SECRET_ACCESS_KEY:
@@ -238,7 +238,7 @@ services:
       - 'colenda_workspace:${REMOTE_WORKSPACE}'
   sidekiq_xml:
     image: 'quay.io/upennlibraries/bulwark:${BULWARK_IMAGE_TAG}'
-    command: '/sbin/my_init --skip-runit -- bundle exec sidekiq -C config/sidekiq_xml.yml'
+    command: '/sbin/my_init --skip-runit -- /etc/my_init.d/gitannex.sh && /etc/my_init.d/imaging.sh && bundle exec sidekiq -C config/sidekiq_xml.yml'
     environment:
       AWS_ACCESS_KEY_ID:
       AWS_SECRET_ACCESS_KEY:
@@ -314,7 +314,7 @@ services:
       - '15672:15672'
   sidekiq_metadata:
     image: 'quay.io/upennlibraries/bulwark:${BULWARK_IMAGE_TAG}'
-    command: '/sbin/my_init --skip-runit -- bundle exec sidekiq -C config/sidekiq_metadata.yml'
+    command: '/sbin/my_init --skip-runit -- /etc/my_init.d/gitannex.sh && /etc/my_init.d/imaging.sh && bundle exec sidekiq -C config/sidekiq_metadata.yml'
     environment:
       AWS_ACCESS_KEY_ID:
       AWS_SECRET_ACCESS_KEY:
