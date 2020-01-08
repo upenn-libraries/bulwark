@@ -167,7 +167,7 @@ services:
       - '${LOCAL_FEATURED}:/home/app/webapp/public/assets/featured'
   sidekiq:
     image: 'quay.io/upennlibraries/bulwark:${BULWARK_IMAGE_TAG}'
-    command: '/sbin/my_init --skip-startup-files --skip-runit -- bundle exec sidekiq -C config/sidekiq.yml'
+    command: '/sbin/my_init --skip-runit -- bundle exec sidekiq -C config/sidekiq.yml'
     environment:
       AWS_ACCESS_KEY_ID:
       AWS_SECRET_ACCESS_KEY:
