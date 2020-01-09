@@ -121,7 +121,6 @@ module Utils
         Dir.chdir(Rails.root.to_s)
         parent_dir = dir.gsub(repo.names.git,"")
         FileUtils.rm_rf(parent_dir, :secure => true) if File.directory?(parent_dir)
-        change_bare_repo_permissions if Rails.env.production?
       end
 
       def get(options, dir)
@@ -134,6 +133,7 @@ module Utils
         change_dir_working(dir)
         drop = options[:content].present? ? options[:content] : '.'
         `git annex drop #{Shellwords.escape(options[:content])}`
+        change_perms(File.basename(dir)) if ENV['IMAGING_USER'].present?
       end
 
       def unlock(options, dir)
@@ -244,8 +244,8 @@ module Utils
         "#{Utils.config[:workspace]}/#{path_seed}"
       end
 
-      def change_bare_repo_permissions
-        `chown -R #{ENV['IMAGING_USER']}:#{ENV['IMAGING_USER']} #{Utils.config["assets_path"]}/#{repo.names.git}` if ENV['IMAGING_USER']
+      def change_perms(repo)
+        FileUtils.chown_R(ENV['IMAGING_USER'], ENV['IMAGING_USER'], "#{Utils.config['assets_path']}/#{repo}")
       end
 
     end

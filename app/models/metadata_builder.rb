@@ -85,6 +85,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   def perform_file_checks_and_generate_previews
     self.repo.problem_files = {}
+    self.repo.save!
     working_path = self.repo.version_control_agent.clone
     file_checks_previews(working_path)
     Utils::Process.refresh_assets(working_path, self.repo)
