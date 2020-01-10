@@ -62,9 +62,6 @@ class ReposController < ApplicationController
       else
         ids = legacy_image_list(repo)
       end
-
-      ids.map! { |id| id.gsub(ENV['IIIF_IMAGE_SERVER'], '').gsub(/^[^=]*=/, '').gsub('/info.json', '') }
-
       title = [repo.metadata_builder.metadata_source.first.user_defined_mappings['title']].flatten.join("; ")
       result = { :id => params[:id], :title => title, :image_ids => ids }
     end

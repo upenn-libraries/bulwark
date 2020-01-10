@@ -378,6 +378,23 @@ class Repo < ActiveRecord::Base
     formatted_types
   end
 
+  def set_image_data
+    self.images_to_render["iiif"]["images"] = {}
+    working_directory = self.version_control_agent.clone
+    ms = self.metadata_builder.metadata_source.last #TODO fix to detect structural_bibid
+    ms.user_defined_mappings.each do |mapping|
+      sha_key = self.version_control_agent.look_up_key("#{self.assets_subdirectory}/#{mapping[1]["file_name"]}", working_directory)
+
+      self.images_to_render["iiif"]["images"]["#{ENV['IIIF_IMAGE_SERVER']}/%2F#{self.names.bucket}/#{sha_key}"] = {
+          "page_number" => "#{mapping[1]["page_number"]}#{%w[recto verso].include?(mapping[1]["side"]) ? mapping[1]["side"][0] : nil}",
+          "file_name" => mapping[1]["file_name"],
+          "description" => mapping[1]["description"].present? ? mapping[1]["description"] : nil,
+          "tocentry_data" => mapping[1]['tocentry']
+      }
+    end
+    self.save!
+  end
+
   private
 
   def _build_and_populate_directories(working_path)
