@@ -381,7 +381,7 @@ class Repo < ActiveRecord::Base
   def set_image_data
     self.images_to_render["iiif"]["images"] = {}
     working_directory = self.version_control_agent.clone
-    ms = self.metadata_builder.metadata_source.last #TODO fix to detect structural_bibid
+    ms = self.metadata_builder.metadata_source.find_all { |ms| ms.source_type == 'structural_bibid' }.first
     ms.user_defined_mappings.each do |mapping|
       sha_key = self.version_control_agent.look_up_key("#{self.assets_subdirectory}/#{mapping[1]["file_name"]}", working_directory)
 
