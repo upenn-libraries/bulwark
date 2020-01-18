@@ -16,6 +16,10 @@ en:
         title: 'View items in Fedora Queue'
         menu: 'View Fedora Queue'
         breadcrumb: 'View Fedora Queue'
+      statistics:
+        title: 'View the latest Colenda statistics'
+        menu: 'View Colenda statistics'
+        breadcrumb: 'View Colenda statistics'
       git_actions:
         title: 'Repo Information'
         menu: '1. Repo Information'
