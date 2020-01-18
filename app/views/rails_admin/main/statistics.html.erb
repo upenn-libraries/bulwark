@@ -16,3 +16,8 @@ HOLD
 
 <h2>Current last action performed on all items in Colenda</h2>
 <%= pie_chart display_action_labels(Repo.group(:last_action_performed).count), download: true %>
+
+<hr />
+
+<h2>Repository ownership</h2>
+<%= column_chart Repo.group(:owner).count, download: true %>
