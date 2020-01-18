@@ -1,0 +1,10 @@
+<h2>Objects ingested in the last 90 days</h2>
+
+<h2>Repositories created in the last 90 days</h2>
+<%= area_chart Repo.group_by_day(:created_at, range: 90.days.ago..1.day.ago).count, download: true %>
+
+<h2>Colenda objects by collection name</h2>
+<%= pie_chart render_collection_names_hash, download: true %>
+
+<h2>Current last action performed on all items in Colenda</h2>
+<%= pie_chart display_action_labels(Repo.group(:last_action_performed).count), download: true %>

@@ -25,6 +25,15 @@ module ApplicationHelper
     return items.html_safe
   end
 
+  def render_collection_names_hash
+    ms = MetadataSource.where(source_type: %w[voyager pap kaplan pqc custom])
+    u = ms.pluck("user_defined_mappings")
+    collection_array = u.map{|c| c["collection"].present? ? c["collection"].first : "No collection" }
+    counts = Hash.new(0)
+    collections_hash = collection_array.each { |name| counts[name] += 1 }
+    return counts
+  end
+
   def resolve_reading_direction(repo)
     reading_direction = repo.images_to_render['iiif'].present? ? repo.images_to_render['iiif']['reading_direction'] : legacy_reading_direction(repo)
     return 'ltr' unless reading_direction.present?

@@ -78,4 +78,12 @@ module RepoHelper
     selected_problem_files
   end
 
+  def display_action_labels(repo_actions_array)
+    repo_actions = {}
+    repo_actions_array.each do |last_action, amount|
+      repo_actions[last_action[:description]] = amount
+    end
+    return repo_actions
+  end
+
 end
