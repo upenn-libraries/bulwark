@@ -50,6 +50,8 @@ gem 'sidekiq'
 gem 'active_job_status', '1.1.0'
 gem 'redis-rails'
 gem 'sinatra', :require => false
+gem 'chartkick'
+gem 'groupdate'
 
 gem 'roo'
 
