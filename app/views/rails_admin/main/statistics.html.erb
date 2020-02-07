@@ -1,6 +1,5 @@
 <h2>Objects ingested in the last 90 days</h2>
-
-HOLD
+<%= area_chart Repo.where(:ingested => true).group_by_day(:created_at, range: 90.days.ago..1.day.ago).count, download: true %>
 
 <hr />
 
