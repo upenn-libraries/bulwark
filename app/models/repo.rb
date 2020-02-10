@@ -383,9 +383,8 @@ class Repo < ActiveRecord::Base
     working_directory = self.version_control_agent.clone
     ms = self.metadata_builder.metadata_source.find_all { |ms| ms.source_type == 'structural_bibid' }.first
     ms.user_defined_mappings.each do |mapping|
-      sha_key = self.version_control_agent.look_up_key("#{self.assets_subdirectory}/#{mapping[1]["file_name"]}", working_directory)
-
-      self.images_to_render["iiif"]["images"]["#{ENV['IIIF_IMAGE_SERVER']}/#{self.names.bucket}%2F#{sha_key}"] = {
+      sha_key = self.file_display_attributes.select{|k, v| v[:file_name].end_with?("#{mapping[1]["file_name"]}.jpeg")}.first[0]
+      self.images_to_render["iiif"]["images"]["#{self.names.bucket}%2F#{sha_key}"] = {
           "page_number" => "#{mapping[1]["page_number"]}#{%w[recto verso].include?(mapping[1]["side"]) ? mapping[1]["side"][0] : nil}",
           "file_name" => mapping[1]["file_name"],
           "description" => mapping[1]["description"].present? ? mapping[1]["description"] : nil,
