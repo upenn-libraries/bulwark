@@ -10,6 +10,7 @@ require Rails.root.join('lib', 'rails_admin', 'preserve.rb')
 require Rails.root.join('lib', 'rails_admin', 'repo_new.rb')
 require Rails.root.join('lib', 'rails_admin', 'batch_new.rb')
 require Rails.root.join('lib', 'rails_admin', 'in_queue.rb')
+require Rails.root.join('lib', 'rails_admin', 'statistics.rb')
 
 RailsAdmin::Config::Actions.register(RailsAdmin::Config::Actions::InQueue)
 
@@ -32,6 +33,7 @@ RailsAdmin.config do |config|
     dashboard                     # mandatory
     index
     in_queue
+    statistics
     repo_new do
       only ['Repo']
     end
