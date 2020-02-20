@@ -26,11 +26,15 @@ module ApplicationHelper
   end
 
   def render_collection_names_hash
-    ms = MetadataSource.where(source_type: %w[voyager pap kaplan pqc custom])
-    u = ms.pluck("user_defined_mappings")
-    collection_array = u.map{|c| c["collection"].present? ? c["collection"].first : "No collection" }
+    collections_array = []
+    Repo.where(:ingested => true).each do |repo|
+      repo.metadata_builder.metadata_source.where(source_type: %w[voyager pap kaplan pqc custom]).pluck(:user_defined_mappings).each do |udm|
+        collection = udm["collection"].present? ? udm["collection"].first : "No collection"
+        collections_array << collection
+      end
+    end
     counts = Hash.new(0)
-    collections_hash = collection_array.each { |name| counts[name] += 1 }
+    collections_array.each { |name| counts[name] += 1 }
     return counts
   end
 
