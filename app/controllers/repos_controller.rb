@@ -62,11 +62,9 @@ class ReposController < ApplicationController
       else
         ids = legacy_image_list(repo)
       end
-
-      ids.map! { |id| id.gsub(ENV['IIIF_IMAGE_SERVER'], '').gsub(/^[^=]*=/, '').gsub('/info.json', '') }
-
       title = [repo.metadata_builder.metadata_source.first.user_defined_mappings['title']].flatten.join("; ")
-      result = { :id => params[:id], :title => title, :image_ids => ids }
+      reading_direction = repo.images_to_render['iiif'].present? ? repo.images_to_render['iiif']['reading_direction'] : "left-to-right"
+      result = { :id => params[:id], :title => title, :reading_direction => reading_direction, :image_ids => ids }
     end
 
     render :json => JSON(result)
