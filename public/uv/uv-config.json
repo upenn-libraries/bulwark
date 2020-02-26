@@ -36,14 +36,30 @@
       "options":
       {
         "branchNodesSelectable": true,
-        "defaultToTreeEnabled": true
+        "defaultToTreeEnabled": false
       }
     },
     "footerPanel":
     {
-      "options":
-      {
+      "options": {
+        "bookmarkEnabled": false,
+        "downloadEnabled": true,
+        "embedEnabled": true,
+        "feedbackEnabled": false,
+        "fullscreenEnabled": true,
+        "minimiseButtons": true,
+        "moreInfoEnabled": false,
+        "openEnabled": false,
+        "printEnabled": true,
         "shareEnabled": false
+      },
+      "content": {
+        "download": "Download",
+        "embed": "Embed",
+        "exitFullScreen": "Exit Full Screen",
+        "fullScreen": "Full Screen",
+        "open": "Open",
+        "share": "Share"
       }
     }
   }

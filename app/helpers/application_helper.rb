@@ -115,7 +115,9 @@ module ApplicationHelper
   end
 
   def universal_viewer_path(identifier)
-    "/uv/uv#?manifest=uv/uv#?manifest=#{ENV['UV_URL']}/#{identifier}/manifest&config=/uv/uv-config.json"
+    # Add to this for additional UV params
+    url_args = "cv=#{params[:cv]}"
+    "/uv/uv#?manifest=uv/uv#?manifest=#{ENV['UV_URL']}/#{identifier}/manifest&#{url_args}&config=/uv/uv-config.json"
   end
 
     def render_reviewed_queue
