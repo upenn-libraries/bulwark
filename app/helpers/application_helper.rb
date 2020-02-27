@@ -26,16 +26,28 @@ module ApplicationHelper
   end
 
   def render_collection_names_hash
-    collections_array = []
-    Repo.where(:ingested => true).each do |repo|
-      repo.metadata_builder.metadata_source.where(source_type: %w[voyager pap kaplan pqc custom]).pluck(:user_defined_mappings).each do |udm|
-        collection = udm["collection"].present? ? udm["collection"].first : "No collection"
-        collections_array << collection
-      end
+    collections_hash = Hash.new(0)
+    solr_url = ENV['PROD_SOLR_URL'].present? ? ENV['PROD_SOLR_URL'] : 'http://localhost:8983/solr/blacklight-core'
+    collections_url = "#{solr_url}/select?q=*%3A*&fq=-active_fedora_model_ssi%3AImage&fq=-active_fedora_model_ssi%3ACollection&fq=-active_fedora_model_ssi%3A%22ActiveFedora%3A%3ADirectContainer%22&fq=-active_fedora_model_ssi%3A%22ActiveFedora%3A%3AIndirectContainer%22&fq=-active_fedora_model_ssi%3A%22ActiveFedora%3A%3AAggregation%3A%3AProxy%22&rows=0&indent=true&facet=true&facet.field=collection_sim&facet.limit=-1&wt=json"
+    collections_uri = URI(collections_url)
+    collections_response = Net::HTTP.get(collections_uri)
+    JSON.parse(collections_response)['facet_counts']['facet_fields']['collection_sim'].each_slice(2) do |value|
+      collections_hash[value.first] = value.last if value.last >= 5
     end
-    counts = Hash.new(0)
-    collections_array.each { |name| counts[name] += 1 }
-    return counts
+    no_coll_url = "#{solr_url}/select?q=-collection_sim%3A*&fq=-active_fedora_model_ssi%3AImage&fq=-active_fedora_model_ssi%3ACollection&fq=-active_fedora_model_ssi%3A%22ActiveFedora%3A%3ADirectContainer%22&fq=-active_fedora_model_ssi%3A%22ActiveFedora%3A%3AIndirectContainer%22&fq=-active_fedora_model_ssi%3A%22ActiveFedora%3A%3AAggregation%3A%3AProxy%22&rows=0&fl=collection_sim&wt=json&indent=true"
+    no_coll_uri = URI(no_coll_url)
+    no_coll_response = Net::HTTP.get(no_coll_uri)
+    collections_hash['No collection'] = JSON.parse(no_coll_response)['response']['numFound']
+    return collections_hash
+  end
+
+  def render_ingested_hash
+    ingested_hash = Hash.new(0)
+    batches = Batch.where(:status => "complete", :updated_at => 14.days.ago..0.days.ago)
+    batches.each do |batch|
+      ingested_hash[batch.updated_at.to_date] += batch.queue_list.count
+    end
+    return ingested_hash
   end
 
   def resolve_reading_direction(repo)
@@ -103,7 +115,9 @@ module ApplicationHelper
   end
 
   def universal_viewer_path(identifier)
-    "/uv/uv#?manifest=uv/uv#?manifest=#{ENV['UV_URL']}/#{identifier}/manifest&config=/uv/uv-config.json"
+    # Add to this for additional UV params
+    url_args = "cv=#{params[:cv]}"
+    "/uv/uv#?manifest=uv/uv#?manifest=#{ENV['UV_URL']}/#{identifier}/manifest&#{url_args}&config=/uv/uv-config.json"
   end
 
     def render_reviewed_queue

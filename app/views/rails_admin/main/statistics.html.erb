@@ -1,5 +1,5 @@
 <h2>Objects ingested, <%= "#{14.days.ago.strftime("%m/%d/%Y")} to #{0.days.ago.strftime("%m/%d/%Y")}" %></h2>
-<%= area_chart Repo.where(:ingested => true).group_by_day(:updated_at, range: 14.days.ago..0.days.ago).count, download: true %>
+<%= area_chart render_ingested_hash, download: true %>
 
 <hr />
 
@@ -8,7 +8,7 @@
 
 <hr />
 
-<h2>Colenda objects by collection name</h2>
+<h2>Colenda objects by collection name (5 objects or more)</h2>
 <%= pie_chart render_collection_names_hash, download: true %>
 
 <hr />

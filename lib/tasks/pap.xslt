@@ -71,7 +71,7 @@
             <xsl:apply-templates select="normalized_call_number" />
           </sv:property>
           <sv:property sv:name="ns004:collection" sv:type="String" sv:multiple="false">
-            <xsl:apply-templates select="collection" />
+            <sv:value>Penn in Hand: Selected Manuscripts</sv:value>
           </sv:property>
           <sv:property sv:name="ns002:identifier" sv:type="String" sv:multiple="false">
             <sv:value><xsl:apply-templates select="identifier"/></sv:value>
