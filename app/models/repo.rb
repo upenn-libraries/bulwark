@@ -45,6 +45,7 @@ class Repo < ActiveRecord::Base
   end
 
   def set_defaults
+    self[:unique_identifier].strip!
     self[:owner] = User.current
     self[:unique_identifier] = mint_ezid unless self[:unique_identifier].present?
     self[:derivatives_subdirectory] = "#{Utils.config[:object_derivatives_path]}"
@@ -74,10 +75,6 @@ class Repo < ActiveRecord::Base
 
   def preservation_filename=(preservation_filename)
     self[:preservation_filename] = preservation_filename.xmlify
-  end
-
-  def unique_identifier=(unique_identifier)
-    self[:unique_identifier] = unique_identifier.strip!
   end
 
   def thumbnail=(thumbnail)
