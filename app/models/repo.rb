@@ -60,7 +60,6 @@ class Repo < ActiveRecord::Base
     self[:assets_subdirectory] = "#{Utils.config[:object_data_path]}/#{assets_subdirectory}"
   end
 
-
   def file_extensions=(file_extensions)
     self[:file_extensions] = Array.wrap(file_extensions).reject(&:blank?)
   end
@@ -75,6 +74,10 @@ class Repo < ActiveRecord::Base
 
   def preservation_filename=(preservation_filename)
     self[:preservation_filename] = preservation_filename.xmlify
+  end
+
+  def unique_identifier=(unique_identifier)
+    self[:unique_identifier] = unique_identifier.strip!
   end
 
   def thumbnail=(thumbnail)
