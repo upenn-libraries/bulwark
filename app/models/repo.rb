@@ -45,6 +45,7 @@ class Repo < ActiveRecord::Base
   end
 
   def set_defaults
+    self[:unique_identifier].strip!
     self[:owner] = User.current
     self[:unique_identifier] = mint_ezid unless self[:unique_identifier].present?
     self[:derivatives_subdirectory] = "#{Utils.config[:object_derivatives_path]}"
@@ -59,7 +60,6 @@ class Repo < ActiveRecord::Base
   def assets_subdirectory=(assets_subdirectory)
     self[:assets_subdirectory] = "#{Utils.config[:object_data_path]}/#{assets_subdirectory}"
   end
-
 
   def file_extensions=(file_extensions)
     self[:file_extensions] = Array.wrap(file_extensions).reject(&:blank?)
