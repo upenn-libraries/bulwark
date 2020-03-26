@@ -195,7 +195,7 @@ module Utils
       end
 
       def _get_drop_calls(dir, action)
-        dir = Shellwords.escape(dir)
+        dir = Dir.exist?(Shellwords.escape(dir)) ? Shellwords.escape(dir) : dir
         if File.directory?(dir)
           Dir.chdir(dir)
           rolling_upgrade(dir)
