@@ -101,6 +101,12 @@ rake db:migrate
 rails s
 ```
 
+## Deployment workflow
+
+This illustration represents the current deployment workflow for Bulwark.
+
+![Bulwark deployment workflow](bulwark_deployment.png)
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at [https://github.com/upenn-libraries/bulwark](https://github.com/upenn-libraries/bulwark).

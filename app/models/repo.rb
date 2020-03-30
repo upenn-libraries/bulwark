@@ -45,9 +45,9 @@ class Repo < ActiveRecord::Base
   end
 
   def set_defaults
-    self[:unique_identifier].strip!
     self[:owner] = User.current
     self[:unique_identifier] = mint_ezid unless self[:unique_identifier].present?
+    self[:unique_identifier].strip!
     self[:derivatives_subdirectory] = "#{Utils.config[:object_derivatives_path]}"
     self[:admin_subdirectory] = "#{Utils.config[:object_admin_path]}"
     self[:ingested] = false
