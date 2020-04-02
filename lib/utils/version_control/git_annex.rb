@@ -18,7 +18,7 @@ module Utils
       end
 
       def initialize_bare_remote
-        `git init --bare --shared=group #{@remote_repo_path}`
+        `git init --bare --shared=group "#{@remote_repo_path}"`
         Dir.chdir(@remote_repo_path)
         `git annex init origin`
         `git config annex.largefiles 'not (include=.repoadmin/bin/*.sh)'`
@@ -151,7 +151,7 @@ module Utils
       def look_up_key(path, dir)
         change_dir_working(dir) unless Dir.pwd == dir
         dir = dir.ends_with?('/') ? dir : "#{dir}/"
-        `git annex lookupkey #{path.gsub(dir, '')}`.chomp
+        `git annex lookupkey "#{path.gsub(dir, '')}"`.chomp
       end
 
       def rolling_upgrade(dir)
