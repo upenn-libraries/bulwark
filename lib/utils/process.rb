@@ -138,7 +138,7 @@ module Utils
     def attachable_url(repo, working_path, file_path)
       repo.version_control_agent.add({:content => "#{file_path}"}, working_path)
       repo.version_control_agent.copy({:content => "#{file_path}", :to => Utils::Storage::Ceph.config.special_remote_name}, working_path)
-      lookup_key = repo.version_control_agent.look_up_key(file_path, working_path)
+      lookup_key = repo.version_control_agent.look_up_key(Shellwords.shellescape(file_path), working_path)
       read_storage_link(lookup_key, repo)
     end
 
