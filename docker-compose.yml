@@ -408,6 +408,8 @@ volumes:
     external: true
   sceti_completed_2:
     external: true
+  sceti_completed_3:
+    external: true
   scanstore_rescue:
     external: true
   kaplan_rescue:
