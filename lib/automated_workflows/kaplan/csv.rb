@@ -58,7 +58,7 @@ module AutomatedWorkflows
           file_lines = File.readlines(directories_file).each{|l| l.strip! }
           repos = []
           file_lines.each do |dir|
-            directory, unique_identifier, repo_name = dir.split('|')
+            directory, unique_identifier, repo_name = dir.split('|', 3)
             last_updated = DateTime.now
             repo = AutomatedWorkflows::Actions::Repos.create(repo_name,
                                                              :owner => AutomatedWorkflows::Kaplan::Csv.config.owner,
