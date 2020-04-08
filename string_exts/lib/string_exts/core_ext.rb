@@ -42,7 +42,7 @@ String.class_eval do
   # User-submitted strings as directory names
 
   def directorify
-    self.gsub(' ','_').gsub(/[[^[:ascii:]]\/:;&\[\]|'"]/,'')
+    self.gsub(' ','_').gsub(/[[^[:ascii:]]\/:;&\[\]|'"\(\)]/,'')
   end
 
   # Bare git repos
