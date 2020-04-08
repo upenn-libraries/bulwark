@@ -591,7 +591,7 @@ class MetadataSource < ActiveRecord::Base
   def generate_kaplan_struct_md(mappings)
     return {} unless mappings['filenames'].present?
     structural_mappings = {}
-    file_names = mappings['filenames'].first.split(';').uniq.each{|x| x.strip!}
+    file_names = mappings['filenames'].first.split(';').uniq.each{|x| x.gsub!(/[^[:ascii:]]/, ''); x.strip!}
     file_names.each_with_index do |file, i|
       side = ''
       if File.basename(file, ".*").ends_with?('r')
