@@ -81,7 +81,7 @@ module AutomatedWorkflows
                                       :protocol => AutomatedWorkflows::Kaplan::Csv.config.assets_protocol,
                                       :problems => {} )
             struct.save!
-            repo.endpoint += [desc, struct]
+            repo.endpoint = [desc, struct]
             AutomatedWorkflows::Agent.verify_sources(repo)
             repo.save!
             repos << repo.unique_identifier
