@@ -1,0 +1,19 @@
+<%= form_for @object, :validate => true, :method => :post, :html => { :class => "file-checks-form" }, :url => "/manifests/#{@object.id}/create_repos" do |f| %>
+    <%= f.submit form_label('create_repos', @object.steps) %>
+<% end -%>
+
+<% if @object.steps[:create_repos]
+     endpoint_problems = @object.repos_with_endpoint_problems
+     if endpoint_problems.present? %>
+       <h2><%= t('colenda.manifests.create_repos.review.problems.heading') %></h2>
+       <div class="manifest-endpoint-problems content-block">
+         <% endpoint_problems.each do |ark, problems| %>
+           <%= render partial: "manifests/endpoint_problems", locals: { :ark => ark, :problems => problems } %>
+         <% end %>
+       </div>
+<%   else # No repo problems %>
+       <h2><%= t('colenda.manifests.create_repos.review.success.heading') %></h2>
+<%   end
+   else # Repo creation not performed %>
+     <h2><%= t('colenda.manifests.create_repos.review.not_performed.heading') %></h2>
+<% end %>

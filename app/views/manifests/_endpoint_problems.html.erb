@@ -1,0 +1,10 @@
+<% unless problems.empty? %>
+  <h3><%= ark %></h3>
+  <ul>
+    <% problems.each do |problem| 
+         problem.each do |source, issue| %>
+          <li><%= "#{issue}: #{source}" %></li>
+      <% end %>
+    <% end %>
+  </ul>
+<% end %>

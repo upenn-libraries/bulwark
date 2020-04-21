@@ -1,0 +1,8 @@
+<% unless @object.validation_problems[problem_type].empty? %>
+  <h3><%= t("colenda.manifests.validate_manifest.review.problems.#{problem_type}") %></h3>
+  <ul>
+    <% @object.validation_problems[problem_type].each do |p| %>
+      <li><%= p %></li>
+    <% end %>
+  </ul>
+<% end %>
