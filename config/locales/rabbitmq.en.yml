@@ -7,5 +7,8 @@ en:
         file_checks: 'File checks performed'
         mailer: 'Mail created'
         ingest: 'Ingest complete'
+        validate_manifest: 'Manifest validated'
+        create_repos: 'Repositories created'
+        process_manifest: 'Manifest processed'
     errors:
       publish: 'Could not publish message to %{host}'

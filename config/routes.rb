@@ -21,6 +21,15 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :manifests do
+    member do
+      post :manifest_new
+      post :validate_manifest
+      post :create_repos
+      post :process_manifest
+    end
+  end
+
   resources :metadata_builders do
     member do
       post :update

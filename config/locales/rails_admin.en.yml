@@ -12,6 +12,11 @@ en:
         breadcrumb: 'Add a New Repo'
         done: 'created'
         warning_reason: 'Metadata subdirectory and assets subdirectory are the same.'
+      manifest_new:
+        title: 'Load a Manifest'
+        menu: 'Load a Manifest'
+        breadcrumb: 'Load a Manifest'
+        done: 'loaded'
       in_queue:
         title: 'View items in Fedora Queue'
         menu: 'View Fedora Queue'
@@ -44,5 +49,17 @@ en:
         title: 'Select Metadata Sources'
         menu: '2. Select Metadata Sources'
         breadcrumb: 'Select Metadata Sources'
+      validate_manifest:
+        title: 'Validate Manifest'
+        menu: '1. Validate Manifest'
+        breadcrumb: 'Validate Manifest'
+      create_repos:
+        title: 'Create Repositories'
+        menu: '2. Create Repositories'
+        breadcrumb: 'Create Repositories'
+      process_manifest:
+        title: 'Process Manifest'
+        menu: '3. Process Manifest'
+        breadcrumb: 'Process Manifest'
     flash:
       warning: '%{name} %{action} with the following warning(s): %{reason}'

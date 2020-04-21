@@ -44,9 +44,35 @@ development:
      metadata:
        descriptive_filename: metadata.xlsx
        structural_filename: struct_metadata.xlsx
+     nonstandard:
+       scanstore-rescue:
+         endpoint: <%= ENV['SCANSCORE_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
+         metadata_suffix: ''
+         assets_suffix: ''
+       managed-masters:
+         endpoint: <%= ENV['OPENN_HARVESTING_ENDPOINT_REMOTE'] %>
+         metadata_suffix: ''
+         assets_suffix: ''
+       sceti-completed:
+         endpoint: <%= ENV['PAP_HARVESTING_ENDPOINT_REMOTE'] %>
+         metadata_suffix: ''
+         assets_suffix: ''
+       sceti-completed-2:
+         endpoint: <%= ENV['SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE'] %>
+         metadata_suffix: ''
+         assets_suffix: ''
+       sceti-completed-3:
+         endpoint: <%= ENV['SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE'] %>
+         metadata_suffix: ''
+         assets_suffix: ''
+       mastersrbm:
+         endpoint: <%= ENV['MASTERSRBM_HARVESTING_ENDPOINT_REMOTE'] %>
+         metadata_suffix: ''
+         assets_suffix: ''
   ingest_only:
      initial_stop: <%= ENV['INGEST_INITIAL_STOP'] || 'ingest' %>
      steps_to_skip: <%= ENV['INGEST_STEPS_TO_SKIP'] || ['fetch_metadata','fetch_assets','extract','file_check','xml'] %>
+
 test:
   openn:
     csv:
