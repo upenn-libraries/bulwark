@@ -67,16 +67,15 @@ module AutomatedWorkflows
                                                              :initial_stop => AutomatedWorkflows::Kaplan::Csv.config.initial_stop,
                                                              :unique_identifier => unique_identifier,
                                                              :type =>'directory')
-            desc = Endpoint.where(:repo => repo, :source => "#{AutomatedWorkflows::Kaplan::Csv.config.endpoint}/#{directory}/#{AutomatedWorkflows::Kaplan::Csv.config.metadata_suffix}").first_or_create
+
+            desc = Endpoint.where(:repo => repo, :source => "#{AutomatedWorkflows::Kaplan::Csv.config.endpoint(share)}/#{directory}/#{AutomatedWorkflows::Kaplan::Csv.config.metadata_suffix(share)}", :content_type => 'metadata').first_or_create
             desc.update_attributes( :destination => repo.metadata_subdirectory,
-                                    :content_type => 'metadata',
                                     :fetch_method => AutomatedWorkflows::Kaplan::Csv.config.metadata_fetch_method,
                                     :protocol => AutomatedWorkflows::Kaplan::Csv.config.metadata_protocol,
                                     :problems => {} )
             desc.save!
-            struct = Endpoint.where(:repo => repo, :source => "#{AutomatedWorkflows::Kaplan::Csv.config.endpoint}/#{directory}/#{AutomatedWorkflows::Kaplan::Csv.config.assets_suffix}").first_or_create
+            struct = Endpoint.where(:repo => repo, :source => "#{AutomatedWorkflows::Kaplan::Csv.config.endpoint(share)}/#{directory}/#{AutomatedWorkflows::Kaplan::Csv.config.assets_suffix(share)}", :content_type => 'assets').first_or_create
             struct.update_attributes( :destination => repo.assets_subdirectory,
-                                      :content_type => 'assets',
                                       :fetch_method => AutomatedWorkflows::Kaplan::Csv.config.assets_fetch_method,
                                       :protocol => AutomatedWorkflows::Kaplan::Csv.config.assets_protocol,
                                       :problems => {} )
