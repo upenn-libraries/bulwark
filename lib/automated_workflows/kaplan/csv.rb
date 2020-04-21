@@ -7,9 +7,6 @@ module AutomatedWorkflows
       attr_accessor :owner
       attr_accessor :description
       attr_accessor :initial_stop
-      attr_accessor :endpoint
-      attr_accessor :metadata_suffix
-      attr_accessor :assets_suffix
       attr_accessor :metadata_fetch_method
       attr_accessor :metadata_protocol
       attr_accessor :assets_fetch_method
@@ -28,6 +25,31 @@ module AutomatedWorkflows
         @assets_fetch_method = AutomatedWorkflows.config['kaplan']['csv']['endpoints']['assets_fetch_method'] || ''
         @assets_protocol = AutomatedWorkflows.config['kaplan']['csv']['endpoints']['assets_protocol'] || ''
       end
+
+      def endpoint(share = 'kaplan')
+        if share == 'kaplan'
+          return @endpoint
+        else
+          return AutomatedWorkflows.config['kaplan']['csv']['nonstandard'][share]['endpoint']
+        end
+      end
+
+      def metadata_suffix(share = 'kaplan')
+        if share == 'kaplan'
+          return @metadata_suffix
+        else
+          return AutomatedWorkflows.config['kaplan']['csv']['nonstandard'][share]['metadata_suffix']
+        end
+      end
+
+      def assets_suffix(share = 'kaplan')
+        if share == 'kaplan'
+          return @assets_suffix
+        else
+          return AutomatedWorkflows.config['kaplan']['csv']['nonstandard'][share]['assets_suffix']
+        end
+      end
+
     end
 
     class Csv
@@ -45,7 +67,7 @@ module AutomatedWorkflows
           return "#{csv_filename} not found" unless File.exist?(csv_filename)
           directories = []
           listing = SmarterCSV.process(csv_filename)
-          listing.each { |row| directories << "#{row[:path]}|#{row[:unique_identifier]}|#{row[:directive_name]}" }
+          listing.each { |row| directories << "#{row[:share]}|#{row[:path]}|#{row[:unique_identifier]}|#{row[:directive_name]}" }
           directories.uniq!
           f = File.new("#{csv_filename.gsub('.csv','.txt')}", 'w')
           directories.each { |d| f << "#{d}\n" }
@@ -58,7 +80,7 @@ module AutomatedWorkflows
           file_lines = File.readlines(directories_file).each{|l| l.strip! }
           repos = []
           file_lines.each do |dir|
-            directory, unique_identifier, repo_name = dir.split('|', 3)
+            share, directory, unique_identifier, repo_name = dir.split('|', 4)
             last_updated = DateTime.now
             repo = AutomatedWorkflows::Actions::Repos.create(repo_name,
                                                              :owner => AutomatedWorkflows::Kaplan::Csv.config.owner,
