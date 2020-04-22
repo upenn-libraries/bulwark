@@ -9,6 +9,10 @@ class Batch < ActiveRecord::Base
 
   before_destroy :dequeue_repos
 
+  def unique_identifier
+    "#{self.model_name}_#{self.id}"
+  end
+
   def queue_repos
     yield
     set_queued_status(self.queue_list, {:action => 'add'})
@@ -94,6 +98,12 @@ class Batch < ActiveRecord::Base
       names << "#{Repo.where(:unique_identifier => u).pluck(:human_readable_name).first}|"
     end
     return names.to_s
+  end
+
+  def process_batch
+    agent = AutomatedWorkflows::Agent.new(AutomatedWorkflows::IngestOnly, self.queue_list, '', :steps_to_skip => AutomatedWorkflows.config[:ingest_only][:steps_to_skip])
+    agent.proceed
+    self.wrapup
   end
 
 end

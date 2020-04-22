@@ -10,5 +10,6 @@ en:
         validate_manifest: 'Manifest validated'
         create_repos: 'Repositories created'
         process_manifest: 'Manifest processed'
+        process_batch: 'Batch processed'
     errors:
       publish: 'Could not publish message to %{host}'

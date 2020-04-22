@@ -9,6 +9,7 @@ require Rails.root.join('lib', 'rails_admin', 'preview_xml.rb')
 require Rails.root.join('lib', 'rails_admin', 'preserve.rb')
 require Rails.root.join('lib', 'rails_admin', 'repo_new.rb')
 require Rails.root.join('lib', 'rails_admin', 'batch_new.rb')
+require Rails.root.join('lib', 'rails_admin', 'process_batch.rb')
 require Rails.root.join('lib', 'rails_admin', 'manifest_new.rb')
 require Rails.root.join('lib', 'rails_admin', 'in_queue.rb')
 require Rails.root.join('lib', 'rails_admin', 'statistics.rb')
@@ -52,6 +53,9 @@ RailsAdmin.config do |config|
     end
     delete do
       only ['Batch','Manifest']
+    end
+    process_batch do
+      only ['Batch']
     end
     preserve do
       only ['Repo']
