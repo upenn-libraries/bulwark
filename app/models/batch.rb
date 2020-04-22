@@ -103,7 +103,6 @@ class Batch < ActiveRecord::Base
   def process_batch
     agent = AutomatedWorkflows::Agent.new(AutomatedWorkflows::IngestOnly, self.queue_list, '', :steps_to_skip => AutomatedWorkflows.config[:ingest_only][:steps_to_skip])
     agent.proceed
-    self.wrapup
   end
 
 end
