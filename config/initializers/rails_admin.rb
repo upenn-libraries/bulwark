@@ -139,18 +139,12 @@ RailsAdmin.config do |config|
           %{#{value[:description]}}.html_safe
         end
       end
-      field :validation_problems? do
-        formatted_value do
-          formatted = "No"
-          formatted = "Yes" if value
-          formatted
-        end
-      end
     end
 
     create do
       field :uploaded_file, :file_upload do
-        label "Manifest"
+        label I18n.t('colenda.rails_admin.manifest_new.labels.uploaded_file')
+        help I18n.t('colenda.rails_admin.manifest_new.uploaded_file.help')
       end
     end
   end

@@ -17,3 +17,16 @@
    else # Repo creation not performed %>
      <h2><%= t('colenda.manifests.create_repos.review.not_performed.heading') %></h2>
 <% end %>
+
+<% identifiers = @object.unique_identifiers_with_id
+   unless identifiers.empty? %>
+     <br/>
+     <h2><%= t('colenda.manifests.create_repos.review.repo_list.heading') %></h2>
+     <div class="manifest-repo-list content-block">
+     <ul>
+<%   identifiers.each do |ids| %>
+    <%= render partial: "manifests/repo_list", locals: { :id => ids[:id], :ark => ids[:unique_identifier] } %>
+<%   end %>
+     </ul>
+     </div>
+<% end %>

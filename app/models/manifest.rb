@@ -40,6 +40,12 @@ class Manifest < ActiveRecord::Base
     manifest.map do |row| row[2] end
   end
 
+  def unique_identifiers_with_id
+    repos = Repo.where(:unique_identifier => self.unique_identifiers)
+
+    repos.map do |r| { :id => r.id, :unique_identifier => r.unique_identifier } end
+  end
+
   def unique_identifiers_by_share(share = nil)
     manifest = CSV.parse(self.content)
 

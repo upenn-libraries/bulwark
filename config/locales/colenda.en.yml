@@ -58,6 +58,8 @@ en:
             heading: 'Repository Creation Step Not Performed'
           problems:
             heading: 'Repository Issues Detected'
+          repo_list:
+            heading: 'Repositories for this Manifest'
           success:
             heading: 'No Repository Issues Detected'
       process_manifest:
@@ -128,6 +130,11 @@ en:
           help: 'Required - Filename for long-term preservation XML file'
         unique_identifier:
           help: 'Optional - the ARK ID pre-minted for this repo'
+      manifest_new:
+        labels:
+          uploaded_file: 'Manifest'
+        uploaded_file:
+          help: 'Required - a CSV formatted manifest'
       dashboard_link_text: 'Admin Dashboard'
       links:
         front_end: 'Front End'
