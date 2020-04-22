@@ -101,6 +101,9 @@ module RailsAdminHelper
       object_steps[:create_repos] ? t('colenda.rails_admin.labels.create_repos.additional_times') : t('colenda.rails_admin.labels.create_repos.first_time')
     when 'process_manifest'
       object_steps[:process_manifest] ? t('colenda.rails_admin.labels.process_manifest.additional_times') : t('colenda.rails_admin.labels.process_manifest.first_time')
+    when 'process_batch'
+      # Batches don't have steps, so completion status is passed in
+      object_steps ? t('colenda.rails_admin.labels.process_batch.additional_times') : t('colenda.rails_admin.labels.process_batch.first_time')
     else
       'Submit'
     end
@@ -128,6 +131,8 @@ module RailsAdminHelper
       partial = 'rails_admin/main/create_repos'
     when 'process_manifest'
       partial = 'rails_admin/main/process_manifest'
+    when 'process_batch'
+      partial = 'rails_admin/main/process_batch'
     else
       partial = 'shared/generic_error'
     end

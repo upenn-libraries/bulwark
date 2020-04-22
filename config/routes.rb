@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   resources :batches do
     member do
       post :batch_new
+      post :process_batch
     end
   end
 

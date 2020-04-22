@@ -1,0 +1,9 @@
+<%= form_for @object, :validate => true, :method => :post, :html => { :class => "file-checks-form" }, :url => "/batches/#{@object.id}/process_batch" do |f| %>
+    <%= f.submit form_label('process_batch', @object.status == 'complete') %>
+<% end -%>
+
+<% if @object.status == 'complete' %>
+       <h2><%= t('colenda.batches.process_batch.review.success.heading') %></h2>
+<% else # Batch processing not performed %>
+     <h2><%= t('colenda.batches.process_batch.review.not_performed.heading') %></h2>
+<% end %>

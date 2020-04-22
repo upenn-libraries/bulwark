@@ -63,7 +63,7 @@ en:
           success:
             heading: 'No Repository Issues Detected'
       process_manifest:
-        success: 'Manifest processing is being performed in the background.  You will receive an email when validation is complete.'
+        success: 'Manifest processing is being performed in the background.  You will receive an email when processing is complete.'
         review:
           not_performed:
             heading: 'Manifest Processing Not Performed'
@@ -71,6 +71,14 @@ en:
             heading: 'Repository Issues Detected'
           success:
             heading: 'No Repository Issues Detected'
+    batches:
+      process_batch:
+        success: 'Batch processing is being performed in the background.  You will receive an email when processing is complete.'
+        review:
+          not_performed:
+            heading: 'Batch Processing Not Performed'
+          success:
+            heading: 'Batch Processing Complete'
     mailers:
       addresses:
         default: 'colenda@upenn.edu'
@@ -178,6 +186,9 @@ en:
         process_manifest:
           first_time: 'Process Manifest'
           additional_times: 'Re-process manifest'
+        process_batch:
+          first_time: 'Process Batch'
+          additional_times: 'Re-process batch'
     repos:
       create_remote_link_text: 'Create Remote'
       preservation_xml_link_text: 'Create Preservation XML'

@@ -61,5 +61,8 @@ en:
         title: 'Process Manifest'
         menu: '3. Process Manifest'
         breadcrumb: 'Process Manifest'
+      process_batch:
+        title: 'Process Batch'
+        menu: '1. Process Batch'
     flash:
       warning: '%{name} %{action} with the following warning(s): %{reason}'
