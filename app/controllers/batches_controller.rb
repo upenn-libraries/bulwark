@@ -18,6 +18,11 @@ class BatchesController < ApplicationController
     redirect_to "#{root_url}admin_repo/batch/#{@batch.id}/process_batch", :flash =>  { :warning => t('colenda.batches.process_batch.success') }
   end
 
+  def initialize_job_activity(process)
+    current_user.job_activity[@job.job_id] = { :unique_identifier => @manifest.unique_identifier, :process => process, :started => DateTime.now }
+    current_user.save
+  end
+
   private
   def set_batch
     @batch = Batch.find(params[:id])
