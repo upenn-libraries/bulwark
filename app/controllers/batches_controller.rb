@@ -19,7 +19,7 @@ class BatchesController < ApplicationController
   end
 
   def initialize_job_activity(process)
-    current_user.job_activity[@job.job_id] = { :unique_identifier => @manifest.unique_identifier, :process => process, :started => DateTime.now }
+    current_user.job_activity[@job.job_id] = { :unique_identifier => @batch.unique_identifier, :process => process, :started => DateTime.now }
     current_user.save
   end
 
