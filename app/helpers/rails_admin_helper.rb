@@ -3,6 +3,7 @@ require 'rexml/document'
 module RailsAdminHelper
 
   include CatalogHelper
+  include ManifestHelper
   include MetadataBuilderHelper
   include MetadataSourceHelper
   include RepoHelper
@@ -74,26 +75,35 @@ module RailsAdminHelper
     end
   end
 
-  def form_label(form_type, repo_steps)
+  def form_label(form_type, object_steps)
     case form_type
     when 'generate_xml'
-      repo_steps[:preservation_xml_generated] ? t('colenda.rails_admin.labels.generate_xml.additional_times') : t('colenda.rails_admin.labels.generate_xml.first_time')
+      object_steps[:preservation_xml_generated] ? t('colenda.rails_admin.labels.generate_xml.additional_times') : t('colenda.rails_admin.labels.generate_xml.first_time')
     when 'source_select'
-      repo_steps[:metadata_sources_selected] ? t('colenda.rails_admin.labels.source_select.additional_times') : t('colenda.rails_admin.labels.source_select.first_time')
+      object_steps[:metadata_sources_selected] ? t('colenda.rails_admin.labels.source_select.additional_times') : t('colenda.rails_admin.labels.source_select.first_time')
     when 'metadata_mappings'
-      repo_steps[:metadata_mappings_generated] ? t('colenda.rails_admin.labels.metadata_mappings.additional_times') : t('colenda.rails_admin.labels.metadata_mappings.first_time')
+      object_steps[:metadata_mappings_generated] ? t('colenda.rails_admin.labels.metadata_mappings.additional_times') : t('colenda.rails_admin.labels.metadata_mappings.first_time')
     when 'extract_metadata'
-      repo_steps[:metadata_extracted] ? t('colenda.rails_admin.labels.extract_metadata.additional_times') : t('colenda.rails_admin.labels.extract_metadata.first_time')
+      object_steps[:metadata_extracted] ? t('colenda.rails_admin.labels.extract_metadata.additional_times') : t('colenda.rails_admin.labels.extract_metadata.first_time')
     when 'metadata_source_additional_info'
-      repo_steps[:metadata_source_additional_info_set] ? t('colenda.rails_admin.labels.metadata_source_additional_info.additional_times'): t('colenda.rails_admin.labels.metadata_source_additional_info.first_time')
+      object_steps[:metadata_source_additional_info_set] ? t('colenda.rails_admin.labels.metadata_source_additional_info.additional_times'): t('colenda.rails_admin.labels.metadata_source_additional_info.first_time')
     when 'set_source_types'
-      repo_steps[:metadata_source_type_specified] ? t('colenda.rails_admin.labels.set_source_types.additional_times') : t('colenda.rails_admin.labels.set_source_types.first_time')
+      object_steps[:metadata_source_type_specified] ? t('colenda.rails_admin.labels.set_source_types.additional_times') : t('colenda.rails_admin.labels.set_source_types.first_time')
     when 'file_checks'
       t('colenda.rails_admin.labels.file_checked')
     when 'queued_for_ingest'
-      repo_steps[:published_preview] ? t('colenda.rails_admin.labels.queued_for_ingest.additional_times') : t('colenda.rails_admin.labels.queued_for_ingest.first_time')
+      object_steps[:queued_for_ingest] ? t('colenda.rails_admin.labels.queued_for_ingest.additional_times') : t('colenda.rails_admin.labels.queued_for_ingest.first_time')
     when 'publish_preview'
-      repo_steps[:published_preview] ? t('colenda.rails_admin.labels.publish_preview.additional_times') : t('colenda.rails_admin.labels.publish_preview.first_time')
+      object_steps[:published_preview] ? t('colenda.rails_admin.labels.publish_preview.additional_times') : t('colenda.rails_admin.labels.publish_preview.first_time')
+    when 'validate_manifest'
+      object_steps[:validate_manifest] ? t('colenda.rails_admin.labels.validate_manifest.additional_times') : t('colenda.rails_admin.labels.validate_manifest.first_time')
+    when 'create_repos'
+      object_steps[:create_repos] ? t('colenda.rails_admin.labels.create_repos.additional_times') : t('colenda.rails_admin.labels.create_repos.first_time')
+    when 'process_manifest'
+      object_steps[:process_manifest] ? t('colenda.rails_admin.labels.process_manifest.additional_times') : t('colenda.rails_admin.labels.process_manifest.first_time')
+    when 'process_batch'
+      # Batches don't have steps, so completion status is passed in
+      object_steps ? t('colenda.rails_admin.labels.process_batch.additional_times') : t('colenda.rails_admin.labels.process_batch.first_time')
     else
       'Submit'
     end
@@ -115,6 +125,14 @@ module RailsAdminHelper
       partial = 'rails_admin/main/preview_xml'
     when 'file_checks'
       partial = 'rails_admin/main/file_checks'
+    when 'validate_manifest'
+      partial = 'rails_admin/main/validate_manifest'
+    when 'create_repos'
+      partial = 'rails_admin/main/create_repos'
+    when 'process_manifest'
+      partial = 'rails_admin/main/process_manifest'
+    when 'process_batch'
+      partial = 'rails_admin/main/process_batch'
     else
       partial = 'shared/generic_error'
     end

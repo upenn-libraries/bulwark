@@ -34,6 +34,51 @@ en:
           success: 'Metadata sources set successfully.'
         clear_files:
           success: 'Unidentified files have been removed from the repository.'
+    manifests:
+      validate_manifest:
+        success: 'Manifest validation is being performed in the background.  You will receive an email when validation is complete.'
+        review:
+          not_performed:
+            heading: 'Validation Not Performed'
+          problems:
+            heading: 'Validation Issues Detected'
+            duplicate_paths: "Duplicate paths in manifest"
+            duplicate_arks: "Duplicate arks in manifest"
+            duplicate_directives: "Duplicate directives in manifest"
+            existing_arks: "Arks that are already in Colenda"
+            existing_directives: "Directives that are already in Colenda"
+            git_conflicts: "Non-duplicate directives that will conflict with existing directives"
+            unminted_arks: "Unminted arks"
+          success:
+            heading: 'No Validation Issues Detected'
+      create_repos:
+        success: 'Repository creation is being performed in the background.  You will receive an email when repository creation is complete.'
+        review:
+          not_performed:
+            heading: 'Repository Creation Step Not Performed'
+          problems:
+            heading: 'Repository Issues Detected'
+          repo_list:
+            heading: 'Repositories for this Manifest'
+          success:
+            heading: 'No Repository Issues Detected'
+      process_manifest:
+        success: 'Manifest processing is being performed in the background.  You will receive an email when processing is complete.'
+        review:
+          not_performed:
+            heading: 'Manifest Processing Not Performed'
+          problems:
+            heading: 'Repository Issues Detected'
+          success:
+            heading: 'No Repository Issues Detected'
+    batches:
+      process_batch:
+        success: 'Batch processing is being performed in the background.  You will receive an email when processing is complete.'
+        review:
+          not_performed:
+            heading: 'Batch Processing Not Performed'
+          success:
+            heading: 'Batch Processing Complete'
     mailers:
       addresses:
         default: 'colenda@upenn.edu'
@@ -59,6 +104,15 @@ en:
         batch_processed:
           subject: 'Batch processed into Fedora'
           body: 'Batch %{uuid} processed in Fedora.  See report for %{queue_list} - %{report_blob}'
+        validate_manifest:
+          subject: 'Manifest validation complete'
+          body: 'Manifest %{name} has been validated.  Review the results at %{root_url}admin_repo/manifest/%{link_fragment}/validate'
+        create_repos:
+          subject: 'Repository creation complete'
+          body: 'Repositories for manifest %{name} have been created.  Review the results at %{root_url}admin_repo/manifest/%{link_fragment}/create_repos'
+        process_manifest:
+          subject: 'Manifest processing complete'
+          body: 'Manifest %{name} has been processed.  Review the results at %{root_url}admin_repo/manifest/%{link_fragment}/process'
     validators:
       xml_tags:
         starts_with_xml: 'Invalid tag "%{value}" specified for "%{key}" - valid XML tags cannot start with %{xml}'
@@ -84,6 +138,11 @@ en:
           help: 'Required - Filename for long-term preservation XML file'
         unique_identifier:
           help: 'Optional - the ARK ID pre-minted for this repo'
+      manifest_new:
+        labels:
+          uploaded_file: 'Manifest'
+        uploaded_file:
+          help: 'Required - a CSV formatted manifest'
       dashboard_link_text: 'Admin Dashboard'
       links:
         front_end: 'Front End'
@@ -118,6 +177,18 @@ en:
         publish_preview:
           first_time: 'Publish preview'
           additional_times: 'Re-publish preview'
+        validate_manifest:
+          first_time: 'Validate manifest'
+          additional_times: 'Re-validate manifest'
+        create_repos:
+          first_time: 'Create repositories'
+          additional_times: 'Re-create repositories'
+        process_manifest:
+          first_time: 'Process Manifest'
+          additional_times: 'Re-process manifest'
+        process_batch:
+          first_time: 'Process Batch'
+          additional_times: 'Re-process batch'
     repos:
       create_remote_link_text: 'Create Remote'
       preservation_xml_link_text: 'Create Preservation XML'

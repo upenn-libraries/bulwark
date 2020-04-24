@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180419151403) do
+ActiveRecord::Schema.define(version: 20200410203426) do
 
   create_table "batches", force: :cascade do |t|
     t.text     "queue_list",      limit: 4294967295
@@ -50,6 +50,17 @@ ActiveRecord::Schema.define(version: 20180419151403) do
   end
 
   add_index "endpoints", ["repo_id"], name: "index_endpoints_on_repo_id", using: :btree
+
+  create_table "manifests", force: :cascade do |t|
+    t.string   "name",                  limit: 255
+    t.text     "content",               limit: 4294967295
+    t.text     "validation_problems",   limit: 4294967295
+    t.string   "owner",                 limit: 255
+    t.string   "steps",                 limit: 255
+    t.string   "last_action_performed", limit: 255
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+  end
 
   create_table "metadata_builders", force: :cascade do |t|
     t.string   "parent_repo",        limit: 255

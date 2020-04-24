@@ -18,6 +18,16 @@ Rails.application.routes.draw do
   resources :batches do
     member do
       post :batch_new
+      post :process_batch
+    end
+  end
+
+  resources :manifests do
+    member do
+      post :manifest_new
+      post :validate_manifest
+      post :create_repos
+      post :process_manifest
     end
   end
 

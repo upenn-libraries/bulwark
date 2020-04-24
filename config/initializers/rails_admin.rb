@@ -9,8 +9,13 @@ require Rails.root.join('lib', 'rails_admin', 'preview_xml.rb')
 require Rails.root.join('lib', 'rails_admin', 'preserve.rb')
 require Rails.root.join('lib', 'rails_admin', 'repo_new.rb')
 require Rails.root.join('lib', 'rails_admin', 'batch_new.rb')
+require Rails.root.join('lib', 'rails_admin', 'process_batch.rb')
+require Rails.root.join('lib', 'rails_admin', 'manifest_new.rb')
 require Rails.root.join('lib', 'rails_admin', 'in_queue.rb')
 require Rails.root.join('lib', 'rails_admin', 'statistics.rb')
+require Rails.root.join('lib', 'rails_admin', 'validate_manifest.rb')
+require Rails.root.join('lib', 'rails_admin', 'create_repos.rb')
+require Rails.root.join('lib', 'rails_admin', 'process_manifest.rb')
 
 RailsAdmin::Config::Actions.register(RailsAdmin::Config::Actions::InQueue)
 
@@ -27,7 +32,7 @@ RailsAdmin.config do |config|
     'Front End' => '/'
   }
 
-  config.included_models = ['Repo', 'Batch']
+  config.included_models = ['Repo', 'Batch', 'Manifest']
 
   config.actions do
     dashboard                     # mandatory
@@ -40,10 +45,16 @@ RailsAdmin.config do |config|
     batch_new do
       only ['Batch']
     end
+    manifest_new do
+      only ['Manifest']
+    end
     git_actions do
       only ['Repo']
     end
     delete do
+      only ['Batch','Manifest']
+    end
+    process_batch do
       only ['Batch']
     end
     preserve do
@@ -63,6 +74,15 @@ RailsAdmin.config do |config|
     end
     ingest do
       only ['Repo']
+    end
+    validate_manifest do
+      only ['Manifest']
+    end
+    create_repos do
+      only ['Manifest']
+    end
+    process_manifest do
+      only ['Manifest']
     end
   end
 
@@ -108,6 +128,27 @@ RailsAdmin.config do |config|
       end
       field :end do
         visible true
+      end
+    end
+  end
+
+  config.model Manifest do
+    list do
+      field :name
+      field :owner
+      field :last_action_performed do
+        visible true
+        searchable true
+        pretty_value do
+          %{#{value[:description]}}.html_safe
+        end
+      end
+    end
+
+    create do
+      field :uploaded_file, :file_upload do
+        label I18n.t('colenda.rails_admin.manifest_new.labels.uploaded_file')
+        help I18n.t('colenda.rails_admin.manifest_new.uploaded_file.help')
       end
     end
   end
@@ -191,6 +232,9 @@ RailsAdmin.config do |config|
       end
       field :directory_link do
         visible true
+        pretty_value do
+          %{#{value}}.html_safe
+        end
       end
       field :description do
         visible true

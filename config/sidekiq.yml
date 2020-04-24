@@ -3,4 +3,8 @@
 :queues:
   - [file_checks, 1]
   - [ingest, 1]
+  - [validate_manifest, 1]
+  - [create_repos, 1]
+  - [process_manifest, 1]
+  - [process_batch, 1]
 :retry: 2
