@@ -46,7 +46,7 @@ development:
        structural_filename: struct_metadata.xlsx
      nonstandard:
        scanstore-rescue:
-         endpoint: <%= ENV['SCANSCORE_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
+         endpoint: <%= ENV['SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
          metadata_suffix: ''
          assets_suffix: ''
        managed-masters:
@@ -135,7 +135,7 @@ production:
        structural_filename: struct_metadata.xlsx
      nonstandard:
        scanstore-rescue:
-         endpoint: <%= ENV['SCANSCORE_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
+         endpoint: <%= ENV['SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
          metadata_suffix: ''
          assets_suffix: ''
        managed-masters:
