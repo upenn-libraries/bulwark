@@ -66,7 +66,7 @@ class Manifest < ActiveRecord::Base
   def set_defaults
     self.owner = User.current
     self.name = uploaded_file.original_filename
-    self.content = uploaded_file.tempfile.read
+    self.content = normalize_content(uploaded_file.tempfile.read)
     self.steps = {}
     self.validation_problems = {}
   end
@@ -187,6 +187,12 @@ class Manifest < ActiveRecord::Base
     end
     self.content = manifest.map do |r| CSV.generate_line(r) end .join('')
     self.save!
+  end
+
+  def normalize_content(content)
+    # Reference: https://stackoverflow.com/a/7339436/12956763
+    # Removes any empty CSV lines
+    content.gsub("\r", '').gsub(/^,+$?\n/, '')
   end
 
   def action_description
