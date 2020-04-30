@@ -45,6 +45,10 @@ development:
        descriptive_filename: metadata.xlsx
        structural_filename: struct_metadata.xlsx
      nonstandard:
+       kaplan-rescue:
+         endpoint: <%= ENV['KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
+         metadata_suffix: ''
+         assets_suffix: ''
        scanstore-rescue:
          endpoint: <%= ENV['SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
          metadata_suffix: ''
@@ -134,6 +138,10 @@ production:
        descriptive_filename: metadata.xlsx
        structural_filename: struct_metadata.xlsx
      nonstandard:
+       kaplan-rescue:
+         endpoint: <%= ENV['KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
+         metadata_suffix: ''
+         assets_suffix: ''
        scanstore-rescue:
          endpoint: <%= ENV['SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
          metadata_suffix: ''
