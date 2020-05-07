@@ -37,6 +37,20 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 
 ENV NOTVISIBLE "in users profile"
 
+# The base phusion passenger-ruby image keeps the nginx logs within the container
+# and then forwards them to stdout/stderr which causes bloat. Instead
+# we want to redirect logs to stdout and stderr and defer to Docker for log handling.
+
+# Solution from: https://github.com/phusion/passenger-docker/issues/72#issuecomment-493270957
+# Disable nginx-log-forwarder because we just use stderr/stdout, but
+# need to remove the "sv restart" line in the nginx run command too.
+RUN touch /etc/service/nginx-log-forwarder/down && \
+    sed -i '/nginx-log-forwarder/d' /etc/service/nginx/run
+
+# Forward request and error logs to docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+	&& ln -sf /dev/stderr /var/log/nginx/error.log
+
 RUN echo "export VISIBLE=now" >> /etc/profile
 
 RUN mkdir -p /home/app/webapp
