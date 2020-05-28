@@ -24,7 +24,7 @@ gem 'hydra-pcdm'
 gem 'qa'
 gem 'blacklight_range_limit'
 gem 'ezid-client'
-gem 'jhove-service'
+gem 'jhove-service', "1.1.4"
 
 gem 'string_exts', :path => 'string_exts'
 gem 'rails_admin_colenda', :path => 'rails_admin_colenda'
