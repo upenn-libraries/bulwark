@@ -1,0 +1,13 @@
+/*************
+*
+* Rails Admin Overrides
+*
+**************/
+
+body.rails_admin .table td {
+  white-space: normal;
+
+  &:last-of-type {
+    white-space: nowrap;
+  }
+}
