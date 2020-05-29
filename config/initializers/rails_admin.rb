@@ -129,6 +129,14 @@ RailsAdmin.config do |config|
       field :end do
         visible true
       end
+      field :created_at do
+        visible true
+        searchable true
+      end
+      field :updated_at do
+        visible true
+        searchable true
+      end
     end
   end
 
@@ -142,6 +150,14 @@ RailsAdmin.config do |config|
         pretty_value do
           %{#{value[:description]}}.html_safe
         end
+      end
+      field :created_at do
+        visible true
+        searchable true
+      end
+      field :updated_at do
+        visible true
+        searchable true
       end
     end
 
@@ -245,6 +261,14 @@ RailsAdmin.config do |config|
         pretty_value do
           %{#{value[:description]}}.html_safe
         end
+      end
+      field :created_at do
+        visible true
+        searchable true
+      end
+      field :updated_at do
+        visible true
+        searchable true
       end
     end
 
