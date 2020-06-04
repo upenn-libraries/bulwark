@@ -48,6 +48,7 @@ gem 'bxslider-rails'
 
 gem 'bunny'
 gem 'sidekiq'
+gem 'sidekiq-failures'
 gem 'active_job_status', '1.1.0'
 gem 'redis-rails'
 gem 'sinatra', :require => false

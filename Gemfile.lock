@@ -545,6 +545,8 @@ GEM
       connection_pool (~> 2.2, >= 2.2.2)
       rack-protection (>= 1.5.0)
       redis (>= 3.3.5, < 5)
+    sidekiq-failures (1.0.0)
+      sidekiq (>= 4.0.0)
     sinatra (1.4.8)
       rack (~> 1.5)
       rack-protection (~> 1.4)
@@ -655,6 +657,7 @@ DEPENDENCIES
   sass-rails (< 5.0)
   sdoc (~> 0.4.0)
   sidekiq
+  sidekiq-failures
   sinatra
   smarter_csv
   string_exts!
