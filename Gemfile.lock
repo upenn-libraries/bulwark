@@ -384,7 +384,7 @@ GEM
       nokogiri (~> 1.6)
       rails (>= 4.2.0, < 6.0)
       rdf
-    rack (1.6.11)
+    rack (1.6.13)
     rack-pjax (0.8.0)
       nokogiri (~> 1.5)
       rack (~> 1.1)
