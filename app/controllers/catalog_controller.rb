@@ -253,5 +253,4 @@ class CatalogController < ApplicationController
       end
     end
   end
-
 end
