@@ -241,4 +241,16 @@ class CatalogController < ApplicationController
     [Collection, Image, ActiveFedora::DirectContainer, ActiveFedora::IndirectContainer, ActiveFedora::Aggregation::Proxy]
   end
 
+  def render_search_results_as_json
+    docs_with_urls
+    super
+  end
+
+  def docs_with_urls
+    @document_list.each do |doc|
+      unless Repo.where(:unique_identifier => doc.id.reverse_fedorafy).pluck(:thumbnail).first.nil?
+        doc._source['thumbnail_url'] = ActiveFedora::Base.where(:id => doc.id).first.thumbnail_link
+      end
+    end
+  end
 end
