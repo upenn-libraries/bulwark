@@ -249,7 +249,11 @@ class CatalogController < ApplicationController
   def docs_with_urls
     @document_list.each do |doc|
       unless Repo.where(:unique_identifier => doc.id.reverse_fedorafy).pluck(:thumbnail).first.nil?
-        doc._source['thumbnail_url'] = ActiveFedora::Base.where(:id => doc.id).first.thumbnail_link
+        doc._source['thumbnail_url'] = if ENV['PUBLIC_FEDORA_URL']
+          ENV['PUBLIC_FEDORA_URL'] + "/#{doc.id}/thumbnail"
+        else
+          ActiveFedora::Base.where(:id => doc.id).first.thumbnail_link
+        end
       end
     end
   end
