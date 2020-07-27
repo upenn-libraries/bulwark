@@ -3,7 +3,7 @@ require 'spec_helper'
 describe ReposController do
 
   before :each do
-    @repo = FactoryGirl.create(:repo)
+    @repo = FactoryBot.create(:repo)
     @repo.create_remote
   end
 

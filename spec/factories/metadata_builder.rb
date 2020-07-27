@@ -1,9 +1,9 @@
 require 'faker'
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :metadata_builder do
-    p_repo = FactoryGirl.create(:repo)
-    parent_repo p_repo.id
-    source [Faker::Internet.slug]
+    # p_repo = FactoryBot.create(:repo)
+    parent_repo { association :repo }
+    source { [Faker::Internet.slug] }
   end
 end
