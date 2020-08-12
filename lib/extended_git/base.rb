@@ -4,9 +4,9 @@
 module ExtendedGit
   class Base < DelegateClass(Git::Base)
 
-    def initialize(options = {})
+    def initialize(obj)
       raise ExtendedGit::Error, 'git-annex is not installed.' unless ExtendedGit.git_annex_installed?
-      super(options)
+      super(obj)
     end
 
     # Methods for git annex:
