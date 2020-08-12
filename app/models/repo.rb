@@ -129,6 +129,7 @@ class Repo < ActiveRecord::Base
     read_attribute(:thumbnail) || ''
   end
 
+  # Creates remote, clones repository, adds content that all repositories are expected to have.
   def create_remote
     # Function weirdness forcing update_steps to the top
     self.update_steps(:git_remote_initialized)
@@ -426,9 +427,11 @@ class Repo < ActiveRecord::Base
   end
 
   def _generate_readme(directory)
-    readme_filename = 'README.md'
-    File.open(readme_filename, 'w') { |file| file.write(I18n.t('colenda.version_control_agents.readme_contents', :unique_identifier => self.unique_identifier)) }
-    return "#{directory}/#{readme_filename}"
+    readme_filename = File.join(directory, 'README.md')
+    File.open(readme_filename, 'w') do |file|
+      file.write(I18n.t('colenda.version_control_agents.readme_contents', unique_identifier: self.unique_identifier))
+    end
+    readme_filename
   end
 
   def _populate_admin_manifest(admin_path)
@@ -528,5 +531,3 @@ class Repo < ActiveRecord::Base
   end
 
 end
-
-
