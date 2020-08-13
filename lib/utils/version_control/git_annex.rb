@@ -23,7 +23,7 @@ module Utils
         `git annex init origin`
         `git config annex.largefiles 'not (include=.repoadmin/bin/*.sh)'`
         rolling_upgrade(@remote_repo_path)
-        init_special_remote(@remote_repo_path, 's3', @repo.unique_identifier)
+        init_special_remote(@remote_repo_path, Utils.config[:special_remote][:type], @repo.unique_identifier)
       end
 
       def set_remote_permissions
@@ -37,7 +37,7 @@ module Utils
         destination = options[:destination].present? ? options[:destination] : @working_repo_path
         fsck = options[:fsck].nil? ? true : options[:fsck]
         begin
-          Git.clone(@remote_repo_path, destination)
+          ExtendedGit.clone(@remote_repo_path, destination)
           init_clone(destination, fsck)
         rescue => exception
           raise Utils::Error::VersionControl.new(error_message(exception.message))
@@ -70,7 +70,7 @@ module Utils
         content = options[:content].present? ? options[:content] : nil
         `git push origin master git-annex`
         if content.present?
-          `git annex copy #{Shellwords.escape(content)} --to=#{Utils::Storage::Ceph.config.special_remote_name}`
+          `git annex copy #{Shellwords.escape(content)} --to=#{Utils.config[:special_remote][:name]}`
         else
           `git annex sync --content`
         end
@@ -85,7 +85,7 @@ module Utils
         change_dir_working(dir)
         content = options[:content].present? ? options[:content] : '.'
         add_type = options[:add_type].present? ? options[:add_type] : :store
-        return `git annex add #{Shellwords.escape(content)}` if add_type == :store
+        return `git annex add #{Shellwords.escape(content)}` if add_type == :store # TODO: this hangs
         return `git add #{Shellwords.escape(content)}` if add_type == :git
       end
 
@@ -164,19 +164,41 @@ module Utils
 
       def init_special_remote(dir, remote_type, remote_name)
         change_dir_working(dir) unless Dir.pwd == dir
-        raise 'Missing S3 special remote environment variables' unless Utils::Storage::Ceph.required_configs?
-        `export AWS_ACCESS_KEY_ID=#{Utils::Storage::Ceph.config.aws_access_key_id}; export AWS_SECRET_ACCESS_KEY=#{Utils::Storage::Ceph.config.aws_secret_access_key};  git annex initremote #{Utils::Storage::Ceph.config.special_remote_name} type=#{Utils::Storage::Ceph.config.storage_type} encryption=#{Utils::Storage::Ceph.config.encryption} requeststyle=#{Utils::Storage::Ceph.config.request_style} host=#{Utils::Storage::Ceph.config.host} port=#{Utils::Storage::Ceph.config.port} public=#{Utils::Storage::Ceph.config.public} bucket='#{remote_name.bucketize}'
-` if remote_type == 's3'
+        case remote_type
+        when 'S3'
+          raise 'Missing S3 special remote environment variables' unless Utils::Storage::Ceph.required_configs?
+          `export AWS_ACCESS_KEY_ID=#{Utils::Storage::Ceph.config.aws_access_key_id}; export AWS_SECRET_ACCESS_KEY=#{Utils::Storage::Ceph.config.aws_secret_access_key};  git annex initremote #{Utils::Storage::Ceph.config.special_remote_name} type=#{Utils::Storage::Ceph.config.storage_type} encryption=#{Utils::Storage::Ceph.config.encryption} requeststyle=#{Utils::Storage::Ceph.config.request_style} host=#{Utils::Storage::Ceph.config.host} port=#{Utils::Storage::Ceph.config.port} public=#{Utils::Storage::Ceph.config.public} bucket='#{remote_name.bucketize}'`
+        when 'directory'
+          special_remote = Utils.config[:special_remote]
+          raise 'Missing config for Directory special remote' unless special_remote[:name] && special_remote[:directory]
+
+          special_remote_directory = File.join(special_remote[:directory], remote_name.bucketize)
+          FileUtils.mkdir_p(special_remote_directory) unless File.directory?(special_remote_directory) # Creates directory if not already present
+          `git annex initremote #{special_remote[:name]} type=directory directory=#{special_remote_directory} encryption=none`
+        else
+          raise ArgumentError, "Special remote type: \"#{remote_type}\" is invalid."
+        end
       end
 
+      # Almost identical to docker/init.sh
       def init_clone(dir, fsck = true)
-        Dir.chdir(dir)
-        `git annex init --version=#{Utils.config[:supported_vca_version]}`
-        `git annex enableremote #{Utils::Storage::Ceph.config.special_remote_name}`
-        `git config remote.origin.annex-ignore true`
-        `git config annex.pidlock true`
-        `git config annex.largefiles 'not (include=.repoadmin/bin/*.sh)'`
-        `git annex fsck --from #{Utils::Storage::Ceph.config.special_remote_name} --fast` if fsck
+        git = ExtendedGit.open(dir)
+        git.annex.init(version: Utils.config[:supported_vca_version])
+
+        special_remote = Utils.config[:special_remote]
+        case special_remote[:type]
+        when 'S3'
+          git.annex.enableremote(special_remote[:name])
+        when 'directory'
+          git.annex.enableremote(special_remote[:name], directory: File.join(special_remote[:directory], @repo.unique_identifier.bucketize))
+        else
+          raise "Special remote type not implemented #{special_remote[:type]}"
+        end
+
+        git.config('remote.origin.annex-ignore', 'true') # Does not store binary files in origin remote
+        git.config('annex.pidlock', 'true') if special_remote[:top_level_pid_lock]
+        git.config('annex.largefiles', 'not (include=.repoadmin/bin/*.sh)')
+        git.annex.fsck(from: special_remote[:name], fast: true) if fsck
       end
 
       private

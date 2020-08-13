@@ -172,7 +172,7 @@ GEM
       execjs
     coffee-script-source (1.12.2)
     colorize (0.8.1)
-    concurrent-ruby (1.1.3)
+    concurrent-ruby (1.1.6)
     connection_pool (2.2.2)
     crass (1.0.4)
     csv-xlsx-converter (0.0.3)
@@ -199,13 +199,13 @@ GEM
     ezid-client (1.8.0)
       hashie (~> 3.4, >= 3.4.3)
       nokogiri
-    factory_girl (4.9.0)
-      activesupport (>= 3.0.0)
-    factory_girl_rails (4.9.0)
-      factory_girl (~> 4.9.0)
-      railties (>= 3.0.0)
-    faker (1.9.1)
-      i18n (>= 0.7)
+    factory_bot (5.2.0)
+      activesupport (>= 4.2.0)
+    factory_bot_rails (5.2.0)
+      factory_bot (~> 5.2.0)
+      railties (>= 4.2.0)
+    faker (2.2.1)
+      i18n (>= 0.8)
     faraday (0.15.4)
       multipart-post (>= 1.2, < 3)
     fastimage (2.1.5)
@@ -581,6 +581,7 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
+    sqlite3 (1.3.13)
     stomp (1.4.6)
     sxp (0.1.5)
     therubyracer (0.12.3)
@@ -620,7 +621,7 @@ DEPENDENCIES
   devise
   devise-guests (~> 0.3)
   ezid-client
-  factory_girl_rails
+  factory_bot_rails
   faker
   fastimage
   git
@@ -660,6 +661,7 @@ DEPENDENCIES
   sidekiq-failures
   sinatra
   smarter_csv
+  sqlite3 (~> 1.3.0)
   string_exts!
   therubyracer
   tzinfo-data

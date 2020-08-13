@@ -1,8 +1,8 @@
 require 'faker'
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :manuscript do
-    title {Faker::Lorem.words(10, true)}
-    identifier [Faker::Internet.slug]
+    title { Faker::Lorem.words(10, true) }
+    identifier { [Faker::Internet.slug] }
   end
 end

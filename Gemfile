@@ -17,6 +17,7 @@ gem 'therubyracer',  platforms: :ruby
 gem 'tzinfo-data'
 
 gem 'mysql2', '~> 0.4.0'
+gem 'sqlite3', '~> 1.3.0'
 gem 'hydra', git: 'https://github.com/projecthydra/hydra.git', branch: 'pcdm'
 gem 'hydra-works'
 gem 'hydra-pcdm'
@@ -82,7 +83,7 @@ end
 
 group :test do
   gem 'rspec-rails'
-  gem 'factory_girl_rails'
+  gem 'factory_bot_rails'
   gem 'faker'
   gem 'capybara'
   gem 'guard-rspec'
