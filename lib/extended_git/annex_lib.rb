@@ -91,7 +91,9 @@ module ExtendedGit
       output, status = Open3.capture2e(git_cmd)
       exitstatus = status.exitstatus
 
-      if exitstatus > 1 || (exitstatus == 1 && output != '')
+      # Potentially might have to revisit this to not raise errors when status
+      # code is 1 and there is no output. See `Git::Lib#command` implementation.
+      if exitstatus != 0
         raise ExtendedGit::Error.new(git_cmd + ':' + output)
       end
 
