@@ -37,5 +37,9 @@ RSpec.describe Utils::VersionControl::GitAnnex do
       expect(git.config('remote.origin.annex-ignore')).to eq 'true'
       expect(git.config('annex.largefiles')).to eq 'not (include=.repoadmin/bin/*.sh)'
     end
+
+    it 'adds to .git/info/exclude' do
+      expect(IO.read(File.join(git.repo.path, 'info', 'exclude'))).to eql '.nfs*' 
+    end
   end
 end
