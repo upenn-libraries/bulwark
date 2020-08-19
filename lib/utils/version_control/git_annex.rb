@@ -183,6 +183,7 @@ module Utils
       # Almost identical to docker/init.sh
       def init_clone(dir, fsck = true)
         git = ExtendedGit.open(dir)
+        ignore_system_generated_files(dir)
         git.annex.init(version: Utils.config[:supported_vca_version])
 
         special_remote = Utils.config[:special_remote]
@@ -202,6 +203,14 @@ module Utils
       end
 
       private
+
+      # Ignore .nfs* files automatically generated and needed by the nfs store.
+      # By using `.git/info/exclude` we can exclude the files in the
+      # working directory without adding a `.gitignore` to the repo.
+      def ignore_system_generated_files(dir)
+        exclude_path = File.join(dir, '.git', 'info', 'exclude')
+        File.open(exclude_path, 'w') { |f| f.write('.nfs*') } # Ignore `.nfs* files
+      end
 
       def change_dir_working(dir)
         directory = get_directory(dir)
