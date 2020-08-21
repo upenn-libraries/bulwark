@@ -58,7 +58,8 @@ gem 'chartkick'
 gem 'groupdate'
 
 gem 'roo'
-
+gem 'rainbow'
+gem 'aws-sdk-s3'
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
 
