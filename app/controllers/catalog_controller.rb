@@ -211,8 +211,9 @@ class CatalogController < ApplicationController
     # whether the sort is ascending or descending (it must be asc or desc
     # except in the relevancy case).
     config.add_sort_field 'score desc', label: 'relevance'
-    config.add_sort_field 'system_create_dtsi asc', label: 'least recently created'
-    config.add_sort_field 'system_create_dtsi desc', label: 'most recently created'
+    config.add_sort_field 'system_modified_dtsi asc', label: 'least recently modified'
+    config.add_sort_field 'system_modified_dtsi desc', label: 'most recently modified'
+    config.add_sort_field 'id asc', label: 'ark identifier'
 
     # If there are more than this many search results, no spelling ("did you
     # mean") suggestion is offered.
