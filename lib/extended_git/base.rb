@@ -14,15 +14,14 @@ module ExtendedGit
     #   annex.init
     #   annex.info
     #   annex.get
+    #   annex.unlock
+    #   annex.lock
+    #   annex.whereis
     #   annex.initremote
     #   annex.enableremote
     #   annex.testremote
     def annex
-      ExtendedGit::Annex.new(self)
-    end
-
-    def annex_lib
-      @annex_lib ||= ExtendedGit::AnnexLib.new(self)
+      @annex ||= ExtendedGit::Annex.new(self)
     end
   end
 end

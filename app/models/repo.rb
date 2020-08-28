@@ -12,7 +12,7 @@ class Repo < ActiveRecord::Base
   has_many :endpoint, dependent: :destroy
   validates_associated :endpoint
 
-  around_create :set_version_control_agent_and_repo
+  around_create :set_version_control_agent_and_repo # this is essentially an after_create
 
   validates :human_readable_name, presence: true
   validates :metadata_subdirectory, presence: true
@@ -339,6 +339,7 @@ class Repo < ActiveRecord::Base
     FileExtensions.metadata_source_file_extensions
   end
 
+  # Not Called.
   def preserve_exists?
     _check_if_preserve_exists
   end
@@ -398,17 +399,17 @@ class Repo < ActiveRecord::Base
   private
 
   def _build_and_populate_directories(working_path)
-    admin_directory = "#{working_path}/#{Utils.config[:object_admin_path]}"
-    data_directory = "#{working_path}/#{Utils.config[:object_data_path]}"
-    metadata_subdirectory = "#{working_path}/#{self.metadata_subdirectory}"
-    assets_subdirectory = "#{working_path}/#{self.assets_subdirectory}"
-    derivatives_subdirectory = "#{working_path}/#{self.derivatives_subdirectory}"
+    admin_directory = File.join(working_path, Utils.config[:object_admin_path])
+    data_directory = File.join(working_path, Utils.config[:object_data_path])
+    metadata_subdirectory = File.join(working_path, self.metadata_subdirectory)
+    assets_subdirectory = File.join(working_path, self.assets_subdirectory)
+    derivatives_subdirectory = File.join(working_path, self.derivatives_subdirectory)
     readme = _generate_readme(working_path)
     _make_subdir(admin_directory)
     _make_subdir(data_directory)
-    _make_subdir(metadata_subdirectory, :keep => true)
-    _make_subdir(assets_subdirectory, :keep => true)
-    _make_subdir(derivatives_subdirectory, :keep => true)
+    _make_subdir(metadata_subdirectory, keep: true)
+    _make_subdir(assets_subdirectory, keep: true)
+    _make_subdir(derivatives_subdirectory, keep: true)
     _populate_admin_manifest("#{admin_directory}")
     init_script_directory = _add_init_scripts(admin_directory)
     [{:store => [admin_directory, derivatives_subdirectory, readme], :git => [init_script_directory, data_directory, metadata_subdirectory, assets_subdirectory]}]
@@ -470,6 +471,7 @@ class Repo < ActiveRecord::Base
     self.save!
   end
 
+  # Not called.
   def _check_if_preserve_exists
     working_path = self.version_control_agent.clone
     fname = "#{working_path}/#{self.preservation_filename}"

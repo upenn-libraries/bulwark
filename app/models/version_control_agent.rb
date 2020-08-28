@@ -39,10 +39,12 @@ class VersionControlAgent < ActiveRecord::Base
     self.worker.clone(options)
   end
 
+  # Not used.
   def reset_hard(location)
     self.worker.reset_hard(location)
   end
 
+  # Not used.
   def push_bare(location)
     self.worker.push_bare(location)
   end
@@ -51,6 +53,7 @@ class VersionControlAgent < ActiveRecord::Base
     self.worker.push(options, location)
   end
 
+  # Not used.
   def commit_bare(message, location)
     self.worker.commit_bare(message, location)
   end
@@ -71,10 +74,12 @@ class VersionControlAgent < ActiveRecord::Base
     self.worker.get(options, location)
   end
 
+  # Not used
   def sync_content(location)
     self.worker.sync(location)
   end
 
+  # Not used
   def pull(location)
     self.worker.pull(location)
   end

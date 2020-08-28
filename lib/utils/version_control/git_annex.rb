@@ -45,11 +45,13 @@ module Utils
         destination
       end
 
+      # Not used.
       def reset_hard(dir)
         change_dir_working(dir)
         `git reset --hard`
       end
 
+      # Doesn't seem to be used?
       def sync(dir)
         begin
           change_dir_working(dir)
@@ -60,33 +62,47 @@ module Utils
         end
       end
 
+      # Not used.
       def push_bare(dir)
         change_dir_working(dir)
         `git push origin master`
       end
 
       def push(options, dir)
-        change_dir_working(dir)
-        content = options[:content].present? ? options[:content] : nil
-        `git push origin master git-annex`
-        if content.present?
-          `git annex copy #{Shellwords.escape(content)} --to=#{Utils.config[:special_remote][:name]}`
+        git = ExtendedGit.open(dir)
+        git.push('origin', 'master')
+        git.push('origin', 'git-annex')
+
+        if options[:content].present?
+          git.annex.copy(options[:content], to: Utils.config[:special_remote][:name])
         else
-          `git annex sync --content`
+          git.annex.sync(content: true)
         end
       end
 
+      # Not used.
       def pull(dir)
         change_dir_working(dir)
         `git pull`
       end
 
+      # My current understanding is that all files added either by `git add` or
+      # `git annex add` are added via git-annex as long as they meet the requirements
+      # set in `annex.largefiles` and aren't dotfiles. Dotfiles are automatically
+      # controlled by git instead of git annex unless configured otherwise. Based
+      # on our current set up that would be mean any files except for
+      # `/.repoadmin/bin/init.sh` will be added through git-annex.
+      #
+      # See https://git-annex.branchable.com/forum/__34__git_add__34___vs___34__git_annex_add__34___in_v6/
+      #
+      # TLDR; We probably no longer need to specify which files are to be stored in git
+      # vs git annex.
       def add(options, dir)
-        change_dir_working(dir)
         content = options[:content].present? ? options[:content] : '.'
         add_type = options[:add_type].present? ? options[:add_type] : :store
-        return `git annex add #{Shellwords.escape(content)}` if add_type == :store # TODO: this hangs
-        return `git add #{Shellwords.escape(content)}` if add_type == :git
+        git = ExtendedGit.open(dir)
+        return git.annex.add(content) if add_type == :store
+        return git.add(content) if add_type == :git
       end
 
       def copy(options, dir)
@@ -109,17 +125,26 @@ module Utils
         end
       end
 
+      # Not used.
       def commit_bare(commit_message, dir)
         working_repo = Git.open(dir)
         working_repo.add(:all => true)
         working_repo.commit(commit_message)
       end
 
+      # TODO: Using `FileUtils.rm_rf` does not raise StandardErrors. We might want to
+      # at least log those errors, if we don't want them raised.
+      #
+      # TODO: We might want to `git annex uninit` before we delete a cloned repository
+      # because that way, the repository is removed from the list of repositories
+      # when doing a `git annex info` and the `.git/annex` directory
+      # and its contents are completely deleted.
       def remove_working_directory(dir)
+        change_dir_working(dir)
         `git config annex.pidlock true`
         `git annex drop --all --force`
         Dir.chdir(Rails.root.to_s)
-        parent_dir = dir.gsub(repo.names.git,"")
+        parent_dir = dir.gsub(repo.names.git, "")
         FileUtils.rm_rf(parent_dir, :secure => true) if File.directory?(parent_dir)
       end
 
@@ -131,8 +156,8 @@ module Utils
 
       def drop(options = {}, dir)
         change_dir_working(dir)
-        drop = options[:content].present? ? options[:content] : '.'
-        `git annex drop #{Shellwords.escape(options[:content])}`
+        content = options[:content].present? ? options[:content] : '.'
+        `git annex drop #{Shellwords.escape(content)}`
         change_perms(File.basename(dir)) if ENV['IMAGING_USER'].present?
       end
 
