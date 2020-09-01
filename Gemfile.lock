@@ -186,8 +186,6 @@ GEM
       railties (>= 4.1.0, < 6.0)
       responders
       warden (~> 1.2.3)
-    devise-guests (0.6.1)
-      devise
     diff-lcs (1.3)
     ebnf (1.0.0)
       rdf (~> 1.1)
@@ -619,7 +617,6 @@ DEPENDENCIES
   colorize
   csv-xlsx-converter
   devise
-  devise-guests (~> 0.3)
   ezid-client
   factory_bot_rails
   faker

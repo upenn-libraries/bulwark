@@ -68,7 +68,6 @@ gem 'sdoc', '~> 0.4.0',          group: :doc
 
 gem 'rsolr', '~> 1.0.6'
 gem 'devise'
-gem 'devise-guests', '~> 0.3'
 
 gem 'rb-readline'
 
