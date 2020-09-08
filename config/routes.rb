@@ -1,4 +1,6 @@
 require 'sidekiq/web'
+require 'sidekiq/cron/web'
+
 Rails.application.routes.draw do
 
   resources :repos do
@@ -67,6 +69,4 @@ Rails.application.routes.draw do
     mount Qa::Engine => '/qa'
     mount Sidekiq::Web => '/sidekiq'
   end
-
-
 end
