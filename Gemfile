@@ -49,6 +49,7 @@ gem 'bxslider-rails'
 
 gem 'bunny'
 gem 'sidekiq'
+gem 'sidekiq-cron', '~> 1.1'
 gem 'sidekiq-failures'
 gem 'active_job_status', '1.1.0'
 gem 'redis-rails'

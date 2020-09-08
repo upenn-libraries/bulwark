@@ -7,4 +7,5 @@
   - [create_repos, 1]
   - [process_manifest, 1]
   - [process_batch, 1]
+  - [maintenance, 1]
 :max_retries: 2
