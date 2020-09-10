@@ -305,7 +305,7 @@ class Repo < ActiveRecord::Base
       FileUtils.mv(temp_location, destination)
     rescue => exception
       return unless self.problem_files.present?
-      raise Utils::Error::Artifacts.new(error_message(exception.message))
+      raise Utils::Error::Artifacts.new(exception.message)
     end
 
   end
