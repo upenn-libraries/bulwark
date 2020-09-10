@@ -45,29 +45,6 @@ module Utils
         destination
       end
 
-      # Not used.
-      def reset_hard(dir)
-        change_dir_working(dir)
-        `git reset --hard`
-      end
-
-      # Doesn't seem to be used?
-      def sync(dir)
-        begin
-          change_dir_working(dir)
-          rolling_upgrade(dir)
-          `git annex sync --content`
-        rescue
-          raise I18n.t('colenda.utils.version_control.git_annex.errors.sync')
-        end
-      end
-
-      # Not used.
-      def push_bare(dir)
-        change_dir_working(dir)
-        `git push origin master`
-      end
-
       def push(options, dir)
         git = ExtendedGit.open(dir)
         git.push('origin', 'master')
@@ -78,12 +55,6 @@ module Utils
         else
           git.annex.sync(content: true)
         end
-      end
-
-      # Not used.
-      def pull(dir)
-        change_dir_working(dir)
-        `git pull`
       end
 
       # My current understanding is that all files added either by `git add` or
@@ -113,7 +84,6 @@ module Utils
         return `git annex copy #{Shellwords.escape(content)} #{from} #{to}`
       end
 
-
       def commit(commit_message, dir)
         change_dir_working(dir)
         working_repo = Git.open(dir)
@@ -123,13 +93,6 @@ module Utils
           return if exception.message =~ /nothing \w* commit, working \w* clean/ or exception.message =~ /Changes not staged for commit/ or exception.message == 'Nothing staged for commit.'
           raise Utils::Error::VersionControl.new(error_message(exception.message))
         end
-      end
-
-      # Not used.
-      def commit_bare(commit_message, dir)
-        working_repo = Git.open(dir)
-        working_repo.add(:all => true)
-        working_repo.commit(commit_message)
       end
 
       # TODO: Using `FileUtils.rm_rf` does not raise StandardErrors. We might want to
