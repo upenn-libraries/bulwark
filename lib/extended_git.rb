@@ -11,7 +11,7 @@ module ExtendedGit
     Base.new(Git.clone(repository, name, options))
   end
 
-  # (see Git.bare)
+  # (see Git.init)
   def self.init(git_dir, options = {})
     Base.new(Git.init(git_dir, options))
   end

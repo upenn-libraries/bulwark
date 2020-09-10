@@ -106,8 +106,8 @@ RSpec.describe Utils::VersionControl::GitAnnex do
       before { git_annex.push({}, cloned_repo_path) }
 
       it 'content is stored in special remote' do
-        expect(git.annex.whereis(first_new_file).first.locations.map(&:description)).to include '[local]'
-        expect(git.annex.whereis(second_new_file).first.locations.map(&:description)).to include '[local]'
+        expect(git.annex.whereis[first_new_file].locations.map(&:description)).to include '[local]'
+        expect(git.annex.whereis[second_new_file].locations.map(&:description)).to include '[local]'
       end
     end
 
@@ -117,11 +117,11 @@ RSpec.describe Utils::VersionControl::GitAnnex do
       end
 
       it 'expected content is stored in special remote' do
-        expect(git.annex.whereis(second_new_file).first.locations.map(&:description)).to include '[local]'
+        expect(git.annex.whereis[second_new_file].locations.map(&:description)).to include '[local]'
       end
 
       it 'expected content is NOT stored in special remote' do
-        expect(git.annex.whereis(first_new_file).first.locations.map(&:description)).not_to include '[local]'
+        expect(git.annex.whereis[first_new_file].locations.map(&:description)).not_to include '[local]'
       end
     end
   end
@@ -161,8 +161,8 @@ RSpec.describe Utils::VersionControl::GitAnnex do
       before { git_annex.drop({ content: filename }, cloned_repo_path) }
 
       it 'only drops README.md' do
-        expect(git.annex.whereis(filename).first.here?).to be false # README.md dropped.
-        expect(git.annex.whereis(new_file).first.here?).to be true # Other files NOT dropped.
+        expect(git.annex.whereis[filename].here?).to be false # README.md dropped.
+        expect(git.annex.whereis[new_file].here?).to be true # Other files NOT dropped.
       end
     end
 
@@ -193,7 +193,7 @@ RSpec.describe Utils::VersionControl::GitAnnex do
 
       it 'does not have references to old working repo' do
         expect(
-          new_clone.annex.whereis('README.md').first.locations.map(&:uuid)
+          new_clone.annex.whereis['README.md'].locations.map(&:uuid)
         ).not_to include cloned_repo_annex_uuid
       end
     end
@@ -226,16 +226,16 @@ RSpec.describe Utils::VersionControl::GitAnnex do
       expect(File.exist?(File.join(cloned_repo_path, 'README.md'))).to be false
       git_annex.get({ location: 'README.md'}, cloned_repo_path)
       expect(File.exist?(File.join(cloned_repo_path, 'README.md'))).to be true
-      expect(git.annex.whereis('README.md').first.here?).to be true
+      expect(git.annex.whereis['README.md'].here?).to be true
     end
 
     it 'retrieves all files within directory' do
       expect(git.annex.whereis.any?(&:here?)).to be false
       git_annex.get({ location: File.join(cloned_repo_path, 'data', 'assets') }, cloned_repo_path)
       FileUtils.chdir(cloned_repo_path) # `get` changes the directory, have to change it back.
-      expect(git.annex.whereis(first_file).first.here?).to be true
-      expect(git.annex.whereis(second_file).first.here?).to be true
-      expect(git.annex.whereis('README.md').first.here?).to be false
+      expect(git.annex.whereis[first_file].here?).to be true
+      expect(git.annex.whereis[second_file].here?).to be true
+      expect(git.annex.whereis['README.md'].here?).to be false
     end
 
     it 'retrieves all files' do
@@ -251,9 +251,9 @@ RSpec.describe Utils::VersionControl::GitAnnex do
     let(:git) { ExtendedGit.open(cloned_repo_path) }
 
     it 'unlocks file' do
-      expect(git.annex.whereis(locked: true).files.map(&:name)).to include 'README.md'
+      expect(git.annex.whereis(locked: true).includes_file?('README.md')).to be true
       git_annex.unlock({ content: 'README.md' }, cloned_repo_path)
-      expect(git.annex.whereis(unlocked: true).files.map(&:name)).to include 'README.md'
+      expect(git.annex.whereis(unlocked: true).includes_file?('README.md')).to be true
     end
   end
 
@@ -264,9 +264,9 @@ RSpec.describe Utils::VersionControl::GitAnnex do
     before { git.annex.unlock('README.md') }
 
     it 'locks file' do
-      expect(git.annex.whereis(unlocked: true).files.map(&:name)).to include 'README.md'
+      expect(git.annex.whereis(unlocked: true).includes_file?('README.md')).to be true
       git_annex.lock('README.md', cloned_repo_path)
-      expect(git.annex.whereis(locked: true).files.map(&:name)).to include 'README.md'
+      expect(git.annex.whereis(locked: true).includes_file?('README.md')).to be true
     end
   end
 end

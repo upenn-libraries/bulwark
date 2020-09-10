@@ -12,8 +12,10 @@ module ExtendedGit
     # Methods for git annex:
     #   annex.version
     #   annex.init
+    #   annex.uninit
     #   annex.info
     #   annex.get
+    #   annex.sync
     #   annex.unlock
     #   annex.lock
     #   annex.whereis

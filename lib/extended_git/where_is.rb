@@ -10,22 +10,26 @@ module ExtendedGit
       construct_whereis_files(path, options)
     end
 
-    # enumerable methods
+    # Enumerable method
+    def each(&block)
+      @files.values.each(&block)
+    end
+
     def [](file)
       @files[file]
     end
 
-    def each(&block)
-      @files.each(&block)
+    def includes_file?(file)
+      @files.key?(file)
     end
 
     class WhereIsFile
-      attr_accessor :name, :locations
+      attr_accessor :filepath, :locations
 
       def initialize(json)
         parsed_json = JSON.parse(json)
 
-        @name = parsed_json['file']
+        @filepath = parsed_json['file']
         @locations = generate_locations(parsed_json['whereis'])
       end
 
@@ -35,6 +39,7 @@ module ExtendedGit
       end
 
       private
+      
         def generate_locations(locations)
           locations.map do |location|
             OpenStruct.new(
@@ -53,7 +58,9 @@ module ExtendedGit
         results = @base.annex.lib.whereis(path, json: true, **options)
 
         # have to divide the results by new line and then each new line can be parsed
-        @files = results.lines.map { |result| WhereIsFile.new(result) }
+        found_files = results.lines.map { |result| WhereIsFile.new(result) }
+
+        @files = found_files.map { |f| [f.filepath, f] }.to_h
       end
   end
 end

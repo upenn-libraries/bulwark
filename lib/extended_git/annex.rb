@@ -8,12 +8,12 @@ module ExtendedGit
       lib.version(options)
     end
 
-    def info(about = nil)
-      lib.info(about)
+    def init(name = nil, **options)
+      lib.init(name, options)
     end
 
-    def init(options = {})
-      lib.init(options)
+    def uninit
+      lib.uninit
     end
 
     def get(path)
@@ -22,6 +22,10 @@ module ExtendedGit
 
     def add(path)
       lib.add(path)
+    end
+
+    def initremote(name, options = {})
+      lib.initremote(name, options)
     end
 
     def enableremote(name, options = {})
@@ -53,11 +57,15 @@ module ExtendedGit
     end
 
     def lock(path = nil)
-      lib.unlock(path)
+      lib.lock(path)
     end
 
     def whereis(path = nil, **options)
       WhereIs.new(@base, path, options)
+    end
+
+    def info(options = {})
+      RepositoryInfo.new(@base)
     end
 
     def lib

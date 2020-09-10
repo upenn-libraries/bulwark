@@ -19,12 +19,16 @@ module ExtendedGit
     # accepts options:
     #   :version (with version number)
     #   :autoenable
-    def init(opts = {})
+    def init(name, opts = {})
       array_opts = []
       array_opts << "--version=#{opts[:version]}" if opts[:version]
-      array_opts << "--autoenable" if opts[:autoenable]
 
-      command('init', array_opts)
+      command("init #{name}", array_opts)
+    end
+
+    # De-initialize git-annex and clean out repository.
+    def uninit
+      command('uninit')
     end
 
     # Returns version of git-annex running and repository version information.
@@ -36,11 +40,6 @@ module ExtendedGit
       array_opts << '--raw' if opts[:raw]
 
       command('version', array_opts)
-    end
-
-    # Returns information about an item or repository
-    def info(about = nil)
-      command("info #{about}")
     end
 
     # Adds file to git-annex
@@ -58,6 +57,15 @@ module ExtendedGit
       array_opts << "directory=#{opts[:directory]}" if opts[:directory]
 
       command("enableremote #{name}", array_opts)
+    end
+
+    def initremote(name, opts = {})
+      array_opts = []
+      array_opts << "type=#{opts[:type]}"            if opts[:type]
+      array_opts << "directory=#{opts[:directory]}"  if opts[:directory]
+      array_opts << "encryption=#{opts[:encryption]}" if opts[:encryption]
+
+      command("initremote #{name}", array_opts)
     end
 
     def fsck(opts = {})
@@ -80,6 +88,7 @@ module ExtendedGit
       command("testremote #{name}", array_opts)
     end
 
+    # Returns information about where files are located.
     def whereis(path = nil, opts = {})
       array_opts = []
       array_opts << '--json'     if opts[:json]
@@ -87,6 +96,14 @@ module ExtendedGit
       array_opts << '--locked'   if opts[:locked]
 
       command("whereis #{path}", array_opts)
+    end
+
+    # Returns repository information.
+    def info(about = nil, **opts)
+      array_opts = []
+      array_opts << '--json'     if opts[:json]
+
+      command("info #{about}", array_opts)
     end
 
     def unlock(path = nil)
