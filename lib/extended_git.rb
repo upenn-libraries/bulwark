@@ -21,6 +21,11 @@ module ExtendedGit
     Base.new(Git.open(working_dir, options))
   end
 
+  # (see Git.bare)
+  def self.bare(git_dir, options = {})
+    Base.new(Git.bare(git_dir, options))
+  end
+
   # Returns true if directory is a working directory.
   def self.is_working_directory?(directory)
     output, _status = Open3.capture2e(

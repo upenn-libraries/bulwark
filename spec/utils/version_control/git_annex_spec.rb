@@ -14,6 +14,28 @@ RSpec.describe Utils::VersionControl::GitAnnex do
     end
   end
 
+  describe '#initialize_bare_remote' do
+    let(:remote_path) { git_annex.remote_repo_path }
+    let(:git) { ExtendedGit.bare(remote_path) }
+
+    it 'is a shared bare repository' do
+      expect(ExtendedGit.is_git_directory?(remote_path)).to be true
+      expect(git.config('core.bare')).to eql 'true'
+      expect(git.config('core.sharedrepository')).to eql '1'
+    end
+
+    it 'is annexed' do
+      expect(git.config('annex.uuid')).not_to be_blank
+      expect(git.config('annex.largefiles')).to eql 'not (include=.repoadmin/bin/*.sh)'
+    end
+
+    it 'has special remote' do
+      special_remote = git.annex.info.remote('local')
+      expect(special_remote).not_to be nil
+      expect(special_remote.type).to eql 'directory'
+    end
+  end
+
   describe '#clone' do
     let(:cloned_repo_path) { git_annex.clone }
     let(:git) { ExtendedGit.open(cloned_repo_path) }
@@ -232,7 +254,6 @@ RSpec.describe Utils::VersionControl::GitAnnex do
     it 'retrieves all files within directory' do
       expect(git.annex.whereis.any?(&:here?)).to be false
       git_annex.get({ location: File.join(cloned_repo_path, 'data', 'assets') }, cloned_repo_path)
-      FileUtils.chdir(cloned_repo_path) # `get` changes the directory, have to change it back.
       expect(git.annex.whereis[first_file].here?).to be true
       expect(git.annex.whereis[second_file].here?).to be true
       expect(git.annex.whereis['README.md'].here?).to be false
@@ -241,7 +262,6 @@ RSpec.describe Utils::VersionControl::GitAnnex do
     it 'retrieves all files' do
       expect(git.annex.whereis.any?(&:here?)).to be false
       git_annex.get({ location: '.' }, cloned_repo_path)
-      FileUtils.chdir(cloned_repo_path) # `get` changes the directory, have to change it back.
       expect(git.annex.whereis.all?(&:here?)).to be true
     end
   end

@@ -193,6 +193,11 @@ RSpec.describe ExtendedGit::Annex, type: :model do
       git.annex.drop(readme)
       expect(File.exist?(readme_path)).to be false
     end
+
+    it 'drops everything' do
+      git.annex.drop
+      expect(File.exist?(readme_path)).to be false
+    end
   end
 
   describe '#testremote' do

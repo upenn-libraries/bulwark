@@ -36,8 +36,8 @@ module ExtendedGit
       lib.fsck(options)
     end
 
-    def drop(path = nil)
-      lib.drop(path)
+    def drop(path = nil, **options)
+      lib.drop(path, options)
     end
 
     def sync(options = {})

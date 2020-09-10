@@ -49,7 +49,7 @@ module ExtendedGit
 
     # Makes the content of annexed files available.
     def get(path)
-      command("get #{path}")
+      command("get #{escape(path)}")
     end
 
     def enableremote(name, opts = {})
@@ -77,8 +77,12 @@ module ExtendedGit
     end
 
     # Removes content of files from repository.
-    def drop(path = nil)
-      command("drop #{path}")
+    def drop(path = nil, opts = {})
+      array_opts = []
+      array_opts << "--all" if opts[:all]
+      array_opts << "--force" if opts[:force]
+
+      command("drop #{escape(path)}", array_opts)
     end
 
     def testremote(name, opts = {})

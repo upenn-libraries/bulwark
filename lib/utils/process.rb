@@ -170,6 +170,7 @@ module Utils
       end
 
       repo.save!
+      Dir.chdir(Rails.root.to_s) # FIXME: Eventually remove, when we don't depend on changing the directory
     end
 
     def jettison_originals(repo, working_path, commit_message)
