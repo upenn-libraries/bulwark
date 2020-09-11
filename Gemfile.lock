@@ -240,6 +240,7 @@ GEM
     hashie (3.6.0)
     high_voltage (3.1.0)
     hike (1.2.3)
+    honeybadger (4.7.2)
     htmlentities (4.3.4)
     http_logger (0.5.1)
     hydra-access-controls (9.1.4)
@@ -634,6 +635,7 @@ DEPENDENCIES
   groupdate
   guard-rspec
   high_voltage (~> 3.1)
+  honeybadger
   htmlentities
   hydra!
   hydra-pcdm
