@@ -145,7 +145,7 @@ module ExtendedGit
         # TODO:global config, pointing at correct working path and git dir
         global_opts = []
         global_opts << "--git-dir=#{@git_dir}" if !@git_dir.nil?
-        global_opts << "--work-tree=#{@git_work_dir}" if !@git_work_dir.nil?
+        global_opts << "--work-tree=#{@git_work_dir}" if @git_work_dir
 
         global_opts = global_opts.flatten.join(' ') # TODO: should be escaped?
 
