@@ -1,5 +1,4 @@
-
-
+# Adding Honeybadger configuration.
 
 if Rails.env.production? && File.exist?('/run/secrets/honeybadger_api_key')
   Honeybadger.configure do |config|
