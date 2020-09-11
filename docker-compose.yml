@@ -14,6 +14,9 @@ secrets:
   bulwark_database_config:
     external: true
     name: colenda_bulwark_database_config
+  bulwark_honeybadger_api_key:
+    external: true
+    name: colenda_bulwark_honeybadger_api_key_v${HONEYBADGER_API_KEY_VERSION}
   bulwark_secrets_config:
     external: true
     name: colenda_bulwark_secrets_config
@@ -146,6 +149,8 @@ services:
     secrets:
       - source: bulwark_database_config
         target: /home/app/webapp/config/database.yml
+      - source: bulwark_honeybadger_api_key
+        target: /run/secrets/honeybadger_api_key
       - source: bulwark_secrets_config
         target: /home/app/webapp/config/secrets.yml
       - source: bulwark_ssh_host_dsa_key
@@ -411,11 +416,6 @@ services:
       - 'scanstore_rescue:${SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
       - 'kaplan_rescue:${KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
       - 'colenda_workspace:${REMOTE_WORKSPACE}'
-  rabbitmq:
-    image: 'rabbitmq:3-management'
-    hostname: 'rabbitmq'
-    ports:
-      - '15672:15672'
 
 volumes:
   colenda_workspace:
