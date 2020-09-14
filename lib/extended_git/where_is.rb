@@ -1,3 +1,19 @@
+# Using the `git annex whereis` command finds the location of the set of files
+# described by the path and options. Files that are managed by git-annex may
+# be stored in different location. This class helps confirm the files that are
+# tracked by git-annex and the location of those files.
+#
+# Examples:
+#   git = ExtendedGit.open(directory)
+
+#   To get the location of a specific file without quering for all the files:
+#     git.annex.whereis('filename.txt')['filename.txt'].locations
+#
+#   To get the locations of each file within a directory:
+#     files = git.annex.whereis('directory_name/') # Returns list of files
+#     files.first.locations                        # Returns the locations of the first file
+#     files['specific_file.txt'].locations         # Returns locations of specific file
+
 module ExtendedGit
   class WhereIs
     include Enumerable
@@ -39,7 +55,7 @@ module ExtendedGit
       end
 
       private
-      
+
         def generate_locations(locations)
           locations.map do |location|
             OpenStruct.new(
