@@ -73,6 +73,7 @@ gem 'devise'
 gem 'rb-readline'
 
 gem 'pry-rails', '~> 0.3.4'
+gem 'honeybadger'
 
 group :development, :test do
   gem 'jettywrapper'
