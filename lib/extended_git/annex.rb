@@ -64,7 +64,7 @@ module ExtendedGit
       WhereIs.new(@base, path, options)
     end
 
-    def info(options = {})
+    def info
       RepositoryInfo.new(@base)
     end
 

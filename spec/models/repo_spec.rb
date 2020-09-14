@@ -75,7 +75,7 @@ RSpec.describe Repo, type: :model do
         end
 
         it 'special remote is configured in remote repo' do
-          expect(working_repo.annex.info('local')).not_to match /failed/
+          expect(working_repo.annex.info.remote?('local')).to be true
         end
 
         context 'when setting up special remote' do
