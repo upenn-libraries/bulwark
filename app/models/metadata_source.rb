@@ -226,6 +226,7 @@ class MetadataSource < ActiveRecord::Base
     `xsltproc #{Rails.root}/lib/tasks/pqc_mets.xslt #{file_name}`
     pqc_path = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{Utils.config['mets_xml_derivative']}"
     FileUtils.mv(Utils.config["mets_xml_derivative"], pqc_path) if Utils.config["mets_xml_derivative"].present?
+    Dir.chdir(Rails.root.to_s) # FIXME: Eventually remove, when we don't depend on changing the directory
   end
 
   def jettison_metadata(working_path, files_to_jettison)
@@ -742,6 +743,7 @@ class MetadataSource < ActiveRecord::Base
   end
 
   #TODO: Refactor to use config variables
+  # Never used.
   def _set_voyager_structural_metadata(working_path)
     mapped_values = {}
     _refresh_bibid(working_path)

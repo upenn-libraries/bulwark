@@ -5,35 +5,71 @@ module ExtendedGit
     end
 
     def version(options = {})
-      @base.annex_lib.version(options)
+      lib.version(options)
     end
 
-    def info(about = nil)
-      @base.annex_lib.info(about)
+    def init(name = nil, **options)
+      lib.init(name, options)
     end
 
-    def init(options = {})
-      @base.annex_lib.init(options)
+    def uninit
+      lib.uninit
     end
 
     def get(path)
-      @base.annex_lib.get(path)
+      lib.get(path)
+    end
+
+    def add(path)
+      lib.add(path)
+    end
+
+    def initremote(name, options = {})
+      lib.initremote(name, options)
     end
 
     def enableremote(name, options = {})
-      @base.annex_lib.enableremote(name, options)
+      lib.enableremote(name, options)
     end
 
     def fsck(options = {})
-      @base.annex_lib.fsck(options)
+      lib.fsck(options)
     end
 
-    def drop(path)
-      @base.annex_lib.drop(path)
+    def drop(path = nil, **options)
+      lib.drop(path, options)
+    end
+
+    def sync(options = {})
+      lib.sync(options)
+    end
+
+    def copy(path, options = {})
+      lib.copy(path, options)
     end
 
     def testremote(name, options = {})
-      @base.annex_lib.testremote(name, options)
+      lib.testremote(name, options)
+    end
+
+    def unlock(path = nil)
+      lib.unlock(path)
+    end
+
+    def lock(path = nil)
+      lib.lock(path)
+    end
+
+    def whereis(path = nil, **options)
+      WhereIs.new(@base, path, options)
+    end
+
+    def info
+      RepositoryInfo.new(@base)
+    end
+
+    def lib
+      @lib ||= ExtendedGit::AnnexLib.new(@base)
     end
   end
 end

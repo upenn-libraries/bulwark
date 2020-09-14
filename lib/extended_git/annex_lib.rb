@@ -19,12 +19,16 @@ module ExtendedGit
     # accepts options:
     #   :version (with version number)
     #   :autoenable
-    def init(opts = {})
+    def init(name, opts = {})
       array_opts = []
       array_opts << "--version=#{opts[:version]}" if opts[:version]
-      array_opts << "--autoenable" if opts[:autoenable]
 
-      command('init', array_opts)
+      command("init #{name}", array_opts)
+    end
+
+    # De-initialize git-annex and clean out repository.
+    def uninit
+      command('uninit')
     end
 
     # Returns version of git-annex running and repository version information.
@@ -38,14 +42,14 @@ module ExtendedGit
       command('version', array_opts)
     end
 
-    # Returns information about an item or repository
-    def info(about = nil)
-      command("info #{about}")
+    # Adds file to git-annex
+    def add(path)
+      command("add #{escape(path)}")
     end
 
     # Makes the content of annexed files available.
     def get(path)
-      command("get #{path}")
+      command("get #{escape(path)}")
     end
 
     def enableremote(name, opts = {})
@@ -53,6 +57,15 @@ module ExtendedGit
       array_opts << "directory=#{opts[:directory]}" if opts[:directory]
 
       command("enableremote #{name}", array_opts)
+    end
+
+    def initremote(name, opts = {})
+      array_opts = []
+      array_opts << "type=#{opts[:type]}"            if opts[:type]
+      array_opts << "directory=#{opts[:directory]}"  if opts[:directory]
+      array_opts << "encryption=#{opts[:encryption]}" if opts[:encryption]
+
+      command("initremote #{name}", array_opts)
     end
 
     def fsck(opts = {})
@@ -64,8 +77,12 @@ module ExtendedGit
     end
 
     # Removes content of files from repository.
-    def drop(path)
-      command("drop #{path}")
+    def drop(path = nil, opts = {})
+      array_opts = []
+      array_opts << "--all" if opts[:all]
+      array_opts << "--force" if opts[:force]
+
+      command("drop #{escape(path)}", array_opts)
     end
 
     def testremote(name, opts = {})
@@ -75,29 +92,76 @@ module ExtendedGit
       command("testremote #{name}", array_opts)
     end
 
-    # Run a git annex command. This method takes a lot of inspiration from
-    # the `command` method in `Git::Lib`.
-    def command(cmd, opts = [])
-      # TODO:global config, pointing at correct working path and git dir
-      global_opts = []
-      global_opts << "--git-dir=#{@git_dir}" if !@git_dir.nil?
-      global_opts << "--work-tree=#{@git_work_dir}" if !@git_work_dir.nil?
+    # Returns information about where files are located.
+    def whereis(path = nil, opts = {})
+      array_opts = []
+      array_opts << '--json'     if opts[:json]
+      array_opts << '--unlocked' if opts[:unlocked]
+      array_opts << '--locked'   if opts[:locked]
 
-      global_opts = global_opts.flatten.join(' ') # TODO: should be escaped?
+      command("whereis #{path}", array_opts)
+    end
 
-      opts = [opts].flatten.join(' ') # TODO: should be escaped?
+    # Returns repository information.
+    def info(about = nil, **opts)
+      array_opts = []
+      array_opts << '--json'     if opts[:json]
 
-      git_cmd = "git #{global_opts} annex #{cmd} #{opts}"
-      output, status = Open3.capture2e(git_cmd)
-      exitstatus = status.exitstatus
+      command("info #{about}", array_opts)
+    end
 
-      # Potentially might have to revisit this to not raise errors when status
-      # code is 1 and there is no output. See `Git::Lib#command` implementation.
-      if exitstatus != 0
-        raise ExtendedGit::Error.new(git_cmd + ':' + output)
+    def unlock(path = nil)
+      command("unlock #{escape(path)}")
+    end
+
+    def lock(path = nil)
+      command("lock #{escape(path)}")
+    end
+
+    def sync(opts = {})
+      array_opts = []
+      array_opts << '--content' if opts[:content]
+
+      command('sync', array_opts)
+    end
+
+    def copy(path, opts = {})
+      array_opts = []
+      array_opts << "--to=#{opts[:to]}" if opts[:to]
+
+      command("copy #{escape(path)}", array_opts)
+    end
+
+    private
+
+      # Only escape non-nil values.
+      def escape(value)
+        value.nil? ? nil : value.shellescape
       end
 
-      output
-    end
+      # Run a git annex command. This method takes a lot of inspiration from
+      # the `command` method in `Git::Lib`.
+      def command(cmd, opts = [])
+        # TODO:global config, pointing at correct working path and git dir
+        global_opts = []
+        global_opts << "--git-dir=#{@git_dir}" if @git_dir
+        global_opts << "--work-tree=#{@git_work_dir}" if @git_work_dir
+
+        global_opts = global_opts.flatten.join(' ') # TODO: should be escaped?
+
+        opts = [opts].flatten.join(' ') # TODO: should be escaped?
+
+        git_cmd = "git #{global_opts} annex #{cmd} #{opts}"
+        output, status = Open3.capture2e(git_cmd)
+        exitstatus = status.exitstatus
+
+        # Potentially might have to revisit this to not raise errors when status
+        # code is 1 and there is no output. See `Git::Lib#command` implementation.
+        if exitstatus != 0
+          raise ExtendedGit::Error.new(git_cmd + ':' + output)
+        end
+
+        output
+      end
   end
 end

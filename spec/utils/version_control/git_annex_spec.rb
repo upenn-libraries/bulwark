@@ -14,9 +14,33 @@ RSpec.describe Utils::VersionControl::GitAnnex do
     end
   end
 
+  describe '#initialize_bare_remote' do
+    let(:remote_path) { git_annex.remote_repo_path }
+    let(:git) { ExtendedGit.bare(remote_path) }
+
+    it 'is a shared bare repository' do
+      expect(ExtendedGit.is_git_directory?(remote_path)).to be true
+      expect(git.config('core.bare')).to eql 'true'
+      expect(git.config('core.sharedrepository')).to eql '1'
+    end
+
+    it 'is annexed' do
+      expect(git.config('annex.uuid')).not_to be_blank
+      expect(git.config('annex.largefiles')).to eql 'not (include=.repoadmin/bin/*.sh)'
+    end
+
+    it 'has special remote' do
+      special_remote = git.annex.info.remote('local')
+      expect(special_remote).not_to be nil
+      expect(special_remote.type).to eql 'directory'
+    end
+  end
+
   describe '#clone' do
     let(:cloned_repo_path) { git_annex.clone }
     let(:git) { ExtendedGit.open(cloned_repo_path) }
+
+    after { git_annex.remove_working_directory(cloned_repo_path) }
 
     it 'is a working directory' do
       expect(ExtendedGit.is_working_directory?(cloned_repo_path)).to be true
@@ -40,6 +64,233 @@ RSpec.describe Utils::VersionControl::GitAnnex do
 
     it 'adds to .git/info/exclude' do
       expect(IO.read(File.join(git.repo.path, 'info', 'exclude'))).to eql '.nfs*' 
+    end
+  end
+
+  describe '#add' do
+    let(:cloned_repo_path) { git_annex.clone }
+    let(:new_file_path) { File.join(cloned_repo_path, 'new_file.txt') }
+
+    after { git_annex.remove_working_directory(cloned_repo_path) }
+
+    [:store, :git].each do |type|
+      before do
+        FileUtils.touch(new_file_path)
+        git_annex.add({ content: new_file_path, add_type: type }, cloned_repo_path)
+      end
+
+      it "adds files when adding through #{type}" do
+        git = ExtendedGit.open(cloned_repo_path)
+        expect(git.status.added?('new_file.txt')).to be true
+      end
+    end
+  end
+
+  describe '#commit' do
+    after { git_annex.remove_working_directory(cloned_repo_path) }
+
+    context 'after adding a file' do
+      let(:cloned_repo_path) { git_annex.clone }
+      let(:git) { ExtendedGit.open(cloned_repo_path) }
+      let(:commit_message) { 'New commit.' }
+
+      before do
+        new_file_path = File.join(cloned_repo_path, 'new_file.txt')
+        FileUtils.touch(new_file_path)
+        git.add(new_file_path)
+        git_annex.commit(commit_message, cloned_repo_path)
+      end
+
+      it 'correctly commits new file' do
+        expect(git.log.first.message).to eql commit_message
+        expect(git.status['new_file.txt']).not_to be nil
+        expect(git.status.untracked?('new_file.txt')).to be false
+      end
+    end
+  end
+
+  describe '#push' do
+    let(:cloned_repo_path) { git_annex.clone }
+    let(:git) { ExtendedGit.open(cloned_repo_path) }
+    let(:first_new_file) { 'first_new_file.txt' }
+    let(:second_new_file) { 'second_new_file.txt' }
+
+    before do
+      [first_new_file, second_new_file].each do |new_file|
+        new_file_path = File.join(cloned_repo_path, new_file )
+        # Each file needs to have different content.
+        File.open(new_file_path, 'w') { |f| f.write("New file -- #{new_file}") }
+        git.add(new_file_path)
+      end
+
+      git_annex.commit('New files.', cloned_repo_path)
+    end
+
+    after { git_annex.remove_working_directory(cloned_repo_path) }
+
+    context 'when pushing all new content' do
+      before { git_annex.push({}, cloned_repo_path) }
+
+      it 'content is stored in special remote' do
+        expect(git.annex.whereis[first_new_file].locations.map(&:description)).to include '[local]'
+        expect(git.annex.whereis[second_new_file].locations.map(&:description)).to include '[local]'
+      end
+    end
+
+    context 'when only pushing specified content' do
+      before do
+        git_annex.push({ content: second_new_file }, cloned_repo_path)
+      end
+
+      it 'expected content is stored in special remote' do
+        expect(git.annex.whereis[second_new_file].locations.map(&:description)).to include '[local]'
+      end
+
+      it 'expected content is NOT stored in special remote' do
+        expect(git.annex.whereis[first_new_file].locations.map(&:description)).not_to include '[local]'
+      end
+    end
+  end
+
+  describe '#drop' do
+    let(:cloned_repo_path) { git_annex.clone }
+    let(:git) { ExtendedGit.open(cloned_repo_path) }
+    let(:new_file) { 'new_file.txt' }
+
+    # Adding an additional file.
+    before do
+      new_file_path = File.join(cloned_repo_path, new_file)
+      FileUtils.touch(new_file_path)
+      git.add(new_file_path)
+      git_annex.commit('Adding new file.', cloned_repo_path)
+      git_annex.push({}, cloned_repo_path)
+    end
+
+    after { git_annex.remove_working_directory(cloned_repo_path) }
+
+    # Checking that files are present in working directory.
+    it 'contains files in current working directory' do
+      expect(git.annex.whereis.all?(&:here?)).to be true
+    end
+
+    context 'when dropping everything' do
+      before { git_annex.drop({}, cloned_repo_path) }
+
+      it 'drops all files' do
+        expect(git.annex.whereis.any?(&:here?)).to be false
+      end
+    end
+
+    context 'when dropping specific content' do
+      let(:filename) { 'README.md' }
+
+      before { git_annex.drop({ content: filename }, cloned_repo_path) }
+
+      it 'only drops README.md' do
+        expect(git.annex.whereis[filename].here?).to be false # README.md dropped.
+        expect(git.annex.whereis[new_file].here?).to be true # Other files NOT dropped.
+      end
+    end
+
+    context 'when imaging user configured' do
+      it 'changes permissions'
+    end
+  end
+
+  describe '#remove_working_directory' do
+    let!(:cloned_repo_path) { git_annex.clone }
+    let!(:cloned_repo) { ExtendedGit.open(cloned_repo_path) }
+    let!(:cloned_repo_annex_uuid) { cloned_repo.config('annex.uuid') }
+
+    before do
+      cloned_repo.annex.get('README.md')
+      git_annex.remove_working_directory(cloned_repo_path)
+    end
+
+    context 'when cloning repository again' do
+      let(:temp_location) { Rails.root.join('tmp', 'test_directory') }
+      let(:new_clone) do
+        new_clone = ExtendedGit.clone(git_annex.remote_repo_path, temp_location)
+        new_clone.annex.init
+        new_clone
+      end
+
+      after { FileUtils.remove_dir(new_clone.dir.path) }
+
+      it 'does not have references to old working repo' do
+        expect(
+          new_clone.annex.whereis['README.md'].locations.map(&:uuid)
+        ).not_to include cloned_repo_annex_uuid
+      end
+    end
+
+    it 'deletes directory' do
+      expect(File.directory?(cloned_repo_path)).to be false
+    end
+  end
+
+  describe '#get' do
+    let(:cloned_repo_path) { git_annex.clone }
+    let(:git) { ExtendedGit.open(cloned_repo_path) }
+
+    let(:first_file) { File.join('data', 'assets', 'new_file.txt') }
+    let(:second_file) { File.join('data', 'assets', 'other_new_file.txt') }
+
+    # Adding files to remote and special remote, then dropping them to test `get`.
+    before do
+      [first_file, second_file].each do |file|
+        new_file_path = File.join(cloned_repo_path, file)
+        File.open(new_file_path, 'w') { |f| f.write("New file -- #{file}") }
+        git.add(new_file_path)
+      end
+      git_annex.commit('Adding new files.', cloned_repo_path)
+      git_annex.push({}, cloned_repo_path)
+      git_annex.drop({}, cloned_repo_path)
+    end
+
+    it 'retrieves a file' do
+      expect(File.exist?(File.join(cloned_repo_path, 'README.md'))).to be false
+      git_annex.get({ location: 'README.md'}, cloned_repo_path)
+      expect(File.exist?(File.join(cloned_repo_path, 'README.md'))).to be true
+      expect(git.annex.whereis['README.md'].here?).to be true
+    end
+
+    it 'retrieves all files within directory' do
+      expect(git.annex.whereis.any?(&:here?)).to be false
+      git_annex.get({ location: File.join(cloned_repo_path, 'data', 'assets') }, cloned_repo_path)
+      expect(git.annex.whereis[first_file].here?).to be true
+      expect(git.annex.whereis[second_file].here?).to be true
+      expect(git.annex.whereis['README.md'].here?).to be false
+    end
+
+    it 'retrieves all files' do
+      expect(git.annex.whereis.any?(&:here?)).to be false
+      git_annex.get({ location: '.' }, cloned_repo_path)
+      expect(git.annex.whereis.all?(&:here?)).to be true
+    end
+  end
+
+  describe '#unlock' do
+    let(:cloned_repo_path) { git_annex.clone }
+    let(:git) { ExtendedGit.open(cloned_repo_path) }
+
+    it 'unlocks file' do
+      expect(git.annex.whereis(locked: true).includes_file?('README.md')).to be true
+      git_annex.unlock({ content: 'README.md' }, cloned_repo_path)
+      expect(git.annex.whereis(unlocked: true).includes_file?('README.md')).to be true
+    end
+  end
+
+  describe '#lock' do
+    let(:cloned_repo_path) { git_annex.clone }
+    let(:git) { ExtendedGit.open(cloned_repo_path) }
+
+    before { git.annex.unlock('README.md') }
+
+    it 'locks file' do
+      expect(git.annex.whereis(unlocked: true).includes_file?('README.md')).to be true
+      git_annex.lock('README.md', cloned_repo_path)
+      expect(git.annex.whereis(locked: true).includes_file?('README.md')).to be true
     end
   end
 end

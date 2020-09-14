@@ -39,20 +39,8 @@ class VersionControlAgent < ActiveRecord::Base
     self.worker.clone(options)
   end
 
-  def reset_hard(location)
-    self.worker.reset_hard(location)
-  end
-
-  def push_bare(location)
-    self.worker.push_bare(location)
-  end
-
   def push(options = {}, location)
     self.worker.push(options, location)
-  end
-
-  def commit_bare(message, location)
-    self.worker.commit_bare(message, location)
   end
 
   def add(options = {}, location)
@@ -69,14 +57,6 @@ class VersionControlAgent < ActiveRecord::Base
 
   def get(options = {}, location)
     self.worker.get(options, location)
-  end
-
-  def sync_content(location)
-    self.worker.sync(location)
-  end
-
-  def pull(location)
-    self.worker.pull(location)
   end
 
   def drop(options = {}, location)
@@ -102,9 +82,7 @@ class VersionControlAgent < ActiveRecord::Base
 
   private
 
-  def create_worker
-    @worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo)
-  end
-
-
+    def create_worker
+      @worker = "Utils::VersionControl::#{self.vc_type}".constantize.new(self.repo)
+    end
 end

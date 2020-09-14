@@ -75,7 +75,7 @@ RSpec.describe Repo, type: :model do
         end
 
         it 'special remote is configured in remote repo' do
-          expect(working_repo.annex.info('local')).not_to match /failed/
+          expect(working_repo.annex.info.remote?('local')).to be true
         end
 
         context 'when setting up special remote' do
@@ -121,6 +121,40 @@ RSpec.describe Repo, type: :model do
     it 'generates file in correct location' do
       expect(readme_path).to eql File.join(directory, 'README.md')
       expect(File.exists?(readme_path)).to be true
+    end
+  end
+
+  describe '#_build_and_populate_directories' do
+    let(:repo) { FactoryBot.create(:repo) }
+    let(:directory) { Rails.root.join('tmp', 'test_directory') }
+
+    before do
+      FileUtils.mkdir_p(directory)
+      repo.send('_build_and_populate_directories', directory)
+    end
+
+    after { FileUtils.remove_dir(directory) }
+
+    it 'creates README.md file' do
+      expect(File.exist?(File.join(directory, 'README.md')))
+    end
+
+    it 'creates init script' do
+      expect(File.exist?(File.join(directory, '.repoadmin', 'bin', 'init.sh'))).to be true
+    end
+
+    it 'creates expected directories' do
+      expect(File.directory?(File.join(directory, '.derivs'))).to be true
+      expect(File.directory?(File.join(directory, '.repoadmin'))).to be true
+      expect(File.directory?(File.join(directory, 'data'))).to be true
+      expect(File.directory?(File.join(directory, 'data', 'metadata'))).to be true
+      expect(File.directory?(File.join(directory, 'data', 'assets'))).to be true
+    end
+
+    it 'creates expected .keep files' do
+      expect(File.exist?(File.join(directory, 'data', 'metadata', '.keep'))).to be true
+      expect(File.exist?(File.join(directory, 'data', 'assets', '.keep'))).to be true
+      expect(File.exist?(File.join(directory, '.derivs', '.keep'))).to be true
     end
   end
 end

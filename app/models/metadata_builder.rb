@@ -165,6 +165,7 @@ class MetadataBuilder < ActiveRecord::Base
       File.open(transformed_xml, 'w') {|f| f.puts fedora_xml }
       self.repo.version_control_agent.lock(file_path, working_path)
       self.repo.ingest(transformed_xml, working_path)
+      Dir.chdir(Rails.root.to_s) # FIXME: Eventually remove, when we don't depend on changing the directory
     end
   end
 

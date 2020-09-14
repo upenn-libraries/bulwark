@@ -11,7 +11,7 @@ module ExtendedGit
     Base.new(Git.clone(repository, name, options))
   end
 
-  # (see Git.bare)
+  # (see Git.init)
   def self.init(git_dir, options = {})
     Base.new(Git.init(git_dir, options))
   end
@@ -19,6 +19,11 @@ module ExtendedGit
   # (see Git.open)
   def self.open(working_dir, options = {})
     Base.new(Git.open(working_dir, options))
+  end
+
+  # (see Git.bare)
+  def self.bare(git_dir, options = {})
+    Base.new(Git.bare(git_dir, options))
   end
 
   # Returns true if directory is a working directory.
