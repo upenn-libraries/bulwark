@@ -60,6 +60,10 @@ module ExtendedGit
       lib.lock(path)
     end
 
+    def lookupkey(path)
+      lib.lookupkey(path)
+    end
+
     def whereis(path = nil, **options)
       WhereIs.new(@base, path, options)
     end

@@ -138,11 +138,10 @@ module Utils
         git.annex.lock(file)
       end
 
+      # @return [String] return git-annex key
       def look_up_key(path, dir)
-        change_dir_working(dir) unless Dir.pwd == dir
-        dir = dir.ends_with?('/') ? dir : "#{dir}/"
-        `git annex lookupkey #{path.gsub(dir, '')}`.chomp
-        Dir.chdir(Rails.root.to_s) # FIXME: Eventually remove, when we don't depend on changing the directory
+        git = ExtendedGit.open(dir)
+        git.annex.lookupkey(path)
       end
 
       def rolling_upgrade(dir)

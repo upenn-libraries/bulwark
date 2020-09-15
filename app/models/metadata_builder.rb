@@ -93,7 +93,8 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def file_checks_previews(working_path)
-    self.repo.version_control_agent.get({:location => "#{working_path}/#{self.repo.assets_subdirectory}"}, working_path)
+    self.repo.version_control_agent.get({ location: "#{working_path}/#{self.repo.assets_subdirectory}"}, working_path)
+    self.repo.version_control_agent.get({ location: self.repo.derivatives_subdirectory }, working_path)
     if self.metadata_source.where(:source_type => MetadataSource.structural_types).empty?
       Dir.glob("#{working_path}/#{self.repo.assets_subdirectory}/*.{#{self.repo.file_extensions.join(",")}}").each do |file_path|
         self.repo.version_control_agent.unlock({:content => file_path}, working_path)
