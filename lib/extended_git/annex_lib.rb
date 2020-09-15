@@ -132,6 +132,10 @@ module ExtendedGit
       command("copy #{escape(path)}", array_opts)
     end
 
+    def lookupkey(path)
+      command("lookupkey #{escape(path)}")
+    end
+
     private
 
       # Only escape non-nil values.

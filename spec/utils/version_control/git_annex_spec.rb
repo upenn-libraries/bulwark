@@ -63,7 +63,7 @@ RSpec.describe Utils::VersionControl::GitAnnex do
     end
 
     it 'adds to .git/info/exclude' do
-      expect(IO.read(File.join(git.repo.path, 'info', 'exclude'))).to eql '.nfs*' 
+      expect(IO.read(File.join(git.repo.path, 'info', 'exclude'))).to eql '.nfs*'
     end
   end
 
@@ -291,6 +291,19 @@ RSpec.describe Utils::VersionControl::GitAnnex do
       expect(git.annex.whereis(unlocked: true).includes_file?('README.md')).to be true
       git_annex.lock('README.md', cloned_repo_path)
       expect(git.annex.whereis(locked: true).includes_file?('README.md')).to be true
+    end
+  end
+
+  describe '#look_up_key' do
+    let(:cloned_repo_path) { git_annex.clone }
+    let(:git) { ExtendedGit.open(cloned_repo_path) }
+
+    it 'returns key for README.md' do
+      expect(git_annex.look_up_key('README.md', cloned_repo_path)).to match /SHA256E-s156--.+\.md/
+    end
+
+    it 'returns key when using full path' do
+      expect(git_annex.look_up_key(File.join(cloned_repo_path, 'README.md'), cloned_repo_path)).to match /SHA256E-s156--.+\.md/
     end
   end
 end
