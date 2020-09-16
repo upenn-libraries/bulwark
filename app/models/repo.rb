@@ -270,7 +270,7 @@ class Repo < ActiveRecord::Base
       self.generate_logs(working_path)
       self.version_control_agent.add({:content => "#{working_path}/#{self.admin_subdirectory}"}, working_path)
       self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'), working_path)
-      self.version_control_agent.lock(working_path)
+      self.version_control_agent.lock(self.admin_subdirectory, working_path)
       self.version_control_agent.push({:content => "#{working_path}/#{self.admin_subdirectory}"}, working_path)
       self.metadata_builder.last_file_checks = DateTime.now
       self.metadata_builder.save!
