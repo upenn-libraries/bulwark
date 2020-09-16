@@ -165,7 +165,7 @@ module ExtendedGit
           raise ExtendedGit::Error.new(git_cmd + ':' + output)
         end
 
-        output
+        output.chomp
       end
   end
 end

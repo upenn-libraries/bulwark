@@ -299,11 +299,11 @@ RSpec.describe Utils::VersionControl::GitAnnex do
     let(:git) { ExtendedGit.open(cloned_repo_path) }
 
     it 'returns key for README.md' do
-      expect(git_annex.look_up_key('README.md', cloned_repo_path)).to match /SHA256E-s156--.+\.md/
+      expect(git_annex.look_up_key('README.md', cloned_repo_path)).to match(/\ASHA256E-s156--.+\.md\z/)
     end
 
     it 'returns key when using full path' do
-      expect(git_annex.look_up_key(File.join(cloned_repo_path, 'README.md'), cloned_repo_path)).to match /SHA256E-s156--.+\.md/
+      expect(git_annex.look_up_key(File.join(cloned_repo_path, 'README.md'), cloned_repo_path)).to match(/\ASHA256E-s156--.+\.md\z/)
     end
   end
 end
