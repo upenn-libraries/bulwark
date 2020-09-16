@@ -380,6 +380,7 @@ class Repo < ActiveRecord::Base
     formatted_types
   end
 
+  # Not used.
   def set_image_data
     self.images_to_render["iiif"]["images"] = {}
     working_directory = self.version_control_agent.clone
