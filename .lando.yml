@@ -1,0 +1,25 @@
+name: bulwark
+services:
+  solr_test:
+    type: solr:5
+    portforward: true
+    core: bulwark-test
+    config:
+      dir: solr_conf/conf
+  solr_development:
+    type: solr:5
+    portforward: true
+    core: bulwark-development
+    config:
+      dir: solr_conf/conf
+  mysql_test:
+    type: mysql
+    portforward: 3305
+  mysql_development:
+    type: mysql
+    portforward: 3307
+proxy:
+  solr_test:
+    - bulwark-test.solr.lndo.site:8983
+  solr_development:
+    - bulwark-dev.solr.lndo.site:8983
