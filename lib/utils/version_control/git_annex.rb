@@ -22,7 +22,6 @@ module Utils
         git = ExtendedGit.bare(@remote_repo_path)
         git.annex.init('origin')
         git.config('annex.largefiles', 'not (include=.repoadmin/bin/*.sh)')
-        rolling_upgrade(@remote_repo_path)
         init_special_remote(@remote_repo_path, Utils.config[:special_remote][:type], @repo.unique_identifier)
       end
 
@@ -57,7 +56,7 @@ module Utils
         end
       end
 
-      # My current understanding is that all files added either by `git add` or
+      # My current understanding (for git-annex 8) is that all files added either by `git add` or
       # `git annex add` are added via git-annex as long as they meet the requirements
       # set in `annex.largefiles` and aren't dotfiles. Dotfiles are automatically
       # controlled by git instead of git annex unless configured otherwise. Based
@@ -102,6 +101,7 @@ module Utils
       # because that way, the repository is removed from the list of repositories
       # when doing a `git annex info` and the `.git/annex` directory
       # and its contents are completely deleted.
+      #
       def remove_working_directory(dir)
         git = ExtendedGit.open(dir)
         git.config('annex.pidlock', 'true')
@@ -142,15 +142,6 @@ module Utils
       def look_up_key(path, dir)
         git = ExtendedGit.open(dir)
         git.annex.lookupkey(path)
-      end
-
-      def rolling_upgrade(dir)
-        change_dir_working(dir) unless Dir.pwd == dir
-        version_string = `git annex version`
-        unless version_string.include?("local repository version: #{Utils.config[:supported_vca_version]}")
-          `git annex upgrade` if git_annex_upgrade_supported(version_string)
-        end
-        Dir.chdir(Rails.root.to_s) # FIXME: Eventually remove, when we don't depend on changing the directory
       end
 
       def init_special_remote(dir, remote_type, remote_name)
@@ -217,16 +208,6 @@ module Utils
         File.directory?(directory_string) ? directory_string : File.dirname(directory_string)
       end
 
-      def git_annex_upgrade_supported(version_string)
-        sample_local_version = 'local repository version: x'
-        local_version_index = version_string.index /local repository version: [aA-z0-9]/
-        local_version_number = version_string[local_version_index..(local_version_index + sample_local_version.length-1)].last.to_i
-        output_array = version_string.split("\n")
-        supported_version_numbers = _version_numbers(output_array, ':', 'supported repository versions:')
-        upgradable_version_numbers = _version_numbers(output_array, ':', 'upgrade supported from repository versions:')
-        supported_version_numbers.include?(Utils.config[:supported_vca_version]) && upgradable_version_numbers.include?(local_version_number)
-      end
-
       def error_message(message)
         case(message)
           when /no changes/
@@ -239,11 +220,6 @@ module Utils
             error_message = I18n.t('colenda.utils.version_control.git_annex.errors.generic', :error_message => message)
         end
         error_message
-      end
-
-      def _version_numbers(output_array, split_char, string_to_search)
-        versions_line = output_array[output_array.index{|s| s.start_with?(string_to_search)}]
-        versions_line.split("#{split_char}").last.lstrip.split(' ').map(&:to_i)
       end
 
       def path_seed
