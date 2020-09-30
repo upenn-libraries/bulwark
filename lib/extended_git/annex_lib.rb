@@ -43,8 +43,11 @@ module ExtendedGit
     end
 
     # Adds file to git-annex
-    def add(path)
-      command("add #{escape(path)}")
+    def add(path, opts = {})
+      array_opts = []
+      array_opts << "--config annex.dotfiles=true" if opts[:include_dotfiles]
+
+      command("add #{escape(path)}", array_opts)
     end
 
     # Makes the content of annexed files available.

@@ -70,8 +70,9 @@ module Utils
       def add(options, dir)
         content = options[:content].present? ? options[:content] : '.'
         add_type = options[:add_type].present? ? options[:add_type] : :store
+        include_dotfiles = options[:include_dotfiles] || false
         git = ExtendedGit.open(dir)
-        return git.annex.add(content) if add_type == :store
+        return git.annex.add(content, include_dotfiles: include_dotfiles) if add_type == :store
         return git.add(content) if add_type == :git
       end
 
