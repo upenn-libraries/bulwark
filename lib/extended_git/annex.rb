@@ -20,8 +20,8 @@ module ExtendedGit
       lib.get(path)
     end
 
-    def add(path)
-      lib.add(path)
+    def add(path, **options)
+      lib.add(path, options)
     end
 
     def initremote(name, options = {})

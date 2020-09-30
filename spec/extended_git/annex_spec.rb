@@ -87,22 +87,48 @@ RSpec.describe ExtendedGit::Annex, type: :model do
     # when there isn't an initial commit.
     include_context 'add readme to repository'
 
-    let(:filename) { 'new_test_file.txt' }
-    let(:filepath) { File.join(working_directory, filename) }
+    context 'when adding non-dotfile' do
+      let(:filename) { 'new_test_file.txt' }
+      let(:filepath) { File.join(working_directory, filename) }
 
-    before do
-      git.annex.init
-      File.open(filepath, 'w') { |f| f.write("New file -- #{filename}") }
+      before do
+        git.annex.init
+        File.open(filepath, 'w') { |f| f.write("New file -- #{filename}") }
+      end
+
+      it 'adds file to be committed' do
+        git.annex.add(filename)
+        expect(git.status.added?(filename)).to be true
+        expect(git.annex.whereis.includes_file?(filename)).to be true
+      end
+
+      it 'adds entire directory to be committed' do
+        git.annex.add('.')
+        expect(git.status.added?(filename)).to be true
+        expect(git.annex.whereis.includes_file?(filename)).to be true
+      end
     end
 
-    it 'adds file to be committed' do
-      git.annex.add(filename)
-      expect(git.status.added?(filename)).to be true
-    end
+    context 'when adding dotfile' do
+      let(:filename) { '.secret_file' }
+      let(:filepath) { File.join(working_directory, filename) }
 
-    it 'adds entire directory to be committed' do
-      git.annex.add('.')
-      expect(git.status.added?(filename)).to be true
+      before do
+        git.annex.init
+        File.open(filepath, 'w') { |f| f.write("very important secret") }
+      end
+
+      it 'adds file to be committed via git annex' do
+        git.annex.add(filename, include_dotfiles: true)
+        expect(git.status.added?(filename)).to be true
+        expect(git.annex.whereis.includes_file?(filename)).to be true
+      end
+
+      it 'adds file to be committed via git' do
+        git.annex.add(filename)
+        expect(git.status.added?(filename)).to be true
+        expect(git.annex.whereis.includes_file?(filename)).to be false
+      end
     end
   end
 
