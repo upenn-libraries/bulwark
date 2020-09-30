@@ -342,7 +342,7 @@ en:
         post_ingest_artifacts: 'Added post-ingest artifacts'
         write_input_source: 'Saved source in original format'
         catalog_derivative_spreadsheet: 'Created derivative spreadsheet of catalog metadata'
-        generated_derivative: 'Generated derivative for %{file_name}'
+        generated_all_derivatives: 'Generated all derivatives'
         generated_thumbnail: 'Generated thumbnail for %{object_id}'
         generated_admin_metadata: 'Generated admin metadata'
         generated_preservation_metadata: 'Generated JHOVE XML for %{object_id}'
