@@ -77,12 +77,9 @@ module Utils
       end
 
       def copy(options, dir)
-        change_dir_working(dir)
-        content = options[:content].present? ? options[:content] : '.'
-        to = options[:to].present? ? "--to #{options[:to]}" : ''
-        from = options[:from].present? ? "--from #{options[:from]}" : ''
-        return `git annex copy #{Shellwords.escape(content)} #{from} #{to}`
-        Dir.chdir(Rails.root.to_s) # FIXME: Eventually remove, when we don't depend on changing the directory
+        git = ExtendedGit.open(dir)
+        content = options[:content] || '.'
+        git.annex.copy(content, to: options[:to])
       end
 
       def commit(commit_message, dir)
