@@ -157,7 +157,7 @@ module Utils
       repo.file_display_attributes = {}
       display_array = []
       Dir.chdir(working_path)
-      entries = Dir.entries("#{working_path}/#{repo.derivatives_subdirectory}").reject { |f| File.directory?("#{working_path}/#{repo.derivatives_subdirectory}/#{f}") }
+      entries = Dir.entries("#{working_path}/#{repo.derivatives_subdirectory}").reject { |f| File.directory?("#{working_path}/#{repo.derivatives_subdirectory}/#{f}") || f == '.keep' }
       entries.each do |file|
         file_path = "#{working_path}/#{repo.derivatives_subdirectory}/#{file}"
         width, height = FastImage.size(file_path)
