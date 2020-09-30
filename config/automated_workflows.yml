@@ -78,18 +78,26 @@ development:
      steps_to_skip: <%= ENV['INGEST_STEPS_TO_SKIP'] || ['fetch_metadata','fetch_assets','extract','file_check','xml'] %>
 
 test:
-  openn:
+  kaplan:
     csv:
-      owner: user@email.edu
-      description: X
-      initial_stop: create
-      metadata_suffix: X
-      assets_suffix: X
+      owner: testuser@email.edu
+      description: 'Generated from CSV through automated workflow'
+      initial_stop: xml
+      metadata_suffix: ''
+      assets_suffix: 'data/'
       endpoints:
-        metadata_fetch_method: X
-        metadata_protocol: X
-        assets_fetch_method: X
-        assets_protocol: X
+        metadata_fetch_method: rsync
+        metadata_protocol: smb
+        assets_fetch_method: rsync
+        assets_protocol: smb
+      metadata:
+        descriptive_filename: metadata.xlsx
+        structural_filename: struct_metadata.xlsx
+      nonstandard:
+        test:
+          endpoint: <%= Rails.root.join('spec', 'fixtures', 'example_manifest_loads') %>
+          metadata_suffix: ''
+          assets_suffix: ''
 
 production:
   openn:
