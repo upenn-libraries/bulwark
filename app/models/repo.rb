@@ -532,5 +532,4 @@ class Repo < ActiveRecord::Base
   def mint_initial_ark
     Ezid::Identifier.mint
   end
-
 end
