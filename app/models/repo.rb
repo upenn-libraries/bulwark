@@ -280,14 +280,6 @@ class Repo < ActiveRecord::Base
     end
   end
 
-  def lock_keep_files(working_path)
-    if File.exist?(working_path)
-      self.version_control_agent.lock("#{self.metadata_subdirectory}/.keep", working_path)
-      self.version_control_agent.lock("#{self.assets_subdirectory}/.keep", working_path)
-      self.version_control_agent.lock("#{self.derivatives_subdirectory}/.keep", working_path)
-    end
-  end
-
   def package_metadata_info(working_path)
     self.version_control_agent.get({:location => self.admin_subdirectory}, working_path)
     self.version_control_agent.unlock({:content => self.admin_subdirectory}, working_path)
