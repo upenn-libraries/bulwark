@@ -47,6 +47,12 @@ RSpec.describe AutomatedWorkflows::Agent do
             expect(whereis_result[filepath].locations.map(&:description)).to include '[local]'
           end
         end
+
+        it 'contains .keep files only added via git' do
+          expect(
+            whereis_result.map(&:filepath).keep_if { |path| File.basename(path) == '.keep' }
+          ).to be_empty
+        end
       end
 
       it 'generates expected images_to_render hash' do
