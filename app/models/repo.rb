@@ -274,9 +274,9 @@ class Repo < ActiveRecord::Base
       self.version_control_agent.push({:content => "#{working_path}/#{self.admin_subdirectory}"}, working_path)
       self.metadata_builder.last_file_checks = DateTime.now
       self.metadata_builder.save!
-    rescue => exception
+    rescue => e
        self.save!
-       raise $!, I18n.t('colenda.errors.repos.ingest_error', :backtrace => exception.message)
+       raise # Raises last error
     end
   end
 
