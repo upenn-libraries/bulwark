@@ -156,7 +156,6 @@ module Utils
     def refresh_assets(working_path, repo)
       repo.file_display_attributes = {}
       display_array = []
-      Dir.chdir(working_path)
       entries = Dir.entries("#{working_path}/#{repo.derivatives_subdirectory}").reject { |f| File.directory?("#{working_path}/#{repo.derivatives_subdirectory}/#{f}") || f == '.keep' }
       entries.each do |file|
         file_path = "#{working_path}/#{repo.derivatives_subdirectory}/#{file}"
@@ -177,9 +176,9 @@ module Utils
       end
 
       repo.save!
-      Dir.chdir(Rails.root.to_s) # FIXME: Eventually remove, when we don't depend on changing the directory
     end
 
+    # Doesn't seem to be used.
     def jettison_originals(repo, working_path, commit_message)
       Dir.glob("#{working_path}/#{repo.assets_subdirectory}/*").each do |original|
         repo.version_control_agent.unlock({:content => original}, working_path)
