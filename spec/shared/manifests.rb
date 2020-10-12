@@ -7,7 +7,7 @@ shared_context 'manifest csv for object one' do
       test,object_one,#{ark},,"#{name}",
     MANIFEST
   end
-  let(:ark) { 'ark:/99999/fk4th9vh1c' }
+  let(:ark) { Ezid::Identifier.mint.id }
   let(:name) { 'Object One' }
   let(:csv_filepath) do
     filepath = Rails.root.join('tmp', 'manifest.csv').to_s

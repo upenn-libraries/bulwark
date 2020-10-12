@@ -128,17 +128,18 @@ module Utils
         repo.version_control_agent.get({:location => thumbnail_link}, working_path)
         repo.version_control_agent.unlock({:content => thumbnail_link}, working_path)
       end
-
       thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{working_path}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, '', @@derivatives_working_destination)}" : ''
+      repo.version_control_agent.add({ content: thumbnail_link, include_dotfiles: true }, working_path)
       execute_curl(_build_command('file_attach', :file => attachable_url(repo, working_path, thumbnail_link), :fid => repo.names.fedora, :child_container => 'thumbnail'))
       repo.version_control_agent.lock(thumbnail_link, working_path)
       refresh_assets(working_path, repo)
     end
 
     def attachable_url(repo, working_path, file_path)
-      repo.version_control_agent.add({content: file_path}, working_path)
-      repo.version_control_agent.copy({content: file_path, to: Utils.config[:special_remote][:name]}, working_path)
-      lookup_key = repo.version_control_agent.look_up_key(relative_path(working_path, file_path), working_path)
+      relative_file_path = relative_path(working_path, file_path)
+      repo.version_control_agent.add({content: relative_file_path}, working_path)
+      repo.version_control_agent.copy({content: relative_file_path, to: Utils.config[:special_remote][:name]}, working_path)
+      lookup_key = repo.version_control_agent.look_up_key(relative_file_path, working_path)
       read_storage_link(lookup_key, repo)
     end
 

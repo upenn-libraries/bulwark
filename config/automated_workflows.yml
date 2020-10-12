@@ -98,6 +98,9 @@ test:
           endpoint: <%= Rails.root.join('spec', 'fixtures', 'example_manifest_loads') %>
           metadata_suffix: ''
           assets_suffix: ''
+  ingest_only:
+    initial_stop: ingest
+    steps_to_skip: ['fetch_metadata','fetch_assets','extract','file_check','xml']
 
 production:
   openn:

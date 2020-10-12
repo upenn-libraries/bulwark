@@ -14,7 +14,7 @@ RSpec.describe AutomatedWorkflows::Agent do
           AutomatedWorkflows::Kaplan,
           [ark],
           AutomatedWorkflows::Kaplan::Csv.config.endpoint('test'),
-          steps_to_skip: ['xml', 'ingest']
+          steps_to_skip: ['ingest']
         )
       end
       let(:repo) { Repo.find_by(unique_identifier: ark) }
@@ -36,8 +36,11 @@ RSpec.describe AutomatedWorkflows::Agent do
         end
 
         it 'contains metadata files' do
-          expect(whereis_result.map(&:filepath)).to include('data/metadata/metadata.xlsx')
+          expect(whereis_result.map(&:filepath)).to include('data/metadata/metadata.xlsx', 'data/metadata/mets.xml', 'data/metadata/preservation.xml')
           expect(whereis_result['data/metadata/metadata.xlsx'].locations.map(&:description)).to include '[local]'
+          expect(whereis_result['data/metadata/mets.xml'].locations.map(&:description)).to include '[local]'
+          expect(whereis_result['data/metadata/preservation.xml'].locations.map(&:description)).to include '[local]'
+
         end
 
         it 'contains derivatives' do
@@ -59,8 +62,8 @@ RSpec.describe AutomatedWorkflows::Agent do
         expect(repo.images_to_render).to match({
           'iiif' => {
             'images' => [
-              '/ark99999fk4th9vh1c%2FSHA256E-s543526--c39499899465124b36b9d4ea0dca99e5aa150dc6f2532598f5626aa2712f571a.tif.jpeg/info.json',
-              '/ark99999fk4th9vh1c%2FSHA256E-s450792--9e90bce3272fcea22c84195ebd9391fcc8672da969fc08f55b99112c25fdef6b.tif.jpeg/info.json'
+              "/#{repo.names.bucket}%2FSHA256E-s543526--c39499899465124b36b9d4ea0dca99e5aa150dc6f2532598f5626aa2712f571a.tif.jpeg/info.json",
+              "/#{repo.names.bucket}%2FSHA256E-s450792--9e90bce3272fcea22c84195ebd9391fcc8672da969fc08f55b99112c25fdef6b.tif.jpeg/info.json"
             ],
             'reading_direction' => 'left-to-right'
           }
@@ -73,6 +76,32 @@ RSpec.describe AutomatedWorkflows::Agent do
           'Filename(s)' => ['front.tif; back.tif'],
           'Title' => ['Trade card; J. Rosenblatt & Co.; Baltimore, Maryland, United States; undated;']
         )
+      end
+
+      context 'when ingesting content' do
+        before do
+          AutomatedWorkflows::Agent.new(
+            AutomatedWorkflows::IngestOnly,
+            [ark],
+            '',
+            steps_to_skip: AutomatedWorkflows.config[:ingest_only][:steps_to_skip]
+          ).proceed
+        end
+
+        it 'creates fedora object' do
+          fedora_object = ActiveFedora::Base.find(repo.names.fedora)
+          expect(fedora_object).not_to be nil
+          expect(fedora_object.title).to match_array('Trade card; J. Rosenblatt &amp; Co.; Baltimore, Maryland, United States; undated;')
+          expect(fedora_object.unique_identifier).to eql ark
+          expect(fedora_object.thumbnail).to be_a ActiveFedora::File
+        end
+
+        it 'creates solr document' do
+          document = Blacklight.default_index.find(repo.names.fedora).docs.first
+          expect(document['active_fedora_model_ssi']).to eql 'PrintedWork'
+          expect(document['title_ssim']).to match_array('Trade card; J. Rosenblatt &amp; Co.; Baltimore, Maryland, United States; undated;')
+          expect(document['unique_identifier_tesim']).to match_array(ark)
+        end
       end
     end
 

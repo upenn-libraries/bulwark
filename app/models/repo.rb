@@ -261,8 +261,8 @@ class Repo < ActiveRecord::Base
         thumbnail_path = "#{self.assets_subdirectory}/#{self.thumbnail}"
         self.version_control_agent.get({:location => "#{working_path}/#{thumbnail_path}"}, working_path)
         self.version_control_agent.unlock({:content => "#{working_path}/#{thumbnail_path}"}, working_path)
-        self.version_control_agent.add({:content => "#{working_path}/#{thumbnail_path}"}, working_path)
-        self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_previews'), working_path)
+        self.version_control_agent.add({:content => "#{working_path}/#{thumbnail_path}"}, working_path) # Why is this necessary if the file is already present?
+        self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_previews'), working_path) # Why is this necessary?
         Utils::Process.generate_thumbnail(self, working_path)
       end
       self.version_control_agent.lock(thumbnail_path, working_path)
