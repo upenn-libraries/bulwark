@@ -627,6 +627,7 @@ DEPENDENCIES
   colorize
   csv-xlsx-converter
   devise
+  equivalent-xml
   ezid-client
   factory_bot_rails
   faker
@@ -648,6 +649,7 @@ DEPENDENCIES
   letter_opener
   mini_magick
   mysql2 (~> 0.4.0)
+  nokogiri
   openseadragon
   pry-byebug
   pry-rails (~> 0.3.4)
