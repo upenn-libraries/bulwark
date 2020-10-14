@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <xsl:stylesheet version="1.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:exsl="http://exslt.org/common"
-                xmlns:ex="http://exslt.org/dates-and-times"
-                xmlns:sv="http://www.jcp.org/jcr/sv/1.0"
-                xmlns:image="http://www.modeshape.org/images/1.0"
-                xmlns:space="preserve"
-                extension-element-prefixes="exsl ex">
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:exsl="http://exslt.org/common"
+  xmlns:ex="http://exslt.org/dates-and-times"
+  xmlns:sv="http://www.jcp.org/jcr/sv/1.0"
+  xmlns:image="http://www.modeshape.org/images/1.0"
+  xmlns:space="preserve"
+  extension-element-prefixes="exsl ex">
   <xsl:variable name="uuid">
     <xsl:value-of select="/root/record/uuid" />
   </xsl:variable>
@@ -16,28 +16,28 @@
     <xsl:copy>
       <exsl:document method="xml" href="fedora.xml">
         <sv:node xmlns:premis="http://www.loc.gov/premis/rdf/v1#"
-                 xmlns:image="http://www.modeshape.org/images/1.0"
-                 xmlns:sv="http://www.jcp.org/jcr/sv/1.0"
-                 xmlns:test="info:fedora/test/"
-                 xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
-                 xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-                 xmlns:ns001="info:fedora/fedora-system:def/model#"
-                 xmlns:ns002="http://purl.org/dc/terms/"
-                 xmlns:ns003="http://pcdm.org/models#"
-                 xmlns:ns004="http://library.upenn.edu/pqc/ns/"
-                 xmlns:space="preserve"
-                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xmlns:mode="http://www.modeshape.org/1.0"
-                 xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                 xmlns:fedora="http://fedora.info/definitions/v4/repository#"
-                 xmlns:jcr="http://www.jcp.org/jcr/1.0"
-                 xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#"
-                 xmlns:ldp="http://www.w3.org/ns/ldp#"
-                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                 xmlns:fedoraconfig="http://fedora.info/definitions/v4/config#"
-                 xmlns:mix="http://www.jcp.org/jcr/mix/1.0"
-                 xmlns:foaf="http://xmlns.com/foaf/0.1/"
-                 xmlns:dc="http://purl.org/dc/elements/1.1/">
+          xmlns:image="http://www.modeshape.org/images/1.0"
+          xmlns:sv="http://www.jcp.org/jcr/sv/1.0"
+          xmlns:test="info:fedora/test/"
+          xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+          xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+          xmlns:ns001="info:fedora/fedora-system:def/model#"
+          xmlns:ns002="http://purl.org/dc/terms/"
+          xmlns:ns003="http://pcdm.org/models#"
+          xmlns:ns004="http://library.upenn.edu/pqc/ns/"
+          xmlns:space="preserve"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:mode="http://www.modeshape.org/1.0"
+          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+          xmlns:fedora="http://fedora.info/definitions/v4/repository#"
+          xmlns:jcr="http://www.jcp.org/jcr/1.0"
+          xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#"
+          xmlns:ldp="http://www.w3.org/ns/ldp#"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:fedoraconfig="http://fedora.info/definitions/v4/config#"
+          xmlns:mix="http://www.jcp.org/jcr/mix/1.0"
+          xmlns:foaf="http://xmlns.com/foaf/0.1/"
+          xmlns:dc="http://purl.org/dc/elements/1.1/">
           <xsl:attribute name="sv:name"><xsl:value-of select="translate(substring-after($uuid,'ark:/'),'/','-')" /></xsl:attribute>
           <sv:property sv:name="jcr:primaryType" sv:type="Name">
             <sv:value>nt:folder</sv:value>
@@ -113,24 +113,24 @@
             <xsl:apply-templates select="provenance" />
           </sv:property>
           <sv:node xmlns:premis="http://www.loc.gov/premis/rdf/v1#" xmlns:image="http://www.modeshape.org/images/1.0"
-                   xmlns:sv="http://www.jcp.org/jcr/sv/1.0" xmlns:test="info:fedora/test/"
-                   xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
-                   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-                   xmlns:ns004="http://library.upenn.edu/pqc/ns/"
-                   xmlns:ns003="http://pcdm.org/models#" xmlns:ns002="http://purl.org/dc/terms/"
-                   xmlns:space="preserve" xmlns:ns001="http://www.openarchives.org/ore/terms/"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xmlns:mode="http://www.modeshape.org/1.0"
-                   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                   xmlns:fedora="http://fedora.info/definitions/v4/repository#"
-                   xmlns:jcr="http://www.jcp.org/jcr/1.0"
-                   xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#"
-                   xmlns:ldp="http://www.w3.org/ns/ldp#"
-                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                   xmlns:fedoraconfig="http://fedora.info/definitions/v4/config#"
-                   xmlns:mix="http://www.jcp.org/jcr/mix/1.0"
-                   xmlns:foaf="http://xmlns.com/foaf/0.1/"
-                   xmlns:dc="http://purl.org/dc/elements/1.1/" sv:name="members">
+            xmlns:sv="http://www.jcp.org/jcr/sv/1.0" xmlns:test="info:fedora/test/"
+            xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+            xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+            xmlns:ns004="http://library.upenn.edu/pqc/ns/"
+            xmlns:ns003="http://pcdm.org/models#" xmlns:ns002="http://purl.org/dc/terms/"
+            xmlns:space="preserve" xmlns:ns001="http://www.openarchives.org/ore/terms/"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:mode="http://www.modeshape.org/1.0"
+            xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+            xmlns:fedora="http://fedora.info/definitions/v4/repository#"
+            xmlns:jcr="http://www.jcp.org/jcr/1.0"
+            xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#"
+            xmlns:ldp="http://www.w3.org/ns/ldp#"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:fedoraconfig="http://fedora.info/definitions/v4/config#"
+            xmlns:mix="http://www.jcp.org/jcr/mix/1.0"
+            xmlns:foaf="http://xmlns.com/foaf/0.1/"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" sv:name="members">
             <sv:property sv:name="jcr:primaryType" sv:type="Name">
               <sv:value>nt:folder</sv:value>
             </sv:property>

@@ -12,33 +12,33 @@
   </xsl:variable>
   <xsl:output method="xml" indent="yes"/>
   <xsl:preserve-space elements="sv:node sv:property sv:value"/>
-    <xsl:template match="/root/record">
-      <xsl:copy>
-        <exsl:document method="xml" href="fedora.xml">
-          <sv:node xmlns:premis="http://www.loc.gov/premis/rdf/v1#"
-            xmlns:image="http://www.modeshape.org/images/1.0"
-            xmlns:sv="http://www.jcp.org/jcr/sv/1.0"
-            xmlns:test="info:fedora/test/"
-            xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
-            xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-            xmlns:ns001="info:fedora/fedora-system:def/model#"
-            xmlns:ns002="http://purl.org/dc/terms/"
-            xmlns:ns003="http://pcdm.org/models#"
-            xmlns:ns004="http://library.upenn.edu/pqc/ns/"
-            xmlns:space="preserve"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:mode="http://www.modeshape.org/1.0"
-            xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-            xmlns:fedora="http://fedora.info/definitions/v4/repository#"
-            xmlns:jcr="http://www.jcp.org/jcr/1.0"
-            xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#"
-            xmlns:ldp="http://www.w3.org/ns/ldp#"
-            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-            xmlns:fedoraconfig="http://fedora.info/definitions/v4/config#"
-            xmlns:mix="http://www.jcp.org/jcr/mix/1.0"
-            xmlns:foaf="http://xmlns.com/foaf/0.1/"
-            xmlns:dc="http://purl.org/dc/elements/1.1/">
-            <xsl:attribute name="sv:name"><xsl:value-of select="translate(substring-after($uuid,'ark:/'),'/','-')" /></xsl:attribute>
+  <xsl:template match="/root/record">
+    <xsl:copy>
+      <exsl:document method="xml" href="fedora.xml">
+        <sv:node xmlns:premis="http://www.loc.gov/premis/rdf/v1#"
+          xmlns:image="http://www.modeshape.org/images/1.0"
+          xmlns:sv="http://www.jcp.org/jcr/sv/1.0"
+          xmlns:test="info:fedora/test/"
+          xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+          xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+          xmlns:ns001="info:fedora/fedora-system:def/model#"
+          xmlns:ns002="http://purl.org/dc/terms/"
+          xmlns:ns003="http://pcdm.org/models#"
+          xmlns:ns004="http://library.upenn.edu/pqc/ns/"
+          xmlns:space="preserve"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:mode="http://www.modeshape.org/1.0"
+          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+          xmlns:fedora="http://fedora.info/definitions/v4/repository#"
+          xmlns:jcr="http://www.jcp.org/jcr/1.0"
+          xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#"
+          xmlns:ldp="http://www.w3.org/ns/ldp#"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:fedoraconfig="http://fedora.info/definitions/v4/config#"
+          xmlns:mix="http://www.jcp.org/jcr/mix/1.0"
+          xmlns:foaf="http://xmlns.com/foaf/0.1/"
+          xmlns:dc="http://purl.org/dc/elements/1.1/">
+          <xsl:attribute name="sv:name"><xsl:value-of select="translate(substring-after($uuid,'ark:/'),'/','-')" /></xsl:attribute>
           <sv:property sv:name="jcr:primaryType" sv:type="Name">
             <sv:value>nt:folder</sv:value>
           </sv:property>
@@ -60,7 +60,7 @@
           </sv:property>
 
           <sv:property sv:name="ns004:uniqueIdentifier" sv:type="String" sv:multiple="false">
-              <sv:value><xsl:value-of select="$uuid" /></sv:value>
+            <sv:value><xsl:value-of select="$uuid" /></sv:value>
           </sv:property>
 
           <sv:property sv:name="ns002:title" sv:type="String" sv:multiple="false">
@@ -292,235 +292,235 @@
           </sv:property>
 
           <xsl:apply-templates select="pages/page" />
-          </sv:node>
-        </exsl:document>
-      </xsl:copy>
-    </xsl:template>
+        </sv:node>
+      </exsl:document>
+    </xsl:copy>
+  </xsl:template>
 
-    <xsl:template match="administrative_contact">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="administrative_contact">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="administrative_contact_email">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="administrative_contact_email">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="metadata_creator">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="metadata_creator">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="metadata_creator_email">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="metadata_creator_email">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="repository_country">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="repository_country">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="repository_city">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="repository_city">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="holding_institution">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="holding_institution">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="repository_name">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="repository_name">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="source_collection">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="source_collection">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="call_numberid">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="call_numberid">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="record_url">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="record_url">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="alternate_id">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="alternate_id">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="alternate_id_type">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="alternate_id_type">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="manuscript_name">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="manuscript_name">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="author_name">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="author_name">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="author_uri">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="author_uri">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="translator_name">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="translator_name">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="translator_uri">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="translator_uri">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="artist_name">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="artist_name">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="artist_uri">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="artist_uri">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="former_owner_name">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="former_owner_name">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="former_owner_uri">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="former_owner_uri">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="provenance">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="provenance">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="date_single">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="date_single">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="date_range_start">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="date_range_start">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="date_range_end">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="date_range_end">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="date_narrative">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="date_narrative">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="place_of_origin">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="place_of_origin">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="origin_details">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="origin_details">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="description">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="description">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="language">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="language">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="foliation_pagination">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="foliation_pagination">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="flyleaves_and_leaves">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="flyleaves_and_leaves">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="layout">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="layout">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="colophon">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="colophon">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="collation">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="collation">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="script">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="script">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="decoration">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="decoration">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="binding">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="binding">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="watermarks">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="watermarks">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="catchwords">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="catchwords">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="signatures">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="signatures">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="notes">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="notes">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="support_material">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="support_material">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="page_dimensions">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="page_dimensions">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="bound_dimensions">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="bound_dimensions">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="related_resource">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="related_resource">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="related_resource_url">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="related_resource_url">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="subject_names">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="subject_names">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="subject_names_uri">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="subject_names_uri">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="subject_topical_uri">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="subject_topical_uri">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="subject_geographic">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="subject_geographic">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="subject_geographic_uri">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="subject_geographic_uri">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="subject_genre_form">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="subject_genre_form">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
-    <xsl:template match="subject_genre_form_uri">
-      <sv:value><xsl:apply-templates /></sv:value>
-    </xsl:template>
+  <xsl:template match="subject_genre_form_uri">
+    <sv:value><xsl:apply-templates /></sv:value>
+  </xsl:template>
 
 
 
-    <xsl:template match="pages/page">
-      <sv:node>
+  <xsl:template match="pages/page">
+    <sv:node>
       <xsl:attribute name="sv:name">
         <xsl:value-of select="format-number(serial_num, '00000')" />
       </xsl:attribute>
