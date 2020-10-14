@@ -2,7 +2,6 @@
 
 development:
   manifest_location: /abs/path/to/manifest.txt
-  fedora_xml_derivative: fedora.xml
   mets_xml_derivative: mets.xml
   object_admin_path: .repoadmin
   object_derivatives_path: .derivs
@@ -27,7 +26,6 @@ test:
   repository_prefix: prefix
 production:
   manifest_location: /abs/path/to/manifest.txt
-  fedora_xml_derivative: fedora.xml
   mets_xml_derivative: mets.xml
   object_admin_path: .repoadmin
   object_derivatives_path: .derivs
