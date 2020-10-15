@@ -9,22 +9,19 @@ RSpec.describe AutomatedWorkflows::Agent do
       include_context 'manifest csv for object one'
       include_context 'cleanup test storage' # TODO: Can remove this once Repos cleanup after themselves.
 
-      let(:agent) do
+      let(:repo) { Repo.find_by(unique_identifier: ark) }
+
+      before do
+        AutomatedWorkflows::Kaplan::Csv.generate_repos(csv_filepath)
         AutomatedWorkflows::Agent.new(
           AutomatedWorkflows::Kaplan,
           [ark],
           AutomatedWorkflows::Kaplan::Csv.config.endpoint('test'),
           steps_to_skip: ['ingest']
-        )
-      end
-      let(:repo) { Repo.find_by(unique_identifier: ark) }
-
-      before do
-        AutomatedWorkflows::Kaplan::Csv.generate_repos(csv_filepath)
-        agent.proceed
+        ).proceed
       end
 
-      context 'when cloning repo' do
+      context 'within cloned repo' do
         let(:working_dir) { repo.version_control_agent.clone }
         let(:git) { ExtendedGit.open(working_dir) }
         let(:whereis_result) { git.annex.whereis }
@@ -168,8 +165,85 @@ RSpec.describe AutomatedWorkflows::Agent do
           expect(document['unique_identifier_tesim']).to match_array(ark)
         end
       end
-    end
 
-    context 'when updating a digital object with a new asset'
+      context 'when updating a digital object' do
+        let(:repo) { Repo.find_by(unique_identifier: ark) }
+        let(:updated_preservation) do
+          <<~PRESERVATION
+            <?xml version="1.0" encoding="UTF-8"?>
+            <root>
+              <record>
+                <uuid>#{ark}</uuid>
+                <description>J. Rosenblatt &amp;amp; Co.: Importers: Earthenware, China, Majolica, Novelties</description>
+                <description>32 South Howard Street, Baltimore, MD</description>
+                <description>New and important facts.</description>
+                <title>Trade card; J. Rosenblatt &amp;amp; Co.; Baltimore, Maryland, United States; undated;</title>
+                <collection>Arnold and Deanne Kaplan Collection of Early American Judaica (University of Pennsylvania)</collection>
+                <call_number>Arc.MS.56</call_number>
+                <item_type>Trade cards</item_type>
+                <language>English</language>
+                <date>1843</date>
+                <corporate_name>J. Rosenblatt &amp;amp; Co.</corporate_name>
+                <geographic_subject>Baltimore, Maryland, United States</geographic_subject>
+                <geographic_subject>Maryland, United States</geographic_subject>
+                <rights>http://rightsstatements.org/page/NoC-US/1.0/?</rights>
+                <subject>Jewish merchants</subject>
+                <subject>Trade cards (advertising)</subject>
+                <pages>
+                  <page>
+                    <sequence>1</sequence>
+                    <page_number>1</page_number>
+                    <reading_direction>left-to-right</reading_direction>
+                    <side></side>
+                    <file_name>front.tif</file_name>
+                    <item_type>[]</item_type>
+                  </page>
+                  <page>
+                    <sequence>2</sequence>
+                    <page_number>2</page_number>
+                    <reading_direction>left-to-right</reading_direction>
+                    <side></side>
+                    <file_name>back.tif</file_name>
+                    <item_type>[]</item_type>
+                  </page>
+                </pages>
+              </record>
+            </root>
+          PRESERVATION
+        end
+        let(:updated_mets) do
+          <<~METS
+            <?xml version="1.0"?>
+            <METS:mets xmlns:METS="http://www.loc.gov/METS/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-0.xsd" OBJID="#{ark}"><METS:metsHdr CREATEDATE="2004-10-28T00:00:00.001" LASTMODDATE="2004-10-28T00:00:00.001"><METS:agent ROLE="CREATOR" TYPE="ORGANIZATION"><METS:name>University of Pennsylvania Libraries</METS:name></METS:agent></METS:metsHdr><METS:dmdSec ID="DM1"><METS:mdWrap MDTYPE="MODS"><METS:xmlData><mods:mods><mods:titleInfo><mods:title xmlns:image="http://www.modeshape.org/images/1.0" xmlns:space="preserve">Trade card; J. Rosenblatt &amp;amp; Co.; Baltimore, Maryland, United States; undated;</mods:title></mods:titleInfo><mods:originInfo><mods:issuance>monographic</mods:issuance></mods:originInfo><mods:language><mods:languageTerm xmlns:image="http://www.modeshape.org/images/1.0" xmlns:space="preserve" type="text" authority="iso639-2b" authorityURI="http://id.loc.gov/vocabulary/iso639-2.html" valueURI="http://id.loc.gov/vocabulary/iso639-2/ita">English</mods:languageTerm></mods:language><mods:name type="personal"/><mods:name type="corporate"><mods:namePart xmlns:image="http://www.modeshape.org/images/1.0" xmlns:space="preserve">J. Rosenblatt &amp;amp; Co.</mods:namePart></mods:name><mods:subject><mods:topic xmlns:image="http://www.modeshape.org/images/1.0" xmlns:space="preserve">Jewish merchants</mods:topic><mods:topic xmlns:image="http://www.modeshape.org/images/1.0" xmlns:space="preserve">Trade cards (advertising)</mods:topic></mods:subject><mods:subject><mods:geographic xmlns:image="http://www.modeshape.org/images/1.0" xmlns:space="preserve">Baltimore, Maryland, United States</mods:geographic><mods:geographic xmlns:image="http://www.modeshape.org/images/1.0" xmlns:space="preserve">Maryland, United States</mods:geographic></mods:subject><mods:physicalDescription><mods:extent>J. Rosenblatt &amp;amp; Co.: Importers: Earthenware, China, Majolica, Novelties32 South Howard Street, Baltimore, MDNew and important facts.</mods:extent><mods:digitalOrigin>reformatted digital</mods:digitalOrigin><mods:reformattingQuality>preservation</mods:reformattingQuality><mods:form authority="marcform" authorityURI="http://www.loc.gov/standards/valuelist/marcform.html">print</mods:form></mods:physicalDescription><mods:abstract displayLabel="Summary"/><mods:note type="bibliography"/><mods:note type="citation/reference"/><mods:note type="ownership"/><mods:note type="preferred citation"/><mods:note type="additional physical form"/><mods:note type="publications"/><mods:identifier type="uuid">#{ark}</mods:identifier></mods:mods></METS:xmlData></METS:mdWrap></METS:dmdSec></METS:mets>
+          METS
+        end
+        let(:working_dir) { repo.version_control_agent.clone }
+        let(:git) { ExtendedGit.open(working_dir) }
+
+        before do
+          filepath = Rails.root.join('tmp', 'manifest.csv').to_s
+          File.open(filepath, 'w') do |f|
+            manifest = <<~MANIFEST
+              share,path,unique_identifier,timestamp,directive_name,status
+              test,object_one_update,#{repo.unique_identifier},,"#{repo.human_readable_name}",
+            MANIFEST
+            f.write(manifest)
+          end
+          AutomatedWorkflows::Kaplan::Csv.generate_repos(filepath)
+          AutomatedWorkflows::Agent.new(
+            AutomatedWorkflows::Kaplan,
+            [ark],
+            AutomatedWorkflows::Kaplan::Csv.config.endpoint('test'),
+            steps_to_skip: ['ingest']
+          ).proceed
+        end
+
+        it 'contains updated metadata' do
+          git.annex.get(repo.metadata_subdirectory)
+          expect(File.read(File.join(working_dir, repo.metadata_subdirectory, 'mets.xml'))).to be_equivalent_to updated_mets
+          expect(File.read(File.join(working_dir, repo.metadata_subdirectory, 'preservation.xml'))).to be_equivalent_to updated_preservation
+        end
+      end
+    end
   end
 end
