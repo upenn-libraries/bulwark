@@ -105,7 +105,6 @@ module Utils
         git.config('annex.pidlock', 'true')
         git.annex.drop(all: true, force: true) # Not sure we have to be so forceful here.
 
-        Dir.chdir(Rails.root.to_s) # FIXME: Ensure we are not in the directory we want to delete; eventually can delete.
         parent_dir = dir.gsub(repo.names.git, "")
         FileUtils.rm_rf(parent_dir, secure: true) if File.directory?(parent_dir)
       end
@@ -143,22 +142,29 @@ module Utils
       end
 
       def init_special_remote(dir, remote_type, remote_name)
-        change_dir_working(dir) unless Dir.pwd == dir
+        git = ExtendedGit.bare(@remote_repo_path)
         case remote_type
         when 'S3'
           raise 'Missing S3 special remote environment variables' unless Utils::Storage::Ceph.required_configs?
-          `export AWS_ACCESS_KEY_ID=#{Utils::Storage::Ceph.config.aws_access_key_id}; export AWS_SECRET_ACCESS_KEY=#{Utils::Storage::Ceph.config.aws_secret_access_key};  git annex initremote #{Utils::Storage::Ceph.config.special_remote_name} type=#{Utils::Storage::Ceph.config.storage_type} encryption=#{Utils::Storage::Ceph.config.encryption} requeststyle=#{Utils::Storage::Ceph.config.request_style} host=#{Utils::Storage::Ceph.config.host} port=#{Utils::Storage::Ceph.config.port} public=#{Utils::Storage::Ceph.config.public} bucket='#{remote_name.bucketize}'`
+          # `git annex initremote` reads AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY from environment. If
+          # these aren't available in the environment they will need to be temporarily set and then cleared.
+          ceph_config = Utils::Storage::Ceph.config
+          git.annex.initremote(
+            ceph_config.special_remote_name, type: ceph_config.storage_type,
+            encryption: ceph_config.encryption, requeststyle: ceph_config.request_style,
+            host: ceph_config.host, port: ceph_config.port, public: ceph_config.public,
+            bucket: remote_name.bucketize
+          )
         when 'directory'
           special_remote = Utils.config[:special_remote]
           raise 'Missing config for Directory special remote' unless special_remote[:name] && special_remote[:directory]
 
           special_remote_directory = File.join(special_remote[:directory], remote_name.bucketize)
           FileUtils.mkdir_p(special_remote_directory) unless File.directory?(special_remote_directory) # Creates directory if not already present
-          `git annex initremote #{special_remote[:name]} type=directory directory=#{special_remote_directory} encryption=none`
+          git.annex.initremote(special_remote[:name], type: 'directory', directory: special_remote_directory, encryption: 'none')
         else
           raise ArgumentError, "Special remote type: \"#{remote_type}\" is invalid."
         end
-        Dir.chdir(Rails.root.to_s) # FIXME: Eventually remove, when we don't depend on changing the directory
       end
 
       # Almost identical to docker/init.sh
@@ -191,19 +197,6 @@ module Utils
       def ignore_system_generated_files(dir)
         exclude_path = File.join(dir, '.git', 'info', 'exclude')
         File.open(exclude_path, 'w') { |f| f.write('.nfs*') } # Ignore `.nfs* files
-      end
-
-      def change_dir_working(dir)
-        directory = get_directory(dir)
-        begin
-          Dir.chdir(directory)
-        rescue
-          raise I18n.t('colenda.utils.version_control.git_annex.errors.missing_directory', :directory => directory)
-        end
-      end
-
-      def get_directory(directory_string)
-        File.directory?(directory_string) ? directory_string : File.dirname(directory_string)
       end
 
       def error_message(message)

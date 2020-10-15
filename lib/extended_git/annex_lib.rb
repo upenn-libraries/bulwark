@@ -64,9 +64,18 @@ module ExtendedGit
 
     def initremote(name, opts = {})
       array_opts = []
-      array_opts << "type=#{opts[:type]}"            if opts[:type]
-      array_opts << "directory=#{opts[:directory]}"  if opts[:directory]
+      array_opts << "type=#{opts[:type]}"             if opts[:type]
       array_opts << "encryption=#{opts[:encryption]}" if opts[:encryption]
+
+      # Options for directory special remotes.
+      array_opts << "directory=#{opts[:directory]}"   if opts[:directory]
+
+      # Options for S3 special remotes.
+      array_opts << "requeststyle=#{opts[:requeststyle]}" if opts[:requeststyle]
+      array_opts << "host=#{opts[:host]}"                 if opts[:host]
+      array_opts << "port=#{opts[:port]}"                 if opts[:port]
+      array_opts << "public=#{opts[:public]}"             if opts[:public]
+      array_opts << "bucket='#{opts[:bucket]}'"           if opts[:bucket]
 
       command("initremote #{name}", array_opts)
     end
