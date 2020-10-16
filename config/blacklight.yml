@@ -1,6 +1,6 @@
 development:
   adapter: solr
-  url: http://localhost:8983/solr/bulwark-development
+  url: http://bulwark-dev.solr.lndo.site/solr/bulwark-development
 test: &test
   adapter: solr
   url: http://127.0.0.1:8983/solr/bulwark-test
