@@ -249,25 +249,25 @@ module Utils
     private
 
     def _build_command(type, options = {})
-      @fedora_yml = "#{Rails.root}/config/fedora.yml"
-      fedora_config = YAML.load(ERB.new(File.read(@fedora_yml)).result)[Rails.env]
-      @fedora_user = fedora_config['user']
-      @fedora_password = fedora_config['password']
-      @fedora_link = "#{fedora_config['url']}#{fedora_config['base_path']}"
+      fedora_yml = "#{Rails.root}/config/fedora.yml"
+      fedora_config = YAML.load(ERB.new(File.read(fedora_yml)).result)[Rails.env]
+      fedora_user = fedora_config['user']
+      fedora_password = fedora_config['password']
+      fedora_link = "#{fedora_config['url']}#{fedora_config['base_path']}"
       child_container = options[:child_container]
       file = options[:file]
       fid = options[:fid]
       object_uri = options[:object_uri]
       case type
         when 'import'
-          command = "curl -u #{@fedora_user}:#{@fedora_password} -X POST --data-binary \"@#{file}\" \"#{@fedora_link}/fcr:import?format=jcr/xml\""
+          command = "curl -u #{fedora_user}:#{fedora_password} -X POST --data-binary \"@#{file}\" \"#{fedora_link}/fcr:import?format=jcr/xml\""
         when 'file_attach'
-          fedora_full_path = "#{@fedora_link}/#{fid}/#{child_container}"
-          command = "curl -u #{@fedora_user}:#{@fedora_password}  -X PUT -H \"Content-Type: message/external-body; access-type=URL; URL=\\\"#{file}\\\"\" \"#{fedora_full_path}\""
+          fedora_full_path = "#{fedora_link}/#{fid}/#{child_container}"
+          command = "curl -u #{fedora_user}:#{fedora_password}  -X PUT -H \"Content-Type: message/external-body; access-type=URL; URL=\\\"#{file}\\\"\" \"#{fedora_full_path}\""
         when 'delete'
-          command = "curl -u #{@fedora_user}:#{@fedora_password} -X DELETE \"#{object_uri}\""
+          command = "curl -u #{fedora_user}:#{fedora_password} -X DELETE \"#{object_uri}\""
         when 'delete_tombstone'
-          command = "curl -u #{@fedora_user}:#{@fedora_password} -X DELETE \"#{object_uri}/fcr:tombstone\""
+          command = "curl -u #{fedora_user}:#{fedora_password} -X DELETE \"#{object_uri}/fcr:tombstone\""
         else
           raise I18n.t('colenda.utils.process.warnings.invalid_curl_command')
       end
