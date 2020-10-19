@@ -1,7 +1,7 @@
 # This is a sample config file that points to a solr server for each environment
 development:
-  url: http://localhost:8983/solr/bulwark-development
+  url: http://bulwark.solr.lndo.site/solr/bulwark-development
 test:
-  url: http://127.0.0.1:8983/solr/bulwark-test
+  url: http://bulwark.solr.lndo.site/solr/bulwark-test
 production:
   url: <%= ENV['PROD_SOLR_URL']%>

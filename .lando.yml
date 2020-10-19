@@ -1,24 +1,17 @@
 name: bulwark
 services:
-#  solr_test:
-#    type: solr:5
-#    portforward: true
-#    core: bulwark-test
-#    config:
-#      dir: solr_conf/conf
-  solr_development:
+  solr:
     type: solr:5
     portforward: true
     core: bulwark-development
     config:
       dir: solr_conf/conf
-#  mysql_test:
-#    type: mysql
-#    portforward: 3305
-  mysql_development:
+    run:
+      - solr create_core -c bulwark-test -d /solrconf/conf
+  mysql:
     type: mysql
     portforward: 3307
-  fcrepo_development:
+  fcrepo:
     type: compose
     app_mount: false
     services:
@@ -29,9 +22,7 @@ services:
       ports:
         - '8080:8080'
 proxy:
-#  solr_test:
-#    - bulwark-test.solr.lndo.site:8983
-  solr_development:
-    - bulwark-dev.solr.lndo.site:8983
-  fcrepo_development:
-    - bulwark-dev.fcrepo.lndo.site:8080
+  solr:
+    - bulwark.solr.lndo.site:8983
+  fcrepo:
+    - bulwark.fcrepo.lndo.site:8080
