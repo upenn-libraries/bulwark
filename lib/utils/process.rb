@@ -2,31 +2,23 @@ require 'fastimage'
 
 module Utils
   module Process
-
     include Finder
-
-    @@status_message
-    @@status_type
-    @@derivatives_working_destination
-    @@working_path
 
     extend self
 
     def import(file, repo, working_path)
       Repo.update(repo.id, :ingested => false)
       repo.file_display_attributes = {}
-      @@working_path = working_path
-      @oid = repo.names.fedora
-      @@derivatives_working_destination = "#{@@working_path}/#{repo.derivatives_subdirectory}"
-      @@status_type = :error
+      oid = repo.names.fedora
+      status_type = :error
       repo.file_display_attributes = {}
-      af_object = Finder.fedora_find(@oid)
+      af_object = Finder.fedora_find(oid)
       delete_duplicate(af_object) if af_object.present?
-      @@status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
-      delete_members(@oid)
+      status_message = contains_blanks(file) ? I18n.t('colenda.utils.process.warnings.missing_identifier') : execute_curl(_build_command('import', :file => file))
+      delete_members(oid)
       FileUtils.rm(file)
       file_extensions = { :images => %w[ tif tiff jpeg jpg ], :av => %w[ wav mp3 mp4 ], :downloadable => %w[ zip gz ], :pdf => %w[ pdf ] }
-      attach_images(@oid, repo, working_path) if repo.file_extensions.any? { |ext| file_extensions[:images].include?(ext) }
+      attach_images(oid, repo, working_path) if repo.file_extensions.any? { |ext| file_extensions[:images].include?(ext) }
 
       file_extensions[:av].each do |ext|
         attach_av(repo, working_path, ext)
@@ -37,13 +29,13 @@ module Utils
       file_extensions[:pdf].each do |ext|
         attach_pdf(repo, working_path, ext)
       end
-      update_index(@oid)
+      update_index(oid)
 
       repo.save!
-      @@status_type = :success
-      @@status_message = I18n.t('colenda.utils.process.success.ingest_complete')
+      status_type = :success
+      status_message = I18n.t('colenda.utils.process.success.ingest_complete')
       Repo.update(repo.id, :ingested => true, :queued => false)
-      {@@status_type => @@status_message}
+      {status_type => status_message}
     end
 
     def delete_duplicate(af_object)
@@ -59,8 +51,8 @@ module Utils
       execute_curl(_build_command('delete_tombstone', :object_uri => members_id))
     end
 
-    def attach_images(oid = @oid, repo, working_path)
-      af_object = Finder.fedora_find(@oid)
+    def attach_images(oid, repo, working_path)
+      af_object = Finder.fedora_find(oid)
       source_file =  "#{working_path}/#{repo.metadata_subdirectory}/#{repo.preservation_filename}"
       source_blob = File.read(source_file)
       reader = Nokogiri::XML(source_blob) do |config|
@@ -128,17 +120,19 @@ module Utils
         repo.version_control_agent.get({:location => thumbnail_link}, working_path)
         repo.version_control_agent.unlock({:content => thumbnail_link}, working_path)
       end
-
-      thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{working_path}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, '', @@derivatives_working_destination)}" : ''
+      derivatives_working_destination = "#{working_path}/#{repo.derivatives_subdirectory}"
+      thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{working_path}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, '', derivatives_working_destination)}" : ''
+      repo.version_control_agent.add({ content: thumbnail_link, include_dotfiles: true }, working_path)
       execute_curl(_build_command('file_attach', :file => attachable_url(repo, working_path, thumbnail_link), :fid => repo.names.fedora, :child_container => 'thumbnail'))
       repo.version_control_agent.lock(thumbnail_link, working_path)
       refresh_assets(working_path, repo)
     end
 
     def attachable_url(repo, working_path, file_path)
-      repo.version_control_agent.add({content: file_path}, working_path)
-      repo.version_control_agent.copy({content: file_path, to: Utils.config[:special_remote][:name]}, working_path)
-      lookup_key = repo.version_control_agent.look_up_key(relative_path(working_path, file_path), working_path)
+      relative_file_path = relative_path(working_path, file_path)
+      repo.version_control_agent.add({content: relative_file_path}, working_path)
+      repo.version_control_agent.copy({content: relative_file_path, to: Utils.config[:special_remote][:name]}, working_path)
+      lookup_key = repo.version_control_agent.look_up_key(relative_file_path, working_path)
       read_storage_link(lookup_key, repo)
     end
 

@@ -222,11 +222,20 @@ class MetadataSource < ActiveRecord::Base
 
   def generate_pqc_xml(working_path)
     file_name = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{self.metadata_builder.repo.preservation_filename}"
-    Dir.chdir(working_path)
-    `xsltproc #{Rails.root}/lib/tasks/pqc_mets.xslt #{file_name}`
-    pqc_path = "#{working_path}/#{self.metadata_builder.repo.metadata_subdirectory}/#{Utils.config['mets_xml_derivative']}"
-    FileUtils.mv(Utils.config["mets_xml_derivative"], pqc_path) if Utils.config["mets_xml_derivative"].present?
-    Dir.chdir(Rails.root.to_s) # FIXME: Eventually remove, when we don't depend on changing the directory
+
+    mets_relative_path = File.join(self.metadata_builder.repo.metadata_subdirectory, Utils.config['mets_xml_derivative'])
+
+    # Retrieve METS file, if its present
+    if ExtendedGit.open(working_path).annex.whereis.includes_file?(mets_relative_path)
+      self.metadata_builder.repo.version_control_agent.get({ location: mets_relative_path }, working_path)
+      self.metadata_builder.repo.version_control_agent.unlock({ content: mets_relative_path }, working_path)
+    end
+
+    doc = Nokogiri::XML(File.read(file_name))
+    xslt = Nokogiri::XSLT(File.read("#{Rails.root}/lib/tasks/pqc_mets.xslt"))
+    output = xslt.transform(doc)
+    pqc_path = File.join(working_path, mets_relative_path)
+    File.write(pqc_path, output)
   end
 
   def jettison_metadata(working_path, files_to_jettison)

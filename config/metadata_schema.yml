@@ -86,11 +86,24 @@ test:
     - pages
     - records
   schema_terms:
-    - title
-    - author
-  canonical_identifier_path:
     - identifier
-  unique_identifier_field: identifier
+    - abstract
+    - coverage
+    - description
+    - language
+    - date
+    - title
+    - creator
+    - file_name
+    - page_number
+    - ocr_text
+    - parent_manuscript
+    - exhibit_id
+  canonical_identifier_path:
+    - /root/record/uuid
+  unique_identifier_field: uuid
+  erc:
+    default_who: University of Pennsylvania Libraries
   voyager:
     root_element: root
     http_lookup: <%= ENV['VOYAGER_HTTP_LOOKUP_URL'] %>

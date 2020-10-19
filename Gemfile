@@ -74,6 +74,7 @@ gem 'rb-readline'
 
 gem 'pry-rails', '~> 0.3.4'
 gem 'honeybadger'
+gem 'nokogiri'
 
 group :development, :test do
   gem 'jettywrapper'
@@ -88,4 +89,5 @@ group :test do
   gem 'faker'
   gem 'capybara'
   gem 'guard-rspec'
+  gem 'equivalent-xml'
 end

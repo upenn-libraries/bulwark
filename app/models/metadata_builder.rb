@@ -158,14 +158,15 @@ class MetadataBuilder < ActiveRecord::Base
         next
       end
       xslt_file = xslt_file_select
-      Dir.chdir(working_path)
-      `xsltproc #{Rails.root}/lib/tasks/#{xslt_file}.xslt #{file_path}`
-      transformed_xml = "#{working_path}/#{Utils.config[:fedora_xml_derivative]}"
-      fedora_xml = File.read(transformed_xml).gsub(self.repo.unique_identifier, repo.names.fedora)
-      File.open(transformed_xml, 'w') {|f| f.puts fedora_xml }
+
+      doc = Nokogiri::XML(File.read(file_path))
+      xslt = Nokogiri::XSLT(File.read("#{Rails.root}/lib/tasks/#{xslt_file}.xslt"))
+      output = xslt.transform(doc).to_s.gsub(self.repo.unique_identifier, repo.names.fedora)
+      fedora_xml_filepath = File.join(working_path, 'fedora.xml')
+      File.write(fedora_xml_filepath, output)
+
       self.repo.version_control_agent.lock(file_path, working_path)
-      self.repo.ingest(transformed_xml, working_path)
-      Dir.chdir(Rails.root.to_s) # FIXME: Eventually remove, when we don't depend on changing the directory
+      self.repo.ingest(fedora_xml_filepath, working_path)
     end
   end
 

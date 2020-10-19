@@ -10,7 +10,6 @@ defaults: &defaults
   init_script_permissions: a+x
   supported_vca_version: 6
   init_script_path: <%= Rails.root.join('docker', 'init.sh') %>
-  fedora_xml_derivative: fedora.xml
   mets_xml_derivative: mets.xml
 
 development:
@@ -51,7 +50,6 @@ production:
     name: <%= ENV['SPECIAL_REMOTE_NAME'] %>
     top_level_pid_lock: true
   manifest_location: /home/app/webapp/docker/manifest.txt
-  fedora_xml_derivative: fedora.xml
   mets_xml_derivative: mets.xml
   object_admin_path: .repoadmin
   object_derivatives_path: .derivs
