@@ -77,7 +77,6 @@ gem 'honeybadger'
 gem 'nokogiri'
 
 group :development, :test do
-  gem 'jettywrapper'
   gem 'letter_opener'
   gem 'launchy'
   gem 'pry-byebug'
