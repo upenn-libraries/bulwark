@@ -18,7 +18,26 @@ Bulwark is a Hydra head providing administrative digital asset and metadata gene
 * [ImageMagick](http://www.imagemagick.org/script/index.php) - Software suite for creating and editing binary images, relied upon by the [minimagick](https://github.com/minimagick/minimagick) gem, used to create image derivatives.
 * [NPM](https://www.npmjs.com/)
 
-## Installation
+## Installing a local development and test environment
+
+1. Install git-annex, ImageMagick and lando
+  a. Mac (installing via homebrew)
+    ```
+    brew install git-annex
+    brew install imagemagick
+    brew cask install lando
+    ```
+  b. Linux
+2. To start:
+  ```
+  lando start
+  rake db:setup RAILS_ENV=development
+  rake db:setup RAILS_ENV=test
+  ```
+3. To stop:
+  ```
+  lando destroy -y
+  ```
 
 ### Configuration Files
 
