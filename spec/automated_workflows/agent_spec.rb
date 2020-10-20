@@ -108,18 +108,18 @@ RSpec.describe AutomatedWorkflows::Agent do
             whereis_result.map(&:filepath).keep_if { |path| File.basename(path) == '.keep' }
           ).to be_empty
         end
-      end
 
-      it 'generates expected images_to_render hash' do
-        expect(repo.images_to_render).to match({
-          'iiif' => {
-            'images' => [
-              "/#{repo.names.bucket}%2FSHA256E-s543526--c39499899465124b36b9d4ea0dca99e5aa150dc6f2532598f5626aa2712f571a.tif.jpeg/info.json",
-              "/#{repo.names.bucket}%2FSHA256E-s450792--9e90bce3272fcea22c84195ebd9391fcc8672da969fc08f55b99112c25fdef6b.tif.jpeg/info.json"
-            ],
-            'reading_direction' => 'left-to-right'
-          }
-        })
+        it 'generates expected images_to_render hash' do
+          expect(repo.images_to_render).to match({
+            'iiif' => {
+              'images' => [
+                "/#{repo.names.bucket}%2F#{git.annex.lookupkey('.derivs/front.tif.jpeg')}/info.json",
+                "/#{repo.names.bucket}%2F#{git.annex.lookupkey('.derivs/back.tif.jpeg')}/info.json"
+              ],
+              'reading_direction' => 'left-to-right'
+            }
+          })
+        end
       end
 
       it 'generates expected metadata sources objects' do
