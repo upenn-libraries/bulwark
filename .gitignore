@@ -15,7 +15,6 @@
 /log/*
 !/log/.keep
 /tmp
-/jetty
 /imports
 .DS_Store
 
@@ -28,10 +27,6 @@
 
 # Ignore featured objects directory
 /public/featured
-
-# Ignore bash script
-repo.sh
-just_jetty.sh
 
 # Ignore rdf
 *.rdf
