@@ -19,6 +19,7 @@ Bulwark is a Hydra head providing administrative digital asset and metadata gene
 * [NPM](https://www.npmjs.com/)
 
 ## Installing a local development and test environment
+We are using [lando](https://docs.lando.dev/basics/) to set up our local development and test environments. We have some custom rake tasks that wrap lando commands and run other necessary tasks.
 
 1. Install git-annex, ImageMagick and lando
   a. Mac (installing via homebrew)
@@ -30,13 +31,17 @@ Bulwark is a Hydra head providing administrative digital asset and metadata gene
   b. Linux
 2. To start:
   ```
-  lando start
-  rake db:setup RAILS_ENV=development
-  rake db:setup RAILS_ENV=test
+  rake bulwark:start
+  rails s
   ```
 3. To stop:
   ```
-  lando destroy -y
+  rake bulwark:stop
+  ```
+4. To clean out data and start over:
+  ```
+  rake bulwark:clean
+  rake bulwark:start
   ```
 
 ### Configuration Files
