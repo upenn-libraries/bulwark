@@ -18,7 +18,7 @@ Bulwark is a Hydra head providing administrative digital asset and metadata gene
 * [ImageMagick](http://www.imagemagick.org/script/index.php) - Software suite for creating and editing binary images, relied upon by the [minimagick](https://github.com/minimagick/minimagick) gem, used to create image derivatives.
 * [NPM](https://www.npmjs.com/)
 
-## Installing a local development and test environment
+## Setting up local development and test environment
 We are using [lando](https://docs.lando.dev/basics/) to set up our local development and test environments. We have some custom rake tasks that wrap lando commands and run other necessary tasks.
 
 1. Install git-annex, ImageMagick and lando
@@ -111,19 +111,6 @@ email: name@organization.org
 
 * `assets_path` - This is the absolute path on the filesystem where the preservation-worthy git repositories are stored.  
 * `email` - An email address that can be used to communicate semantic errors, preservation concerns, dead ends, etc to a human.  This should be an email that the application developer/owner has access to.
-
-### Setup
-From within the repository's directory, run the following commands:
-```bash
-rake jetty:clean
-rake jetty:config
-rake jetty:start
-```
-Check that Solr and Fedora are running at the port number defined in your jetty configuration.  If this step was successful, run the migrations and start the server:
-```bash
-rake db:migrate
-rails s
-```
 
 ## Deployment workflow
 
