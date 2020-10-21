@@ -2,14 +2,6 @@
 
 Bulwark is a Hydra head providing administrative digital asset and metadata generation, management, review, and ingest to a repository with a public facing capability.
 
-## Table of contents
-
-* [System dependencies](#system-dependencies)
-* [Installation](#installation)
-* [Contributing](#contributing)
-* [License](#license)
-* [Acknowledgments](#acknowledgments)
-
 ## System dependencies
 
 * [Git](https://git-scm.com/) - The application supports robust versioning of content and metadata through the use of git for version control.
