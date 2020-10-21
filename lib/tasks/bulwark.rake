@@ -9,18 +9,18 @@ namespace :bulwark do
     system('lando start')
 
     # Migrate test and development databases
-    system('rake db:setup RAILS_ENV=development')
-    system('rake db:setup RAILS_ENV=test')
+    system('RAILS_ENV=development rake db:setup')
+    system('RAILS_ENV=test rake db:setup')
   end
 
 
   desc 'Cleans development/test environment'
-  task clean: :environment do
+  task :clean do
     system('lando destroy -y')
   end
 
   desc 'Stop development/test environment'
-  task stop: :environment do
+  task :stop do
     system('lando stop -y')
   end
 end
