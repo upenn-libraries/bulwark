@@ -9,7 +9,7 @@ services:
     run:
       - solr create_core -c bulwark-test -d /solrconf/conf
   mysql:
-    type: mysql
+    type: mysql:5.7.31
     portforward: 3307
   fcrepo:
     type: compose

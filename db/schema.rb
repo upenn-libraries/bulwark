@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(version: 20200515093216) do
     t.string   "document_type", limit: 255
   end
 
-  add_index "bookmarks", ["user_id"], name: "index_bookmarks_on_user_id"
+  add_index "bookmarks", ["user_id"], name: "index_bookmarks_on_user_id", using: :btree
 
   create_table "endpoints", force: :cascade do |t|
     t.string   "source",       limit: 255
@@ -49,7 +49,7 @@ ActiveRecord::Schema.define(version: 20200515093216) do
     t.string   "fetch_method", limit: 255
   end
 
-  add_index "endpoints", ["repo_id"], name: "index_endpoints_on_repo_id"
+  add_index "endpoints", ["repo_id"], name: "index_endpoints_on_repo_id", using: :btree
 
   create_table "manifests", force: :cascade do |t|
     t.string   "name",                  limit: 255
@@ -75,8 +75,8 @@ ActiveRecord::Schema.define(version: 20200515093216) do
     t.datetime "last_file_checks"
   end
 
-  add_index "metadata_builders", ["metadata_source_id"], name: "index_metadata_builders_on_metadata_source_id"
-  add_index "metadata_builders", ["repo_id"], name: "index_metadata_builders_on_repo_id"
+  add_index "metadata_builders", ["metadata_source_id"], name: "index_metadata_builders_on_metadata_source_id", using: :btree
+  add_index "metadata_builders", ["repo_id"], name: "index_metadata_builders_on_repo_id", using: :btree
 
   create_table "metadata_sources", force: :cascade do |t|
     t.string   "path",                  limit: 255
@@ -104,7 +104,7 @@ ActiveRecord::Schema.define(version: 20200515093216) do
     t.string   "file_field",            limit: 255
   end
 
-  add_index "metadata_sources", ["metadata_builder_id"], name: "index_metadata_sources_on_metadata_builder_id"
+  add_index "metadata_sources", ["metadata_builder_id"], name: "index_metadata_sources_on_metadata_builder_id", using: :btree
 
   create_table "repos", force: :cascade do |t|
     t.string   "human_readable_name",        limit: 255
@@ -136,9 +136,9 @@ ActiveRecord::Schema.define(version: 20200515093216) do
     t.string   "queued",                     limit: 255
   end
 
-  add_index "repos", ["endpoint_id"], name: "index_repos_on_endpoint_id"
-  add_index "repos", ["metadata_builder_id"], name: "index_repos_on_metadata_builder_id"
-  add_index "repos", ["version_control_agent_id"], name: "index_repos_on_version_control_agent_id"
+  add_index "repos", ["endpoint_id"], name: "index_repos_on_endpoint_id", using: :btree
+  add_index "repos", ["metadata_builder_id"], name: "index_repos_on_metadata_builder_id", using: :btree
+  add_index "repos", ["version_control_agent_id"], name: "index_repos_on_version_control_agent_id", using: :btree
 
   create_table "roles", force: :cascade do |t|
     t.string "name", limit: 255
@@ -149,8 +149,8 @@ ActiveRecord::Schema.define(version: 20200515093216) do
     t.integer "user_id", limit: 4
   end
 
-  add_index "roles_users", ["role_id", "user_id"], name: "index_roles_users_on_role_id_and_user_id"
-  add_index "roles_users", ["user_id", "role_id"], name: "index_roles_users_on_user_id_and_role_id"
+  add_index "roles_users", ["role_id", "user_id"], name: "index_roles_users_on_role_id_and_user_id", using: :btree
+  add_index "roles_users", ["user_id", "role_id"], name: "index_roles_users_on_user_id_and_role_id", using: :btree
 
   create_table "searches", force: :cascade do |t|
     t.text     "query_params", limit: 65535
@@ -160,7 +160,7 @@ ActiveRecord::Schema.define(version: 20200515093216) do
     t.datetime "updated_at"
   end
 
-  add_index "searches", ["user_id"], name: "index_searches_on_user_id"
+  add_index "searches", ["user_id"], name: "index_searches_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                  limit: 255,        default: "",    null: false
@@ -182,8 +182,8 @@ ActiveRecord::Schema.define(version: 20200515093216) do
     t.datetime "locked_at"
   end
 
-  add_index "users", ["email"], name: "index_users_on_email", unique: true
-  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
+  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
   create_table "version_control_agents", force: :cascade do |t|
     t.string   "vc_type",     limit: 255
@@ -193,6 +193,14 @@ ActiveRecord::Schema.define(version: 20200515093216) do
     t.datetime "updated_at",              null: false
   end
 
-  add_index "version_control_agents", ["repo_id"], name: "index_version_control_agents_on_repo_id"
+  add_index "version_control_agents", ["repo_id"], name: "index_version_control_agents_on_repo_id", using: :btree
 
+  add_foreign_key "endpoints", "repos"
+  add_foreign_key "metadata_builders", "metadata_sources"
+  add_foreign_key "metadata_builders", "repos"
+  add_foreign_key "metadata_sources", "metadata_builders"
+  add_foreign_key "repos", "endpoints"
+  add_foreign_key "repos", "metadata_builders"
+  add_foreign_key "repos", "version_control_agents"
+  add_foreign_key "version_control_agents", "repos"
 end
