@@ -8,9 +8,12 @@ namespace :bulwark do
     # Start lando
     system('lando start')
 
+    # Create databases, if they aren't present.
+    system('rake db:create:all')
+
     # Migrate test and development databases
-    system('RAILS_ENV=development rake db:setup')
-    system('RAILS_ENV=test rake db:setup')
+    system('RAILS_ENV=development rake db:migrate')
+    system('RAILS_ENV=test rake db:migrate')
   end
 
 
