@@ -7,6 +7,11 @@ RSpec.describe ExtendedGit::Annex, type: :model do
 
   let(:git) { ExtendedGit.clone(remote_origin, repo_name, path: Rails.root.join('tmp')) }
 
+  before do
+    remote_git = ExtendedGit.init(nil, bare: true, repository: remote_origin)
+    remote_git.annex.init
+  end
+
   shared_context 'add readme to repository' do
     let(:readme) { 'README.txt' }
 
@@ -44,10 +49,6 @@ RSpec.describe ExtendedGit::Annex, type: :model do
       FileUtils.chmod_R(0755, special_remote_dir)
       FileUtils.rm_r(special_remote_dir)
     end
-  end
-
-  before do
-    ExtendedGit.init(nil, repository: remote_origin, bare: true)
   end
 
   after do
