@@ -25,13 +25,11 @@ RUN apt-get update && apt-get install -qq -y --no-install-recommends \
       vim \
       xsltproc
 
-# Remove default generated SSH keys to prevent use in production
-RUN rm /etc/ssh/ssh_host_*
-
-RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-
+# Remove default generated SSH keys to prevent use in production 
 # SSH login fix. Otherwise user is kicked off after login
-RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+RUN rm /etc/ssh/ssh_host_* && \
+    sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 
 ENV NOTVISIBLE "in users profile"
 
