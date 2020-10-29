@@ -85,8 +85,6 @@ RUN bundle install
 
 COPY . /home/app/webapp/
 
-CMD bundle update --source hydra && bundle update --source rails_admin
-
 RUN RAILS_ENV=production SECRET_KEY_BASE=x bundle exec rake assets:precompile --trace
 
 RUN rm -f /etc/service/nginx/down
@@ -109,7 +107,5 @@ RUN wget https://www.incommon.org/custom/certificates/repository/sha384%20Interm
 
 # Clean up APT and bundler when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-CMD ["/usr/sbin/sshd", "-D"]
 
 CMD ["/sbin/my_init"]
