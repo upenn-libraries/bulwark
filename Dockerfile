@@ -87,15 +87,13 @@ COPY . /home/app/webapp/
 
 RUN RAILS_ENV=production SECRET_KEY_BASE=x bundle exec rake assets:precompile --trace
 
-RUN rm -f /etc/service/nginx/down
-
-RUN rm /etc/nginx/sites-enabled/default
+RUN rm -f /etc/service/nginx/down && \
+    rm /etc/nginx/sites-enabled/default
 
 USER app
 
-RUN git config --global user.email 'docker-user@example.com'
-
-RUN git config --global user.name 'Docker User'
+RUN git config --global user.email 'docker-user@example.com' && \
+    git config --global user.name 'Docker User'
 
 USER root
 
