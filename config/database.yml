@@ -20,6 +20,7 @@ test:
   port: 3307
 
 production:
+  adapter: mysql2
   encoding: utf8
   pool: 5
   host: db
