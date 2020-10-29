@@ -13,35 +13,41 @@ Bulwark is a Hydra head providing administrative digital asset and metadata gene
 ## Setting up local development and test environment
 We are using [lando](https://docs.lando.dev/basics/) to set up our local development and test environments. We have some custom rake tasks that wrap lando commands and run other necessary tasks.
 
-1. Install git-annex, ImageMagick and lando
-  a. Mac (installing via homebrew)
-    ```
-    brew install git-annex
-    brew install imagemagick
-    brew cask install lando
-    ```
-  b. Linux
-    ```
-    sudo apt-get install imagemagick 
-    sudo apt-get install git-annex
-    ```
-    See the [lando website](https://docs.lando.dev/basics/installation.html#linux) for installation options
-2. To start:
+### Installing system requirements
+
+#### Mac (installing via homebrew)  
+```
+brew install git-annex
+brew install imagemagick
+brew cask install lando
+```
+
+#### Linux  
+See the [lando website](https://docs.lando.dev/basics/installation.html#linux) for installation options
+```
+sudo apt-get install imagemagick git-annex
+```  
+
+### Running Services in Development
+
+#### Starting
   ```
   rake bulwark:start
   rails s
   ```
-3. To stop:
+
+#### Stopping
   ```
   rake bulwark:stop
   ```
-4. To clean out data and start over:
+
+#### Starting Fresh
   ```
   rake bulwark:clean
   rake bulwark:start
   ```
 
-### Configuration Files
+## Configuration Files
 
 #### filesystem.yml
 This configuration file specifies semantic information about the filesystem and filesystem behaviors that the application will use for asset lookup.
