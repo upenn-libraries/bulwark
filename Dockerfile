@@ -1,7 +1,5 @@
 FROM pennlib/passenger-ruby23:0.9.23-ruby-build
 
-MAINTAINER Katherine Lynch <katherly@upenn.edu>
-
 # Expose Nginx HTTP service
 EXPOSE 80
 
