@@ -21,6 +21,11 @@ We are using [lando](https://docs.lando.dev/basics/) to set up our local develop
     brew cask install lando
     ```
   b. Linux
+    ```
+    sudo apt-get install imagemagick 
+    sudo apt-get install git-annex
+    ```
+    See the [lando website](https://docs.lando.dev/basics/installation.html#linux) for installation options
 2. To start:
   ```
   rake bulwark:start
