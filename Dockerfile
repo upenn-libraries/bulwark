@@ -60,11 +60,11 @@ RUN mkdir -p /home/app/webapp/log && \
     mkdir -p /home/app/webapp/rails_admin_colenda && \
     mkdir -p /etc/my_init.d
 
-ADD docker/gitannex.sh /etc/my_init.d/gitannex.sh
+COPY docker/gitannex.sh /etc/my_init.d/gitannex.sh
 
-ADD docker/imaging.sh /etc/my_init.d/imaging.sh
+COPY docker/imaging.sh /etc/my_init.d/imaging.sh
 
-ADD docker/ssh_service.sh /etc/my_init.d/ssh_service.sh
+COPY docker/ssh_service.sh /etc/my_init.d/ssh_service.sh
 
 RUN chmod 0700 \
     /etc/my_init.d/gitannex.sh \
@@ -77,9 +77,9 @@ WORKDIR /home/app/webapp
 
 COPY Gemfile Gemfile.lock /home/app/webapp/
 
-ADD rails_admin_colenda /home/app/webapp/rails_admin_colenda
+COPY rails_admin_colenda /home/app/webapp/rails_admin_colenda
 
-ADD string_exts /home/app/webapp/string_exts
+COPY string_exts /home/app/webapp/string_exts
 
 RUN bundle install
 
@@ -101,9 +101,9 @@ RUN git config --global user.name 'Docker User'
 
 USER root
 
-ADD webapp.conf /etc/nginx/sites-enabled/webapp.conf
+COPY webapp.conf /etc/nginx/sites-enabled/webapp.conf
 
-ADD rails-env.conf /etc/nginx/main.d/rails-env.conf
+COPY rails-env.conf /etc/nginx/main.d/rails-env.conf
 
 RUN wget https://www.incommon.org/custom/certificates/repository/sha384%20Intermediate%20cert.txt --output-document=/etc/ssl/certs/InCommon.pem --no-check-certificate
 
