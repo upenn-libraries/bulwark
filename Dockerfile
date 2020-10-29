@@ -12,18 +12,18 @@ EXPOSE 25
 RUN add-apt-repository ppa:jtgeibel/ppa
 
 RUN apt-get update && apt-get install -qq -y --no-install-recommends \
-      build-essential \
-      default-jdk \
-      git-annex \
-      git-core \
-      imagemagick \
-      libmysqlclient-dev \
-      netbase \
-      nodejs \
-      openssh-server \
-      sudo \
-      vim \
-      xsltproc
+        build-essential \
+        default-jdk \
+        git-annex \
+        git-core \
+        imagemagick \
+        libmysqlclient-dev \
+        netbase \
+        nodejs \
+        openssh-server \
+        sudo \
+        vim \
+        xsltproc
 
 # Remove default generated SSH keys to prevent use in production 
 # SSH login fix. Otherwise user is kicked off after login
@@ -45,37 +45,20 @@ RUN touch /etc/service/nginx-log-forwarder/down && \
 
 # Forward request and error logs to docker log collector
 RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
-	  ln -sf /dev/stderr /var/log/nginx/error.log
+    ln -sf /dev/stderr /var/log/nginx/error.log
 
 RUN echo "export VISIBLE=now" >> /etc/profile
 
-RUN mkdir -p /home/app/webapp
-
-RUN mkdir -p /home/app/webapp/log
-
-RUN mkdir -p /home/app/webapp/tmp
-
-RUN mkdir -p /fs
-
-RUN mkdir -p /fs/pub
-
-RUN mkdir -p /fs/pub/data
-
-RUN mkdir -p /fs/priv
-
-RUN mkdir -p /fs/priv/workspace
-
-RUN mkdir -p /fs/automate
-
-RUN mkdir -p /fs/automate_kaplan
-
-RUN mkdir -p /fs/automate_pap
-
-RUN mkdir -p /home/app/webapp/string_exts
-
-RUN mkdir -p /home/app/webapp/rails_admin_colenda
-
-RUN mkdir -p /etc/my_init.d
+RUN mkdir -p /home/app/webapp/log && \
+    mkdir -p /home/app/webapp/tmp && \
+    mkdir -p /fs/pub/data && \
+    mkdir -p /fs/priv/workspace && \
+    mkdir -p /fs/automate && \
+    mkdir -p /fs/automate_kaplan && \
+    mkdir -p /fs/automate_pap && \
+    mkdir -p /home/app/webapp/string_exts && \
+    mkdir -p /home/app/webapp/rails_admin_colenda && \
+    mkdir -p /etc/my_init.d
 
 ADD docker/gitannex.sh /etc/my_init.d/gitannex.sh
 
@@ -84,9 +67,9 @@ ADD docker/imaging.sh /etc/my_init.d/imaging.sh
 ADD docker/ssh_service.sh /etc/my_init.d/ssh_service.sh
 
 RUN chmod 0700 \
-  /etc/my_init.d/gitannex.sh \
-  /etc/my_init.d/imaging.sh \
-  /etc/my_init.d/ssh_service.sh
+    /etc/my_init.d/gitannex.sh \
+    /etc/my_init.d/imaging.sh \
+    /etc/my_init.d/ssh_service.sh
 
 RUN chown -R app:app /fs
 
