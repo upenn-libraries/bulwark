@@ -12,18 +12,18 @@ EXPOSE 25
 RUN add-apt-repository ppa:jtgeibel/ppa
 
 RUN apt-get update && apt-get install -qq -y --no-install-recommends \
-        build-essential \
-        default-jdk \
-        git-annex \
-        git-core \
-        imagemagick \
-        libmysqlclient-dev \
-        netbase \
-        nodejs \
-        openssh-server \
-        sudo \
-        vim \
-        xsltproc
+      build-essential \
+      default-jdk \
+      git-annex \
+      git-core \
+      imagemagick \
+      libmysqlclient-dev \
+      netbase \
+      nodejs \
+      openssh-server \
+      sudo \
+      vim \
+      xsltproc
 
 # Remove default generated SSH keys to prevent use in production
 RUN rm /etc/ssh/ssh_host_*
@@ -46,8 +46,8 @@ RUN touch /etc/service/nginx-log-forwarder/down && \
     sed -i '/nginx-log-forwarder/d' /etc/service/nginx/run
 
 # Forward request and error logs to docker log collector
-RUN ln -sf /dev/stdout /var/log/nginx/access.log \
-	&& ln -sf /dev/stderr /var/log/nginx/error.log
+RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
+	  ln -sf /dev/stderr /var/log/nginx/error.log
 
 RUN echo "export VISIBLE=now" >> /etc/profile
 
