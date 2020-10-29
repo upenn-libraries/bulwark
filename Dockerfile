@@ -73,6 +73,15 @@ RUN chmod 0700 \
 
 RUN chown -R app:app /fs
 
+# Install newer version of rsync
+WORKDIR /tmp
+
+RUN wget http://rsync.samba.org/ftp/rsync/src/rsync-3.2.3.tar.gz -O - | tar xz && \
+    cd rsync-3.2.3 && \
+    ./configure --disable-xxhash --disable-zstd --disable-lz4 --disable-md2man && \
+    make && make install && make clean && \
+    rsync --version
+
 WORKDIR /home/app/webapp
 
 COPY Gemfile Gemfile.lock /home/app/webapp/
