@@ -38,3 +38,6 @@
 *.rdb
 /.idea
 *.csv
+
+# Ignore .ruby-version, for now
+.ruby-version
