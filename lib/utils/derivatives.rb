@@ -20,7 +20,7 @@ module Utils
         image.write(write_path)
         File.chmod(0644, write_path)
         return "#{derivative_path}/#{copy_type}#{image.signature}.#{extension}".gsub("#{directory}/",'')
-      rescue => exception
+      rescue => e
         # Raise new error with new message and original backtrace
         raise Bulwark::DerivativeGenerationError, "Error generating derivative for #{file}: ${e.class} ${e.message}", e.backtrace
       end
