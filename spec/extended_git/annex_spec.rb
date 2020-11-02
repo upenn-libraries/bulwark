@@ -75,11 +75,11 @@ RSpec.describe ExtendedGit::Annex, type: :model do
 
   describe '#version' do
     it 'returns full version output' do
-      expect(git.annex.version).to match(/^git-annex version: \d+\.\d+$/)
+      expect(git.annex.version).to match(/^git-annex version: \d+\.\d+/)
     end
 
     it 'returns raw version output' do
-      expect(git.annex.version(raw: true)).to match(/^\d+\.\d+$/)
+      expect(git.annex.version(raw: true)).to match(/^\d+\.\d+/)
     end
   end
 
