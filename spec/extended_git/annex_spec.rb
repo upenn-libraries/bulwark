@@ -7,6 +7,11 @@ RSpec.describe ExtendedGit::Annex, type: :model do
 
   let(:git) { ExtendedGit.clone(remote_origin, repo_name, path: Rails.root.join('tmp')) }
 
+  before do
+    remote_git = ExtendedGit.init(nil, bare: true, repository: remote_origin)
+    remote_git.annex.init
+  end
+
   shared_context 'add readme to repository' do
     let(:readme) { 'README.txt' }
 
@@ -46,10 +51,6 @@ RSpec.describe ExtendedGit::Annex, type: :model do
     end
   end
 
-  before do
-    ExtendedGit.init(nil, repository: remote_origin, bare: true)
-  end
-
   after do
     # Remove working directory
     git.annex.uninit if git.config('annex.uuid').present?
@@ -74,11 +75,11 @@ RSpec.describe ExtendedGit::Annex, type: :model do
 
   describe '#version' do
     it 'returns full version output' do
-      expect(git.annex.version).to match(/^git-annex version: \d+\.\d+\.\d+$/)
+      expect(git.annex.version).to match(/^git-annex version: \d+\.\d+$/)
     end
 
     it 'returns raw version output' do
-      expect(git.annex.version(raw: true)).to match(/^\d+\.\d+\.\d+$/)
+      expect(git.annex.version(raw: true)).to match(/^\d+\.\d+$/)
     end
   end
 

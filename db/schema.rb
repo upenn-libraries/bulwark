@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200410203426) do
+ActiveRecord::Schema.define(version: 20200515093216) do
 
   create_table "batches", force: :cascade do |t|
     t.text     "queue_list",      limit: 4294967295
@@ -86,7 +86,7 @@ ActiveRecord::Schema.define(version: 20200410203426) do
     t.integer  "y_start",               limit: 4,          default: 1
     t.integer  "x_stop",                limit: 4,          default: 1
     t.integer  "y_stop",                limit: 4,          default: 1
-    t.text     "original_mappings",     limit: 65535
+    t.text     "original_mappings",     limit: 4294967295
     t.string   "root_element",          limit: 255
     t.string   "parent_element",        limit: 255
     t.text     "user_defined_mappings", limit: 4294967295

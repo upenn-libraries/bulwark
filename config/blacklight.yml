@@ -1,9 +1,9 @@
 development:
   adapter: solr
-  url: http://localhost:8983/solr/development
+  url: http://bulwark.solr.lndo.site/solr/bulwark-development
 test: &test
   adapter: solr
-  url: http://127.0.0.1:8983/solr/test
+  url: http://bulwark.solr.lndo.site/solr/bulwark-test
 production:
   adapter: solr
   url: <%= ENV['PROD_SOLR_URL'] || "http://127.0.0.1:8983/solr/blacklight-core" %>

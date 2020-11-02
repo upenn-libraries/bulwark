@@ -642,7 +642,6 @@ DEPENDENCIES
   hydra-pcdm
   hydra-works
   jbuilder (~> 2.0)
-  jettywrapper
   jhove-service!
   jquery-rails
   launchy

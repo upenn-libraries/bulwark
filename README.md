@@ -2,14 +2,6 @@
 
 Bulwark is a Hydra head providing administrative digital asset and metadata generation, management, review, and ingest to a repository with a public facing capability.
 
-## Table of contents
-
-* [System dependencies](#system-dependencies)
-* [Installation](#installation)
-* [Contributing](#contributing)
-* [License](#license)
-* [Acknowledgments](#acknowledgments)
-
 ## System dependencies
 
 * [Git](https://git-scm.com/) - The application supports robust versioning of content and metadata through the use of git for version control.
@@ -18,9 +10,44 @@ Bulwark is a Hydra head providing administrative digital asset and metadata gene
 * [ImageMagick](http://www.imagemagick.org/script/index.php) - Software suite for creating and editing binary images, relied upon by the [minimagick](https://github.com/minimagick/minimagick) gem, used to create image derivatives.
 * [NPM](https://www.npmjs.com/)
 
-## Installation
+## Setting up local development and test environment
+We are using [lando](https://docs.lando.dev/basics/) to set up our local development and test environments. We have some custom rake tasks that wrap lando commands and run other necessary tasks.
 
-### Configuration Files
+### Installing system requirements
+
+#### Mac (installing via homebrew)  
+```
+brew install git-annex
+brew install imagemagick
+brew cask install lando
+```
+
+#### Linux  
+See the [lando website](https://docs.lando.dev/basics/installation.html#linux) for installation options
+```
+sudo apt-get install imagemagick git-annex
+```  
+
+### Running Services in Development
+
+#### Starting
+  ```
+  rake bulwark:start
+  rails s
+  ```
+
+#### Stopping
+  ```
+  rake bulwark:stop
+  ```
+
+#### Starting Fresh
+  ```
+  rake bulwark:clean
+  rake bulwark:start
+  ```
+
+## Configuration Files
 
 #### filesystem.yml
 This configuration file specifies semantic information about the filesystem and filesystem behaviors that the application will use for asset lookup.
@@ -87,19 +114,6 @@ email: name@organization.org
 
 * `assets_path` - This is the absolute path on the filesystem where the preservation-worthy git repositories are stored.  
 * `email` - An email address that can be used to communicate semantic errors, preservation concerns, dead ends, etc to a human.  This should be an email that the application developer/owner has access to.
-
-### Setup
-From within the repository's directory, run the following commands:
-```bash
-rake jetty:clean
-rake jetty:config
-rake jetty:start
-```
-Check that Solr and Fedora are running at the port number defined in your jetty configuration.  If this step was successful, run the migrations and start the server:
-```bash
-rake db:migrate
-rails s
-```
 
 ## Deployment workflow
 

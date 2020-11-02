@@ -1,0 +1,31 @@
+name: bulwark
+services:
+  solr:
+    type: solr:5
+    portforward: true
+    config:
+      dir: solr_conf/conf
+    run:
+      - mkdir -p /opt/solr/server/solr/lib/contrib/
+      - cp -r /opt/solr/contrib/analysis-extras/ /opt/solr/server/solr/lib/contrib/
+      - solr delete -c lando # Deleting lando created core because it raises errors.
+      - solr create_core -c bulwark-development -d /solrconf/conf
+      - solr create_core -c bulwark-test -d /solrconf/conf
+  mysql:
+    type: mysql:5.7.31
+    portforward: 3307
+  fcrepo:
+    type: compose
+    app_mount: false
+    services:
+      image: quay.io/upennlibraries/fcrepo_dev:latest
+      command:
+        - catalina.sh
+        - run
+      ports:
+        - '8080:8080'
+proxy:
+  solr:
+    - bulwark.solr.lndo.site:8983
+  fcrepo:
+    - bulwark.fcrepo.lndo.site:8080

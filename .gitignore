@@ -15,7 +15,6 @@
 /log/*
 !/log/.keep
 /tmp
-/jetty
 /imports
 .DS_Store
 
@@ -29,10 +28,6 @@
 # Ignore featured objects directory
 /public/featured
 
-# Ignore bash script
-repo.sh
-just_jetty.sh
-
 # Ignore rdf
 *.rdf
 
@@ -43,3 +38,6 @@ just_jetty.sh
 *.rdb
 /.idea
 *.csv
+
+# Ignore .ruby-version, for now
+.ruby-version
