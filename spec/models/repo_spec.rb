@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Repo, type: :model do
+  include_context 'stub successful EZID requests'
+
   it 'has a valid factory' do
     expect(FactoryBot.create(:repo)).to be_valid
   end
