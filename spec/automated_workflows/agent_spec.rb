@@ -131,6 +131,8 @@ RSpec.describe AutomatedWorkflows::Agent do
       end
 
       context 'when ingesting content' do
+        include_context 'stub successful EZID requests'
+
         before do
           AutomatedWorkflows::Agent.new(
             AutomatedWorkflows::IngestOnly,
