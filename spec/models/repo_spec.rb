@@ -157,4 +157,30 @@ RSpec.describe Repo, type: :model do
       expect(File.exist?(File.join(directory, '.derivs', '.keep'))).to be true
     end
   end
+
+  describe '#structural_metadata' do
+    let(:repo) { FactoryBot.create(:repo) }
+    before do
+      MetadataSource.create(source_type: 'kaplan_structural', metadata_builder: repo.metadata_builder)
+      repo.reload
+    end
+
+    it 'return expected metadata_source' do
+      expect(repo.structural_metadata).to be_a MetadataSource
+      expect(repo.structural_metadata.source_type).to eql 'kaplan_structural'
+    end
+  end
+
+  describe '#descriptive_metadata' do
+    let(:repo) { FactoryBot.create(:repo) }
+    before do
+      MetadataSource.create(source_type: 'pqc', metadata_builder: repo.metadata_builder)
+      repo.reload
+    end
+
+    it 'return expected metadata_source' do
+      expect(repo.descriptive_metadata).to be_a MetadataSource
+      expect(repo.descriptive_metadata.source_type).to eql 'pqc'
+    end
+  end
 end

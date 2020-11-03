@@ -2,8 +2,10 @@ require 'open-uri'
 require 'csv_xlsx_converter'
 
 class MetadataSource < ActiveRecord::Base
-
   include Utils::Artifacts::InputFormats
+
+  STRUCTURAL_TYPES = %w[custom structural_bibid pap_structural kaplan_structural pqc_ark pqc_combined_struct pqc_structural]
+  DESCRIPTIVE_TYPES = %w[kaplan pap pqc_combined_desc pqc_desc voyager pqc]
 
   attr_accessor :xml_header, :xml_footer
   attr_accessor :user_defined_mappings
