@@ -20,8 +20,8 @@ module CatalogHelper
   # end
 
   def thumbnail(document, options)
-    repo = Repo.find_by(unique_identifier: document[:unique_identifier_ssim])
-    repo.nil? ? '' : image_tag(repo.thumbnail_link)    
+    repo = Repo.find_by(unique_identifier: document['unique_identifier_tesim'].first)
+    repo.nil? ? '' : image_tag(repo.thumbnail_link)
   end
 
   def current_user?
