@@ -389,6 +389,16 @@ class Repo < ActiveRecord::Base
     self.save!
   end
 
+  # Returning MetadataSource that contains structural metadata.
+  def structural_metadata
+    metadata_builder.metadata_source.find_by(source_type: MetadataSource::STRUCTURAL_TYPES)
+  end
+
+  # Returning MetadataSource that contains descriptive metadata.
+  def descriptive_metadata
+    metadata_builder.metadata_source.find_by(source_type: MetadataSource::DESCRIPTIVE_TYPES)
+  end
+
   private
 
   def _build_and_populate_directories(working_path)
