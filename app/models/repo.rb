@@ -399,6 +399,15 @@ class Repo < ActiveRecord::Base
     metadata_builder.metadata_source.find_by(source_type: MetadataSource::DESCRIPTIVE_TYPES)
   end
 
+  def thumbnail_link
+    return '' unless thumbnail
+    git_annex_key = file_display_attributes
+                      .find { |k, v| v['file_name'].end_with?("#{thumbnail}.thumb.jpeg") } # Returns array of [key, value]
+                      .first
+    # Need to devise a way for this to work in our local environments
+    "#{Utils::Storage::Ceph.config.read_protocol}#{Utils::Storage::Ceph.config.read_host}/#{names.bucket}/#{git_annex_key}"
+  end
+
   private
 
   def _build_and_populate_directories(working_path)
