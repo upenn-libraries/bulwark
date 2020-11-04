@@ -12,13 +12,6 @@ module CatalogHelper
     BulwarkPresenter::DocumentPresenter
   end
 
-  # def thumbnail(document, options)
-  #   default = '' # TODO: better non-image alternative thumbnail
-  #   return default unless ActiveFedora::Base.where(:id => document.id).first.present?
-  #   thumbnail_url = public_fedora_path("#{ActiveFedora::Base.where(:id => document.id).first.thumbnail_link}")
-  #   Repo.where(:unique_identifier => document.id.reverse_fedorafy).pluck(:thumbnail).first ? image_tag(thumbnail_url) : default
-  # end
-
   def thumbnail(document, options)
     repo = Repo.find_by(unique_identifier: document['unique_identifier_tesim'].first)
     repo.nil? ? '' : image_tag(repo.thumbnail_link)

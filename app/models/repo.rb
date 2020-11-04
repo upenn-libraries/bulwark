@@ -397,13 +397,15 @@ class Repo < ActiveRecord::Base
   # Returning MetadataSource that contains descriptive metadata.
   def descriptive_metadata
     metadata_builder.metadata_source.find_by(source_type: MetadataSource::DESCRIPTIVE_TYPES)
+    Repo.select { |repo| thumbnail_sha = repo.file_display_attributes.find { |k, v| v[:file_name]&.end_with?("#{repo.thumbnail}.thumb.jpeg") }&.first; thumbnail_sha.nil? } }.count
   end
 
   def thumbnail_link
     return '' unless thumbnail
-    git_annex_key = file_display_attributes
-                      .find { |k, v| v['file_name'].end_with?("#{thumbnail}.thumb.jpeg") } # Returns array of [key, value]
-                      .first
+    git_annex_key = file_display_attributes.find { |k, v| v[:file_name]&.end_with?("#{thumbnail}.thumb.jpeg") }&.first
+
+    return '' unless git_annex_key
+
     # Need to devise a way for this to work in our local environments
     "#{Utils::Storage::Ceph.config.read_protocol}#{Utils::Storage::Ceph.config.read_host}/#{names.bucket}/#{git_annex_key}"
   end

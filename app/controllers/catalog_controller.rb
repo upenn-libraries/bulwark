@@ -247,7 +247,7 @@ class CatalogController < ApplicationController
 
   def docs_with_urls
     @document_list.each do |doc|
-      repo = Repo.find(unique_identifier: doc['unique_identifier_tesim'].first)
+      repo = Repo.find_by(unique_identifier: doc['unique_identifier_tesim'].first)
       doc._source['thumbnail_url'] = repo.thumbnail_link if repo
     end
   end
