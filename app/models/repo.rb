@@ -391,16 +391,12 @@ class Repo < ActiveRecord::Base
 
   # Returning MetadataSource that contains structural metadata.
   def structural_metadata
-    metadata_builder.metadata_source.find do |metadata|
-      MetadataSource::STRUCTURAL_TYPES.include?(metadata.source_type)
-    end
+    metadata_builder.metadata_source.find_by(source_type: MetadataSource::STRUCTURAL_TYPES)
   end
 
   # Returning MetadataSource that contains descriptive metadata.
   def descriptive_metadata
-    source = metadata_builder.metadata_source.find do |metadata|
-      MetadataSource::DESCRIPTIVE_TYPES.include?(metadata.source_type)
-    end
+    metadata_builder.metadata_source.find_by(source_type: MetadataSource::DESCRIPTIVE_TYPES)
   end
 
   private
