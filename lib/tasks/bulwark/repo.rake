@@ -1,4 +1,4 @@
-namespace :colenda do
+namespace :bulwark do
   namespace :repo do
     desc 'Purges Repo. Removes db object, git repository and special remotes.'
     task purge: :environment do
