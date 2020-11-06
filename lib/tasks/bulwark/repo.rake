@@ -5,7 +5,15 @@ namespace :bulwark do
       abort(Rainbow('Incorrect arguments. Pass arklist=/path/to/file or arks=seperated,by,commas').red) if ENV['arklist'].blank? && ENV['arks'].blank?
 
       # Pass in ARK(s) for digital object(s) to be deleted.
-      arks = open(ENV['arklist']).map(&:strip!) if ENV['arklist'].present?
+      if ENV['arklist'].present?
+        begin
+          file = open(ENV['arklist'])
+        rescue => e
+          abort(Rainbow("Error loading arklist: #{e.message}").red)
+        end
+        arks = file.map(&:strip!)
+
+      end
       arks = ENV['arks'].split(',')             if ENV['arks'].present?
 
       puts Rainbow("Preparing to purge #{arks.size} repo(s)...\n").yellow
@@ -26,7 +34,7 @@ namespace :bulwark do
           FileUtils.remove_dir(remote_path)
           puts "  Git Repository: Removed"
         rescue StandardError => e
-          puts Rainbow("  Git Repository: Error removing git repository from #{remote_path}").red
+          puts Rainbow("  Git Repository: Error removing git repository from #{remote_path}. #{e.message}").red
         end
 
         # Remove Ceph (S3) bucket.
