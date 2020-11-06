@@ -49,6 +49,9 @@ namespace :bulwark do
           puts "  Ceph Bucket: Does not exist"
         end
 
+        # Purposefully not deleting fedora object and solr documents because they will
+        # most likely be recreated.
+
         # Checks for Fedora object
         begin
           ActiveFedora::Base.find(repo.names.fedora)
