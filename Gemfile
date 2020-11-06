@@ -75,6 +75,7 @@ gem 'rb-readline'
 gem 'pry-rails', '~> 0.3.4'
 gem 'honeybadger'
 gem 'nokogiri'
+gem 'bixby', '2.0.0'
 
 group :development, :test do
   gem 'letter_opener'
