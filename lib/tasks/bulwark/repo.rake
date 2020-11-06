@@ -34,7 +34,7 @@ namespace :bulwark do
           FileUtils.remove_dir(remote_path)
           puts "  Git Repository: Removed"
         rescue StandardError => e
-          puts Rainbow("  Git Repository: Error removing git repository from #{remote_path}. #{e.message}").red
+          puts Rainbow("  Git Repository: Error removing git repository from \"#{remote_path}\". #{e.message}").red
         end
 
         # Remove Ceph (S3) bucket.
