@@ -12,9 +12,9 @@ namespace :bulwark do
           abort(Rainbow("Error loading arklist: #{e.message}").red)
         end
         arks = file.map(&:strip!)
-
       end
-      arks = ENV['arks'].split(',')             if ENV['arks'].present?
+
+      arks = ENV['arks'].split(',') if ENV['arks'].present?
 
       puts Rainbow("Preparing to purge #{arks.size} repo(s)...\n").yellow
 
