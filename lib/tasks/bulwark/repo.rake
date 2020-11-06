@@ -57,7 +57,7 @@ namespace :bulwark do
           ActiveFedora::Base.find(repo.names.fedora)
           puts Rainbow("  Fedora Object: Found for id #{repo.names.fedora}").red
         rescue ActiveFedora::ObjectNotFoundError
-          puts Rainbow("  Fedora Object: Not found")
+          puts "  Fedora Object: Not found"
         end
 
         # Checks for Solr document,
