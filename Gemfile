@@ -23,7 +23,6 @@ gem 'hydra-works'
 gem 'hydra-pcdm'
 
 gem 'qa'
-gem 'blacklight_range_limit'
 gem 'ezid-client'
 # gem 'jhove-service', "1.1.5"
 gem 'jhove-service', git: 'https://github.com/lts-andrewnk/jhove-service', branch: 'mem_increase'
