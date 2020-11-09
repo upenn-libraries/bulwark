@@ -51,8 +51,8 @@ Rails.application.routes.draw do
 
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
 
-  root to: "catalog#index"
-  blacklight_for :catalog
+  root to: 'catalog#index'
+  blacklight_for :catalog, except: [:bookmarks, :saved_searches, :search_history]
 
   devise_for :users, skip: :registrations
   devise_scope :user do
