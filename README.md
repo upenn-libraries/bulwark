@@ -115,6 +115,10 @@ email: name@organization.org
 * `assets_path` - This is the absolute path on the filesystem where the preservation-worthy git repositories are stored.  
 * `email` - An email address that can be used to communicate semantic errors, preservation concerns, dead ends, etc to a human.  This should be an email that the application developer/owner has access to.
 
+## Rubocop
+To recreate .rubocop_todo.yml use the following command:
+`rake bulwark:rubocop:create_todo`
+
 ## Deployment workflow
 
 This illustration represents the current deployment workflow for Bulwark.

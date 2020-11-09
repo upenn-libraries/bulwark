@@ -127,6 +127,7 @@ GEM
       public_suffix (>= 2.0.2, < 4.0)
     amq-protocol (2.3.0)
     arel (6.0.4)
+    ast (2.4.1)
     autoprefixer-rails (9.4.2)
       execjs
     awesome_print (1.8.0)
@@ -149,6 +150,9 @@ GEM
     bcp47 (0.3.3)
       i18n
     bcrypt (3.1.12)
+    bixby (2.0.0)
+      rubocop (= 0.63.1)
+      rubocop-rspec (= 1.31.0)
     blacklight (5.13.1)
       bootstrap-sass (~> 3.2)
       deprecation
@@ -290,6 +294,7 @@ GEM
       hydra-pcdm (~> 0.4)
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
+    jaro_winkler (1.5.4)
     jbuilder (2.8.0)
       activesupport (>= 4.2.0)
       multi_json (>= 1.2)
@@ -387,6 +392,10 @@ GEM
     openseadragon (0.5.0)
       rails (> 3.2.0)
     orm_adapter (0.5.0)
+    parallel (1.19.2)
+    parser (2.7.2.0)
+      ast (~> 2.4.1)
+    powerpack (0.1.2)
     pry (0.12.2)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
@@ -543,6 +552,17 @@ GEM
       rspec-support (~> 3.8.0)
     rspec-support (3.8.0)
     rsync (1.0.9)
+    rubocop (0.63.1)
+      jaro_winkler (~> 1.5.1)
+      parallel (~> 1.10)
+      parser (>= 2.5, != 2.5.1.1)
+      powerpack (~> 0.1)
+      rainbow (>= 2.2.2, < 4.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (~> 1.4.0)
+    rubocop-rspec (1.31.0)
+      rubocop (>= 0.60.0)
+    ruby-progressbar (1.10.1)
     rubyXL (3.3.31)
       nokogiri (>= 1.4.4)
       rubyzip (>= 1.1.6)
@@ -621,6 +641,7 @@ GEM
       tzinfo (>= 1.0.0)
     uglifier (4.1.20)
       execjs (>= 0.3.0, < 3)
+    unicode-display_width (1.4.1)
     warden (1.2.7)
       rack (>= 1.0)
     webmock (3.9.3)
@@ -638,6 +659,7 @@ DEPENDENCIES
   active_job_status (= 1.1.0)
   awesome_print
   aws-sdk-s3
+  bixby (= 2.0.0)
   bootstrap-sass (= 3.3.4.1)
   bunny
   bxslider-rails
