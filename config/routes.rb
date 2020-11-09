@@ -49,10 +49,7 @@ Rails.application.routes.draw do
 
   resources :metadata_sources
 
-  mount Blacklight::Engine => '/'
-
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
-
 
   root to: "catalog#index"
   blacklight_for :catalog
