@@ -2,7 +2,6 @@ require 'sidekiq/web'
 require 'sidekiq/cron/web'
 
 Rails.application.routes.draw do
-
   resources :repos do
     member do
       post :repo_new
