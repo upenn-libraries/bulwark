@@ -18,6 +18,13 @@ class CatalogController < ApplicationController
   CatalogController.search_params_logic += [:exclude_unwanted_models]#, :exclude_unwanted_terms]
 
   configure_blacklight do |config|
+    # Delete document actions that we don't support
+    config.index.document_actions.delete(:bookmark)
+
+    config.show.document_actions.delete(:bookmark)
+    config.show.document_actions.delete(:email)
+    config.show.document_actions.delete(:sms)
+
     config.search_builder_class = Hydra::SearchBuilder
     config.default_solr_params = {
       :qt => 'search',
