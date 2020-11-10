@@ -1,4 +1,4 @@
-:concurrency: 5
+:concurrency: 1
 :logfile: ./log/sidekiq.log
 :queues:
   - [file_checks, 1]
@@ -8,4 +8,6 @@
   - [process_manifest, 1]
   - [process_batch, 1]
   - [maintenance, 1]
+  - [xml, 1]
+  - [metadata_extraction, 1]
 :max_retries: 0

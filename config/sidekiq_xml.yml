@@ -1,5 +1,0 @@
-:concurrency: 1
-:logfile: ./log/sidekiq_xml.log
-:queues:
-  - [xml, 1]
-:max_retries: 0
