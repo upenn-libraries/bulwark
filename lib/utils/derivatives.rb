@@ -22,7 +22,7 @@ module Utils
         return "#{derivative_path}/#{copy_type}#{image.signature}.#{extension}".gsub("#{directory}/",'')
       rescue => e
         # Raise new error with new message and original backtrace
-        raise Bulwark::DerivativeGenerationError, "Error generating derivative for #{file}: ${e.class} ${e.message}", e.backtrace
+        raise Bulwark::DerivativeGenerationError, "Error generating derivative for #{file}: #{e.class} #{e.message}", e.backtrace
       end
     end
 
