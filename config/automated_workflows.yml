@@ -69,6 +69,10 @@ development:
          endpoint: <%= ENV['SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE'] %>
          metadata_suffix: ''
          assets_suffix: ''
+       sceti-completed-4:
+         endpoint: <%= ENV['SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE'] %>
+         metadata_suffix: ''
+         assets_suffix: ''
        mastersrbm:
          endpoint: <%= ENV['MASTERSRBM_HARVESTING_ENDPOINT_REMOTE'] %>
          metadata_suffix: ''
@@ -171,6 +175,10 @@ production:
          assets_suffix: ''
        sceti-completed-3:
          endpoint: <%= ENV['SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE'] %>
+         metadata_suffix: ''
+         assets_suffix: ''
+       sceti-completed-4:
+         endpoint: <%= ENV['SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE'] %>
          metadata_suffix: ''
          assets_suffix: ''
        mastersrbm:
