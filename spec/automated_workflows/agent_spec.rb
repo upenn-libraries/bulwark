@@ -166,6 +166,12 @@ RSpec.describe AutomatedWorkflows::Agent do
           expect(document['title_ssim']).to match_array('Trade card; J. Rosenblatt &amp; Co.; Baltimore, Maryland, United States; undated;')
           expect(document['unique_identifier_tesim']).to match_array(ark)
         end
+
+        it 'adds thumbnail_location to Repo', focus: true do
+          binding.pry
+          url = ActiveFedora::Base.find(repo.names.fedora).thumbnail.ldp_source.head.headers['Content-Type'].match(/url="(?<url>[^"]*)"/)[:url]
+          expect(repo.thumbnail_location).to eql Addressable::URI.parse(url).path
+        end
       end
 
       context 'when updating a digital object' do
