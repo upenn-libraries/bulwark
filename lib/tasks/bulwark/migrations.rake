@@ -4,7 +4,7 @@ namespace :bulwark do
     task add_thumbnail_location: :environment do
       Repo.find_each do |repo|
         begin
-          fedora_object = ActiveFedora.find(repo.names.fedora)
+          fedora_object = ActiveFedora::Base.find(repo.names.fedora)
           if url = fedora_object.thumbnail.ldp_source.head.headers['Content-Type'].match(/url="(?<url>[^"]*)"/)[:url]
             repo.thumbnail_location = Addressable::URI.parse(url).path # Removing host and scheme
             repo.save!
