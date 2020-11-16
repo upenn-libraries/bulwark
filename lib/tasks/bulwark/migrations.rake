@@ -9,10 +9,10 @@ namespace :bulwark do
             repo.thumbnail_location = Addressable::URI.parse(url).path # Removing host and scheme
             repo.save!
           else
-            Rainbow("Was not able to update thumbnail location for #{repo.id}. URL not found in expected location.").red
+            puts Rainbow("Was not able to update thumbnail location for #{repo.id}. URL not found in expected location.").red
           end
         rescue => e
-          Rainbow("Was not able to update thumbnail_location for #{repo.id}. Error: #{e.message}").red
+          puts Rainbow("Was not able to update thumbnail_location for #{repo.id}. Error: #{e.message}").red
         end
       end
     end
