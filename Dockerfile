@@ -1,4 +1,4 @@
-FROM pennlib/passenger-ruby23:0.9.23-ruby-build
+FROM quay.io/upennlibraries/passenger-ruby23:0.9.23-ruby-build
 
 # Expose Nginx HTTP service
 EXPOSE 80
@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -qq -y --no-install-recommends \
         vim \
         xsltproc
 
-# Remove default generated SSH keys to prevent use in production 
+# Remove default generated SSH keys to prevent use in production
 # SSH login fix. Otherwise user is kicked off after login
 RUN rm /etc/ssh/ssh_host_* && \
     sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
