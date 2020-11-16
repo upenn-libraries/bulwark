@@ -167,8 +167,7 @@ RSpec.describe AutomatedWorkflows::Agent do
           expect(document['unique_identifier_tesim']).to match_array(ark)
         end
 
-        it 'adds thumbnail_location to Repo', focus: true do
-          binding.pry
+        it 'adds thumbnail_location to Repo' do
           url = ActiveFedora::Base.find(repo.names.fedora).thumbnail.ldp_source.head.headers['Content-Type'].match(/url="(?<url>[^"]*)"/)[:url]
           expect(repo.thumbnail_location).to eql Addressable::URI.parse(url).path
         end
