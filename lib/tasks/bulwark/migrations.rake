@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :bulwark do
   namespace :migrations do
     desc 'Retrieving thumbnail_location from Fedora and storing it in the database'
@@ -5,7 +7,7 @@ namespace :bulwark do
       Repo.find_each do |repo|
         begin
           fedora_object = ActiveFedora::Base.find(repo.names.fedora)
-          if url = fedora_object.thumbnail.ldp_source.head.headers['Content-Type'].match(/url="(?<url>[^"]*)"/)[:url]
+          if (url = fedora_object.thumbnail.ldp_source.head.headers['Content-Type'].match(/url="(?<url>[^"]*)"/)[:url])
             repo.thumbnail_location = Addressable::URI.parse(url).path # Removing host and scheme
             repo.save!
           else
