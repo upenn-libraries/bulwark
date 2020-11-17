@@ -123,7 +123,9 @@ module Utils
       derivatives_working_destination = "#{working_path}/#{repo.derivatives_subdirectory}"
       thumbnail_link = File.exist?(unencrypted_thumbnail_path) ? "#{working_path}/#{repo.derivatives_subdirectory}/#{Utils::Derivatives::Thumbnail.generate_copy(unencrypted_thumbnail_path, '', derivatives_working_destination)}" : ''
       repo.version_control_agent.add({ content: thumbnail_link, include_dotfiles: true }, working_path)
-      execute_curl(_build_command('file_attach', :file => attachable_url(repo, working_path, thumbnail_link), :fid => repo.names.fedora, :child_container => 'thumbnail'))
+      url = attachable_url(repo, working_path, thumbnail_link)
+      execute_curl(_build_command('file_attach', file: url, fid: repo.names.fedora, child_container: 'thumbnail'))
+      repo.update(thumbnail_location: Addressable::URI.parse(url).path)
       repo.version_control_agent.lock(thumbnail_link, working_path)
       refresh_assets(working_path, repo)
     end

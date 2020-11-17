@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200515093216) do
+ActiveRecord::Schema.define(version: 20201109210929) do
 
   create_table "batches", force: :cascade do |t|
     t.text     "queue_list",      limit: 4294967295
@@ -134,6 +134,7 @@ ActiveRecord::Schema.define(version: 20200515093216) do
     t.integer  "endpoint_id",                limit: 4
     t.string   "last_action_performed",      limit: 255
     t.string   "queued",                     limit: 255
+    t.text     "thumbnail_location",         limit: 65535
   end
 
   add_index "repos", ["endpoint_id"], name: "index_repos_on_endpoint_id", using: :btree

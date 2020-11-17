@@ -657,6 +657,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_job_status (= 1.1.0)
+  addressable
   awesome_print
   aws-sdk-s3
   bixby (= 2.0.0)
