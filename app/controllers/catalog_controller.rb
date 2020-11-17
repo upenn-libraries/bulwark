@@ -253,14 +253,14 @@ class CatalogController < ApplicationController
   end
 
   def docs_with_urls
+    # Retrieve all thumbnail_links at the same time.
+    arks = @document_list.map { |d| d['unique_identifier_tesim'].first }
+    arks_to_thumbnail_links = Repo.where(unique_identifier: arks).map { |r| [r.unique_identifier, r.thumbnail_link] }.to_h
+
     @document_list.each do |doc|
-      unless Repo.where(:unique_identifier => doc.id.reverse_fedorafy).pluck(:thumbnail).first.nil?
-        doc._source['thumbnail_url'] = if ENV['PUBLIC_FEDORA_URL']
-          ENV['PUBLIC_FEDORA_URL'] + "/#{doc.id}/thumbnail"
-        else
-          ActiveFedora::Base.where(:id => doc.id).first.thumbnail_link
-        end
-      end
+      ark = doc['unique_identifier_tesim'].first
+      thumbnail_link = arks_to_thumbnail_links[ark]
+      doc._source['thumbnail_url'] = thumbnail_link if thumbnail_link
     end
   end
 end
