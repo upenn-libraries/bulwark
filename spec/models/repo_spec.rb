@@ -185,4 +185,18 @@ RSpec.describe Repo, type: :model do
       expect(repo.descriptive_metadata.source_type).to eql 'pqc'
     end
   end
+
+  describe '#thumbnail_link' do
+    let(:repo) { FactoryBot.create(:repo) }
+
+    before do
+      repo.update!(thumbnail_location: "/#{repo.names.bucket}/file_one.jpeg")
+      ceph_config = double('ceph_config', read_protocol: 'https://', read_host: 'storage.library.upenn.edu')
+      allow(Utils::Storage::Ceph).to receive(:config).and_return(ceph_config)
+    end
+
+    it 'return expected thumbnail_link' do
+      expect(repo.thumbnail_link).to eql "https://storage.library.upenn.edu/#{repo.names.bucket}/file_one.jpeg"
+    end
+  end
 end

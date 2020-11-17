@@ -399,6 +399,16 @@ class Repo < ActiveRecord::Base
     metadata_builder.metadata_source.find_by(source_type: MetadataSource::DESCRIPTIVE_TYPES)
   end
 
+  def thumbnail_link
+    return '' unless thumbnail_location
+
+    Addressable::URI.new(
+      path: thumbnail_location,
+      host: Utils::Storage::Ceph.config.read_host,
+      scheme: Utils::Storage::Ceph.config.read_protocol.gsub('://', '')
+    ).to_s
+  end
+
   private
 
   def _build_and_populate_directories(working_path)
