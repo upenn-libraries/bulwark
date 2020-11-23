@@ -599,7 +599,6 @@ class MetadataSource < ActiveRecord::Base
     return sanitized
   end
 
-
   def generate_kaplan_struct_md(mappings)
     return {} unless mappings['filenames'].present?
     structural_mappings = {}
@@ -692,44 +691,6 @@ class MetadataSource < ActiveRecord::Base
     return xlsx
   end
 
-  def _set_voyager_data(working_path)
-    _refresh_bibid(working_path)
-    mapped_values = {}
-    voyager_source = reconcile_metadata_lookup_source(self.source_type, validate_bib_id(self.original_mappings['bibid']))
-    data = Nokogiri::XML(open(voyager_source))
-    nodeset = data.xpath('//page/response/result/doc/xml[@name="marcrecord"]').children.first
-    nodeset.children.each do |child|
-      if child.name == 'datafield' && CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value].present?
-        if CustomEncodings::Marc21::Constants::TAGS[child.attributes['tag'].value]['*'].present?
-          header = _fetch_header_from_marc21(child)
-          mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
-          child.children.each do |c|
-            mapped_values["#{header}"] << c.text
-          end
-        else
-          child.children.each do |c|
-            if c.name == 'subfield'
-              header = _fetch_header_from_subfield_catalog(child.attributes['tag'].value, c)
-              if header.present?
-                mapped_values["#{header}"] = [] unless mapped_values["#{header}"].present?
-                c.children.each do |s|
-                  mapped_values["#{header}"] << s.text
-                end
-              end
-            end
-          end
-        end
-      end
-    end
-    mapped_values['identifier'] = ["#{Utils.config[:repository_prefix]}_#{validate_bib_id(self.original_mappings['bibid'])}"] unless mapped_values.keys.include?('identifier')
-    mapped_values['collection'] = [_get_catalog_collection(self.source_type, self.original_mappings['bibid'])]
-    mapped_values.each do |entry|
-      mapped_values[entry.first] = entry.last.join(' ') unless MetadataSchema.config[:voyager][:multivalue_fields].include?(entry.first)
-    end
-    mapped_values = _catalog_xml_cleanup(mapped_values)
-    mapped_values
-  end
-
   def _catalog_xml_cleanup(mappings)
     mappings.each do |key, value|
       value = [value] unless value.respond_to?(:each)
@@ -739,42 +700,10 @@ class MetadataSource < ActiveRecord::Base
     end
   end
 
-  def _get_catalog_collection(source_type, bib_id)
-    voyager_source = reconcile_metadata_lookup_source(source_type, bib_id)
-    data = Nokogiri::XML(open(voyager_source))
-    data.remove_namespaces!
-    collection_name = data.xpath('//page/collection/name').children.first.text
-    return collection_name
-  end
-
   def reconcile_metadata_lookup_source(source_type, bib_id)
     return nil unless source_type.present?
     return "#{MetadataSchema.config[:pap][:http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:http_lookup_suffix]}" if %w[voyager pap pqc_desc].include?(source_type)
     return "#{MetadataSchema.config[:pap][:structural_http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:structural_lookup_suffix]}" if %w[structural_bibid pap_structural].include?(source_type)
-  end
-
-  #TODO: Refactor to use config variables
-  # Never used.
-  def _set_voyager_structural_metadata(working_path)
-    mapped_values = {}
-    _refresh_bibid(working_path)
-    voyager_source = reconcile_metadata_lookup_source(self.source_type, validate_bib_id(self.original_mappings['bibid']))
-    data = Nokogiri::XML(open(voyager_source))
-    reading_direction = _get_catalog_reading_direction(voyager_source)
-    data.xpath('//xml/page').each_with_index do |page, index|
-      mapped_values[index+1] = {
-          'page_number' => page['number'],
-          'sequence' => page['seq'],
-          'reading_direction' => reading_direction,
-          'side' => page['side'],
-          'tocentry' => _get_tocentry(page),
-          'identifier' => page['id'],
-          'file_name' => "#{page['image']}.tif",
-          'description' => page['visiblepage']
-
-      }
-    end
-    mapped_values
   end
 
   def _set_marmite_data(working_path)
@@ -915,19 +844,6 @@ class MetadataSource < ActiveRecord::Base
     return tocentry
   end
 
-  def _get_catalog_reading_direction(xml_document)
-    reading_direction = 'left-to-right'
-    doc = Nokogiri::XML(open(xml_document))
-    doc.remove_namespaces!
-    doc_s = doc.xpath('//xml/record/datafield[@tag="996"]')
-    if doc_s.present? && doc_s.length == 1
-      d = doc_s.first
-      element = _sanitize_elements(d).first
-      reading_direction = 'right-to-left' if element.children.first.text == 'hinge-right'
-    end
-    return reading_direction
-  end
-
   def _get_marmite_reading_direction(xml_document)
     reading_direction = 'left-to-right'
     doc = Nokogiri::XML(open(xml_document))
@@ -963,10 +879,6 @@ class MetadataSource < ActiveRecord::Base
     end
     bib_id = validate_bib_id(worksheet[page][y][x].value)
     self.original_mappings = {'bibid' => bib_id}
-  end
-
-  def _legacy_bib_id_check(bib_to_check)
-    return bib_to_check.to_s.start_with?("99") && bib_to_check.to_s.end_with?("3681") ? bib_to_check : "99#{bib_to_check}3681"
   end
 
   def _fetch_header_from_marc21(marc_field)
@@ -1176,24 +1088,4 @@ class MetadataSource < ActiveRecord::Base
   def _reconcile_working_path_slashes(working_path, file_path)
     file_path.start_with?(working_path) ? file_path : "#{working_path}/#{file_path}".gsub("//","/")
   end
-
-
-  # def _build_spreadsheet_derivative(spreadsheet_values, options = {})
-  #   spreadsheet_derivative_path = "#{@working_path}/#{Utils.config[:object_derivatives_path]}/#{self.original_mappings["bibid"]}.xlsx"
-  #   self.metadata_builder.metadata_source << MetadataSource.create(path: spreadsheet_derivative_path, source_type: "voyager_derivative", view_type: options[:view_type], x_start: options[:x_start], y_start: options[:y_start], x_stop: options[:x_stop], y_stop: options[:y_stop]) unless self.metadata_builder.metadata_source.where(metadata_builder_id: self.metadata_builder.id).pluck(:path) == spreadsheet_derivative_path
-  #   self.metadata_builder.save!
-  #   workbook = RubyXL::Workbook.new
-  #   worksheet = workbook[0]
-  #   spreadsheet_values.keys.each_with_index do |key, k_index|
-  #     worksheet.add_cell(0, k_index, key)
-  #     spreadsheet_values[key].each_with_index do |val, v_index|
-  #       worksheet.add_cell(v_index+1,k_index,val)
-  #     end
-  #   end
-  #   workbook.write(spreadsheet_derivative_path)
-  #   self.metadata_builder.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.catalog_derivative_spreadsheet'))
-  #   self.metadata_builder.repo.version_control_agent.push
-  #   generate_and_build_individual_xml("#{@working_path}/#{Utils.config[:object_derivatives_path]}/#{self.original_mappings["bibid"]}.xlsx")
-  # end
-
 end
