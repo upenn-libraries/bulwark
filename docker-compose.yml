@@ -125,6 +125,7 @@ services:
       SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE:
+      OCEANUS_SCETI_HARVESTING_ENDPOINT_REMOTE:
       SMTP_ADDRESS:
       SMTP_DOMAIN:
       SMTP_PORT:
@@ -176,6 +177,7 @@ services:
       - 'sceti_completed_3:${SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_4:${SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE}'
       - 'scanstore_rescue:${SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
+      - 'oceanus_sceti:${OCEANUS_SCETI_HARVESTING_ENDPOINT_REMOTE}'
       - 'kaplan_rescue:${KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
       - 'colenda_workspace:${REMOTE_WORKSPACE}'
       - '${LOCAL_FEATURED}:/home/app/webapp/public/assets/featured'
@@ -231,6 +233,7 @@ services:
       SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE:
+      OCEANUS_SCETI_HARVESTING_ENDPOINT_REMOTE:
       SMTP_ADDRESS:
       SMTP_DOMAIN:
       SMTP_PORT:
@@ -258,6 +261,7 @@ services:
       - 'sceti_completed_2:${SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_3:${SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_4:${SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE}'
+      - 'oceanus_sceti:${OCEANUS_SCETI_HARVESTING_ENDPOINT_REMOTE}'
       - 'scanstore_rescue:${SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
       - 'kaplan_rescue:${KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
       - 'colenda_workspace:${REMOTE_WORKSPACE}'
@@ -277,6 +281,8 @@ volumes:
   sceti_completed_3:
     external: true
   sceti_completed_4:
+    external: true
+  oceanus_sceti:
     external: true
   scanstore_rescue:
     external: true
