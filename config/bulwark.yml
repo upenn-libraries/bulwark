@@ -1,0 +1,11 @@
+development:
+  marmite:
+    url: http://marmite.library.upenn.edu
+
+test:
+  marmite:
+    url: https://marmite.library.upenn.edu
+
+production:
+  marmite:
+    url: <%= ENV['MARMITE_BASE'] %>
