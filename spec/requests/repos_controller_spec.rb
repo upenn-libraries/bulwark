@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe ReposController, type: :request do
   describe '#fetch_image_ids' do
+    include_context 'stub successful EZID requests'
+    
     let(:repo) { FactoryBot.create(:repo) }
 
     before do
