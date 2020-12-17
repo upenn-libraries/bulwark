@@ -117,6 +117,7 @@ ActiveRecord::Schema.define(version: 20201222201318) do
     t.string   "input_source",          limit: 255
     t.string   "identifier",            limit: 255
     t.string   "file_field",            limit: 255
+    t.text     "remote_location",       limit: 65535
   end
 
   add_index "metadata_sources", ["metadata_builder_id"], name: "index_metadata_sources_on_metadata_builder_id", using: :btree
