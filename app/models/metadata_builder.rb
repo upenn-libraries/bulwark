@@ -74,6 +74,134 @@ class MetadataBuilder < ActiveRecord::Base
     self.save!
   end
 
+  # Creates preservation xml. This xml file represents both the descriptive and
+  # structural metadata.
+  def preservation_xml
+    descriptive_metadata = metadata_source.find_by(source_type: 'descriptive').user_defined_mappings
+    structural_metadata = metadata_source.find_by(source_type: 'structural').user_defined_mappings
+
+    xml_content = Nokogiri::XML::Builder.new(encoding: 'UTF-8') { |xml|
+      xml.root {
+        xml.record {
+          xml.uuid { xml.text repo.unique_identifier }
+
+          descriptive_metadata.each do |field, values|
+            values.each { |value| xml.send(field + '_', value) }
+          end
+
+          xml.pages {
+            structural_metadata['sequence'].map do |asset|
+              xml.page {
+                asset.map { |field, value| xml.send(field, value) }
+              }
+            end
+          }
+        }
+      }
+    }.to_xml
+  end
+
+  def mets_xml
+    descriptive_metadata = metadata_source.find_by(source_type: 'descriptive').user_defined_mappings
+    xml_content = Nokogiri::XML::Builder.new { |xml|
+      xml['METS'].mets(
+        'xmlns:METS' => 'http://www.loc.gov/METS/',
+        'xmlns:mods' => 'http://www.loc.gov/mods/v3',
+        'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
+        'xsi:schemaLocation' => 'http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-0.xsd',
+        'OBJID' => repo.unique_identifier
+      ) {
+        xml['METS'].metsHdr('CREATEDATE' => '2004-10-28T00:00:00.001', 'LASTMODDATE' => '2004-10-28T00:00:00.001') {
+          xml['METS'].agent('ROLE' => 'CREATOR', 'TYPE' => 'ORGANIZATION') {
+            xml['METS'].name {
+              xml.text 'University of Pennsylvania Libraries'
+            }
+          }
+        }
+        xml['METS'].dmdSec('ID' => 'DM1') {
+          xml['METS'].mdWrap('MDTYPE' => 'MODS') {
+            xml['METS'].xmlData {
+              xml['mods'].mods {
+                xml['mods'].titleInfo {
+                  descriptive_metadata['title']&.each { |title|
+                    xml['mods'].title { xml.text title }
+                  }
+                }
+                xml['mods'].originInfo {
+                  xml['mods'].issuance { xml.text 'monographic' }
+                }
+                xml['mods'].language {
+                  descriptive_metadata['language']&.each { |language|
+                    xml['mods'].languageTerm(
+                      'type' => 'text',
+                      'authority' => 'iso639-2b',
+                      'authorityURI' => 'http://id.loc.gov/vocabulary/iso639-2.html',
+                      'valueURI' => 'http://id.loc.gov/vocabulary/iso639-2/ita'
+                     ) { xml.text language }
+                  }
+
+                }
+                xml['mods'].name(type: 'personal') {
+                  descriptive_metadata['personal_name']&.each { |name|
+                    xml['mods'].namePart { xml.text name }
+                  }
+                }
+                xml['mods'].name(type: 'corporate') {
+                  descriptive_metadata['corporate_name']&.each { |name|
+                    xml['mods'].namePart { xml.text name }
+                  }
+                }
+                xml['mods'].subject {
+                  descriptive_metadata['subject']&.each { |subject|
+                    xml['mods'].topic { xml.text subject }
+                  }
+                }
+                xml['mods'].subject {
+                  descriptive_metadata['geographic_subject']&.each { |subject|
+                    xml['mods'].geographic { xml.text subject }
+                  }
+                }
+                xml['mods'].physicalDescription {
+                  xml['mods'].extent {
+                    xml.text descriptive_metadata['description']&.join
+                  }
+                  xml['mods'].digitalOrigin { xml.text 'reformatted digital' }
+                  xml['mods'].reformattingQuality { xml.text 'preservation' }
+                  xml['mods'].form('authority' => 'marcform', 'authorityURI' => 'http://www.loc.gov/standards/valuelist/marcform.html') {
+                    xml.text 'print'
+                  }
+                }
+                xml['mods'].abstract(displayLabel: 'Summary') {
+                  xml.text descriptive_metadata['abstract']&.join
+                }
+                xml['mods'].note(type: 'bibliography') {
+                  descriptive_metadata['bibliography_note']&.join
+                }
+                xml['mods'].note(type: 'citation/reference') {
+                  descriptive_metadata['citation_note']&.join
+                }
+                xml['mods'].note(type: 'ownership') {
+                  descriptive_metadata['ownership_note']&.join
+                }
+                xml['mods'].note(type: 'preferred citation') {
+                  descriptive_metadata['preferred_citation_note']&.join
+                }
+                xml['mods'].note(type: 'additional physical form') {
+                  descriptive_metadata['additional_physical_form_note']&.join
+                }
+                xml['mods'].note(type: 'publications') {
+                  descriptive_metadata['publications_note']&.join
+                }
+                xml['mods'].identifier(type: 'uuid') { xml.text repo.unique_identifier }
+              }
+            }
+          }
+        }
+      }
+    }.to_xml
+  end
+
+  # Doesn't seem to be called anywhere.
   def save_input_sources(working_path)
     self.metadata_source.each do |source|
       save_input_source(working_path) if source.input_source.present? && source.input_source.downcase.start_with?('http')
@@ -133,13 +261,9 @@ class MetadataBuilder < ActiveRecord::Base
   end
 
   def get_structural_filenames
-    filenames = []
-    ms = self.metadata_source.where(:source_type => MetadataSource.structural_types).first
+    ms = self.metadata_source.where(source_type: MetadataSource.structural_types).first
     return nil if ms.nil?
-    ms.user_defined_mappings.each do |key,value|
-      filenames << value[ms.file_field]
-    end
-    return filenames
+    ms.filenames
   end
 
   def transform_and_ingest(array)
@@ -208,6 +332,9 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.delete_clone(working_path)
   end
 
+  # Going forward we are going to stop storing the xml_preview on this object.
+  # We can get the data from CEPH instead of storing it in the database and
+  # bloating the database.
   def read_and_store_xml(working_path)
     get_location = "#{working_path}/#{self.repo.metadata_subdirectory}"
     self.repo.version_control_agent.get({:location => get_location}, working_path)

@@ -3,9 +3,11 @@ require 'csv_xlsx_converter'
 
 class MetadataSource < ActiveRecord::Base
   include Utils::Artifacts::InputFormats
+  include DescriptiveMetadataSources
+  include StructuralMetadataSources
 
-  STRUCTURAL_TYPES = %w[custom structural_bibid pap_structural kaplan_structural pqc_ark pqc_combined_struct pqc_structural]
-  DESCRIPTIVE_TYPES = %w[kaplan pap pqc_combined_desc pqc_desc voyager pqc]
+  STRUCTURAL_TYPES = %w[custom structural_bibid pap_structural kaplan_structural pqc_ark pqc_combined_struct pqc_structural structural]
+  DESCRIPTIVE_TYPES = %w[kaplan pap pqc_combined_desc pqc_desc voyager pqc descriptive]
 
   attr_accessor :xml_header, :xml_footer
   attr_accessor :user_defined_mappings
@@ -138,6 +140,10 @@ class MetadataSource < ActiveRecord::Base
   def set_metadata_mappings(working_path = '')
     if self.source_type.present?
       case self.source_type
+        when 'descriptive'
+          descriptive_metadata(working_path)
+        when 'structural'
+          structural_metadata(working_path)
         when 'custom'
           unless self.root_element.present?
             self.root_element = 'pages'
@@ -203,6 +209,7 @@ class MetadataSource < ActiveRecord::Base
     self.metadata_builder.repo.version_control_agent.delete_clone(working_path)
   end
 
+  # Main method that generates xml?
   def generate_all_xml(working_path)
     self.generate_and_build_individual_xml(working_path)
     self.children.each do |child|
@@ -249,6 +256,7 @@ class MetadataSource < ActiveRecord::Base
     $jettison_files = Set.new
   end
 
+  # Generates preservation.xml file.
   def generate_and_build_individual_xml(working_path, fname = self.path)
     fname = self.source_type if %w[pqc_desc pqc_ark pqc_combined_desc pqc_combined_struct pqc_structural].include?(self.source_type)
     xml_fname = "#{fname}.xml"
@@ -536,6 +544,7 @@ class MetadataSource < ActiveRecord::Base
     self.user_defined_mappings = mappings
   end
 
+  # Not used.
   def determine_format_type(source_mapping)
     return nil unless source_mapping.present?
     source_mapping = [source_mapping] unless source_mapping.respond_to?(:each)
@@ -657,25 +666,27 @@ class MetadataSource < ActiveRecord::Base
 
   def filenames
     case self.source_type
-      when 'custom'
-        orig = ''
-        self.original_mappings.each do |key, value|
-          orig = value if key == self.file_field
-        end
-        return orig
-      when 'structural_bibid', 'pap_structural', 'kaplan_structural', 'pqc_ark', 'pqc_combined_struct', 'pqc_combined_desc', 'pqc_structural'
-        filenames = []
-        self.user_defined_mappings.each do |key, value|
-          filenames << value[self.file_field] if value[self.file_field].present?
-        end
-        return filenames
-      else
-        return nil
+    when 'custom'
+      orig = ''
+      self.original_mappings.each do |key, value|
+        orig = value if key == self.file_field
+      end
+      return orig
+    when 'structural_bibid', 'pap_structural', 'kaplan_structural', 'pqc_ark', 'pqc_combined_struct', 'pqc_combined_desc', 'pqc_structural'
+      filenames = []
+      self.user_defined_mappings.each do |key, value|
+        filenames << value[self.file_field] if value[self.file_field].present?
+      end
+      return filenames
+    when 'structural'
+      self.user_defined_mappings['sequence'].map { |row| row['filename'] }
+    else
+      return nil
     end
   end
 
   def self.structural_types
-    %w[custom structural_bibid pap_structural kaplan_structural pqc_ark pqc_combined_struct pqc_structural]
+    STRUCTURAL_TYPES
   end
 
   def validate_bib_id(bib_id)

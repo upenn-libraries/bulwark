@@ -1,11 +1,23 @@
 development:
+  mounted_drives:
+    test: <%= Rails.root.join('spec', 'fixtures', 'example_manifest_loads') %>
   marmite:
     url: http://marmite.library.upenn.edu
 
 test:
+  mounted_drives:
+    test: <%= Rails.root.join('spec', 'fixtures', 'example_manifest_loads') %>
   marmite:
     url: https://marmite.library.upenn.edu
 
 production:
+  mounted_drives:
+    kaplan-rescue: <%= ENV['KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
+    scanstore-rescue: <%= ENV['SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
+    sceti-completed-2: <%= ENV['SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE'] %>
+    sceti-completed-3: <%= ENV['SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE'] %>
+    sceti-completed-4: <%= ENV['SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE'] %>
+    oceanus-sceti: <%= ENV['OCEANUS_SCETI_HARVESTING_ENDPOINT_REMOTE'] %>
+    mastersrbm:  <%= ENV['MASTERSRBM_HARVESTING_ENDPOINT_REMOTE'] %>
   marmite:
     url: <%= ENV['MARMITE_BASE'] %>
