@@ -31,4 +31,10 @@ RSpec.describe Bulwark::PennQualifiedCore::TransformMarc do
       Bulwark::PennQualifiedCore::TransformMarc.from_marc_xml(xml)
     ).to eq expected_pqc
   end
+
+  it 'raises error when xml is invalid' do
+    expect {
+      Bulwark::PennQualifiedCore::TransformMarc.from_marc_xml('')
+    }.to raise_error StandardError, 'Error mapping MARC XML to PQC: NoMethodError undefined method `text\' for nil:NilClass'
+  end
 end

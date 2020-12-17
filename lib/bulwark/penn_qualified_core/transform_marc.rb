@@ -71,6 +71,8 @@ module Bulwark
         end
 
         mapped_values
+      rescue => e
+        raise StandardError, "Error mapping MARC XML to PQC: #{e.class} #{e.message}", e.backtrace
       end
 
       def self.pqc_field(marc_field, code = '*')
