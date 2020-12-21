@@ -1,7 +1,7 @@
 module StructuralMetadataSources
   extend ActiveSupport::Concern
 
-  VALID_STRUCTURAL_METADATA_FIELDS = ['sequence', 'filename', 'label'].freeze
+  VALID_STRUCTURAL_METADATA_FIELDS = ['sequence', 'filename', 'label', 'viewing_direction'].freeze
 
   def structural_metadata(working_path)
     self.metadata_builder.repo.version_control_agent.get({ location: path }, working_path)
@@ -22,5 +22,12 @@ module StructuralMetadataSources
     self.user_defined_mappings = {
       'sequence' => ordered_metadata.map { |row| row.keep_if { |k, v| VALID_STRUCTURAL_METADATA_FIELDS.include?(k) } }
     }
+  end
+
+  def viewing_direction
+    return nil unless source_type == 'structural'
+    direction = user_defined_mappings['sequence'].map { |asset| asset['viewing_direction'] }.uniq
+    raise 'Conflicting viewing_directions. Viewing direction must be the same for all assets' if direction.length > 1
+    direction.first || 'left-to-right'
   end
 end

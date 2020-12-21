@@ -23,7 +23,7 @@ module Bulwark
     # @options opts [Hash] :assets
     # @options opts [Hash] :descriptive_metadata
     # @options opts [Hash] :structural_metadata
-    def initialize(**args)#type:, created_by:, directive: nil, unique_identifier: nil, assets: {}, descriptive_metadata: {}, structural_metadata: {})
+    def initialize(**args)
       args = args.deep_symbolize_keys
 
       @type = args[:type]
@@ -47,7 +47,7 @@ module Bulwark
 
       if type == CREATE
         @errors << "\"directive\" must be provided to create an object" unless directive
-        @errors << "structural_metadata must be provided to create an object" unless structural_metadata[:filenames]
+        @errors << "structural_metadata must be provided to create an object" unless structural_metadata[:filenames] || (structural_metadata[:drive] && structural_metadata[:path])
         @errors << "\"assets.path\" and \"assets.drive\" must be provided to create an object" if !assets[:drive] || !assets[:path]
         @errors << "descriptive_metadata must be provided to create an object" if descriptive_metadata.empty?
         if unique_identifier
@@ -63,6 +63,11 @@ module Bulwark
 
       @errors << "asset drive invalid" if assets[:drive] && !MountedDrives.valid?(assets[:drive])
       @errors << "asset path invalid" if assets[:drive] && assets[:path] && !MountedDrives.valid_path?(assets[:drive], assets[:path])
+
+      @errors << "cannot provide structural metadata two different ways" if (structural_metadata[:drive] || structural_metadata[:path]) && structural_metadata[:filenames]
+      @errors << "structural drive invalid" if structural_metadata[:drive] && !MountedDrives.valid?(structural_metadata[:drive])
+      @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
+
       @errors << "created_by must always be provided" unless created_by
       errors.empty?
     end
@@ -71,19 +76,12 @@ module Bulwark
       # Validate before processing data
       return Result.new(status: Result::FAILED, errors: errors) unless validate
 
-      case type.downcase
-      when CREATE
-        if Repo.find_by(unique_identifier: unique_identifier)
-          raise Error, "Digital object with unique_identifier: #{unique_identifier} already present. Cannot create a new object with the unique_identifier given."
-        else
-          @repo = create_digital_object
-        end
-      when UPDATE
-        @repo = Repo.find_by(unique_identifier: unique_identifier)
-        raise Error, "Digital object with unique_identifier: #{unique_identifier} was not found. Cannot update object." unless repo
-      else
-        raise Error, "Invalid ingest type: #{import_type}"
-      end
+      @repo = case type.downcase
+              when CREATE
+                create_digital_object
+              when UPDATE
+                Repo.find_by(unique_identifier: unique_identifier)
+              end
 
       update_digital_object(repo)
 
@@ -96,7 +94,7 @@ module Bulwark
       unless descriptive_metadata.empty?
         # If metadata is already present merge metadata, otherwise create new
         # metadata file.
-        if metadata_source = repo.metadata_builder.metadata_source.find_by(source_type: 'descriptive')
+        if (metadata_source = repo.metadata_builder.metadata_source.find_by(source_type: 'descriptive'))
           desc_metadata_file = metadata_source.path
           repo.version_control_agent.get({ location: desc_metadata_file }, clone_location)
           repo.version_control_agent.unlock({ content: desc_metadata_file }, clone_location)
@@ -118,28 +116,34 @@ module Bulwark
         end
       end
 
-      # Create structural metadata
-      if ordered_filenames = structural_metadata[:filenames]
+      # Add structural metadata. Replace structural metadata if its already present.
+      # FIXME: This isn't a great solution because there is a potential for
+      # data loss if more detailed structural metadata is already available.
+      new_structural = nil
+      if (ordered_filenames = structural_metadata[:filenames])
         ordered_filenames.split('; ')
         # Generate structural metadata file based on contents in Bulk import csv given or path given.
-        csv_data = CSV.generate do |csv|
+        new_structural = CSV.generate do |csv|
           csv << ['filename', 'sequence']
           ordered_filenames.split('; ').each_with_index do |f, i|
-            csv << [f, i+1]
+            csv << [f, i + 1]
           end
         end
+      elsif structural_metadata[:drive] && structural_metadata[:path]
+        filepath = File.join(MountedDrives.path_to(structural_metadata[:drive]), structural_metadata[:path])
+        raise 'structural metadata path must lead to a file.' unless File.file?(filepath)
+        new_structural = File.read(filepath)
+      end
 
-        if metadata_source = repo.metadata_builder.metadata_source.find_by(source_type: 'structural')
+      if new_structural
+        if (metadata_source = repo.metadata_builder.metadata_source.find_by(source_type: 'structural'))
           struct_metadata_file = metadata_source.path
           repo.version_control_agent.get({ location: struct_metadata_file }, clone_location)
           repo.version_control_agent.unlock({ content: struct_metadata_file }, clone_location)
 
-          # Replace structural metadata if its already present.
-          # FIXME: This isn't a great solution because there is a potential for
-          # data loss if more detailed structural metadata is already available.
-          File.write(File.join(clone_location, struct_metadata_file), csv_data)
+          File.write(File.join(clone_location, struct_metadata_file), new_structural)
         else
-          File.write(File.join(clone_location, repo.metadata_subdirectory, STRUCTURAL_METADATA_FILENAME), csv_data)
+          File.write(File.join(clone_location, repo.metadata_subdirectory, STRUCTURAL_METADATA_FILENAME), new_structural)
         end
       end
 
@@ -150,12 +154,12 @@ module Bulwark
       repo.version_control_agent.push({}, clone_location)
 
       # Create or update metadata source for descriptive and structural metadata
-      repo.metadata_builder.metadata_source.find_or_create_by(source_type: 'descriptive') do |metadata_source|
-        metadata_source.path = File.join(repo.metadata_subdirectory, DESCRIPTIVE_METADATA_FILENAME)
+      repo.metadata_builder.metadata_source.find_or_create_by(source_type: 'descriptive') do |descriptive_source|
+        descriptive_source.path = File.join(repo.metadata_subdirectory, DESCRIPTIVE_METADATA_FILENAME)
       end
 
-      repo.metadata_builder.metadata_source.find_or_create_by(source_type: 'structural') do |metadata_source|
-        metadata_source.path = File.join(repo.metadata_subdirectory, STRUCTURAL_METADATA_FILENAME)
+      repo.metadata_builder.metadata_source.find_or_create_by(source_type: 'structural') do |structural_source|
+        structural_source.path = File.join(repo.metadata_subdirectory, STRUCTURAL_METADATA_FILENAME)
       end
 
       # "Extract" metadata
@@ -180,6 +184,7 @@ module Bulwark
     end
 
     private
+
       def add_preservation_and_mets_xml(clone_location)
         # Create and add preservation.xml to repository
         preservation_filepath = File.join(repo.metadata_subdirectory, repo.preservation_filename)
@@ -225,15 +230,15 @@ module Bulwark
         end
         repo.file_display_attributes = new_file_display_attributes
 
-        if structural = repo.structural_metadata
+        if (structural = repo.structural_metadata)
           display_array = structural.filenames.map do |filename|
-            entry = repo.file_display_attributes.select { |key, hash| File.basename(hash[:file_name]) == "#{filename}.jpeg" }
+            entry = repo.file_display_attributes.select { |_key, hash| File.basename(hash[:file_name]) == "#{filename}.jpeg" }
             raise I18n.t('colenda.utils.process.warnings.multiple_structural_files') if entry.length > 1
             entry.keys.first # Returns the sha264 git-annex filename
           end
 
           repo.images_to_render['iiif'] = {
-            'reading_direction' => 'left-to-right', # repo.metadata_builder.determine_reading_direction,
+            'reading_direction' => structural.viewing_direction,
             'images' => display_array.map { |s| "#{Display.config['iiif']['image_server']}/#{repo.names.bucket}%2F#{s}/info.json" }
           }
         end

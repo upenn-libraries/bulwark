@@ -95,7 +95,7 @@ RSpec.describe Bulwark::Import do
       end
     end
 
-    context 'when drive is invalid' do
+    context 'when asset drive is invalid' do
       subject { described_class.new(assets: { 'drive' => 'invalid' }) }
 
       it 'adds error' do
@@ -110,6 +110,33 @@ RSpec.describe Bulwark::Import do
       it 'adds error' do
         expect(subject.validate).to be false
         expect(subject.errors).to include 'asset path invalid'
+      end
+    end
+
+    context 'when structural filenames and file are provided' do
+      subject { described_class.new(structural_metadata: { filenames: 'something', asset: 'something', drive: 'test' }) }
+
+      it 'adds error' do
+        expect(subject.validate).to be false
+        expect(subject.errors).to include 'cannot provide structural metadata two different ways'
+      end
+    end
+
+    context 'when structural drive is invalid' do
+      subject { described_class.new(structural_metadata: { 'drive' => 'invalid' }) }
+
+      it 'adds error' do
+        expect(subject.validate).to be false
+        expect(subject.errors).to include 'structural drive invalid'
+      end
+    end
+
+    context 'when structural path is invalid' do
+      subject { described_class.new(structural_metadata: { drive: 'test', path: 'invalid/something' }) }
+
+      it 'adds error' do
+        expect(subject.validate).to be false
+        expect(subject.errors).to include 'structural path invalid'
       end
     end
   end
@@ -348,6 +375,63 @@ RSpec.describe Bulwark::Import do
         derivatives.each do |filepath|
           expect(whereis_result[filepath].locations.map(&:description)).to include '[local]'
         end
+      end
+    end
+
+    context 'when creating a new digital object with advanced structural metadata' do
+      let(:structural_metadata) do
+        {
+          'sequence' => [
+            { 'sequence' => '1', 'filename' => 'front.tif', 'label' => 'p. 1', 'viewing_direction' => 'top-to-bottom' },
+            { 'sequence' => '2', 'filename' => 'back.tif', 'label' => 'p. 2', 'viewing_direction' => 'top-to-bottom' }
+          ]
+        }
+      end
+      let(:expected_structural) { fixture_to_str('example_manifest_loads', 'object_one', 'structural_metadata.csv') }
+      let(:import) do
+        described_class.new(
+          type: Bulwark::Import::CREATE,
+          directive: 'object_one',
+          assets: { drive: 'test', path: 'object_one' },
+          descriptive_metadata: { title: ['Object One'] },
+          structural_metadata: { drive: 'test', path: 'object_one/structural_metadata.csv' },
+          created_by: created_by
+        )
+      end
+      let(:repo) { Repo.find_by(unique_identifier: result.unique_identifier) }
+      let(:working_dir) { repo.version_control_agent.clone }
+      let(:git) { ExtendedGit.open(working_dir) }
+      let(:whereis_result) { git.annex.whereis }
+
+      let(:result) { import.process }
+
+      it 'import was successful' do
+        expect(result.status).to be Bulwark::Import::Result::SUCCESS
+      end
+
+      it 'creates structural metadata source' do
+        metadata_source = repo.structural_metadata
+        expect(metadata_source.source_type).to eql 'structural'
+        expect(metadata_source.original_mappings).to eql structural_metadata
+        expect(metadata_source.user_defined_mappings).to eql structural_metadata
+        expect(metadata_source.remote_location).to eql "#{repo.names.bucket}/#{git.annex.lookupkey('data/metadata/structural_metadata.csv')}"
+      end
+
+      it 'given structural metadata files contain expected data' do
+        git.annex.get(repo.metadata_subdirectory)
+        expect(File.read(File.join(working_dir, repo.metadata_subdirectory, 'structural_metadata.csv'))).to eql expected_structural
+      end
+
+      it 'generates expected images_to_render hash' do
+        expect(repo.images_to_render).to match({
+          'iiif' => {
+            'images' => [
+              "/#{repo.names.bucket}%2F#{git.annex.lookupkey('.derivs/front.tif.jpeg')}/info.json",
+              "/#{repo.names.bucket}%2F#{git.annex.lookupkey('.derivs/back.tif.jpeg')}/info.json"
+            ],
+            'reading_direction' => 'top-to-bottom'
+          }
+        })
       end
     end
 
