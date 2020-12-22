@@ -23,7 +23,7 @@ module Bulwark
     # @options opts [Hash] :assets
     # @options opts [Hash] :descriptive_metadata
     # @options opts [Hash] :structural_metadata
-    def initialize(**args)
+    def initialize(args)
       args = args.deep_symbolize_keys
 
       @type = args[:type]
@@ -41,7 +41,8 @@ module Bulwark
     # before pulling down the entire repository. Returns false if there is
     # missing or incorrect information. Errors are stored in an instance variable.
     #
-    # @return [Array<String>]
+    # @return [True] if no errors were generated
+    # @ return [False] if errors were generated
     def validate
       @errors << "\"#{type}\" is not a valid import type" unless IMPORT_TYPES.include?(type)
 
@@ -169,10 +170,35 @@ module Bulwark
       repo.metadata_builder.file_checks_previews(clone_location)
       update_derivatives_information(clone_location) # replaces Utils::Process.refresh_assets
 
+      # Create Thumbnail
+      repo.thumbnail = repo.structural_metadata.user_defined_mappings['sequence'].sort_by { |file| file['sequence'] }.first['filename']
+      repo.save!
+      thumbnails_directory = File.join(clone_location, repo.derivatives_subdirectory, 'thumbnails')
+      if File.exist?(thumbnails_directory)
+        repo.version_control_agent.get({ location: thumbnails_directory }, clone_location)
+        repo.version_control_agent.unlock({ content: thumbnails_directory }, clone_location)
+      else # create thumbnails directory
+        FileUtils.mkdir(thumbnails_directory)
+      end
+
+      # Generate derivative
+      original_file = File.join(clone_location, repo.assets_subdirectory, repo.thumbnail)
+      thumbnail_filepath = Bulwark::Derivatives::Image.thumbnail(original_file, thumbnails_directory)
+
+      # add, commit, push new derivative
+      repo.version_control_agent.add({ content: thumbnails_directory, include_dotfiles: true }, clone_location)
+      repo.version_control_agent.commit('Adding thumbnail', clone_location)
+      repo.version_control_agent.push({ content: thumbnails_directory }, clone_location)
+
+      # Add derivative location to repo.thumbnail_location
+      relative_thumbnail_filepath = Pathname.new(thumbnail_filepath).relative_path_from(Pathname.new(clone_location)).to_s
+      key = repo.version_control_agent.look_up_key(relative_thumbnail_filepath, clone_location)
+      repo.thumbnail_location = File.join(repo.names.bucket, key)
+      repo.save
+
       # Generate xml: generate mets.xml and preservation.xml (can be moved to earlier in the process)
       add_preservation_and_mets_xml(clone_location)
 
-      # TODO: Create Thumbnail
       # TODO: Create Marmite IIIF Document?
 
       # TODO: ingest: index straight into Solr, skip Fedora.

@@ -210,6 +210,13 @@ RSpec.describe Bulwark::Import do
         expect(metadata_source.remote_location).to eql "#{repo.names.bucket}/#{git.annex.lookupkey('data/metadata/structural_metadata.csv')}"
       end
 
+      it 'creates thumbnail' do
+        expect(whereis_result.map(&:filepath)).to include('.derivs/thumbnails/front.jpeg')
+        expect(whereis_result['.derivs/thumbnails/front.jpeg'].locations.map(&:description)).to include '[local]'
+        expect(repo.thumbnail).to eql 'front.tif'
+        expect(repo.thumbnail_location).to eql "#{repo.names.bucket}/#{git.annex.lookupkey('.derivs/thumbnails/front.jpeg')}"
+      end
+
       it 'contains assets files' do
         expect(whereis_result.map(&:filepath)).to include('data/assets/back.tif', 'data/assets/front.tif')
         expect(whereis_result['data/assets/back.tif'].locations.map(&:description)).to include '[local]'
@@ -276,9 +283,9 @@ RSpec.describe Bulwark::Import do
         let(:updated_structural_metadata) do
           {
             'sequence' => [
-              { 'sequence' => '1', 'filename' => 'front.tif' },
-              { 'sequence' => '2', 'filename' => 'back.tif' },
-              { 'sequence' => '3', 'filename' => 'new.tif' }
+              { 'sequence' => '1', 'filename' => 'new.tif' },
+              { 'sequence' => '2', 'filename' => 'front.tif' },
+              { 'sequence' => '3', 'filename' => 'back.tif' }
             ]
           }
         end
@@ -292,7 +299,7 @@ RSpec.describe Bulwark::Import do
             unique_identifier: result.unique_identifier,
             descriptive_metadata: updated_descriptive_metadata,
             assets: { drive: 'test', path: 'object_one_update/new.tif' },
-            structural_metadata: { filenames: 'front.tif; back.tif; new.tif' },
+            structural_metadata: { filenames: 'new.tif; front.tif; back.tif' },
             created_by: created_by
           ).process
         end
@@ -312,6 +319,13 @@ RSpec.describe Bulwark::Import do
           new_asset_and_derivatives.each do |filepath|
             expect(updated_whereis_result[filepath].locations.map(&:description)).to include '[local]'
           end
+        end
+
+        it 'updated thumbnail' do
+          expect(updated_whereis_result.map(&:filepath)).to include('.derivs/thumbnails/new.jpeg')
+          expect(updated_whereis_result['.derivs/thumbnails/new.jpeg'].locations.map(&:description)).to include '[local]'
+          expect(updated_repo.thumbnail).to eql 'new.tif'
+          expect(updated_repo.thumbnail_location).to eql "#{updated_repo.names.bucket}/#{updated_git.annex.lookupkey('.derivs/thumbnails/new.jpeg')}"
         end
 
         it 'updated descriptive metadata source' do
