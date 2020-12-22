@@ -1,0 +1,20 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
+RSpec.describe BulkImport, type: :model do
+  let(:bulk_import) { FactoryBot.build :bulk_import }
+
+  it 'has many DigitalObjectImports' do
+    expect(bulk_import.digital_object_imports).to be_a ActiveRecord::Associations::CollectionProxy
+    expect(bulk_import.digital_object_imports.first).to be_a DigitalObjectImport
+  end
+
+  it 'has a User' do
+    expect(bulk_import.user).to be_a User
+  end
+
+  it 'has timestamps' do
+    expect(bulk_import).to respond_to :created_at, :updated_at
+  end
+end

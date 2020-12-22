@@ -2,6 +2,8 @@ class User < ActiveRecord::Base
   # Connects this user object to Hydra behaviors.
   include Hydra::User
 
+  has_many :bulk_imports
+
   if Blacklight::Utils.needs_attr_accessible?
     attr_accessible :email, :password, :password_confirmation
   end
