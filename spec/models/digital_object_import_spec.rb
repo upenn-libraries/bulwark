@@ -17,6 +17,13 @@ RSpec.describe DigitalObjectImport, type: :model do
     expect(digital_object_import.status).to be_a String
   end
 
+  it 'has status helpers' do
+    expect(digital_object_import.queued?).to be true
+    expect(digital_object_import.in_progress?).to be false
+    expect(digital_object_import.failed?).to be false
+    expect(digital_object_import.successful?).to be false
+  end
+
   it 'can have an Array of process_errors' do
     expect(digital_object_import.process_errors).to be_a Array
   end

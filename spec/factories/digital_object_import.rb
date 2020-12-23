@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'faker'
-
 FactoryBot.define do
   factory :digital_object_import do
     process_errors { [] }
