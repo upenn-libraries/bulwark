@@ -4,7 +4,6 @@ require 'faker'
 
 FactoryBot.define do
   factory :digital_object_import do
-    status { 'in_progress' }
     process_errors { [] }
     import_data do
       {

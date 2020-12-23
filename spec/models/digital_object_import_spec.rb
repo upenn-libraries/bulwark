@@ -31,8 +31,18 @@ RSpec.describe DigitalObjectImport, type: :model do
 
   context 'validations' do
     context 'status' do
-      xit 'allows nil' do; end
-      xit 'allows only acceptable values' do; end
+      it 'defaults to queued' do
+        expect(digital_object_import.status).to eq 'queued'
+      end
+      it 'is valid when given a valid status' do
+        digital_object_import.status = 'failed'
+        expect(digital_object_import.valid?).to be true
+      end
+      it 'is invalid with a value not in DigitalObjectImport::STATUSES' do
+        invalid_import = FactoryBot.build :digital_object_import,
+                                          status: 'ecstatic'
+        expect(invalid_import.valid?).to be false
+      end
     end
   end
 end
