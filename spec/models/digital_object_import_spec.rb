@@ -39,10 +39,10 @@ RSpec.describe DigitalObjectImport, type: :model do
   context 'validations' do
     context 'status' do
       it 'defaults to queued' do
-        expect(digital_object_import.status).to eq 'queued'
+        expect(digital_object_import.status).to eq DigitalObjectImport::QUEUED
       end
       it 'is valid when given a valid status' do
-        digital_object_import.status = 'failed'
+        digital_object_import.status = DigitalObjectImport::FAILED
         expect(digital_object_import.valid?).to be true
       end
       it 'is invalid with a value not in DigitalObjectImport::STATUSES' do
