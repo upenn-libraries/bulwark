@@ -13,8 +13,8 @@ RSpec.describe BulkImport, type: :model do
     expect(bulk_import.digital_object_imports.first).to be_a DigitalObjectImport
   end
 
-  it 'has a User' do
-    expect(bulk_import.user).to be_a User
+  it 'returns a User using created_by' do
+    expect(bulk_import.created_by).to be_a User
   end
 
   it 'has timestamps' do

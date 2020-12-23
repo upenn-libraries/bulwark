@@ -2,6 +2,6 @@
 
 FactoryBot.define do
   factory :bulk_import do
-    association :user, strategy: :build
+    association :created_by, strategy: :build, factory: :user
   end
 end
