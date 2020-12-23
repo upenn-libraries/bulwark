@@ -11,6 +11,8 @@ module Bulwark
       # @params format [String] format image should be in
       # @return [String] location of derivative
       def self.generate(original, write_to, width, height, format)
+        raise Bulwark::Derivatives::Error, "#{write_to} does not exist" unless File.exist?(write_to)
+
         image = MiniMagick::Image.open(original)
         image.quality(90)
         image.resize("#{width}x#{height}")
@@ -20,7 +22,6 @@ module Bulwark
           write_to = File.join(write_to, "#{File.basename(original, '.*')}.#{format}").to_s
         end
 
-        FileUtils.mkdir_p(File.dirname(write_to))
         image.write(write_to)
         File.chmod(0644, write_to)
         write_to
