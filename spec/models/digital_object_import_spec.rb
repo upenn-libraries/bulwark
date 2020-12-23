@@ -21,8 +21,12 @@ RSpec.describe DigitalObjectImport, type: :model do
     expect(digital_object_import.process_errors).to be_a Array
   end
 
-  it 'has an import_data hash' do
-    expect(digital_object_import.import_data).to be_a String # JSON string
+  it 'has timestamps' do
+    expect(digital_object_import).to respond_to :created_at, :updated_at
+  end
+
+  it 'has a import_data Hash' do
+    expect(digital_object_import.import_data).to be_a Hash
   end
 
   context 'validations' do

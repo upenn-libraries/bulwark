@@ -4,6 +4,6 @@ require 'faker'
 
 FactoryBot.define do
   factory :bulk_import do
-    user
+    association :user, strategy: :build
   end
 end

@@ -6,7 +6,7 @@ class DigitalObjectImport < ActiveRecord::Base
   belongs_to :bulk_import
 
   serialize :process_errors, Array
-  serialize :item_data, JSON
+  serialize :import_data, JSON
 
   validates :status, inclusion: { in: STATUSES }
 end
