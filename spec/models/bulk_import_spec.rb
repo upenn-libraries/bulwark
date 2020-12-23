@@ -3,7 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe BulkImport, type: :model do
-  let(:bulk_import) { FactoryBot.build :bulk_import }
+  let(:bulk_import) do
+    FactoryBot.build :bulk_import,
+                     digital_object_imports: FactoryBot.build_list(:digital_object_import, 1)
+  end
 
   it 'has many DigitalObjectImports' do
     expect(bulk_import.digital_object_imports).to be_a ActiveRecord::Associations::CollectionProxy

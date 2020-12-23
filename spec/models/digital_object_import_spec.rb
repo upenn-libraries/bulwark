@@ -3,10 +3,14 @@
 require 'rails_helper'
 
 RSpec.describe DigitalObjectImport, type: :model do
-  let(:digital_object_import) { FactoryBot.build :digital_object_import }
+  let(:bulk_import) { FactoryBot.create :bulk_import }
+  let(:digital_object_import) do
+    FactoryBot.build :digital_object_import,
+                     bulk_import: bulk_import
+  end
 
   it 'has one BulkImport' do
-    expect(digital_object_import.bulk_import).to be_a BulkImport
+    expect(digital_object_import.bulk_import).to be bulk_import
   end
 
   it 'has a status' do
