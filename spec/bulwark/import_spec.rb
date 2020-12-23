@@ -243,6 +243,13 @@ RSpec.describe Bulwark::Import do
         expect(Nokogiri::XML(File.read(File.join(working_dir, repo.metadata_subdirectory, 'mets.xml')))).to be_equivalent_to(expected_mets).ignoring_attr_values('OBJID').ignoring_content_of('mods|identifier')
       end
 
+      it 'links to generated metadata files are stored' do
+        expect(repo.metadata_builder.generated_metadata_files).to match(
+          'data/metadata/preservation.xml' => "#{repo.names.bucket}/#{git.annex.lookupkey('data/metadata/preservation.xml')}",
+          'data/metadata/mets.xml' => "#{repo.names.bucket}/#{git.annex.lookupkey('data/metadata/mets.xml')}"
+        )
+      end
+
       it 'contains derivatives' do
         derivatives = ['.derivs/back.tif.jpeg', '.derivs/back.tif.thumb.jpeg', '.derivs/front.tif.jpeg', '.derivs/front.tif.thumb.jpeg']
         expect(whereis_result.map(&:filepath)).to include(*derivatives)

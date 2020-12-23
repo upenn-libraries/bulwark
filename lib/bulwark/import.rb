@@ -234,6 +234,12 @@ module Bulwark
         repo.version_control_agent.push({ content: repo.metadata_subdirectory }, clone_location)
 
         # Save link to xml files in metadata_builder
+        repo.metadata_builder.update(
+          generated_metadata_files: {
+            "#{preservation_filepath}" => File.join(repo.names.bucket, repo.version_control_agent.look_up_key(preservation_filepath, clone_location)).to_s,
+            "#{mets_filepath}" => File.join(repo.names.bucket, repo.version_control_agent.look_up_key(mets_filepath, clone_location)).to_s
+          }
+        )
       end
 
       # Update file_display_attributes, which is used to display derivatives.

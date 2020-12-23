@@ -12,6 +12,7 @@ class MetadataBuilder < ActiveRecord::Base
   validates :parent_repo, presence: true
 
   serialize :preserve, Set
+  serialize :generated_metadata_files, JSON
 
   @@xml_tags = Array.new
   @@error_message = nil
