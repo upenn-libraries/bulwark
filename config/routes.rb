@@ -49,6 +49,13 @@ Rails.application.routes.draw do
 
   resources :metadata_sources
 
+  namespace :admin do
+    resources :digital_objects, only: [:index]
+  end
+
+  get '/admin', to: redirect('/admin/digital_objects')
+
+
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
 
   root to: 'catalog#index'
