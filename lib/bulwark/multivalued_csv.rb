@@ -40,7 +40,7 @@ module Bulwark
       end
     end
 
-    # Generates CSV string from am array of hash.
+    # Generates CSV string from an array of hash.
     #
     # @param csv_data [Array<Hash>]
     # @return [String] csv formatted string
