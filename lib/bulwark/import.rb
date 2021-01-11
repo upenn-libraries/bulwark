@@ -122,7 +122,6 @@ module Bulwark
       # data loss if more detailed structural metadata is already available.
       new_structural = nil
       if (ordered_filenames = structural_metadata[:filenames])
-        ordered_filenames.split('; ')
         # Generate structural metadata file based on contents in Bulk import csv given or path given.
         new_structural = CSV.generate do |csv|
           csv << ['filename', 'sequence']
