@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20201109210929) do
+ActiveRecord::Schema.define(version: 20201222201318) do
 
   create_table "batches", force: :cascade do |t|
     t.text     "queue_list",      limit: 4294967295
@@ -35,6 +35,21 @@ ActiveRecord::Schema.define(version: 20201109210929) do
   end
 
   add_index "bookmarks", ["user_id"], name: "index_bookmarks_on_user_id", using: :btree
+
+  create_table "bulk_imports", force: :cascade do |t|
+    t.integer  "created_by_id", limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  create_table "digital_object_imports", force: :cascade do |t|
+    t.integer  "bulk_import_id", limit: 4
+    t.string   "status",         limit: 255
+    t.text     "process_errors", limit: 65535
+    t.text     "import_data",    limit: 16777215
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
 
   create_table "endpoints", force: :cascade do |t|
     t.string   "source",       limit: 255
