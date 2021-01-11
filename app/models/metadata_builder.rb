@@ -249,6 +249,7 @@ class MetadataBuilder < ActiveRecord::Base
       end
     end
 
+
     self.repo.save!
     self.last_file_checks = DateTime.now
     self.save!
@@ -257,6 +258,7 @@ class MetadataBuilder < ActiveRecord::Base
     self.repo.version_control_agent.add({:content => "#{repo.metadata_subdirectory}/#{jhove.filename}"}, working_path)
     self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_preservation_metadata', :object_id => repo.names.fedora), working_path)
     self.repo.version_control_agent.add({ content: self.repo.derivatives_subdirectory, include_dotfiles: true }, working_path)
+    self.repo.version_control_agent.lock('.derivs', working_path)
     self.repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives', :object_id => repo.names.fedora), working_path)
     self.repo.version_control_agent.push(working_path)
   end
