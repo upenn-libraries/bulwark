@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Bulwark::Import do
-  include_context 'stub successful EZID requests'
 
   describe '.new'
 
@@ -43,6 +42,8 @@ RSpec.describe Bulwark::Import do
     end
 
     context 'when creating a new object with a unique_identifier already in use' do
+      include_context 'stub successful EZID requests' # Stubbing EZID request needed when creating a new repo.
+
       let(:ark) { FactoryBot.create(:repo).unique_identifier }
 
       subject { described_class.new(type: Bulwark::Import::CREATE, unique_identifier: ark) }
@@ -142,6 +143,8 @@ RSpec.describe Bulwark::Import do
   end
 
   describe '.process' do
+    include_context 'stub successful EZID requests'
+
     let(:created_by) { User.create(email: 'test@example.com') }
 
     context 'when creating a new digital object' do
