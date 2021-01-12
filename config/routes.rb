@@ -51,6 +51,11 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :digital_objects, only: [:index]
+    resources :bulk_imports, except: %w[edit update destroy] do
+      member do
+        get :validate
+      end
+    end
   end
 
   get '/admin', to: redirect('/admin/digital_objects')
