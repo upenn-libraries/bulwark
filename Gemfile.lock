@@ -663,7 +663,7 @@ DEPENDENCIES
   aws-sdk-s3
   bixby (= 2.0.0)
   bootstrap-sass (= 3.3.4.1)
-  bootstrap_form
+  bootstrap_form (~> 2.7)
   bunny
   bxslider-rails
   capybara
