@@ -1,0 +1,14 @@
+<h2>Bulk Import Details</h2>
+<dl>
+  <dt>ID</dt>
+  <dd><%= @bulk_import.id %></dd>
+  <dt>Created By</dt>
+  <dd><%= @bulk_import.created_by_email %></dd>
+  <dt>Created At</dt>
+  <dd><%= @bulk_import.created_at %></dd>
+  <dt>Updated At</dt>
+  <dd><%= @bulk_import.updated_at %></dd>
+  <dt>Digital Object Imports</dt>
+  <%# TODO: link to digital object import listing %>
+  <dd><%= @bulk_import.digital_object_imports.length %></dd>
+</dl>

@@ -22,16 +22,18 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/admin">Colenda Admin</a>
+          <%= link_to 'Colenda Admin', admin_path, class: 'navbar-brand' %>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
             <li class="<%= request.path.starts_with?('/admin/digital_objects') ? 'active' : nil %>">
-              <a href="/admin/digital_objects">Digital Objects</a>
+              <%= link_to 'Digital Objects', admin_digital_objects_path %>
             </li>
-            <li><a href="#">Bulk Import Jobs</a></li>
+            <li class="<%= request.path.starts_with?('/admin/bulk_imports') ? 'active' : nil %>">
+              <%= link_to 'Bulk Import Jobs', admin_bulk_imports_path %>
+            </li>
           </ul>
           <p class="navbar-text navbar-right"><%= current_user.email%></p>
         </div>

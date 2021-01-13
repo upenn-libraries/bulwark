@@ -1,0 +1,35 @@
+<h2>Bulk Imports</h2>
+<% if @bulk_imports.any? %>
+  <%= link_to 'New Bulk Import', new_admin_bulk_import_path, class: 'btn btn-primary' %>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Created At</th>
+          <th>Created By</th>
+          <th>Digital Object Imports</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% @bulk_imports.each do |bulk_import| %>
+      <tr>
+        <td><%= bulk_import.id %></td>
+        <td><%= bulk_import.created_at %></td>
+        <td><%= bulk_import.created_by.email %></td>
+        <td><%= bulk_import.digital_object_imports.length %></td>
+        <td>
+          <%= link_to 'Details', admin_bulk_import_path(bulk_import), class: 'btn btn-sm btn-default' %>
+        </td>
+      </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+  <%# TODO: match bootstrap styles, clean up %>
+  <%= page_entries_info @bulk_imports %>
+  <%= paginate @bulk_imports %>
+<% else %>
+  <p>No bulk imports yet!</p>
+<% end %>
