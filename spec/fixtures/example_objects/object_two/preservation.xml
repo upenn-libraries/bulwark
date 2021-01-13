@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<root>
+  <record>
+    <uuid>ark:/81431/p3df6k90j</uuid>
+    <identifier>sts- n.r* n.n. di12 (3) 1598 (A)</identifier>
+    <identifier>(OCoLC)ocm16660686</identifier>
+    <identifier>(OCoLC)16660686</identifier>
+    <identifier>2347850</identifier>
+    <identifier>(PU)2347850-penndb-Voyager</identifier>
+    <creator>Ercker, Lazarus,</creator>
+    <title>Beschreibung aller fürnemisten Mineralischen Ertzt vnnd Berckwercksarten :</title>
+    <title>wie dieselbigen vnd eine jede in Sonderheit jrer Natur vnd Eygenschafft nach, auff alle Metalla probirt, vnd im kleinen Fewr sollen versucht werden, mit Erklärung etlicher fürnemer nützlicher Schmeltzwerck im grossen Feuwer, auch Scheidung Goldts, Silbers, vnd anderer Metalln, sampt einem Bericht des Kupffer Saigerns, Messing brennens, vnd Salpeter Siedens, auch aller saltzigen Minerischen proben, vnd was denen allen anhengig : in fünff Bücher verfast, dessgleichen zuvorn niemals in Druck kommen ... : auffs newe an vielen Orten mit besserer Aussführung, vnd mehreren Figurn erklärt /</title>
+    <title>durch den weitberühmten Lazarum Erckern, der Röm. Kay. May. Obersten Bergkmeister vnd Buchhalter in Königreich Böhem  ...</title>
+    <publisher>Gedruckt zu Franckfurt am Mayn : Durch Johan Feyerabendt, 1598.</publisher>
+    <format>[4], 134, [4] leaves : ill. ; 31 cm. (fol.)</format>
+    <bibliographic_note>Leaves printed on both sides. Signatures: )(⁴ A-Z⁴ a-k⁴ l⁶. The last leaf is blank. Woodcut illustrations, initials and tail-pieces. Title page printed in black and red. Printed marginalia. "Erratum" on verso of last printed leaf. Online version available via Colenda https://colenda.library.upenn.edu/catalog/81431-p3df6k90j</bibliographic_note>
+    <provenance>Smith, Edgar Fahs, 1854-1928 (autograph, 1917)</provenance>
+    <provenance>Wright, H. (autograph, 1870)</provenance>
+    <description>Penn Libraries copy has Edgar Fahs Smith's autograph on front free endpaper; autograph of H. Wright on front free endpaper; effaced ms. inscription (autograph?) on title leaf.</description>
+    <subject>Metallurgy -- Early works to 1800.</subject>
+    <subject>Assaying -- Early works to 1800.</subject>
+    <subject>PU</subject>
+    <subject>PU</subject>
+    <subject>PU</subject>
+    <date>1598</date>
+    <personal_name>Feyerabend, Johann,</personal_name>
+    <geographic_subject>Germany -- Frankfurt am Main.</geographic_subject>
+    <collection>Edgar Fahs Smith Memorial Collection (University of Pennsylvania)</collection>
+    <relation>https://colenda.library.upenn.edu/catalog/81431-p3df6k90j</relation>
+    <display_call_number>Folio TN664 .E7 1598</display_call_number>
+    <bibnumber>9923478503503681</bibnumber>
+    <item_type>Manuscript</item_type>
+    <pages>
+      <page>
+        <filename>front.tif</filename>
+        <sequence>1</sequence>
+      </page>
+      <page>
+        <filename>back.tif</filename>
+        <sequence>2</sequence>
+      </page>
+    </pages>
+  </record>
+</root>

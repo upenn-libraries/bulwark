@@ -2,6 +2,7 @@ module ApplicationHelper
 
   include RailsAdmin::ApplicationHelper
 
+  # Doesn't seem to be used?
   def render_image_list
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
     return '' unless repo.present? && repo.images_to_render.present?
@@ -50,6 +51,7 @@ module ApplicationHelper
     return ingested_hash
   end
 
+  # Doesn't seem to be used.
   def resolve_reading_direction(repo)
     reading_direction = repo.images_to_render['iiif'].present? ? repo.images_to_render['iiif']['reading_direction'] : legacy_reading_direction(repo)
     return 'ltr' unless reading_direction.present?

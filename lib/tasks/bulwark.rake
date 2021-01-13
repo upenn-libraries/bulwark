@@ -14,6 +14,13 @@ namespace :bulwark do
     # Migrate test and development databases
     system('RAILS_ENV=development rake db:migrate')
     system('RAILS_ENV=test rake db:migrate')
+
+    puts Rainbow("\nTo generate...").green
+    puts Rainbow('    an admin user').green
+    puts Rainbow('        rake bulwark:setup:create_admin')
+    puts Rainbow('    a digital object and admin users').green
+    puts Rainbow('        rake bulwark:setup:create_digital_object')
+
   end
 
 
