@@ -77,6 +77,7 @@ gem 'honeybadger'
 gem 'nokogiri'
 gem 'bixby', '2.0.0'
 gem 'addressable'
+gem 'bootstrap_form', '~> 2.7'
 
 group :development, :test do
   gem 'letter_opener'
