@@ -188,14 +188,18 @@ RSpec.describe Bulwark::Import do
 
       let(:result) { import.process }
 
-      it 'expect result to be successful' do
-        expect(result.status).to be Bulwark::Import::Result::SUCCESS
-      end
-
       let(:expected_mets) { fixture_to_xml('example_objects', 'object_one', 'mets.xml') }
       let(:expected_preservation) { fixture_to_xml('example_objects', 'object_one', 'preservation.xml') }
       let(:expected_structural) { fixture_to_str('example_objects', 'object_one', 'structural_metadata.csv') }
       let(:expected_descriptive) { fixture_to_str('example_objects', 'object_one', 'descriptive_metadata.csv') }
+
+      it 'expect result to be successful' do
+        expect(result.status).to be Bulwark::Import::Result::SUCCESS
+      end
+
+      it 'sets flag on repo', focus: true do
+        expect(repo.new_format).to be true
+      end
 
       it 'creates descriptive metadata source' do
         metadata_source = repo.descriptive_metadata
