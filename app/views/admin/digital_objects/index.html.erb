@@ -1,1 +1,29 @@
-<p>All "new" digital objects will be displayed here....at some point</p>
+
+<ol class="breadcrumb">
+  <li>Admin</li>
+  <li class="active"><a href="/admin/digital_objects">Digital Objects</a></li>
+</ol>
+
+<h2>Digital Objects</h2>
+
+<div class="table-responsive">
+  <table class="table table-striped">
+    <tr>
+      <th>Name</th>
+      <th>Directory</th>
+      <th>Unique Identifier</th>
+      <th>Description</th>
+      <th>Owner</th>
+    </tr>
+
+    <% @digital_objects.each do |digital_object| %>
+      <tr>
+        <td><%= link_to(digital_object.human_readable_name, admin_digital_object_path(digital_object.id)) %></td>
+        <td><%= digital_object.names.directory %></td>
+        <td><%= digital_object.unique_identifier %></td>
+        <td><%= digital_object.description %></td>
+        <td><%= digital_object.owner %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>

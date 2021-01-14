@@ -1,0 +1,78 @@
+<%# Breadcrumbs %>
+<ol class="breadcrumb">
+  <li>Admin</li>
+  <li><a href="/admin/digital_objects">Digital Objects</a></li>
+  <li class="active"><%= @digital_object.human_readable_name %></li>
+</ol>
+
+<h2><%= @digital_object.human_readable_name %></h2>
+
+<p><strong>Unique Identifier:</strong> <%= @digital_object.unique_identifier %></p>
+<p><strong>Description</strong>: <%= @digital_object.description %></p>
+
+<%# repo directory? %>
+
+<ul class="nav nav-tabs" role="tablist">
+  <li role="presentation" class="active">
+    <a href="#descriptive-metadata" aria-controls="descriptive-metadata" role="tab" data-toggle="tab">Descriptive Metadata</a>
+  </li>
+  <li role="presentation">
+    <a href="#structural-metadata" aria-controls="structural-metadata" role="tab" data-toggle="tab">Structural Metadata</a>
+  </li>
+  <li role="presentation">
+    <a href="#files" aria-controls="files" role="tab" data-toggle="tab">Files</a>
+  </li>
+  <li role="presentation">
+    <a href="#generated-xml" aria-controls="generated-xml" role="tab" data-toggle="tab">Generated XML</a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="descriptive-metadata">
+    <h4>Metadata Provided</h4>
+    <%= link_to 'descriptive_metadata.csv', special_remote_download_url(@digital_object.descriptive_metadata.remote_location) %>
+    <hr>
+    <h4>Extracted Metadata</h4>
+    <table class="table">
+      <% @digital_object.descriptive_metadata.user_defined_mappings.each do |field, values| %>
+        <tr>
+          <td><%= field.gsub('_', ' ').titlecase %></td>
+          <td><%= values.join('<br>').html_safe %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="structural-metadata">
+    <h4>Metadata Provided</h4>
+    <%= link_to 'structural_metadata.csv', special_remote_download_url(@digital_object.structural_metadata.remote_location) %>
+    <hr>
+    <h4>Extracted Metadata</h4>
+    <table class="table">
+      <tr>
+        <% MetadataSource::VALID_STRUCTURAL_METADATA_FIELDS.each do |field| %>
+          <th><%= field %></th>
+        <% end %>
+      </tr>
+      <% @digital_object.structural_metadata.user_defined_mappings['sequence'].each do |values| %>
+        <tr>
+          <% MetadataSource::VALID_STRUCTURAL_METADATA_FIELDS.each do |field| %>
+            <td><%= values[field] %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="files">
+
+  </div>
+  <div role="tabpanel" class="tab-pane" id="generated-xml">
+    <table class="table">
+      <% @digital_object.metadata_builder.generated_metadata_files.each do |filepath, remote_location| %>
+        <tr>
+          <td><%= File.basename(filepath) %></td>
+          <td><%= link_to 'view', special_remote_download_url(remote_location) %>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
