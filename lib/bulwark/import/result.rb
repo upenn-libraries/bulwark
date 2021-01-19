@@ -3,9 +3,6 @@
 module Bulwark
   class Import
     class Result
-      SUCCESS = 'success'
-      FAILED = 'failed'
-
       attr_reader :unique_identifier, :status, :errors
 
       def initialize(status:, errors: [], unique_identifier: nil)

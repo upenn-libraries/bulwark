@@ -9,4 +9,36 @@ class BulkImport < ActiveRecord::Base
   max_paginates_per 100
 
   delegate :email, to: :created_by, prefix: true
+
+  # Returns Hash with validation errors. Errors are organized by row number. The
+  # keys in the hash are the rows and the values are the errors correspoinding to
+  # that row.
+  def validation_errors(csv)
+    validation_errors = {}
+    rows = Bulwark::HierarchicalCSV.parse(csv)
+    rows.each_with_index do |row, index|
+      import = Bulwark::Import.new(
+        descriptive_metadata: row['metadata'],
+        structural_metadata: row['structural'],
+        assets: row['assets'],
+        unique_identifier: row['unique_identifier'],
+        directive: row['directive'],
+        type: row['action'],
+        created_by: created_by
+      )
+      unless import.validate
+        validation_errors["row #{index + 2}"] = import.errors
+      end
+    end
+    validation_errors.blank? ? nil : validation_errors
+  end
+
+
+  def create_imports(csv)
+    rows = Bulwark::HierarchicalCSV.parse(csv)
+    rows.each do |row|
+      digital_object_import = DigitalObjectImport.create(bulk_import: self, import_data: row)
+      ProcessDigitalObjectImportJob.perform_now(digital_object_import) # Doesn't queue jobs
+    end
+  end
 end
