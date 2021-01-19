@@ -197,7 +197,7 @@ RSpec.describe Bulwark::Import do
         expect(result.status).to be Bulwark::Import::Result::SUCCESS
       end
 
-      it 'sets flag on repo', focus: true do
+      it 'sets flag on repo' do
         expect(repo.new_format).to be true
       end
 

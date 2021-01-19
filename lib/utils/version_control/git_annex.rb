@@ -22,7 +22,7 @@ module Utils
         git = ExtendedGit.bare(@remote_repo_path)
         git.annex.init('origin')
         git.config('annex.largefiles', 'not (include=.repoadmin/bin/*.sh)')
-        init_special_remote(@remote_repo_path, Utils.config[:special_remote][:type], @repo.unique_identifier)
+        init_special_remote(@remote_repo_path, Bulwark::Config.special_remote[:type], @repo.unique_identifier)
       end
 
       def set_remote_permissions
@@ -50,7 +50,7 @@ module Utils
         git.push('origin', 'git-annex')
 
         if options[:content].present?
-          git.annex.copy(options[:content], to: Utils.config[:special_remote][:name])
+          git.annex.copy(options[:content], to: Bulwark::Config.special_remote[:name])
         else
           git.annex.sync(content: true)
         end
@@ -156,7 +156,7 @@ module Utils
             bucket: remote_name.bucketize
           )
         when 'directory'
-          special_remote = Utils.config[:special_remote]
+          special_remote = Bulwark::Config.special_remote
           raise 'Missing config for Directory special remote' unless special_remote[:name] && special_remote[:directory]
 
           special_remote_directory = File.join(special_remote[:directory], remote_name.bucketize)
@@ -173,7 +173,7 @@ module Utils
         ignore_system_generated_files(dir)
         git.annex.init(version: Utils.config[:supported_vca_version])
 
-        special_remote = Utils.config[:special_remote]
+        special_remote = Bulwark::Config.special_remote
         case special_remote[:type]
         when 'S3'
           git.annex.enableremote(special_remote[:name])

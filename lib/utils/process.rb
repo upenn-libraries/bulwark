@@ -133,7 +133,7 @@ module Utils
     def attachable_url(repo, working_path, file_path)
       relative_file_path = relative_path(working_path, file_path)
       repo.version_control_agent.add({content: relative_file_path}, working_path)
-      repo.version_control_agent.copy({content: relative_file_path, to: Utils.config[:special_remote][:name]}, working_path)
+      repo.version_control_agent.copy({content: relative_file_path, to: Bulwark::Config.special_remote[:name]}, working_path)
       lookup_key = repo.version_control_agent.look_up_key(relative_file_path, working_path)
       read_storage_link(lookup_key, repo)
     end
