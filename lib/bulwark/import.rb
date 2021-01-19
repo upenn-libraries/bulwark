@@ -48,9 +48,9 @@ module Bulwark
 
       if type == CREATE
         @errors << "\"directive\" must be provided to create an object" unless directive
-        @errors << "structural_metadata must be provided to create an object" unless structural_metadata[:filenames] || (structural_metadata[:drive] && structural_metadata[:path])
-        @errors << "\"assets.path\" and \"assets.drive\" must be provided to create an object" if !assets[:drive] || !assets[:path]
-        @errors << "descriptive_metadata must be provided to create an object" if descriptive_metadata.empty?
+        @errors << "structural_metadata must be provided to create an object" unless structural_metadata && (structural_metadata[:filenames] || (structural_metadata[:drive] && structural_metadata[:path]))
+        @errors << "\"assets.path\" and \"assets.drive\" must be provided to create an object" if assets && (!assets[:drive] || !assets[:path])
+        @errors << "descriptive_metadata must be provided to create an object" if descriptive_metadata.blank?
         if unique_identifier
           @errors << "\"#{unique_identifier}\" already belongs to an object. Cannot create new object with given unique identifier." if Repo.find_by(unique_identifier: unique_identifier)
           @errors << "\"#{unique_identifier}\" is not minted" if unique_identifier && !Utilities.ark_exists?(unique_identifier)
@@ -62,12 +62,16 @@ module Bulwark
         @errors << "\"unique_identifier\" does not belong to an object. Cannot update object." if unique_identifier && !Repo.find_by(unique_identifier: unique_identifier)
       end
 
-      @errors << "asset drive invalid" if assets[:drive] && !MountedDrives.valid?(assets[:drive])
-      @errors << "asset path invalid" if assets[:drive] && assets[:path] && !MountedDrives.valid_path?(assets[:drive], assets[:path])
+      if assets
+        @errors << "asset drive invalid" if assets[:drive] && !MountedDrives.valid?(assets[:drive])
+        @errors << "asset path invalid" if assets[:drive] && assets[:path] && !MountedDrives.valid_path?(assets[:drive], assets[:path])
+      end
 
-      @errors << "cannot provide structural metadata two different ways" if (structural_metadata[:drive] || structural_metadata[:path]) && structural_metadata[:filenames]
-      @errors << "structural drive invalid" if structural_metadata[:drive] && !MountedDrives.valid?(structural_metadata[:drive])
-      @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
+      if structural_metadata
+        @errors << "cannot provide structural metadata two different ways" if (structural_metadata[:drive] || structural_metadata[:path]) && structural_metadata[:filenames]
+        @errors << "structural drive invalid" if structural_metadata[:drive] && !MountedDrives.valid?(structural_metadata[:drive])
+        @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
+      end
 
       @errors << "created_by must always be provided" unless created_by
       errors.empty?
@@ -75,7 +79,7 @@ module Bulwark
 
     def process
       # Validate before processing data
-      return Result.new(status: Result::FAILED, errors: errors) unless validate
+      return Result.new(status: DigitalObjectImport::FAILED, errors: errors) unless validate
 
       @repo = case type.downcase
               when CREATE
@@ -202,10 +206,10 @@ module Bulwark
 
       # TODO: ingest: index straight into Solr, skip Fedora.
 
-      Result.new(status: Result::SUCCESS, unique_identifier: repo.unique_identifier)
+      Result.new(status: DigitalObjectImport::SUCCESSFUL, unique_identifier: repo.unique_identifier)
     rescue => e
       # TODO: Report to Honeybadger
-      Result.new(status: Result::FAILED, errors: [e.message], unique_identifier: repo&.unique_identifier)
+      Result.new(status: DigitalObjectImport::FAILED, errors: [e.message], unique_identifier: repo&.unique_identifier)
     end
 
     private
