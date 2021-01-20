@@ -2,6 +2,7 @@ require "net/http"
 require 'sanitize'
 
 class Repo < ActiveRecord::Base
+  scope :new_format, -> { where(new_format: true) }
 
   include ModelNamingExtensions::Naming
   include Utils::Artifacts::ProblemsLog
