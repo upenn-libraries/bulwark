@@ -38,7 +38,7 @@ class BulkImport < ActiveRecord::Base
     rows = Bulwark::HierarchicalCSV.parse(csv)
     rows.each do |row|
       digital_object_import = DigitalObjectImport.create(bulk_import: self, import_data: row)
-      ProcessDigitalObjectImportJob.perform_now(digital_object_import) # Doesn't queue jobs
+      ProcessDigitalObjectImportJob.perform_later(digital_object_import)
     end
   end
 end
