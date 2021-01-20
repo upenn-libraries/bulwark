@@ -50,8 +50,10 @@ Rails.application.routes.draw do
   resources :metadata_sources
 
   namespace :admin do
+    resources :bulk_imports, except: %w[edit update destroy] do
+      resources :digital_object_imports, only: [:show]
+    end
     resources :digital_objects, only: [:index, :show]
-    resources :bulk_imports, except: %w[edit update destroy]
 
     if Rails.env.development? || Rails.env.test?
       get 'special_remote_download/:bucket/:key', to: :special_remote_download, as: :special_remote_download, constraints: { key: /[^\/]+/ }
