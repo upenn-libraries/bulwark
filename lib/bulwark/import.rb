@@ -283,7 +283,8 @@ module Bulwark
           assets_subdirectory: 'assets',
           file_extensions: ['tif', 'TIF'],
           metadata_source_extensions: ['csv'],
-          preservation_filename: 'preservation.xml'
+          preservation_filename: 'preservation.xml',
+          new_format: true # Setting to differentiate from previously created repos
         )
         repo.unique_identifier = unique_identifier if unique_identifier
         repo.save!

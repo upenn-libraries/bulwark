@@ -61,7 +61,7 @@ RSpec.describe Repo, type: :model do
 
       context 'when cloning git repo' do
         let!(:working_repo) { ExtendedGit.clone(origin_location, repo.names.directory, path: Rails.root.join('tmp')) }
-        let(:special_remote_name) { Utils.config[:special_remote][:name] }
+        let(:special_remote_name) { Bulwark::Config.special_remote[:name] }
 
         after { FileUtils.remove_dir(working_repo.dir.path) }
 
@@ -82,7 +82,7 @@ RSpec.describe Repo, type: :model do
 
         context 'when setting up special remote' do
           let(:special_remote_directory) do
-            File.join(Utils.config[:special_remote][:directory], repo.unique_identifier.bucketize)
+            File.join(Bulwark::Config.special_remote[:directory], repo.unique_identifier.bucketize)
           end
           let(:readme_path) { File.join(working_repo.dir.path, 'README.md') }
 

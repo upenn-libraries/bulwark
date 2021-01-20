@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20201223165114) do
+ActiveRecord::Schema.define(version: 20210114191712) do
 
   create_table "batches", force: :cascade do |t|
     t.text     "queue_list",      limit: 4294967295
@@ -126,8 +126,8 @@ ActiveRecord::Schema.define(version: 20201223165114) do
   create_table "repos", force: :cascade do |t|
     t.string   "human_readable_name",        limit: 255
     t.string   "description",                limit: 255
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
+    t.datetime "created_at",                                                    null: false
+    t.datetime "updated_at",                                                    null: false
     t.string   "metadata_subdirectory",      limit: 255
     t.string   "assets_subdirectory",        limit: 255
     t.string   "derivatives_subdirectory",   limit: 255
@@ -152,6 +152,7 @@ ActiveRecord::Schema.define(version: 20201223165114) do
     t.string   "last_action_performed",      limit: 255
     t.string   "queued",                     limit: 255
     t.text     "thumbnail_location",         limit: 65535
+    t.boolean  "new_format",                                    default: false
   end
 
   add_index "repos", ["endpoint_id"], name: "index_repos_on_endpoint_id", using: :btree
