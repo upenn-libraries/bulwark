@@ -12,7 +12,7 @@ class DigitalObjectImport < ActiveRecord::Base
   serialize :process_errors, Array
   serialize :import_data, JSON
 
-  after_initialize :set_default_status
+  before_validation :set_default_status, on: :create
 
   validates :status, inclusion: { in: STATUSES }
 
@@ -36,13 +36,15 @@ class DigitalObjectImport < ActiveRecord::Base
       created_by: bulk_import.created_by
     ).process
 
-    status = result.status
-    process_errors = result.errors
+    update(
+      status: result.status,
+      process_errors: result.errors
+    )
   end
 
   private
 
     def set_default_status
-      self.status = QUEUED
+      self.status = QUEUED unless status
     end
 end
