@@ -1,5 +1,7 @@
 module Bulwark
-  module HierarchicalCSV
+  # A Structured CSV offers the ability to namespace headers in the csv and
+  # allow for fields to have array or string values.
+  module StructuredCSV
     # Parses CSV string and returns an array of hashes. One hash for each row.
     # For each row, values are combined into an array if the column heading is
     # suffixed with an index. For example, if columns are named `task[1]`
@@ -17,11 +19,11 @@ module Bulwark
     end
 
     def self.parse_row(hash)
-      hierarchical_hash = {}
+      structured_hash = {}
       hash.each do |field, value|
-        parse_field(field, value, hierarchical_hash)
+        parse_field(field, value, structured_hash)
       end
-      hierarchical_hash
+      structured_hash
     end
 
     def self.parse_field(field, value, hash)
@@ -41,6 +43,45 @@ module Bulwark
         else
           hash[field] = value
         end
+      end
+    end
+
+    # Generates CSV string from an array of hash.
+    #
+    # @param csv_data [Array<Hash>]
+    # @return [String] csv formatted string
+    def self.generate(csv_data)
+      hashes = csv_data.map { |hash| generate_row(hash) }
+
+      headers = hashes.sum([], &:keys).uniq.sort
+
+      CSV.generate(headers: true) do |csv|
+        csv << headers
+
+        hashes.each do |hash|
+          row = headers.map { |header| hash[header] }
+          csv << row
+        end
+      end
+    end
+
+    def self.generate_row(original_hash)
+      expanded_hash = {}
+      original_hash.each do |k, v|
+        generate_field(k, v, expanded_hash)
+      end
+      expanded_hash
+    end
+
+    def self.generate_field(field, value, hash)
+      if value.is_a? Hash
+        value.each do |k, v|
+          generate_field("#{field}.#{k}", v, hash)
+        end
+      elsif value.is_a? Array
+        value.each_with_index { |v, i| hash["#{field}[#{i+1}]"] = v }
+      else
+        hash[field] = value
       end
     end
   end

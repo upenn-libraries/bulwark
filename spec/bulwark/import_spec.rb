@@ -194,7 +194,7 @@ RSpec.describe Bulwark::Import do
       let(:expected_descriptive) { fixture_to_str('example_objects', 'object_one', 'descriptive_metadata.csv') }
 
       it 'expect result to be successful' do
-        expect(result.status).to be Bulwark::Import::Result::SUCCESS
+        expect(result.status).to be DigitalObjectImport::SUCCESSFUL
       end
 
       it 'sets flag on repo' do
@@ -324,7 +324,7 @@ RSpec.describe Bulwark::Import do
         let(:updated_whereis_result) { updated_git.annex.whereis }
 
         it 'update is successful' do
-          expect(updated_result.status).to be Bulwark::Import::Result::SUCCESS
+          expect(updated_result.status).to be DigitalObjectImport::SUCCESSFUL
         end
 
         it 'contains additional asset and derivatives' do
@@ -434,7 +434,7 @@ RSpec.describe Bulwark::Import do
       let(:result) { import.process }
 
       it 'import was successful' do
-        expect(result.status).to be Bulwark::Import::Result::SUCCESS
+        expect(result.status).to be DigitalObjectImport::SUCCESSFUL
       end
 
       it 'creates structural metadata source' do

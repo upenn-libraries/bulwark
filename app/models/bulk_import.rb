@@ -15,7 +15,7 @@ class BulkImport < ActiveRecord::Base
   # that row.
   def validation_errors(csv)
     validation_errors = {}
-    rows = Bulwark::HierarchicalCSV.parse(csv)
+    rows = Bulwark::StructuredCSV.parse(csv)
     rows.each_with_index do |row, index|
       import = Bulwark::Import.new(
         descriptive_metadata: row['metadata'],
@@ -35,7 +35,7 @@ class BulkImport < ActiveRecord::Base
 
 
   def create_imports(csv)
-    rows = Bulwark::HierarchicalCSV.parse(csv)
+    rows = Bulwark::StructuredCSV.parse(csv)
     rows.each do |row|
       digital_object_import = DigitalObjectImport.create(bulk_import: self, import_data: row)
       ProcessDigitalObjectImportJob.perform_later(digital_object_import)

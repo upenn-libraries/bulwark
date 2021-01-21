@@ -106,17 +106,17 @@ module Bulwark
 
           # Read in current metadata
           metadata_csv = File.open(File.join(clone_location, desc_metadata_file)).read
-          current_desc_metadata = Bulwark::MultivaluedCSV.parse(metadata_csv).first
+          current_desc_metadata = Bulwark::StructuredCSV.parse(metadata_csv).first
 
           # Merge metadata and generate new CSV
           metadata = current_desc_metadata.merge(descriptive_metadata.deep_stringify_keys)
-          csv_data = Bulwark::MultivaluedCSV.generate([metadata])
+          csv_data = Bulwark::StructuredCSV.generate([metadata])
 
           # Save CSV to file
           File.write(File.join(clone_location, desc_metadata_file), csv_data)
         else
           # If metadata is not already present, create new metadata file
-          csv_data = Bulwark::MultivaluedCSV.generate([descriptive_metadata])
+          csv_data = Bulwark::StructuredCSV.generate([descriptive_metadata])
           File.write(File.join(clone_location, repo.metadata_subdirectory, DESCRIPTIVE_METADATA_FILENAME), csv_data)
         end
       end

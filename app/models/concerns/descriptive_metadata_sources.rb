@@ -26,7 +26,7 @@ module DescriptiveMetadataSources
       # Parse the metadata in from a CSV. Assuming the first-non-header row contains the data.
       metadata_path = File.join(working_path, path)
       csv = File.open(metadata_path).read
-      metadata = Bulwark::MultivaluedCSV.parse(csv)[0]
+      metadata = Bulwark::StructuredCSV.parse(csv)[0]
 
       raise StandardError, "No metadata present at #{metadata_path}" if metadata.empty?
 
