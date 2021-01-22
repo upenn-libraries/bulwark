@@ -15,7 +15,7 @@
 <% unless @digital_object_import.process_errors.blank? %>
   <h4>Errors</h4>
   <ul>
-    <%= @digital_object_import.process_errors.each do |error| %>
+    <% @digital_object_import.process_errors.each do |error| %>
       <li><%= error %></li>
     <% end %>
   </ul>

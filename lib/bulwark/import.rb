@@ -4,34 +4,34 @@ module Bulwark
   class Import
     CREATE = 'create'
     UPDATE = 'update'
-    IMPORT_TYPES = [CREATE, UPDATE].freeze
+    IMPORT_ACTIONS = [CREATE, UPDATE].freeze
     DESCRIPTIVE_METADATA_FILENAME = 'descriptive_metadata.csv'
     STRUCTURAL_METADATA_FILENAME = 'structural_metadata.csv'
     METS_FILENAME = 'mets.xml'
 
-    attr_reader :unique_identifier, :type, :directive, :created_by, :assets,
+    attr_reader :unique_identifier, :action, :directive, :created_by, :assets,
                 :descriptive_metadata, :structural_metadata,
                 :repo, :clone_location, :errors
 
     # Initializes object to import digital objects.
     #
     # @param [Hash] arguments passed in to create/update digital objects
-    # @options opts [String] :type
+    # @options opts [String] :action
     # @options opts [User] :created_by
     # @options opts [String] :directive
     # @options opts [String] :unique_identifier
     # @options opts [Hash] :assets
-    # @options opts [Hash] :descriptive_metadata
-    # @options opts [Hash] :structural_metadata
+    # @options opts [Hash] :metadata  # gets mapped to descriptive_metadata
+    # @options opts [Hash] :structural  # gets mapped to structural_metadata
     def initialize(args)
       args = args.deep_symbolize_keys
 
-      @type = args[:type]
+      @action = args[:action]
       @unique_identifier = args[:unique_identifier]
       @directive = args[:directive]
       @created_by = args[:created_by]
-      @descriptive_metadata = args.fetch(:descriptive_metadata, {})
-      @structural_metadata = args.fetch(:structural_metadata, {})
+      @descriptive_metadata = args.fetch(:metadata, {})
+      @structural_metadata = args.fetch(:structural, {})
       @assets = args.fetch(:assets, {})
       @errors = []
     end
@@ -44,20 +44,20 @@ module Bulwark
     # @return [True] if no errors were generated
     # @ return [False] if errors were generated
     def validate
-      @errors << "\"#{type}\" is not a valid import type" unless IMPORT_TYPES.include?(type)
+      @errors << "\"#{action}\" is not a valid import action" unless IMPORT_ACTIONS.include?(action)
 
-      if type == CREATE
+      if action == CREATE
         @errors << "\"directive\" must be provided to create an object" unless directive
-        @errors << "structural_metadata must be provided to create an object" unless structural_metadata && (structural_metadata[:filenames] || (structural_metadata[:drive] && structural_metadata[:path]))
+        @errors << "structural must be provided to create an object" unless structural_metadata && (structural_metadata[:filenames] || (structural_metadata[:drive] && structural_metadata[:path]))
         @errors << "\"assets.path\" and \"assets.drive\" must be provided to create an object" if assets && (!assets[:drive] || !assets[:path])
-        @errors << "descriptive_metadata must be provided to create an object" if descriptive_metadata.blank?
+        @errors << "metadata must be provided to create an object" if descriptive_metadata.blank?
         if unique_identifier
           @errors << "\"#{unique_identifier}\" already belongs to an object. Cannot create new object with given unique identifier." if Repo.find_by(unique_identifier: unique_identifier)
           @errors << "\"#{unique_identifier}\" is not minted" if unique_identifier && !Utilities.ark_exists?(unique_identifier)
         end
       end
 
-      if type == UPDATE
+      if action == UPDATE
         @errors << "\"unique_identifier\" must be provided when updating an object" unless unique_identifier
         @errors << "\"unique_identifier\" does not belong to an object. Cannot update object." if unique_identifier && !Repo.find_by(unique_identifier: unique_identifier)
       end
@@ -81,7 +81,7 @@ module Bulwark
       # Validate before processing data
       return Result.new(status: DigitalObjectImport::FAILED, errors: errors) unless validate
 
-      @repo = case type.downcase
+      @repo = case action.downcase
               when CREATE
                 create_digital_object
               when UPDATE

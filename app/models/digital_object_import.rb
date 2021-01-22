@@ -26,15 +26,7 @@ class DigitalObjectImport < ActiveRecord::Base
   def process
     update(status: IN_PROGRESS)
 
-    result = Bulwark::Import.new(
-      descriptive_metadata: import_data['metadata'],
-      structural_metadata: import_data['structural'],
-      assets: import_data['assets'],
-      unique_identifier: import_data['unique_identifier'],
-      directive: import_data['directive'],
-      type: import_data['action'],
-      created_by: bulk_import.created_by
-    ).process
+    result = Bulwark::Import.new(created_by: bulk_import.created_by, **import_data.symbolize_keys).process
 
     update(
       status: result.status,

@@ -17,15 +17,8 @@ class BulkImport < ActiveRecord::Base
     validation_errors = {}
     rows = Bulwark::StructuredCSV.parse(csv)
     rows.each_with_index do |row, index|
-      import = Bulwark::Import.new(
-        descriptive_metadata: row['metadata'],
-        structural_metadata: row['structural'],
-        assets: row['assets'],
-        unique_identifier: row['unique_identifier'],
-        directive: row['directive'],
-        type: row['action'],
-        created_by: created_by
-      )
+      import = Bulwark::Import.new(created_by: created_by, **row.symbolize_keys)
+
       unless import.validate
         validation_errors["row #{index + 2}"] = import.errors
       end
