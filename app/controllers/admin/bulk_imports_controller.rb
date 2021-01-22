@@ -10,13 +10,19 @@ module Admin
 
     def create
       @bulk_import = BulkImport.new(created_by: current_user)
-      csv = params[:bulk_import][:bulk_import_csv]
-      # TODO: parse CSV, validate and build DigitalObjectImports
-      if @bulk_import.save
+      uploaded_file = params[:bulk_import][:bulk_import_csv]
+      uploaded_file.tempfile.set_encoding('UTF-8') # CSVs ingested are UTF-8
+      csv = uploaded_file.read
+
+      if errors = @bulk_import.validation_errors(csv) # Validate CSV.
+        errors_array = errors.map { |r, errors| errors.map { |e| "#{r}: #{e}" } }.flatten
+        flash[:error] = errors_array
+        redirect_to new_admin_bulk_import_path
+      else # If no validation errors, create imports.
+        @bulk_import.save
+        @bulk_import.create_imports(csv)
+
         redirect_to admin_bulk_import_path(@bulk_import)
-      else
-        # TODO: display CSV parsing errors?
-        redirect_to new_admin_bulk_import_path, flash: { errors: 'Failed' }
       end
     end
 

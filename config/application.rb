@@ -28,10 +28,11 @@ module Head
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
-    config.cache_store = :redis_store, ENV['CACHE_URL'], { namespace: 'sidekiq::cache',  expires_in: 90.minutes }
-    config.active_job.queue_adapter = :sidekiq
+
     config.assets.enabled = true
     config.autoload_paths << Rails.root.join('lib')
 
+    # Setting default queue adapter, because no setup is required.
+    config.active_job.queue_adapter = :inline
   end
 end

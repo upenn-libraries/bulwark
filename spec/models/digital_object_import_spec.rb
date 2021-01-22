@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe DigitalObjectImport, type: :model do
   let(:bulk_import) { FactoryBot.create :bulk_import }
   let(:digital_object_import) do
-    FactoryBot.build :digital_object_import,
+    FactoryBot.create :digital_object_import,
                      bulk_import: bulk_import
   end
 
@@ -34,6 +34,12 @@ RSpec.describe DigitalObjectImport, type: :model do
 
   it 'has a import_data Hash' do
     expect(digital_object_import.import_data).to be_a Hash
+  end
+
+  it 'can update status' do
+    digital_object_import.update(status: DigitalObjectImport::IN_PROGRESS)
+    digital_object_import.reload
+    expect(digital_object_import.status).to eql DigitalObjectImport::IN_PROGRESS
   end
 
   context 'validations' do
