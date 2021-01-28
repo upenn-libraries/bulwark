@@ -11,6 +11,7 @@ class Repo < ActiveRecord::Base
   has_one :version_control_agent, dependent: :destroy, :validate => false
 
   has_many :endpoint, dependent: :destroy
+  has_many :assets, dependent: :destroy
   validates_associated :endpoint
 
   around_create :set_version_control_agent_and_repo # this is essentially an after_create

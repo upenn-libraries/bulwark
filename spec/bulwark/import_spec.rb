@@ -271,16 +271,19 @@ RSpec.describe Bulwark::Import do
         ).to be_empty
       end
 
-      it 'generates expected images_to_render hash' do
-        expect(repo.images_to_render).to match({
-          'iiif' => {
-            'images' => [
-              "/#{repo.names.bucket}%2F#{git.annex.lookupkey('.derivs/front.tif.jpeg')}/info.json",
-              "/#{repo.names.bucket}%2F#{git.annex.lookupkey('.derivs/back.tif.jpeg')}/info.json"
-            ],
-            'reading_direction' => 'left-to-right'
-          }
-        })
+      it 'creates expected asset records' do
+        front = repo.assets.find_by(filename: 'front.tif')
+        back = repo.assets.find_by(filename: 'back.tif')
+
+        expect(front).not_to be_nil
+        expect(front.original_file_location).to eql git.annex.lookupkey('data/assets/front.tif')
+        expect(front.access_file_location).to eql git.annex.lookupkey('.derivs/front.tif.jpeg')
+        expect(front.preview_file_location).to eql git.annex.lookupkey('.derivs/front.tif.thumb.jpeg')
+
+        expect(back).not_to be_nil
+        expect(back.original_file_location).to eql git.annex.lookupkey('data/assets/back.tif')
+        expect(back.access_file_location).to eql git.annex.lookupkey('.derivs/back.tif.jpeg')
+        expect(back.preview_file_location).to eql git.annex.lookupkey('.derivs/back.tif.thumb.jpeg')
       end
 
       # Updating digital object with additional metadata and an additional asset.
@@ -448,18 +451,6 @@ RSpec.describe Bulwark::Import do
       it 'given structural metadata files contain expected data' do
         git.annex.get(repo.metadata_subdirectory)
         expect(File.read(File.join(working_dir, repo.metadata_subdirectory, 'structural_metadata.csv'))).to eql expected_structural
-      end
-
-      it 'generates expected images_to_render hash' do
-        expect(repo.images_to_render).to match({
-          'iiif' => {
-            'images' => [
-              "/#{repo.names.bucket}%2F#{git.annex.lookupkey('.derivs/front.tif.jpeg')}/info.json",
-              "/#{repo.names.bucket}%2F#{git.annex.lookupkey('.derivs/back.tif.jpeg')}/info.json"
-            ],
-            'reading_direction' => 'top-to-bottom'
-          }
-        })
       end
     end
 

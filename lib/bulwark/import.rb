@@ -95,6 +95,9 @@ module Bulwark
       # Copy over assets and commit them to repository.
       copy_assets(clone_location)
 
+      # Create or update asset records.
+      create_or_update_assets(clone_location)
+
       # Add descriptive metadata
       unless descriptive_metadata.empty?
         # If metadata is already present merge metadata, otherwise create new
@@ -208,11 +211,33 @@ module Bulwark
 
       Result.new(status: DigitalObjectImport::SUCCESSFUL, unique_identifier: repo.unique_identifier)
     rescue => e
+      raise e
       # TODO: Report to Honeybadger
       Result.new(status: DigitalObjectImport::FAILED, errors: [e.message], unique_identifier: repo&.unique_identifier)
     end
 
     private
+
+      def create_or_update_assets(clone_location)
+        # All files in assets folder
+        glob_path = File.join(clone_location, repo.assets_subdirectory, "*.{#{repo.file_extensions.join(",")}}")
+        assets_paths = Dir.glob(glob_path) #full paths
+
+        # Updating or creating asset record for each asset file
+        assets_paths.each do |asset_path|
+          filename = File.basename(asset_path)
+          repo.assets.find_or_create_by(filename: filename) do |asset|
+            asset.original_file_location = repo.version_control_agent.look_up_key(File.join(repo.assets_subdirectory, filename), clone_location)
+            asset.size = File.size(asset_path) # In bytes
+          end
+        end
+
+        # Removing references to files that have been removed.
+        asset_filenames = assets_paths.map { |a| File.basename(a) }
+        repo.assets.each do |asset|
+          asset.destroy unless asset_filenames.include?(asset.filename)
+        end
+      end
 
       def add_preservation_and_mets_xml(clone_location)
         # Create and add preservation.xml to repository
@@ -248,36 +273,53 @@ module Bulwark
       # Update file_display_attributes, which is used to display derivatives.
       # And update iiif information.
       def update_derivatives_information(clone_location)
-        files = Dir.entries(File.join(clone_location, repo.derivatives_subdirectory)).reject do |f|
-          File.directory?(File.join(clone_location, repo.derivatives_subdirectory, f)) || f == '.keep'
-        end
-
-        new_file_display_attributes = {}
-        files.each do |file|
-          relative_filepath = File.join(repo.derivatives_subdirectory, file)
-          width, height = FastImage.size(File.join(clone_location, relative_filepath))
-          special_remote_filename = repo.version_control_agent.look_up_key(relative_filepath, clone_location)
-          new_file_display_attributes[special_remote_filename] = {
-            file_name: File.join(repo.derivatives_subdirectory, file),
-            width: width,
-            height: height
-          }
-        end
-        repo.file_display_attributes = new_file_display_attributes
-
-        if (structural = repo.structural_metadata)
-          display_array = structural.filenames.map do |filename|
-            entry = repo.file_display_attributes.select { |_key, hash| File.basename(hash[:file_name]) == "#{filename}.jpeg" }
-            raise I18n.t('colenda.utils.process.warnings.multiple_structural_files') if entry.length > 1
-            entry.keys.first # Returns the sha264 git-annex filename
+        repo.assets.each do |asset|
+          {
+            access_file_location: "#{asset.filename}.jpeg",
+            preview_file_location: "#{asset.filename}.thumb.jpeg"
+          }.each do |field, derivative_filename|
+            derivative_filepath = File.join(clone_location, repo.derivatives_subdirectory, derivative_filename)
+            if File.exists?(derivative_filepath)
+              remote_key = repo.version_control_agent.look_up_key(File.join(repo.derivatives_subdirectory, derivative_filename), clone_location)
+              asset.send("#{field}=", remote_key)
+            else
+              asset.send("#{field}=", nil)
+            end
           end
 
-          repo.images_to_render['iiif'] = {
-            'reading_direction' => structural.viewing_direction,
-            'images' => display_array.map { |s| "#{Display.config['iiif']['image_server']}/#{repo.names.bucket}%2F#{s}/info.json" }
-          }
+          asset.save!
         end
-        repo.save!
+
+        # files = Dir.entries(File.join(clone_location, repo.derivatives_subdirectory)).reject do |f|
+        #   File.directory?(File.join(clone_location, repo.derivatives_subdirectory, f)) || f == '.keep'
+        # end
+        #
+        # new_file_display_attributes = {}
+        # files.each do |file|
+        #   relative_filepath = File.join(repo.derivatives_subdirectory, file)
+        #   width, height = FastImage.size(File.join(clone_location, relative_filepath))
+        #   special_remote_filename = repo.version_control_agent.look_up_key(relative_filepath, clone_location)
+        #   new_file_display_attributes[special_remote_filename] = {
+        #     file_name: File.join(repo.derivatives_subdirectory, file),
+        #     width: width,
+        #     height: height
+        #   }
+        # end
+        # repo.file_display_attributes = new_file_display_attributes
+        #
+        # if (structural = repo.structural_metadata)
+        #   display_array = structural.filenames.map do |filename|
+        #     entry = repo.file_display_attributes.select { |_key, hash| File.basename(hash[:file_name]) == "#{filename}.jpeg" }
+        #     raise I18n.t('colenda.utils.process.warnings.multiple_structural_files') if entry.length > 1
+        #     entry.keys.first # Returns the sha264 git-annex filename
+        #   end
+        #
+        #   repo.images_to_render['iiif'] = {
+        #     'reading_direction' => structural.viewing_direction,
+        #     'images' => display_array.map { |s| "#{Display.config['iiif']['image_server']}/#{repo.names.bucket}%2F#{s}/info.json" }
+        #   }
+        # end
+        # repo.save!
       end
 
       def create_digital_object
