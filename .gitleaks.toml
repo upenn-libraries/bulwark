@@ -144,7 +144,7 @@ title = "gitlab gitleaks config"
 # Generic rules
 [[rules]]
     description = "Generic credentials"
-    regex = '''(?i)[\w]*(auth|password|passwd|pw|salt|secret|token)[\s]*[:=>]+\s*['"]?[\S]{2,}['"]?'''
+    regex = '''(?i)[\w]*(auth|passwd|pw|salt|secret|token)[\s]*[:=>]+\s*['"]?[\S]{2,}['"]?'''
     [rules.allowlist]
         description = "ignore generic creds"
         paths = [
