@@ -289,37 +289,6 @@ module Bulwark
 
           asset.save!
         end
-
-        # files = Dir.entries(File.join(clone_location, repo.derivatives_subdirectory)).reject do |f|
-        #   File.directory?(File.join(clone_location, repo.derivatives_subdirectory, f)) || f == '.keep'
-        # end
-        #
-        # new_file_display_attributes = {}
-        # files.each do |file|
-        #   relative_filepath = File.join(repo.derivatives_subdirectory, file)
-        #   width, height = FastImage.size(File.join(clone_location, relative_filepath))
-        #   special_remote_filename = repo.version_control_agent.look_up_key(relative_filepath, clone_location)
-        #   new_file_display_attributes[special_remote_filename] = {
-        #     file_name: File.join(repo.derivatives_subdirectory, file),
-        #     width: width,
-        #     height: height
-        #   }
-        # end
-        # repo.file_display_attributes = new_file_display_attributes
-        #
-        # if (structural = repo.structural_metadata)
-        #   display_array = structural.filenames.map do |filename|
-        #     entry = repo.file_display_attributes.select { |_key, hash| File.basename(hash[:file_name]) == "#{filename}.jpeg" }
-        #     raise I18n.t('colenda.utils.process.warnings.multiple_structural_files') if entry.length > 1
-        #     entry.keys.first # Returns the sha264 git-annex filename
-        #   end
-        #
-        #   repo.images_to_render['iiif'] = {
-        #     'reading_direction' => structural.viewing_direction,
-        #     'images' => display_array.map { |s| "#{Display.config['iiif']['image_server']}/#{repo.names.bucket}%2F#{s}/info.json" }
-        #   }
-        # end
-        # repo.save!
       end
 
       def create_digital_object
