@@ -5,7 +5,9 @@ class ApplicationController < ActionController::Base
   include Hydra::Controller::ControllerBehavior
   include Blacklight::Base
 
-  layout 'blacklight'
+  # base application layout is copied from Blacklight, with Matomo tracking added
+  # https://github.com/projectblacklight/blacklight/blob/v5.13.0/app/views/layouts/blacklight.html.erb
+  layout 'application'
 
   before_filter :_set_current_user
 
