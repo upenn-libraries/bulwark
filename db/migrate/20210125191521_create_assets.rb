@@ -6,7 +6,7 @@ class CreateAssets < ActiveRecord::Migration
       t.integer :size, limit: 8 # bigint
       t.text :original_file_location
       t.text :access_file_location
-      t.text :preview_file_location
+      t.text :thumbnail_file_location
       t.timestamps null: false
     end
   end

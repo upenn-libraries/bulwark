@@ -14,14 +14,14 @@
 ActiveRecord::Schema.define(version: 20210125191521) do
 
   create_table "assets", force: :cascade do |t|
-    t.integer  "repo_id",                limit: 4
-    t.string   "filename",               limit: 255
-    t.integer  "size",                   limit: 8
-    t.text     "original_file_location", limit: 65535
-    t.text     "access_file_location",   limit: 65535
-    t.text     "preview_file_location",  limit: 65535
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
+    t.integer  "repo_id",                 limit: 4
+    t.string   "filename",                limit: 255
+    t.integer  "size",                    limit: 8
+    t.text     "original_file_location",  limit: 65535
+    t.text     "access_file_location",    limit: 65535
+    t.text     "thumbnail_file_location", limit: 65535
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
   end
 
   create_table "batches", force: :cascade do |t|
