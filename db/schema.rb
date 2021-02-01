@@ -24,6 +24,8 @@ ActiveRecord::Schema.define(version: 20210125191521) do
     t.datetime "updated_at",                            null: false
   end
 
+  add_index "assets", ["filename", "repo_id"], name: "index_assets_on_filename_and_repo_id", unique: true, using: :btree
+
   create_table "batches", force: :cascade do |t|
     t.text     "queue_list",      limit: 4294967295
     t.text     "directive_names", limit: 4294967295

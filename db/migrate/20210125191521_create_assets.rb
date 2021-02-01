@@ -8,6 +8,8 @@ class CreateAssets < ActiveRecord::Migration
       t.text :access_file_location
       t.text :thumbnail_file_location
       t.timestamps null: false
+
+      t.index [:filename, :repo_id], unique: true
     end
   end
 end
