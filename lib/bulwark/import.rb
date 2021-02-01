@@ -194,7 +194,6 @@ module Bulwark
 
       Result.new(status: DigitalObjectImport::SUCCESSFUL, unique_identifier: repo.unique_identifier)
     rescue => e
-      raise e
       # TODO: Report to Honeybadger
       Result.new(status: DigitalObjectImport::FAILED, errors: [e.message], unique_identifier: repo&.unique_identifier)
     end
