@@ -55,7 +55,6 @@ RSpec.describe Bulwark::Import do
     end
 
     context 'when creating a new object with an unminted ark' do
-
       before do
         # Stub request to get EZID
         stub_request(:get, /#{Ezid::Client.config.host}\/id\/ark:\/99999\/fk4invalid/)
@@ -231,7 +230,7 @@ RSpec.describe Bulwark::Import do
       end
 
       it 'contains metadata files' do
-        files = ['data/metadata/descriptive_metadata.csv', 'data/metadata/structural_metadata.csv', 'data/metadata/mets.xml', 'data/metadata/preservation.xml']
+        files = ['data/metadata/descriptive_metadata.csv', 'data/metadata/structural_metadata.csv', 'data/metadata/jhove_output.xml', 'data/metadata/mets.xml', 'data/metadata/preservation.xml']
         expect(whereis_result.map(&:filepath)).to include(*files)
         files.each do |filepath|
           expect(whereis_result[filepath].locations.map(&:description)).to include '[local]'
@@ -258,7 +257,7 @@ RSpec.describe Bulwark::Import do
       end
 
       it 'contains derivatives' do
-        derivatives = ['.derivs/back.tif.jpeg', '.derivs/back.tif.thumb.jpeg', '.derivs/front.tif.jpeg', '.derivs/front.tif.thumb.jpeg']
+        derivatives = ['.derivs/access/back.jpeg', '.derivs/thumbnails/back.jpeg', '.derivs/access/front.jpeg', '.derivs/thumbnails/front.jpeg']
         expect(whereis_result.map(&:filepath)).to include(*derivatives)
         derivatives.each do |filepath|
           expect(whereis_result[filepath].locations.map(&:description)).to include '[local]'
@@ -277,13 +276,13 @@ RSpec.describe Bulwark::Import do
 
         expect(front).not_to be_nil
         expect(front.original_file_location).to eql git.annex.lookupkey('data/assets/front.tif')
-        expect(front.access_file_location).to eql git.annex.lookupkey('.derivs/front.tif.jpeg')
-        expect(front.preview_file_location).to eql git.annex.lookupkey('.derivs/front.tif.thumb.jpeg')
+        expect(front.access_file_location).to eql git.annex.lookupkey('.derivs/access/front.jpeg')
+        expect(front.thumbnail_file_location).to eql git.annex.lookupkey('.derivs/thumbnails/front.jpeg')
 
         expect(back).not_to be_nil
         expect(back.original_file_location).to eql git.annex.lookupkey('data/assets/back.tif')
-        expect(back.access_file_location).to eql git.annex.lookupkey('.derivs/back.tif.jpeg')
-        expect(back.preview_file_location).to eql git.annex.lookupkey('.derivs/back.tif.thumb.jpeg')
+        expect(back.access_file_location).to eql git.annex.lookupkey('.derivs/access/back.jpeg')
+        expect(back.thumbnail_file_location).to eql git.annex.lookupkey('.derivs/thumbnails/back.jpeg')
       end
 
       # Updating digital object with additional metadata and an additional asset.
@@ -331,7 +330,7 @@ RSpec.describe Bulwark::Import do
         end
 
         it 'contains additional asset and derivatives' do
-          new_asset_and_derivatives = ['.derivs/new.tif.jpeg', '.derivs/new.tif.thumb.jpeg', 'data/assets/new.tif']
+          new_asset_and_derivatives = ['.derivs/access/new.jpeg', '.derivs/thumbnails/new.jpeg', 'data/assets/new.tif']
           expect(updated_whereis_result.map(&:filepath)).to include(*new_asset_and_derivatives)
           new_asset_and_derivatives.each do |filepath|
             expect(updated_whereis_result[filepath].locations.map(&:description)).to include '[local]'
@@ -401,7 +400,7 @@ RSpec.describe Bulwark::Import do
       end
 
       it 'contains derivatives' do
-        derivatives = ['.derivs/front.tif.jpeg', '.derivs/front.tif.thumb.jpeg']
+        derivatives = ['.derivs/access/front.jpeg', '.derivs/thumbnails/front.jpeg']
         expect(whereis_result.map(&:filepath)).to include(*derivatives)
         derivatives.each do |filepath|
           expect(whereis_result[filepath].locations.map(&:description)).to include '[local]'

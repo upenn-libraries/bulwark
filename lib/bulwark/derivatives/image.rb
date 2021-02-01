@@ -34,6 +34,11 @@ module Bulwark
       def self.thumbnail(original, write_to)
         generate(original, write_to, 200, 200, 'jpeg')
       end
+
+      # Generates access copy derivative
+      def self.access_copy(original, write_to)
+        generate(original, write_to, '3500', '7000', 'jpeg')
+      end
     end
   end
 end
