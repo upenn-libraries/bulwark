@@ -250,6 +250,8 @@ services:
     secrets:
       - source: bulwark_database_config
         target: /home/app/webapp/config/database.yml
+      - source: bulwark_honeybadger_api_key
+        target: /run/secrets/honeybadger_api_key
       - source: bulwark_secrets_config
         target: /home/app/webapp/config/secrets.yml
     volumes:
