@@ -7,7 +7,7 @@ class BulkImport < ActiveRecord::Base
   QUEUED = 'queued'
 
   has_many :digital_object_imports, dependent: :destroy
-  belongs_to :created_by, class_name: User
+  belongs_to :created_by, class_name: User, required: true
 
   # kamanari config
   paginates_per 5

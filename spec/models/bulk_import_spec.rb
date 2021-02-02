@@ -21,6 +21,17 @@ RSpec.describe BulkImport, type: :model do
     expect(bulk_import).to respond_to :created_at, :updated_at
   end
 
+  describe '.valid?' do
+    context 'when created_by not present' do
+      let(:bulk_import) { FactoryBot.build(:bulk_import, created_by: nil) }
+
+      it 'returns error' do
+        expect(bulk_import.valid?).to be false
+        expect(bulk_import.errors.messages[:created_by]).to include "can't be blank"
+      end
+    end
+  end
+
   describe '.status' do
     context 'when all imports are queued' do
       let(:import_1) { FactoryBot.build(:digital_object_import, :queued) }
