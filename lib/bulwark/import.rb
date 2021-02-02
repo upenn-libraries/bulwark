@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'jhove_service'
 
 module Bulwark
   class Import
@@ -95,6 +96,9 @@ module Bulwark
       # Copy over assets and commit them to repository.
       copy_assets(clone_location)
 
+      # Create or update asset records.
+      create_or_update_assets(clone_location)
+
       # Add descriptive metadata
       unless descriptive_metadata.empty?
         # If metadata is already present merge metadata, otherwise create new
@@ -170,34 +174,16 @@ module Bulwark
       repo.metadata_builder.get_mappings(clone_location)
 
       # File checks (aka. derivative generation and file characterization)
-      repo.metadata_builder.file_checks_previews(clone_location)
-      update_derivatives_information(clone_location) # replaces Utils::Process.refresh_assets
+      generate_derivatives(clone_location)
+      characterize_assets(clone_location)
 
       # Create Thumbnail
-      repo.thumbnail = repo.structural_metadata.user_defined_mappings['sequence'].sort_by { |file| file['sequence'] }.first['filename']
-      repo.save!
-      thumbnails_directory = File.join(clone_location, repo.derivatives_subdirectory, 'thumbnails')
-      if File.exist?(thumbnails_directory)
-        repo.version_control_agent.get({ location: thumbnails_directory }, clone_location)
-        repo.version_control_agent.unlock({ content: thumbnails_directory }, clone_location)
-      else # create thumbnails directory
-        FileUtils.mkdir(thumbnails_directory)
-      end
-
-      # Generate derivative
-      original_file = File.join(clone_location, repo.assets_subdirectory, repo.thumbnail)
-      thumbnail_filepath = Bulwark::Derivatives::Image.thumbnail(original_file, thumbnails_directory)
-
-      # add, commit, push new derivative
-      repo.version_control_agent.add({ content: thumbnails_directory, include_dotfiles: true }, clone_location)
-      repo.version_control_agent.commit('Adding thumbnail', clone_location)
-      repo.version_control_agent.push({ content: thumbnails_directory }, clone_location)
-
-      # Add derivative location to repo.thumbnail_location
-      relative_thumbnail_filepath = Pathname.new(thumbnail_filepath).relative_path_from(Pathname.new(clone_location)).to_s
-      key = repo.version_control_agent.look_up_key(relative_thumbnail_filepath, clone_location)
-      repo.thumbnail_location = File.join(repo.names.bucket, key)
-      repo.save
+      thumbnail = repo.structural_metadata.user_defined_mappings['sequence'].sort_by { |file| file['sequence'] }.first['filename']
+      thumbnail_location = File.join(repo.names.bucket, repo.assets.find_by!(filename: thumbnail).thumbnail_file_location)
+      repo.update!(
+        thumbnail: thumbnail,
+        thumbnail_location: thumbnail_location
+      )
 
       # Generate xml: generate mets.xml and preservation.xml (can be moved to earlier in the process)
       add_preservation_and_mets_xml(clone_location)
@@ -213,6 +199,90 @@ module Bulwark
     end
 
     private
+
+      def create_or_update_assets(clone_location)
+        # All files in assets folder
+        glob_path = File.join(clone_location, repo.assets_subdirectory, "*.{#{repo.file_extensions.join(",")}}")
+        assets_paths = Dir.glob(glob_path) #full paths
+
+        # Updating or creating asset record for each asset file
+        assets_paths.each do |asset_path|
+          filename = File.basename(asset_path)
+          repo.assets.find_or_create_by(filename: filename) do |asset|
+            asset.original_file_location = repo.version_control_agent.look_up_key(File.join(repo.assets_subdirectory, filename), clone_location)
+            asset.size = File.size(asset_path) # In bytes
+          end
+        end
+
+        # Removing references to files that have been removed.
+        asset_filenames = assets_paths.map { |a| File.basename(a) }
+        repo.assets.each do |asset|
+          asset.destroy unless asset_filenames.include?(asset.filename)
+        end
+      end
+
+      def generate_derivatives(clone_location)
+        repo.version_control_agent.get({ location: repo.assets_subdirectory }, clone_location)
+        repo.version_control_agent.get({ location: repo.derivatives_subdirectory }, clone_location)
+        repo.version_control_agent.unlock({ content: repo.derivatives_subdirectory }, clone_location)
+
+        # Create 'thumbnails' and 'access' directories if they arent present already.
+        access_dir_path = File.join(clone_location, repo.derivatives_subdirectory, 'access')
+        thumbnail_dir_path = File.join(clone_location, repo.derivatives_subdirectory, 'thumbnails')
+
+        [access_dir_path, thumbnail_dir_path].each do |dir|
+          FileUtils.mkdir(dir) unless File.exist?(dir)
+        end
+
+        # Create derivatives for every asset.
+        repo.assets.each do |asset|
+          file_path = File.join(clone_location, repo.assets_subdirectory, asset.filename)
+          repo.version_control_agent.unlock({ content: file_path }, clone_location)
+
+          access_filepath = Derivatives::Image.access_copy(file_path, access_dir_path)
+          repo.version_control_agent.add({content: access_filepath, include_dotfiles: true}, clone_location)
+          asset.access_file_location = repo.version_control_agent.look_up_key(access_filepath, clone_location)
+
+          thumbnail_filepath = Derivatives::Image.thumbnail(file_path, thumbnail_dir_path)
+          repo.version_control_agent.add({content: thumbnail_filepath, include_dotfiles: true}, clone_location)
+          asset.thumbnail_file_location = repo.version_control_agent.look_up_key(thumbnail_filepath, clone_location)
+
+          asset.save!
+
+          repo.version_control_agent.add({content: file_path}, clone_location)
+          repo.version_control_agent.lock(file_path, clone_location)
+        end
+
+        repo.metadata_builder.update!(last_file_checks: DateTime.now)
+
+        repo.version_control_agent.add({ content: repo.derivatives_subdirectory, include_dotfiles: true }, clone_location)
+        repo.version_control_agent.lock(repo.derivatives_subdirectory, clone_location)
+        repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives', object_id: repo.names.fedora), clone_location)
+        repo.version_control_agent.push(clone_location)
+      end
+
+      def characterize_assets(clone_location)
+        repo.version_control_agent.get({ location: repo.assets_subdirectory }, clone_location)
+        repo.version_control_agent.unlock({ content: repo.assets_subdirectory}, clone_location)
+
+        # Retrieve the jhove output file if present in order to update it.
+        jhove_output_filepath = File.join(repo.metadata_subdirectory, 'jhove_output.xml')
+        if ExtendedGit.open(clone_location).annex.whereis.includes_file?(jhove_output_filepath)
+          repo.version_control_agent.get({ location: jhove_output_filepath }, clone_location)
+          repo.version_control_agent.unlock({ content: jhove_output_filepath }, clone_location)
+        end
+
+        # Runs jhove on `data/assets` stores output in `data/metadata/jhove_output.xml`.
+        # Because we unlock the files before running jhove the filename will be
+        # used in the jhove output. Otherwise the file's location in git is used.
+        jhove_output = JhoveService.new(File.join(clone_location, repo.metadata_subdirectory))
+                                   .run_jhove(File.join(clone_location, repo.assets_subdirectory))
+
+        repo.version_control_agent.lock(repo.assets_subdirectory, clone_location)
+        repo.version_control_agent.add({:content => "#{repo.metadata_subdirectory}/#{File.basename(jhove_output)}"}, clone_location)
+        repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_preservation_metadata', object_id: repo.names.fedora), clone_location)
+        repo.version_control_agent.push(clone_location)
+      end
 
       def add_preservation_and_mets_xml(clone_location)
         # Create and add preservation.xml to repository
@@ -243,41 +313,6 @@ module Bulwark
             "#{mets_filepath}" => File.join(repo.names.bucket, repo.version_control_agent.look_up_key(mets_filepath, clone_location)).to_s
           }
         )
-      end
-
-      # Update file_display_attributes, which is used to display derivatives.
-      # And update iiif information.
-      def update_derivatives_information(clone_location)
-        files = Dir.entries(File.join(clone_location, repo.derivatives_subdirectory)).reject do |f|
-          File.directory?(File.join(clone_location, repo.derivatives_subdirectory, f)) || f == '.keep'
-        end
-
-        new_file_display_attributes = {}
-        files.each do |file|
-          relative_filepath = File.join(repo.derivatives_subdirectory, file)
-          width, height = FastImage.size(File.join(clone_location, relative_filepath))
-          special_remote_filename = repo.version_control_agent.look_up_key(relative_filepath, clone_location)
-          new_file_display_attributes[special_remote_filename] = {
-            file_name: File.join(repo.derivatives_subdirectory, file),
-            width: width,
-            height: height
-          }
-        end
-        repo.file_display_attributes = new_file_display_attributes
-
-        if (structural = repo.structural_metadata)
-          display_array = structural.filenames.map do |filename|
-            entry = repo.file_display_attributes.select { |_key, hash| File.basename(hash[:file_name]) == "#{filename}.jpeg" }
-            raise I18n.t('colenda.utils.process.warnings.multiple_structural_files') if entry.length > 1
-            entry.keys.first # Returns the sha264 git-annex filename
-          end
-
-          repo.images_to_render['iiif'] = {
-            'reading_direction' => structural.viewing_direction,
-            'images' => display_array.map { |s| "#{Display.config['iiif']['image_server']}/#{repo.names.bucket}%2F#{s}/info.json" }
-          }
-        end
-        repo.save!
       end
 
       def create_digital_object

@@ -54,9 +54,22 @@ class ReposController < ApplicationController
 
   def fetch_image_ids
     repo = Repo.find_by(unique_identifier: "ark:/#{params[:id].tr('-','/')}")
-    result = {}
 
-    unless repo.nil?
+    if repo.nil?
+      result = {}
+    elsif repo.new_format
+      image_ids = repo.structural_metadata.filenames.map do |filename|
+        asset = repo.assets.find_by(filename: filename)
+        "/#{repo.names.bucket}%2F#{asset.access_file_location}"
+      end
+
+      result = {
+        id: params[:id],
+        title: repo.descriptive_metadata.user_defined_mappings['title'].flatten.join('; '),
+        reading_direction: repo.structural_metadata.viewing_direction,
+        image_ids: image_ids
+      }
+    else
       if repo.images_to_render.key?('iiif')
         ids = repo.images_to_render['iiif']['images']
       else
