@@ -15,5 +15,21 @@ FactoryBot.define do
         directive_name: 'ark-ish'
       }
     end
+
+    trait :successful do
+      status { DigitalObjectImport::SUCCESSFUL }
+    end
+
+    trait :failed do
+      status { DigitalObjectImport::FAILED }
+    end
+
+    trait :in_progress do
+      status { DigitalObjectImport::IN_PROGRESS }
+    end
+
+    trait :queued do
+      status { DigitalObjectImport::QUEUED }
+    end
   end
 end

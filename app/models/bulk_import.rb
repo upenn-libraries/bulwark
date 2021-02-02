@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class BulkImport < ActiveRecord::Base
+  COMPLETED = 'completed'
+  IN_PROGRESS = 'in progress'
+  QUEUED = 'queued'
+
   has_many :digital_object_imports, dependent: :destroy
   belongs_to :created_by, class_name: User
 
@@ -9,6 +13,26 @@ class BulkImport < ActiveRecord::Base
   max_paginates_per 100
 
   delegate :email, to: :created_by, prefix: true
+
+  # Returns 'Completed', 'In Progress', 'Queued' depending on status of the
+  # child import jobs. Completed means all jobs were either failed or were
+  # successful. In progress if there are any jobs in progress. Queued if
+  # all the jobs are queued.
+  def status
+    if digital_object_imports.blank?
+      COMPLETED
+    elsif digital_object_imports.any?(&:in_progress?)
+      IN_PROGRESS
+    elsif digital_object_imports.all?(&:queued?)
+      QUEUED
+    else
+      COMPLETED
+    end
+  end
+
+  def number_of_errors
+    digital_object_imports.where(status: DigitalObjectImport::FAILED).count
+  end
 
   # Returns Hash with validation errors. Errors are organized by row number. The
   # keys in the hash are the rows and the values are the errors correspoinding to
@@ -25,7 +49,6 @@ class BulkImport < ActiveRecord::Base
     end
     validation_errors.blank? ? nil : validation_errors
   end
-
 
   def create_imports(csv)
     rows = Bulwark::StructuredCSV.parse(csv)
