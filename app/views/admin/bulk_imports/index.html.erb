@@ -26,7 +26,7 @@
           <td><%= bulk_import.created_at %></td>
           <td><%= bulk_import.created_by.email %></td>
           <td><%= bulk_import.digital_object_imports.length %></td>
-          <td><%= bulk_import.status.titlecase %></td>
+          <td><%= bulk_import.status.nil? ? 'No Imports' : bulk_import.status.titlecase %></td>
           <td><%= bulk_import.number_of_errors %></td>
           <td>
             <%= link_to 'Details', admin_bulk_import_path(bulk_import), class: 'btn btn-sm btn-default' %>
