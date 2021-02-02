@@ -35,8 +35,8 @@ RSpec.describe BulkImport, type: :model do
     context 'when no imports are present' do
       let(:bulk_import) { FactoryBot.create(:bulk_import) }
 
-      it 'returns completed' do
-        expect(bulk_import.status).to eql BulkImport::COMPLETED
+      it 'returns nil' do
+        expect(bulk_import.status).to be_nil
       end
     end
 
@@ -66,7 +66,7 @@ RSpec.describe BulkImport, type: :model do
       let(:bulk_import) { FactoryBot.create(:bulk_import, digital_object_imports: [import_1, import_2]) }
 
       it 'returns completed' do
-        expect(bulk_import.status).to eql BulkImport::COMPLETED
+        expect(bulk_import.status).to eql BulkImport::COMPLETED_WITH_ERRORS
       end
     end
 
@@ -76,7 +76,7 @@ RSpec.describe BulkImport, type: :model do
       let(:bulk_import) { FactoryBot.create(:bulk_import, digital_object_imports: [import_1, import_2]) }
 
       it 'returns completed' do
-        expect(bulk_import.status).to eql BulkImport::COMPLETED
+        expect(bulk_import.status).to eql BulkImport::COMPLETED_WITH_ERRORS
       end
     end
   end

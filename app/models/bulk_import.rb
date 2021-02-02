@@ -2,6 +2,7 @@
 
 class BulkImport < ActiveRecord::Base
   COMPLETED = 'completed'
+  COMPLETED_WITH_ERRORS = 'completed with errors'
   IN_PROGRESS = 'in progress'
   QUEUED = 'queued'
 
@@ -15,18 +16,19 @@ class BulkImport < ActiveRecord::Base
   delegate :email, to: :created_by, prefix: true
 
   # Returns 'Completed', 'In Progress', 'Queued' depending on status of the
-  # child import jobs. Completed means all jobs were either failed or were
-  # successful. In progress if there are any jobs in progress. Queued if
+  # child import jobs. In progress if there are any jobs in progress. Queued if
   # all the jobs are queued.
   def status
-    if digital_object_imports.blank?
+    return nil if digital_object_imports.empty? # TODO: ???
+
+    if digital_object_imports.all?(&:successful?)
       COMPLETED
+    elsif imports_finished_with_failures?
+      COMPLETED_WITH_ERRORS
     elsif digital_object_imports.any?(&:in_progress?)
       IN_PROGRESS
     elsif digital_object_imports.all?(&:queued?)
       QUEUED
-    else
-      COMPLETED
     end
   end
 
@@ -57,4 +59,15 @@ class BulkImport < ActiveRecord::Base
       ProcessDigitalObjectImportJob.perform_later(digital_object_import)
     end
   end
+
+  private
+
+    # Determine if the related DO Imports are all complete (_not_ in progress or queued) and has at least one failed
+    # @return [TrueClass, FalseClass]
+    def imports_finished_with_failures?
+      digital_object_imports.where(status: DigitalObjectImport::FAILED).exists? &&
+        digital_object_imports.where.not(
+          status: [DigitalObjectImport::QUEUED, DigitalObjectImport::IN_PROGRESS]
+        ).exists?
+    end
 end
