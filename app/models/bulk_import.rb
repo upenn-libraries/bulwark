@@ -21,7 +21,7 @@ class BulkImport < ActiveRecord::Base
   # jobs have been completed successfully. Completed with errors if at least one
   # job failed.
   def status
-    return nil if digital_object_imports.empty? # TODO: ???
+    return nil if digital_object_imports.empty?
 
     if digital_object_imports.all?(&:successful?)
       COMPLETED
