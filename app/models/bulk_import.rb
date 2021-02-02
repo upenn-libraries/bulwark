@@ -15,9 +15,11 @@ class BulkImport < ActiveRecord::Base
 
   delegate :email, to: :created_by, prefix: true
 
-  # Returns 'Completed', 'In Progress', 'Queued' depending on status of the
-  # child import jobs. In progress if there are any jobs in progress. Queued if
-  # all the jobs are queued.
+  # Returns 'completed', 'completed with errors', 'in progress', 'queued'
+  # depending on status of the child import jobs. In progress if there are any
+  # jobs in progress. Queued if all the jobs are queued. Completed if all the
+  # jobs have been completed successfully. Completed with errors if at least one
+  # job failed.
   def status
     return nil if digital_object_imports.empty? # TODO: ???
 
