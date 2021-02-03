@@ -275,11 +275,15 @@ RSpec.describe Bulwark::Import do
         back = repo.assets.find_by(filename: 'back.tif')
 
         expect(front).not_to be_nil
+        expect(front.size).to be 42421
+        expect(front.mime_type).to eql 'image/jpeg'
         expect(front.original_file_location).to eql git.annex.lookupkey('data/assets/front.tif')
         expect(front.access_file_location).to eql git.annex.lookupkey('.derivs/access/front.jpeg')
         expect(front.thumbnail_file_location).to eql git.annex.lookupkey('.derivs/thumbnails/front.jpeg')
 
         expect(back).not_to be_nil
+        expect(back.size).to be 33079
+        expect(back.mime_type).to eql 'image/jpeg'
         expect(back.original_file_location).to eql git.annex.lookupkey('data/assets/back.tif')
         expect(back.access_file_location).to eql git.annex.lookupkey('.derivs/access/back.jpeg')
         expect(back.thumbnail_file_location).to eql git.annex.lookupkey('.derivs/thumbnails/back.jpeg')

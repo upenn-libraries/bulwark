@@ -9,6 +9,7 @@ module Bulwark
     DESCRIPTIVE_METADATA_FILENAME = 'descriptive_metadata.csv'
     STRUCTURAL_METADATA_FILENAME = 'structural_metadata.csv'
     METS_FILENAME = 'mets.xml'
+    JHOVE_OUTPUT_FILENAME = 'jhove_output.xml'
 
     attr_reader :unique_identifier, :action, :directive, :created_by, :assets,
                 :descriptive_metadata, :structural_metadata,
@@ -96,6 +97,9 @@ module Bulwark
       # Copy over assets and commit them to repository.
       copy_assets(clone_location)
 
+      # File characterization via jhove.
+      characterize_assets(clone_location)
+
       # Create or update asset records.
       create_or_update_assets(clone_location)
 
@@ -173,9 +177,8 @@ module Bulwark
       # "Extract" metadata
       repo.metadata_builder.get_mappings(clone_location)
 
-      # File checks (aka. derivative generation and file characterization)
+      # Derivative generation
       generate_derivatives(clone_location)
-      characterize_assets(clone_location)
 
       # Create Thumbnail
       thumbnail = repo.structural_metadata.user_defined_mappings['sequence'].sort_by { |file| file['sequence'] }.first['filename']
@@ -194,6 +197,7 @@ module Bulwark
 
       Result.new(status: DigitalObjectImport::SUCCESSFUL, unique_identifier: repo.unique_identifier)
     rescue => e
+      raise e
       Honeybadger.notify(e) # Sending full error to Honeybadger.
       Result.new(status: DigitalObjectImport::FAILED, errors: [e.message], unique_identifier: repo&.unique_identifier)
     end
@@ -205,12 +209,17 @@ module Bulwark
         glob_path = File.join(clone_location, repo.assets_subdirectory, "*.{#{repo.file_extensions.join(",")}}")
         assets_paths = Dir.glob(glob_path) #full paths
 
+        # Get jhove output in order to get the mime type and size for each asset.
+        repo.version_control_agent.get({ location: File.join(repo.metadata_subdirectory, JHOVE_OUTPUT_FILENAME) }, clone_location)
+        jhove_output = JhoveOutput.new(File.join(clone_location, repo.metadata_subdirectory, JHOVE_OUTPUT_FILENAME))
+
         # Updating or creating asset record for each asset file
         assets_paths.each do |asset_path|
           filename = File.basename(asset_path)
           repo.assets.find_or_create_by(filename: filename) do |asset|
             asset.original_file_location = repo.version_control_agent.look_up_key(File.join(repo.assets_subdirectory, filename), clone_location)
-            asset.size = File.size(asset_path) # In bytes
+            asset.size = jhove_output.size_for(filename) # In bytes
+            asset.mime_type = jhove_output.mime_type_for(filename)
           end
         end
 
@@ -266,7 +275,7 @@ module Bulwark
         repo.version_control_agent.unlock({ content: repo.assets_subdirectory}, clone_location)
 
         # Retrieve the jhove output file if present in order to update it.
-        jhove_output_filepath = File.join(repo.metadata_subdirectory, 'jhove_output.xml')
+        jhove_output_filepath = File.join(repo.metadata_subdirectory, JHOVE_OUTPUT_FILENAME)
         if ExtendedGit.open(clone_location).annex.whereis.includes_file?(jhove_output_filepath)
           repo.version_control_agent.get({ location: jhove_output_filepath }, clone_location)
           repo.version_control_agent.unlock({ content: jhove_output_filepath }, clone_location)
