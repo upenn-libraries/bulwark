@@ -45,6 +45,8 @@ shiftleft_container_scanning:
   stage: sast
   extends:
     - .shiftleft_container_scanning
+  variables:
+    ALLOW_FAIL: "true"
   tags:
     - build
 
