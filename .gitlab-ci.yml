@@ -1,0 +1,77 @@
+include:
+  - project: "devops/gitlab/ci-templates/docker"
+    ref: "master"
+    file: ".build_docker_image.yml"
+  - project: "devops/gitlab/ci-templates/docker"
+    ref: "master"
+    file: ".push_docker_image.yml"
+  - project: "devops/gitlab/ci-templates/docker"
+    ref: "master"
+    file: ".remove_docker_image.yml"
+  - project: "devops/gitlab/ci-templates/ruby"
+    ref: "master"
+    file: ".rspec.yml"
+  - project: "devops/gitlab/ci-templates/sast"
+    ref: "master"
+    file: ".shiftleft_container_scanning.yml"
+  - project: "devops/gitlab/ci-templates/sast"
+    ref: "master"
+    file: ".trivy_container_scanning.yml"
+
+stages:
+  - .pre
+  - test
+  - sast
+  - push
+  - .post
+
+build_image:
+  stage: .pre
+  extends:
+    - .build_docker_image
+  tags:
+    - build
+
+# rspec_test:
+#   stage: test
+#   extends:
+#     - .rspec
+#   variables:
+#     RSPEC_TEST_DOCKER_ENV_VARS: "-e SECRET_KEY_BASE=x -e ALMA_API_KEY=${ALMA_API_KEY}"
+#   tags:
+#     - build
+
+shiftleft_container_scanning:
+  stage: sast
+  extends:
+    - .shiftleft_container_scanning
+  tags:
+    - build
+
+trivy_container_scanning:
+  stage: sast
+  extends:
+    - .trivy_container_scanning
+  variables:
+    ALLOW_FAIL: "true"
+  tags:
+    - build
+
+push_image_to_registry:
+  stage: push
+  extends:
+    - .push_docker_image
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH =~ /(dev|staging)/
+  tags:
+    - build
+
+remove_image:
+  stage: .post
+  extends:
+    - .remove_docker_image
+  when:
+    always
+  tags:
+    - build
