@@ -242,7 +242,7 @@ module Bulwark
           FileUtils.mkdir(dir) unless File.exist?(dir)
         end
 
-        # Create derivatives for every asset.
+        # Create derivatives for jpeg and tiff files.
         repo.assets.each do |asset|
           next unless asset.mime_type == 'image/jpeg' || asset.mime_type == 'image/tiff'
           file_path = File.join(clone_location, repo.assets_subdirectory, asset.filename)
