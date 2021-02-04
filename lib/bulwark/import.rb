@@ -28,7 +28,9 @@ module Bulwark
     def initialize(args)
       args = args.deep_symbolize_keys
 
-      @action = args[:action]
+      Rails.logger.error(args) #temporary
+
+      @action = args[:action]&.downcase
       @unique_identifier = args[:unique_identifier]
       @directive = args[:directive]
       @created_by = args[:created_by]

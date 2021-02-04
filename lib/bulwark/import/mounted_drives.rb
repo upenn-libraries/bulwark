@@ -11,17 +11,19 @@ module Bulwark
 
       # Returns true if the given drive is configured
       def self.valid?(drive)
-        all.keys.include?(drive)
+        all.keys.include?(drive) && all[drive].present?
       end
 
       # Returns true if the given path exists within the drive.
       def self.valid_path?(drive, path)
+        return false if drive.blank? || path.blank?
+        Rails.logger.error("all: #{all}")
         valid?(drive) && File.exist?(File.join(path_to(drive), path))
       end
 
       # Returns all configured drives
       def self.all
-        Rails.application.config_for(:bulwark)['mounted_drives'].with_indifferent_access
+        Rails.application.config_for(:bulwark)['mounted_drives']
       end
     end
   end

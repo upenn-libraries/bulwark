@@ -4,7 +4,7 @@ RSpec.describe Bulwark::Import do
 
   describe '.new'
 
-  describe '.validation' do
+  describe '.validation', focus: true do
     before do
       stub_request(:get, /#{Ezid::Client.config.host}\/id\/.*/)
         .with(
@@ -105,7 +105,7 @@ RSpec.describe Bulwark::Import do
     end
 
     context 'when asset path is invalid' do
-      subject { described_class.new(assets: { drive: 'test', path: 'invalid/something' }) }
+      subject { described_class.new('assets' => { 'drive' => 'test', 'path' => 'invalid/something' }) }
 
       it 'adds error' do
         expect(subject.validate).to be false
@@ -174,7 +174,7 @@ RSpec.describe Bulwark::Import do
         described_class.new(
           action: Bulwark::Import::CREATE,
           directive: 'object_one',
-          assets: { drive: 'test', path: 'object_one' },
+          assets: { 'drive' => 'test', 'path' => 'object_one' },
           metadata: descriptive_metadata,
           structural: { 'filenames' => 'front.tif; back.tif' },
           created_by: created_by
