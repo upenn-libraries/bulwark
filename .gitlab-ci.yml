@@ -11,6 +11,9 @@ include:
   - project: "devops/gitlab/ci-templates/ruby"
     ref: "master"
     file: ".rspec.yml"
+  - project: "devops/gitlab/ci-templates/ruby"
+    ref: "rubocop"
+    file: ".rubocop.yml"
   - project: "devops/gitlab/ci-templates/sast"
     ref: "master"
     file: ".shiftleft_container_scanning.yml"
@@ -40,6 +43,11 @@ build_image:
 #     RSPEC_TEST_DOCKER_ENV_VARS: "-e SECRET_KEY_BASE=x -e ALMA_API_KEY=${ALMA_API_KEY}"
 #   tags:
 #     - build
+
+rubocop:
+  stage: test
+  extends:
+    - .rubocop
 
 shiftleft_container_scanning:
   stage: sast
