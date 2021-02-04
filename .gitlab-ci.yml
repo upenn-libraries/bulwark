@@ -48,6 +48,8 @@ rubocop:
   stage: test
   extends:
     - .rubocop
+  tags:
+    - build
 
 shiftleft_container_scanning:
   stage: sast
