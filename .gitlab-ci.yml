@@ -48,6 +48,10 @@ rubocop:
   stage: test
   extends:
     - .rubocop
+  variables:
+    RUBOCOP_DOCKER_ENV_VARS: "--env-file .env"
+  before_script:
+    - cp ${CI_PROJECT_DIR}/.env.example ${CI_PROJECT_DIR}/.env
   tags:
     - build
 
