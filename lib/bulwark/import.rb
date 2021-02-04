@@ -245,6 +245,7 @@ module Bulwark
 
         # Create derivatives for every asset.
         repo.assets.each do |asset|
+          next unless asset.mime_type == 'image/jpeg' || asset.mime_type == 'image/tiff'
           file_path = File.join(clone_location, repo.assets_subdirectory, asset.filename)
           repo.version_control_agent.unlock({ content: file_path }, clone_location)
 
