@@ -4,9 +4,12 @@
 
 <% if @digital_object.structural_metadata %>
   <% @digital_object.structural_metadata.user_defined_mappings['sequence'].each do |values| %>
-    <% files_with_structural << values['filenames'] %>
-    <% asset = @digital_object.assets.find_by(filename: values['filename']) %>
-    <%= render partial: 'asset', locals: { asset: asset, metadata: values } %>
+    <% if asset = @digital_object.assets.find_by(filename: values['filename']) %>
+      <% files_with_structural << asset.filename %>
+      <%= render partial: 'asset', locals: { asset: asset, metadata: values } %>
+    <% else %>
+      <p>Warning: <%= values['filename'] %> is not a correct asset filename</p>
+    <% end %>
     <hr>
   <% end %>
 <% end %>
