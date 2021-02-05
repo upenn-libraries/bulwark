@@ -16,9 +16,7 @@ module Bulwark
 
       # Returns true if the given path exists within the drive.
       def self.valid_path?(drive, path)
-        Rails.logger.error("all: #{all}")
         return false if drive.blank? || path.blank?
-        Rails.logger.error("fullpath: #{File.join(path_to(drive), path)}")
         valid?(drive) && File.exist?(File.join(path_to(drive), path))
       end
 

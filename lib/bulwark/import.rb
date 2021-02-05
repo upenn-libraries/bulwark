@@ -28,8 +28,6 @@ module Bulwark
     def initialize(args)
       args = args.deep_symbolize_keys
 
-      Rails.logger.error(args) #temporary
-
       @action = args[:action]&.downcase
       @unique_identifier = args[:unique_identifier]
       @directive = args[:directive]
@@ -68,13 +66,13 @@ module Bulwark
 
       if assets
         @errors << "asset drive invalid" if assets[:drive] && !MountedDrives.valid?(assets[:drive])
-        @errors << "asset path invalid" if assets[:drive] && assets[:path] && !MountedDrives.valid_path?(assets[:drive], assets[:path])
+        # @errors << "asset path invalid" if assets[:drive] && assets[:path] && !MountedDrives.valid_path?(assets[:drive], assets[:path])
       end
 
       if structural_metadata
         @errors << "cannot provide structural metadata two different ways" if (structural_metadata[:drive] || structural_metadata[:path]) && structural_metadata[:filenames]
         @errors << "structural drive invalid" if structural_metadata[:drive] && !MountedDrives.valid?(structural_metadata[:drive])
-        @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
+        # @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
       end
 
       @errors << "created_by must always be provided" unless created_by
@@ -83,8 +81,20 @@ module Bulwark
 
     def process
       # Validate before processing data
-      return Result.new(status: DigitalObjectImport::FAILED, errors: errors) unless validate
+      validate
 
+      # Running filepath validations here, until we can configure our web containers to be able to do these checks.
+      if assets
+        @errors << "asset path invalid" if assets[:drive] && assets[:path] && !MountedDrives.valid_path?(assets[:drive], assets[:path])
+      end
+
+      if structural_metadata
+        @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
+      end
+
+      return Result.new(status: DigitalObjectImport::FAILED, errors: errors) unless @errors.empty?
+
+      # Retrieve or create repo.
       @repo = case action.downcase
               when CREATE
                 create_digital_object

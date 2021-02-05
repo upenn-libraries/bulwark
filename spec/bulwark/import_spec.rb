@@ -4,7 +4,7 @@ RSpec.describe Bulwark::Import do
 
   describe '.new'
 
-  describe '.validation', focus: true do
+  describe '.validation' do
     before do
       stub_request(:get, /#{Ezid::Client.config.host}\/id\/.*/)
         .with(
@@ -108,6 +108,7 @@ RSpec.describe Bulwark::Import do
       subject { described_class.new('assets' => { 'drive' => 'test', 'path' => 'invalid/something' }) }
 
       it 'adds error' do
+        pending('path validity is being checked in .process')
         expect(subject.validate).to be false
         expect(subject.errors).to include 'asset path invalid'
       end
@@ -135,6 +136,7 @@ RSpec.describe Bulwark::Import do
       subject { described_class.new(structural: { drive: 'test', path: 'invalid/something' }) }
 
       it 'adds error' do
+        pending('path validity is being checked in .process')
         expect(subject.validate).to be false
         expect(subject.errors).to include 'structural path invalid'
       end
