@@ -261,12 +261,14 @@ module Bulwark
           repo.version_control_agent.unlock({ content: file_path }, clone_location)
 
           access_filepath = Derivatives::Image.access_copy(file_path, access_dir_path)
-          repo.version_control_agent.add({content: access_filepath, include_dotfiles: true}, clone_location)
-          asset.access_file_location = repo.version_control_agent.look_up_key(access_filepath, clone_location)
+          access_relative_path = Pathname.new(access_filepath).relative_path_from(Pathname.new(clone_location)).to_s
+          repo.version_control_agent.add({content: access_relative_path, include_dotfiles: true}, clone_location)
+          asset.access_file_location = repo.version_control_agent.look_up_key(access_relative_path, clone_location)
 
           thumbnail_filepath = Derivatives::Image.thumbnail(file_path, thumbnail_dir_path)
-          repo.version_control_agent.add({content: thumbnail_filepath, include_dotfiles: true}, clone_location)
-          asset.thumbnail_file_location = repo.version_control_agent.look_up_key(thumbnail_filepath, clone_location)
+          thumbnail_relative_path = Pathname.new(thumbnail_filepath).relative_path_from(Pathname.new(clone_location)).to_s
+          repo.version_control_agent.add({content: thumbnail_relative_path, include_dotfiles: true}, clone_location)
+          asset.thumbnail_file_location = repo.version_control_agent.look_up_key(thumbnail_relative_path, clone_location)
 
           asset.save!
 
