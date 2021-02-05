@@ -75,7 +75,7 @@
   </div>
   <div role="tabpanel" class="tab-pane" id="generated-xml">
     <table class="table">
-      <% @digital_object.metadata_builder.generated_metadata_files.each do |filepath, remote_location| %>
+      <% (@digital_object.metadata_builder.generated_metadata_files || {}).each do |filepath, remote_location| %>
         <tr>
           <td><%= File.basename(filepath) %></td>
           <td><%= link_to 'download', special_remote_download_url(remote_location) %>
