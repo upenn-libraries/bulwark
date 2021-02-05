@@ -194,7 +194,7 @@ module Bulwark
 
       # Create Thumbnail
       thumbnail = repo.structural_metadata.user_defined_mappings['sequence'].sort_by { |file| file['sequence'] }.first['filename']
-      thumbnail_location = File.join(repo.names.bucket, repo.assets.find_by!(filename: thumbnail).thumbnail_file_location)
+      thumbnail_location = File.join(repo.names.bucket, repo.assets.find_by!(filename: thumbnail)&.thumbnail_file_location)
       repo.update!(
         thumbnail: thumbnail,
         thumbnail_location: thumbnail_location
