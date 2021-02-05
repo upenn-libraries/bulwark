@@ -11,7 +11,7 @@ module Bulwark
     METS_FILENAME = 'mets.xml'
     JHOVE_OUTPUT_FILENAME = 'jhove_output.xml'
 
-    attr_reader :unique_identifier, :action, :directive, :created_by, :assets,
+    attr_reader :unique_identifier, :action, :directive_name, :created_by, :assets,
                 :descriptive_metadata, :structural_metadata,
                 :repo, :clone_location, :errors
 
@@ -20,7 +20,7 @@ module Bulwark
     # @param [Hash] arguments passed in to create/update digital objects
     # @options opts [String] :action
     # @options opts [User] :created_by
-    # @options opts [String] :directive
+    # @options opts [String] :directive_name
     # @options opts [String] :unique_identifier
     # @options opts [Hash] :assets
     # @options opts [Hash] :metadata  # gets mapped to descriptive_metadata
@@ -30,7 +30,7 @@ module Bulwark
 
       @action = args[:action]&.downcase
       @unique_identifier = args[:unique_identifier]
-      @directive = args[:directive]
+      @directive_name = args[:directive_name]
       @created_by = args[:created_by]
       @descriptive_metadata = args.fetch(:metadata, {})
       @structural_metadata = args.fetch(:structural, {})
@@ -49,7 +49,7 @@ module Bulwark
       @errors << "\"#{action}\" is not a valid import action" unless IMPORT_ACTIONS.include?(action)
 
       if action == CREATE
-        @errors << "\"directive\" must be provided to create an object" unless directive
+        @errors << "\"directive_name\" must be provided to create an object" unless directive_name
         @errors << "structural must be provided to create an object" unless structural_metadata && (structural_metadata[:filenames] || (structural_metadata[:drive] && structural_metadata[:path]))
         @errors << "\"assets.path\" and \"assets.drive\" must be provided to create an object" if assets && (!assets[:drive] || !assets[:path])
         @errors << "metadata must be provided to create an object" if descriptive_metadata.blank?
@@ -65,7 +65,7 @@ module Bulwark
       end
 
       if assets
-        @errors << "asset drive invalid" if assets[:drive] && !MountedDrives.valid?(assets[:drive])
+        @errors << "assets drive invalid" if assets[:drive] && !MountedDrives.valid?(assets[:drive])
         # @errors << "asset path invalid" if assets[:drive] && assets[:path] && !MountedDrives.valid_path?(assets[:drive], assets[:path])
       end
 
@@ -194,7 +194,8 @@ module Bulwark
 
       # Create Thumbnail
       thumbnail = repo.structural_metadata.user_defined_mappings['sequence'].sort_by { |file| file['sequence'] }.first['filename']
-      thumbnail_location = File.join(repo.names.bucket, repo.assets.find_by!(filename: thumbnail)&.thumbnail_file_location)
+      thumbnail_file_location = repo.assets.find_by!(filename: thumbnail)&.thumbnail_file_location
+      thumbnail_location = thumbnail_file_location ? File.join(repo.names.bucket, thumbnail_file_location) : nil
       repo.update!(
         thumbnail: thumbnail,
         thumbnail_location: thumbnail_location
@@ -340,7 +341,7 @@ module Bulwark
 
       def create_digital_object
         repo = Repo.new(
-          human_readable_name: directive,
+          human_readable_name: directive_name,
           metadata_subdirectory: 'metadata',
           assets_subdirectory: 'assets',
           file_extensions: ['tif', 'TIF'],

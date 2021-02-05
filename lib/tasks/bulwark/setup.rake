@@ -12,7 +12,7 @@ namespace :bulwark do
     task create_digital_object: :create_admin do
       Bulwark::Import.new(
         action: Bulwark::Import::CREATE,
-        directive: 'object_one',
+        directive_name: 'object_one',
         assets: { drive: 'test', path: 'object_one' },
         metadata: {
           'collection' => ['Arnold and Deanne Kaplan Collection of Early American Judaica (University of Pennsylvania)'],
