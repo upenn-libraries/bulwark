@@ -29,38 +29,46 @@
 
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="descriptive-metadata">
-    <h4>Metadata Provided</h4>
-    <%= link_to 'descriptive_metadata.csv', special_remote_download_url(@digital_object.descriptive_metadata.remote_location) %>
-    <hr>
-    <h4>Extracted Metadata</h4>
-    <table class="table">
-      <% @digital_object.descriptive_metadata.user_defined_mappings.each do |field, values| %>
-        <tr>
-          <td><%= field.gsub('_', ' ').titlecase %></td>
-          <td><%= values.join('<br>').html_safe %></td>
-        </tr>
-      <% end %>
-    </table>
+    <% if @digital_object.descriptive_metadata %>
+      <h4>Metadata Provided</h4>
+      <%= link_to 'descriptive_metadata.csv', special_remote_download_url(@digital_object.descriptive_metadata.remote_location) %>
+      <hr>
+      <h4>Extracted Metadata</h4>
+      <table class="table">
+        <% @digital_object.descriptive_metadata.user_defined_mappings.each do |field, values| %>
+          <tr>
+            <td><%= field.gsub('_', ' ').titlecase %></td>
+            <td><%= values.join('<br>').html_safe %></td>
+          </tr>
+        <% end %>
+      </table>
+    <% else %>
+      <p>Descriptive metadata not available</p>
+    <% end %>
   </div>
   <div role="tabpanel" class="tab-pane" id="structural-metadata">
-    <h4>Metadata Provided</h4>
-    <%= link_to 'structural_metadata.csv', special_remote_download_url(@digital_object.structural_metadata.remote_location) %>
-    <hr>
-    <h4>Extracted Metadata</h4>
-    <table class="table">
-      <tr>
-        <% MetadataSource::VALID_STRUCTURAL_METADATA_FIELDS.each do |field| %>
-          <th><%= field %></th>
-        <% end %>
-      </tr>
-      <% @digital_object.structural_metadata.user_defined_mappings['sequence'].each do |values| %>
+    <% if @digital_object.structural_metadata %>
+      <h4>Metadata Provided</h4>
+      <%= link_to 'structural_metadata.csv', special_remote_download_url(@digital_object.structural_metadata.remote_location) %>
+      <hr>
+      <h4>Extracted Metadata</h4>
+      <table class="table">
         <tr>
           <% MetadataSource::VALID_STRUCTURAL_METADATA_FIELDS.each do |field| %>
-            <td><%= values[field] %></td>
+            <th><%= field %></th>
           <% end %>
         </tr>
-      <% end %>
-    </table>
+        <% @digital_object.structural_metadata.user_defined_mappings.fetch('sequence', []).each do |values| %>
+          <tr>
+            <% MetadataSource::VALID_STRUCTURAL_METADATA_FIELDS.each do |field| %>
+              <td><%= values[field] %></td>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
+    <% else %>
+      <p>Structural metadata not available</p>
+    <% end %>
   </div>
   <div role="tabpanel" class="tab-pane" id="assets">
     <%= render 'assets' %>
