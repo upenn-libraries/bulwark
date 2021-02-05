@@ -11,10 +11,10 @@ namespace :bulwark do
     desc 'Loads one digital object, to be used in local development environment'
     task create_digital_object: :create_admin do
       Bulwark::Import.new(
-        type: Bulwark::Import::CREATE,
+        action: Bulwark::Import::CREATE,
         directive: 'object_one',
         assets: { drive: 'test', path: 'object_one' },
-        descriptive_metadata: {
+        metadata: {
           'collection' => ['Arnold and Deanne Kaplan Collection of Early American Judaica (University of Pennsylvania)'],
           'call_number' => ['Arc.MS.56'],
           'item_type' => ['Trade cards'],
@@ -27,7 +27,7 @@ namespace :bulwark do
           'subject' => ['House furnishings', 'Jewish merchants', 'Trade cards (advertising)'],
           'title' => ['Trade card; J. Rosenblatt & Co.; Baltimore, Maryland, United States; undated;']
         },
-        structural_metadata: { 'filenames' => 'front.tif; back.tif' },
+        structural: { 'filenames' => 'front.tif; back.tif' },
         created_by: User.find_by(email: 'admin@example.com')
       ).process
     end
