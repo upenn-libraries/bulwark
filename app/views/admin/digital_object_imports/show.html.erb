@@ -10,7 +10,7 @@
 <h2>Digital Object Import: <%= @digital_object_import.id %></h2>
 
 <h4>Status</h4>
-<%= @digital_object_import.status %>
+<%= @digital_object_import.status.titlecase %>
 
 <% unless @digital_object_import.process_errors.blank? %>
   <h4>Errors</h4>

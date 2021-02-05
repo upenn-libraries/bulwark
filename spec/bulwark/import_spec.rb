@@ -37,7 +37,7 @@ RSpec.describe Bulwark::Import do
         expect(subject.errors).to include('structural must be provided to create an object')
         expect(subject.errors).to include('metadata must be provided to create an object')
         expect(subject.errors).to include('"assets.path" and "assets.drive" must be provided to create an object')
-        expect(subject.errors).to include('"directive" must be provided to create an object')
+        expect(subject.errors).to include('"directive_name" must be provided to create an object')
       end
     end
 
@@ -100,14 +100,15 @@ RSpec.describe Bulwark::Import do
 
       it 'adds error' do
         expect(subject.validate).to be false
-        expect(subject.errors).to include 'asset drive invalid'
+        expect(subject.errors).to include 'assets drive invalid'
       end
     end
 
     context 'when asset path is invalid' do
-      subject { described_class.new(assets: { drive: 'test', path: 'invalid/something' }) }
+      subject { described_class.new('assets' => { 'drive' => 'test', 'path' => 'invalid/something' }) }
 
       it 'adds error' do
+        pending('path validity is being checked in .process')
         expect(subject.validate).to be false
         expect(subject.errors).to include 'asset path invalid'
       end
@@ -135,6 +136,7 @@ RSpec.describe Bulwark::Import do
       subject { described_class.new(structural: { drive: 'test', path: 'invalid/something' }) }
 
       it 'adds error' do
+        pending('path validity is being checked in .process')
         expect(subject.validate).to be false
         expect(subject.errors).to include 'structural path invalid'
       end
@@ -173,8 +175,8 @@ RSpec.describe Bulwark::Import do
       let(:import) do
         described_class.new(
           action: Bulwark::Import::CREATE,
-          directive: 'object_one',
-          assets: { drive: 'test', path: 'object_one' },
+          directive_name: 'object_one',
+          assets: { 'drive' => 'test', 'path' => 'object_one' },
           metadata: descriptive_metadata,
           structural: { 'filenames' => 'front.tif; back.tif' },
           created_by: created_by
@@ -384,7 +386,7 @@ RSpec.describe Bulwark::Import do
       let(:import) do
         described_class.new(
           action: Bulwark::Import::CREATE,
-          directive: 'object_one',
+          directive_name: 'object_one',
           assets: { 'drive' => 'test', 'path' => 'object_one/front.tif' },
           metadata: descriptive_metadata,
           structural: { 'filenames' => 'front.tif' },
@@ -425,7 +427,7 @@ RSpec.describe Bulwark::Import do
       let(:import) do
         described_class.new(
           action: Bulwark::Import::CREATE,
-          directive: 'object_one',
+          directive_name: 'object_one',
           assets: { drive: 'test', path: 'object_one' },
           metadata: { title: ['Object One'] },
           structural: { drive: 'test', path: 'object_one/structural_metadata.csv' },
@@ -492,7 +494,7 @@ RSpec.describe Bulwark::Import do
       let(:import) do
         described_class.new(
           action: Bulwark::Import::CREATE,
-          directive: 'object_one',
+          directive_name: 'object_one',
           assets: { drive: 'test', path: 'object_one' },
           metadata: { 'bibnumber' => [bibnumber], 'item_type' => ['Manuscript'] },
           structural: { 'filenames' => 'front.tif; back.tif' },

@@ -6,7 +6,7 @@ module Admin
     end
 
     def show
-      @digital_object = Repo.find_by(params[:id])
+      @digital_object = Repo.find(params[:id])
     end
   end
 end

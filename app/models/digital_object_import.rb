@@ -2,7 +2,7 @@
 
 class DigitalObjectImport < ActiveRecord::Base
   QUEUED = 'queued'
-  IN_PROGRESS = 'in_progress'
+  IN_PROGRESS = 'in progress'
   FAILED = 'failed'
   SUCCESSFUL = 'successful'
   STATUSES = [QUEUED, IN_PROGRESS, FAILED, SUCCESSFUL].freeze
@@ -18,7 +18,7 @@ class DigitalObjectImport < ActiveRecord::Base
 
   # status helpers
   STATUSES.each do |s|
-    define_method "#{s}?" do
+    define_method "#{s.gsub(' ', '_')}?" do
       status == s
     end
   end

@@ -33,7 +33,7 @@
       <% @bulk_import.digital_object_imports.each do |digital_object_import| %>
         <tr>
           <td><%= digital_object_import.id %></td>
-          <td><%= digital_object_import.status %></td>
+          <td><%= digital_object_import.status.titlecase %></td>
           <td>
             <%= link_to 'Details', admin_bulk_import_digital_object_import_path(@bulk_import, digital_object_import), class: 'btn btn-sm btn-default' %>
           </td>

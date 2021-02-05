@@ -11,7 +11,7 @@ module Bulwark
     METS_FILENAME = 'mets.xml'
     JHOVE_OUTPUT_FILENAME = 'jhove_output.xml'
 
-    attr_reader :unique_identifier, :action, :directive, :created_by, :assets,
+    attr_reader :unique_identifier, :action, :directive_name, :created_by, :assets,
                 :descriptive_metadata, :structural_metadata,
                 :repo, :clone_location, :errors
 
@@ -20,7 +20,7 @@ module Bulwark
     # @param [Hash] arguments passed in to create/update digital objects
     # @options opts [String] :action
     # @options opts [User] :created_by
-    # @options opts [String] :directive
+    # @options opts [String] :directive_name
     # @options opts [String] :unique_identifier
     # @options opts [Hash] :assets
     # @options opts [Hash] :metadata  # gets mapped to descriptive_metadata
@@ -28,9 +28,9 @@ module Bulwark
     def initialize(args)
       args = args.deep_symbolize_keys
 
-      @action = args[:action]
+      @action = args[:action]&.downcase
       @unique_identifier = args[:unique_identifier]
-      @directive = args[:directive]
+      @directive_name = args[:directive_name]
       @created_by = args[:created_by]
       @descriptive_metadata = args.fetch(:metadata, {})
       @structural_metadata = args.fetch(:structural, {})
@@ -49,7 +49,7 @@ module Bulwark
       @errors << "\"#{action}\" is not a valid import action" unless IMPORT_ACTIONS.include?(action)
 
       if action == CREATE
-        @errors << "\"directive\" must be provided to create an object" unless directive
+        @errors << "\"directive_name\" must be provided to create an object" unless directive_name
         @errors << "structural must be provided to create an object" unless structural_metadata && (structural_metadata[:filenames] || (structural_metadata[:drive] && structural_metadata[:path]))
         @errors << "\"assets.path\" and \"assets.drive\" must be provided to create an object" if assets && (!assets[:drive] || !assets[:path])
         @errors << "metadata must be provided to create an object" if descriptive_metadata.blank?
@@ -65,14 +65,14 @@ module Bulwark
       end
 
       if assets
-        @errors << "asset drive invalid" if assets[:drive] && !MountedDrives.valid?(assets[:drive])
-        @errors << "asset path invalid" if assets[:drive] && assets[:path] && !MountedDrives.valid_path?(assets[:drive], assets[:path])
+        @errors << "assets drive invalid" if assets[:drive] && !MountedDrives.valid?(assets[:drive])
+        # @errors << "asset path invalid" if assets[:drive] && assets[:path] && !MountedDrives.valid_path?(assets[:drive], assets[:path])
       end
 
       if structural_metadata
         @errors << "cannot provide structural metadata two different ways" if (structural_metadata[:drive] || structural_metadata[:path]) && structural_metadata[:filenames]
         @errors << "structural drive invalid" if structural_metadata[:drive] && !MountedDrives.valid?(structural_metadata[:drive])
-        @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
+        # @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
       end
 
       @errors << "created_by must always be provided" unless created_by
@@ -81,8 +81,20 @@ module Bulwark
 
     def process
       # Validate before processing data
-      return Result.new(status: DigitalObjectImport::FAILED, errors: errors) unless validate
+      validate
 
+      # Running filepath validations here, until we can configure our web containers to be able to do these checks.
+      if assets
+        @errors << "asset path invalid" if assets[:drive] && assets[:path] && !MountedDrives.valid_path?(assets[:drive], assets[:path])
+      end
+
+      if structural_metadata
+        @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
+      end
+
+      return Result.new(status: DigitalObjectImport::FAILED, errors: errors) unless @errors.empty?
+
+      # Retrieve or create repo.
       @repo = case action.downcase
               when CREATE
                 create_digital_object
@@ -182,7 +194,8 @@ module Bulwark
 
       # Create Thumbnail
       thumbnail = repo.structural_metadata.user_defined_mappings['sequence'].sort_by { |file| file['sequence'] }.first['filename']
-      thumbnail_location = File.join(repo.names.bucket, repo.assets.find_by!(filename: thumbnail).thumbnail_file_location)
+      thumbnail_file_location = repo.assets.find_by!(filename: thumbnail)&.thumbnail_file_location
+      thumbnail_location = thumbnail_file_location ? File.join(repo.names.bucket, thumbnail_file_location) : nil
       repo.update!(
         thumbnail: thumbnail,
         thumbnail_location: thumbnail_location
@@ -249,12 +262,14 @@ module Bulwark
           repo.version_control_agent.unlock({ content: file_path }, clone_location)
 
           access_filepath = Derivatives::Image.access_copy(file_path, access_dir_path)
-          repo.version_control_agent.add({content: access_filepath, include_dotfiles: true}, clone_location)
-          asset.access_file_location = repo.version_control_agent.look_up_key(access_filepath, clone_location)
+          access_relative_path = Pathname.new(access_filepath).relative_path_from(Pathname.new(clone_location)).to_s
+          repo.version_control_agent.add({content: access_relative_path, include_dotfiles: true}, clone_location)
+          asset.access_file_location = repo.version_control_agent.look_up_key(access_relative_path, clone_location)
 
           thumbnail_filepath = Derivatives::Image.thumbnail(file_path, thumbnail_dir_path)
-          repo.version_control_agent.add({content: thumbnail_filepath, include_dotfiles: true}, clone_location)
-          asset.thumbnail_file_location = repo.version_control_agent.look_up_key(thumbnail_filepath, clone_location)
+          thumbnail_relative_path = Pathname.new(thumbnail_filepath).relative_path_from(Pathname.new(clone_location)).to_s
+          repo.version_control_agent.add({content: thumbnail_relative_path, include_dotfiles: true}, clone_location)
+          asset.thumbnail_file_location = repo.version_control_agent.look_up_key(thumbnail_relative_path, clone_location)
 
           asset.save!
 
@@ -326,7 +341,7 @@ module Bulwark
 
       def create_digital_object
         repo = Repo.new(
-          human_readable_name: directive,
+          human_readable_name: directive_name,
           metadata_subdirectory: 'metadata',
           assets_subdirectory: 'assets',
           file_extensions: ['tif', 'TIF'],
