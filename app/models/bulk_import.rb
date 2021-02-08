@@ -10,7 +10,7 @@ class BulkImport < ActiveRecord::Base
   belongs_to :created_by, class_name: User, required: true
 
   # kamanari config
-  paginates_per 5
+  paginates_per 10
   max_paginates_per 100
 
   delegate :email, to: :created_by, prefix: true
