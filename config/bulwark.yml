@@ -20,4 +20,4 @@ production:
     oceanus-sceti: <%= ENV['OCEANUS_SCETI_HARVESTING_ENDPOINT_REMOTE'] %>
     mastersrbm:  <%= ENV['MASTERSRBM_HARVESTING_ENDPOINT_REMOTE'] %>
   marmite:
-    url: <%= ENV['MARMITE_BASE'] %>
+    url: <%= ENV['MARMITE_URL'] %>
