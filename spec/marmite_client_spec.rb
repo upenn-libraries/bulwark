@@ -6,7 +6,8 @@ RSpec.describe MarmiteClient do
 
     context 'when request is successful' do
       before do
-        stub_request(:get, "https://marmite.library.upenn.edu/#{bibnumber}/create?format=marc21")
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=marc21").to_return(status: 302)
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=marc21")
           .to_return(status: 200, body: fixture_to_str('marmite', 'marc_xml', "#{bibnumber}.xml"), headers: {})
       end
 
@@ -17,7 +18,8 @@ RSpec.describe MarmiteClient do
 
     context 'when request is unsuccessful' do
       before do
-        stub_request(:get, "https://marmite.library.upenn.edu/#{bibnumber}/create?format=marc21")
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=marc21").to_return(status: 302)
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=marc21")
           .to_return(status: 404, body: "Record #{bibnumber} in marc21 format not found", headers: {})
       end
 
@@ -32,7 +34,7 @@ RSpec.describe MarmiteClient do
   describe '#config' do
     context 'when all configuration is present' do
       it 'returns configuration' do
-        expect(described_class.config).to eql('url' => 'https://marmite.library.upenn.edu')
+        expect(described_class.config).to eql('url' => 'https://marmite.library.upenn.edu:9292')
       end
     end
 

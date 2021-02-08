@@ -2,13 +2,13 @@ development:
   mounted_drives:
     test: <%= Rails.root.join('spec', 'fixtures', 'example_manifest_loads') %>
   marmite:
-    url: http://marmite.library.upenn.edu
+    url: http://marmite.library.upenn.edu:9292
 
 test:
   mounted_drives:
     test: <%= Rails.root.join('spec', 'fixtures', 'example_manifest_loads') %>
   marmite:
-    url: https://marmite.library.upenn.edu
+    url: https://marmite.library.upenn.edu:9292
 
 production:
   mounted_drives:
@@ -20,4 +20,4 @@ production:
     oceanus-sceti: <%= ENV['OCEANUS_SCETI_HARVESTING_ENDPOINT_REMOTE'] %>
     mastersrbm:  <%= ENV['MASTERSRBM_HARVESTING_ENDPOINT_REMOTE'] %>
   marmite:
-    url: <%= ENV['MARMITE_BASE'] %>
+    url: <%= ENV['MARMITE_URL'] %>
