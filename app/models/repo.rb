@@ -3,6 +3,8 @@ require 'sanitize'
 
 class Repo < ActiveRecord::Base
   scope :new_format, -> { where(new_format: true) }
+  scope :name_search, ->(query) { where_like(:human_readable_name, query) }
+  scope :id_search, ->(query) { where_like(:unique_identifier, query) }
 
   include ModelNamingExtensions::Naming
   include Utils::Artifacts::ProblemsLog
@@ -360,6 +362,14 @@ class Repo < ActiveRecord::Base
   #TODO: Add a field that indicates repo ownership candidacy
   def self.repo_owners
     User.where(guest: false).pluck(:email, :email)
+  end
+
+  # Could be put into a concern for other models to be searched
+  # @param [String] column_name
+  # @param [String] query
+  def self.where_like(column_name, query)
+    column = self.arel_table[column_name]
+    where(column.matches("%#{sanitize_sql_like(query)}%"))
   end
 
   def format_types(extensions_array)

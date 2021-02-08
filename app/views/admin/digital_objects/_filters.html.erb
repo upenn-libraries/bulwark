@@ -1,0 +1,27 @@
+<section id="index_filters">
+  <div class="well">
+    <%= bootstrap_form_tag(url: admin_digital_objects_path, method: :get) do %>
+      <div class="row">
+        <div class="col-md-3">
+          <%= label_tag :id_search, 'Identifier' %>
+          <%= text_field_tag :id_search, params[:id_search] %>
+        </div>
+        <div class="col-md-3">
+          <%= label_tag :id_search, 'Name' %>
+          <%= text_field_tag :name_search, params[:name_search]  %>
+        </div>
+        <div class="col-md-3">
+          <%= label_tag :owner_search, 'Owner' %>
+          <%= select_tag :owner_search,
+                         options_from_collection_for_select(Repo.select(:owner).distinct, :owner, :owner, selected: params[:owner_search]), include_blank: 'Any' %>
+        </div>
+        <div class="col-md-3">
+          <div class="btn-group pull-right">
+            <%= submit_tag 'Filter', class: 'btn btn-primary digital-objects-filter-submit' %>
+            <%= link_to 'Clear', admin_digital_objects_path, class: 'btn btn-default' %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>

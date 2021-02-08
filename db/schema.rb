@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210203204115) do
+ActiveRecord::Schema.define(version: 20210205164638) do
 
   create_table "assets", force: :cascade do |t|
     t.integer  "repo_id",                 limit: 4
@@ -170,7 +170,9 @@ ActiveRecord::Schema.define(version: 20210203204115) do
   end
 
   add_index "repos", ["endpoint_id"], name: "index_repos_on_endpoint_id", using: :btree
+  add_index "repos", ["human_readable_name"], name: "index_repos_on_human_readable_name", using: :btree
   add_index "repos", ["metadata_builder_id"], name: "index_repos_on_metadata_builder_id", using: :btree
+  add_index "repos", ["unique_identifier"], name: "index_repos_on_unique_identifier", using: :btree
   add_index "repos", ["version_control_agent_id"], name: "index_repos_on_version_control_agent_id", using: :btree
 
   create_table "roles", force: :cascade do |t|
