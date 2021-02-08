@@ -4,7 +4,7 @@ module Admin
       # Querying for repos created in the new format.
       @digital_objects = Repo.new_format
       @digital_objects = @digital_objects.id_search(params[:id_search]) if params[:id_search].present?
-      @digital_objects = @digital_objects.name_search(params[:name_search]) if params[:id_search].present?
+      @digital_objects = @digital_objects.name_search(params[:name_search]) if params[:name_search].present?
       @digital_objects = @digital_objects.where(owner: params[:owner_search]) if params[:owner_search].present?
     end
 
