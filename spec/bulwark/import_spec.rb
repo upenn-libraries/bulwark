@@ -514,7 +514,7 @@ RSpec.describe Bulwark::Import do
 
       # Stub marmite request
       before do
-        stub_request(:get, "https://marmite.library.upenn.edu/#{bibnumber}/create?format=marc21")
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=marc21")
           .to_return(status: 200, body: fixture_to_str('marmite', 'marc_xml', "#{bibnumber}.xml"), headers: {})
       end
 
