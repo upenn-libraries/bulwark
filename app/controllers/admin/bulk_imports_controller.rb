@@ -1,7 +1,9 @@
 module Admin
   class BulkImportsController < AdminController
     def index
-      @bulk_imports = BulkImport.page(params[:page]).includes(:digital_object_imports)
+      @bulk_imports = BulkImport.order(created_at: :desc)
+                                .page(params[:page])
+                                .includes(:digital_object_imports)
     end
 
     def new
