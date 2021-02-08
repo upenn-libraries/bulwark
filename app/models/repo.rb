@@ -369,7 +369,7 @@ class Repo < ActiveRecord::Base
   # @param [String] query
   def self.where_like(column_name, query)
     column = self.arel_table[column_name]
-    where(column.matches("%#{query}%"))
+    where(column.matches("%#{sanitize_sql_like(query)}%"))
   end
 
   def format_types(extensions_array)
