@@ -31,7 +31,8 @@ class DigitalObjectImport < ActiveRecord::Base
 
     update(
       status: result.status,
-      process_errors: result.errors
+      process_errors: result.errors,
+      repo: result.repo
     )
   end
 

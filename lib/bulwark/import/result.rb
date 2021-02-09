@@ -3,12 +3,12 @@
 module Bulwark
   class Import
     class Result
-      attr_reader :unique_identifier, :status, :errors
+      attr_reader :repo, :status, :errors
 
-      def initialize(status:, errors: [], unique_identifier: nil)
+      def initialize(status:, errors: [], repo: nil)
         @status = status
         @errors = errors
-        @unique_identifier = unique_identifier
+        @repo = repo
       end
     end
   end
