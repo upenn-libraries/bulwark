@@ -27,3 +27,14 @@
     <% end %>
   </table>
 </div>
+
+<div class="row">
+  <div class="col-md-6">
+    <%= paginate @digital_objects, remote: true %>
+  </div>
+  <div class="col-md-6">
+    <div class="pull-right">
+      <%= render 'shared/per_page' %>
+    </div>
+  </div>
+</div>

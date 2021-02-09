@@ -78,6 +78,7 @@ gem 'nokogiri'
 gem 'bixby', '2.0.0'
 gem 'addressable'
 gem 'bootstrap_form', '~> 2.7'
+gem 'kaminari-bootstrap', '~> 3.0.1'
 
 group :development, :test do
   gem 'letter_opener'

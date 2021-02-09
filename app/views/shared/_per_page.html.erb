@@ -1,0 +1,4 @@
+<%= bootstrap_form_tag url: { action: params[:action], controller: params[:controller] }, method: :get do %>
+  <%= label_tag :per_page, 'Per Page' %>
+  <%= select_tag :per_page, options_for_select([25, 50, 100, 200], params[:per_page]), onchange: 'this.form.submit();' %>
+<% end %>
