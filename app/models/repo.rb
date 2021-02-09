@@ -41,6 +41,10 @@ class Repo < ActiveRecord::Base
   serialize :images_to_render, Hash
   serialize :last_action_performed, Hash
 
+  # kamanari config
+  paginates_per 25
+  max_paginates_per 200
+
   def set_version_control_agent_and_repo
     yield
     set_defaults
@@ -366,7 +370,7 @@ class Repo < ActiveRecord::Base
   end
 
   # Could be put into a concern for other models to be searched
-  # @param [String] column_name
+  # @param [Symbol] column_name
   # @param [String] query
   def self.where_like(column_name, query)
     column = self.arel_table[column_name]
