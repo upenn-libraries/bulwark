@@ -8,6 +8,7 @@ class DigitalObjectImport < ActiveRecord::Base
   STATUSES = [QUEUED, IN_PROGRESS, FAILED, SUCCESSFUL].freeze
 
   belongs_to :bulk_import
+  belongs_to :repo
 
   serialize :process_errors, Array
   serialize :import_data, JSON
@@ -30,7 +31,8 @@ class DigitalObjectImport < ActiveRecord::Base
 
     update(
       status: result.status,
-      process_errors: result.errors
+      process_errors: result.errors,
+      repo: result.repo
     )
   end
 

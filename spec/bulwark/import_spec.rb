@@ -182,7 +182,7 @@ RSpec.describe Bulwark::Import do
           created_by: created_by
         )
       end
-      let(:repo) { Repo.find_by(unique_identifier: result.unique_identifier) }
+      let(:repo) { result.repo }
       let(:working_dir) { repo.version_control_agent.clone }
       let(:git) { ExtendedGit.open(working_dir) }
       let(:whereis_result) { git.annex.whereis }
@@ -318,7 +318,7 @@ RSpec.describe Bulwark::Import do
         let(:updated_result) do
           described_class.new(
             action: Bulwark::Import::UPDATE,
-            unique_identifier: result.unique_identifier,
+            unique_identifier: result.repo.unique_identifier,
             metadata: updated_descriptive_metadata,
             assets: { drive: 'test', path: 'object_one_update/new.tif' },
             structural: { filenames: 'new.tif; front.tif; back.tif' },
@@ -326,7 +326,7 @@ RSpec.describe Bulwark::Import do
           ).process
         end
 
-        let(:updated_repo) { Repo.find_by(unique_identifier: updated_result.unique_identifier) }
+        let(:updated_repo) { updated_result.repo }
         let(:updated_working_dir) { updated_repo.version_control_agent.clone }
         let(:updated_git) { ExtendedGit.open(updated_working_dir) }
         let(:updated_whereis_result) { updated_git.annex.whereis }
@@ -393,7 +393,7 @@ RSpec.describe Bulwark::Import do
           created_by: created_by
         )
       end
-      let(:repo) { Repo.find_by(unique_identifier: result.unique_identifier) }
+      let(:repo) { result.repo }
       let(:working_dir) { repo.version_control_agent.clone }
       let(:git) { ExtendedGit.open(working_dir) }
       let(:whereis_result) { git.annex.whereis }
@@ -434,7 +434,7 @@ RSpec.describe Bulwark::Import do
           created_by: created_by
         )
       end
-      let(:repo) { Repo.find_by(unique_identifier: result.unique_identifier) }
+      let(:repo) { result.repo }
       let(:working_dir) { repo.version_control_agent.clone }
       let(:git) { ExtendedGit.open(working_dir) }
       let(:whereis_result) { git.annex.whereis }
@@ -505,7 +505,7 @@ RSpec.describe Bulwark::Import do
       let(:expected_preservation) { fixture_to_xml('example_objects', 'object_two', 'preservation.xml') }
       let(:expected_descriptive) { fixture_to_str('example_objects', 'object_two', 'descriptive_metadata.csv') }
 
-      let(:repo) { Repo.find_by(unique_identifier: result.unique_identifier) }
+      let(:repo) { result.repo }
       let(:working_dir) { repo.version_control_agent.clone }
       let(:git) { ExtendedGit.open(working_dir) }
       let(:whereis_result) { git.annex.whereis }

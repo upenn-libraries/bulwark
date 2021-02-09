@@ -208,10 +208,10 @@ module Bulwark
 
       # TODO: ingest: index straight into Solr, skip Fedora.
 
-      Result.new(status: DigitalObjectImport::SUCCESSFUL, unique_identifier: repo.unique_identifier)
+      Result.new(status: DigitalObjectImport::SUCCESSFUL, repo: repo)
     rescue => e
       Honeybadger.notify(e) # Sending full error to Honeybadger.
-      Result.new(status: DigitalObjectImport::FAILED, errors: [e.message], unique_identifier: repo&.unique_identifier)
+      Result.new(status: DigitalObjectImport::FAILED, errors: [e.message], repo: repo)
     end
 
     private
