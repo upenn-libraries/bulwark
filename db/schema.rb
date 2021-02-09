@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210205164638) do
+ActiveRecord::Schema.define(version: 20210209170510) do
 
   create_table "assets", force: :cascade do |t|
     t.integer  "repo_id",                 limit: 4
@@ -63,7 +63,10 @@ ActiveRecord::Schema.define(version: 20210205164638) do
     t.text     "import_data",    limit: 16777215
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
+    t.integer  "repo_id",        limit: 4
   end
+
+  add_index "digital_object_imports", ["repo_id"], name: "fk_rails_0f30a10968", using: :btree
 
   create_table "endpoints", force: :cascade do |t|
     t.string   "source",       limit: 255
@@ -230,6 +233,7 @@ ActiveRecord::Schema.define(version: 20210205164638) do
 
   add_index "version_control_agents", ["repo_id"], name: "index_version_control_agents_on_repo_id", using: :btree
 
+  add_foreign_key "digital_object_imports", "repos"
   add_foreign_key "endpoints", "repos"
   add_foreign_key "metadata_builders", "metadata_sources"
   add_foreign_key "metadata_builders", "repos"
