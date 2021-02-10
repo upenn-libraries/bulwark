@@ -99,7 +99,7 @@ module Bulwark
               when CREATE
                 create_digital_object
               when UPDATE
-                Repo.find_by(unique_identifier: unique_identifier)
+                Repo.find_by(unique_identifier: unique_identifier, new_format: true)
               end
 
       update_digital_object(repo)
