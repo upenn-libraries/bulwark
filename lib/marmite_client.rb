@@ -18,6 +18,19 @@ module MarmiteClient
     response.body
   end
 
+  # @return [MarmiteClient::Error] if unable to create iiif manifest
+  # @return [String] body of iiif manifest if successfully created
+  def self.iiif_presentation(formatted_ark)
+    # Create IIIF Presentation 2.0 Manifest
+    Faraday.get(url("records/#{formatted_ark}/create?format=iiif_presentation"))
+
+    response = Faraday.get(url("records/#{formatted_ark}/show?format=iiif_presentation"))
+
+    raise Error, "Could not create IIIF Presentation Manifest for #{formatted_ark}. Error: #{response.body}" unless response.success?
+
+    response.body
+  end
+
   # TODO: Structural metadata will also be fetched from Marmite.
   # def structural(bibnumber); end
 

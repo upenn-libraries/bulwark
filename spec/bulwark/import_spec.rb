@@ -291,6 +291,20 @@ RSpec.describe Bulwark::Import do
         expect(back.thumbnail_file_location).to eql git.annex.lookupkey('.derivs/thumbnails/back.jpeg')
       end
 
+      context 'when creating a iiif presentation manifest' do
+        before do
+          allow(Bulwark::Config).to receive(:bulk_import).and_return({ create_iiif_manifest: true })
+        end
+
+        it 'makes requests to generate iiif manifest' do
+          stub_create = stub_request(:get, /https\:\/\/marmite\.library\.upenn\.edu\:9292\/records\/.*\/create\?format=iiif_presentation/)
+          stub_show = stub_request(:get, /https\:\/\/marmite\.library\.upenn\.edu\:9292\/records\/.*\/show\?format=iiif_presentation/)
+          result
+          expect(stub_create).to have_been_requested
+          expect(stub_show).to have_been_requested
+        end
+      end
+
       # Updating digital object with additional metadata and an additional asset.
       context 'when updating a digital object' do
         let(:updated_descriptive_metadata) do
