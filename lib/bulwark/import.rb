@@ -99,7 +99,7 @@ module Bulwark
               when CREATE
                 create_digital_object
               when UPDATE
-                Repo.find_by(unique_identifier: unique_identifier)
+                Repo.find_by(unique_identifier: unique_identifier, new_format: true)
               end
 
       update_digital_object(repo)
@@ -204,12 +204,14 @@ module Bulwark
       # Generate xml: generate mets.xml and preservation.xml (can be moved to earlier in the process)
       add_preservation_and_mets_xml(clone_location)
 
-      # TODO: Create Marmite IIIF Document?
+      # Create Marmite IIIF Manifest
+      MarmiteClient.iiif_presentation(repo.names.fedora) if Bulwark::Config.bulk_import[:create_iiif_manifest]
 
       # TODO: ingest: index straight into Solr, skip Fedora.
 
       Result.new(status: DigitalObjectImport::SUCCESSFUL, repo: repo)
     rescue => e
+      raise e
       Honeybadger.notify(e) # Sending full error to Honeybadger.
       Result.new(status: DigitalObjectImport::FAILED, errors: [e.message], repo: repo)
     end

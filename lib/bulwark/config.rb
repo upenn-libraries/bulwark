@@ -17,5 +17,11 @@ module Bulwark
                        .fetch('special_remote', {})
                        .with_indifferent_access
     end
+
+    def self.bulk_import
+      Rails.application.config_for(:bulwark)
+                       .fetch('bulk_import', {})
+                       .with_indifferent_access
+    end
   end
 end

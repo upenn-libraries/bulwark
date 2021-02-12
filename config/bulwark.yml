@@ -3,12 +3,16 @@ development:
     test: <%= Rails.root.join('spec', 'fixtures', 'example_manifest_loads') %>
   marmite:
     url: http://marmite.library.upenn.edu:9292
+  bulk_import:
+    create_iiif_manifest: false
 
 test:
   mounted_drives:
     test: <%= Rails.root.join('spec', 'fixtures', 'example_manifest_loads') %>
   marmite:
     url: https://marmite.library.upenn.edu:9292
+  bulk_import:
+    create_iiif_manifest: false
 
 production:
   mounted_drives:
@@ -21,3 +25,5 @@ production:
     mastersrbm:  <%= ENV['MASTERSRBM_HARVESTING_ENDPOINT_REMOTE'] %>
   marmite:
     url: <%= ENV['MARMITE_URL'] %>
+  bulk_import:
+    create_iiif_manifest: true
