@@ -60,8 +60,6 @@ shiftleft_container_scanning:
   stage: sast
   extends:
     - .shiftleft_container_scanning
-  # variables:
-  #   ALLOW_FAIL: "true"
   tags:
     - build
   allow_failure: true
@@ -70,8 +68,6 @@ trivy_container_scanning:
   stage: sast
   extends:
     - .trivy_container_scanning
-  # variables:
-  #   ALLOW_FAIL: "true"
   tags:
     - build
   allow_failure: true
@@ -80,9 +76,9 @@ push_image_to_registry:
   stage: push
   extends:
     - .push_docker_image
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_BRANCH =~ /(dev|staging)/
+  # rules:
+  #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  #   - if: $CI_COMMIT_BRANCH =~ /(dev|staging)/
   tags:
     - build
 
