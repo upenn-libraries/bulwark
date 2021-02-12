@@ -43,7 +43,7 @@ RSpec.describe MarmiteClient do
           .to_return(status: 200, body: "{}")
       end
 
-      it 'returns true' do
+      it 'returns response body' do
         expect(described_class.iiif_presentation(repo.names.fedora)).to eql "{}"
       end
     end
