@@ -54,6 +54,7 @@ rubocop:
     - cp ${CI_PROJECT_DIR}/.env.example ${CI_PROJECT_DIR}/.env
   tags:
     - build
+  allow_failure: true
 
 shiftleft_container_scanning:
   stage: sast
