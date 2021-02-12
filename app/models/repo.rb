@@ -422,7 +422,7 @@ class Repo < ActiveRecord::Base
   end
 
   def bibid
-    descriptive_metadata.original_mappings["bibid"] || descriptive_metadata.original_mappings["bibnumber"]
+    descriptive_metadata.original_mappings["bibid"] || descriptive_metadata.original_mappings["bibnumber"]&.first
   end
 
   def thumbnail_link
