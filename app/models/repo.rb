@@ -426,6 +426,52 @@ class Repo < ActiveRecord::Base
     ).to_s
   end
 
+  def solr_document
+    document = {
+      'id' => names.fedora,
+      'active_fedora_model_ssi' => 'Manuscript', # TODO: Can remove once Blacklight doesn't depend on these fields
+      'has_model_ssim' => ['Manuscript'],
+      'unique_identifier_tesim' => unique_identifier,
+      'system_create_dtsi' => first_published_at.utc.iso8601,
+      'system_modified_dtsi' => last_published_at.utc.iso8601
+    }
+
+    MetadataSource::VALID_DESCRIPTIVE_METADATA_FIELDS.each do |field|
+      values = descriptive_metadata.user_defined_mappings.fetch(field, [])
+      next if values.blank?
+
+      document["#{field}_tesim"] = values
+      document["#{field}_ssim"] = values
+      document["#{field}_sim"] = values
+    end
+
+    document
+  end
+
+  # @return [True] if publish was successful
+  # @return [False] if publish was not successful
+  def publish
+    # TODO: check that iiif manifest is available?
+    # TODO: check that descriptive metadata and structural metadata are present?
+
+    # Rollback first_published_at and last_published_at, if solr requests are not successful.
+    self.transaction do
+      now = Time.current
+      self.first_published_at = now if first_published_at.blank?
+      self.last_published_at = now
+      save!
+      # Add Solr Document to Solr Core -- raise error if cannot be added to Solr Core
+      solr = RSolr.connect(url: Bulwark::Config.solr[:url])
+      solr.add(self.solr_document)
+      solr.commit
+    end
+
+    true
+  rescue => e
+    Honeybadger.notify(e)
+    false
+  end
+
   private
 
   def _build_and_populate_directories(working_path)

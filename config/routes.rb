@@ -53,7 +53,11 @@ Rails.application.routes.draw do
     resources :bulk_imports, except: %w[edit update destroy] do
       resources :digital_object_imports, only: [:show]
     end
-    resources :digital_objects, only: [:index, :show]
+    resources :digital_objects, only: [:index, :show] do
+      member do
+        post :publish
+      end
+    end
 
     if Rails.env.development? || Rails.env.test?
       get 'special_remote_download/:bucket/:key', to: :special_remote_download, as: :special_remote_download, constraints: { key: /[^\/]+/ }

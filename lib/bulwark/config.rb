@@ -23,5 +23,9 @@ module Bulwark
                        .fetch('bulk_import', {})
                        .with_indifferent_access
     end
+
+    def self.solr
+      Rails.application.config_for(:solr).with_indifferent_access
+    end
   end
 end

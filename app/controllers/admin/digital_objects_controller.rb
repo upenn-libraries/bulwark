@@ -11,5 +11,20 @@ module Admin
     def show
       @digital_object = Repo.find(params[:id])
     end
+
+    # POST publish
+    # Publishes digital object to public front-end.
+    def publish
+      @digital_object = Repo.find(params[:id])
+      success = @digital_object.publish
+
+      if success
+        flash[:success] = 'Publishing was successful.'
+      else
+        flash[:error] = 'Error publishing digital object. Please see logs.'
+      end
+
+      redirect_to action: :show
+    end
   end
 end

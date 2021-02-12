@@ -207,7 +207,7 @@ module Bulwark
       # Create Marmite IIIF Manifest
       MarmiteClient.iiif_presentation(repo.names.fedora) if Bulwark::Config.bulk_import[:create_iiif_manifest]
 
-      # TODO: ingest: index straight into Solr, skip Fedora.
+      # TODO: Publish if publish flag is set to true.
 
       Result.new(status: DigitalObjectImport::SUCCESSFUL, repo: repo)
     rescue => e
