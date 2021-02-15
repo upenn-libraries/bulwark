@@ -189,6 +189,9 @@ module Bulwark
       # "Extract" metadata
       repo.metadata_builder.get_mappings(clone_location)
 
+      # Check that all filenames referenced in the structural metadata are valid.
+      validate_structural_metadata
+
       # Derivative generation
       generate_derivatives(clone_location)
 
@@ -211,12 +214,19 @@ module Bulwark
 
       Result.new(status: DigitalObjectImport::SUCCESSFUL, repo: repo)
     rescue => e
-      raise e
       Honeybadger.notify(e) # Sending full error to Honeybadger.
       Result.new(status: DigitalObjectImport::FAILED, errors: [e.message], repo: repo)
     end
 
     private
+      def validate_structural_metadata
+        valid_filenames = repo.assets.pluck(:filename)
+        filenames = repo.structural_metadata.filenames
+        invalid_filenames  = filenames - valid_filenames
+        if invalid_filenames.present?
+          raise "Structural metadata contains the following invalid filenames: #{invalid_filenames.join(', ')}"
+        end
+      end
 
       def create_or_update_assets(clone_location)
         # All files in assets folder

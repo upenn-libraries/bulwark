@@ -552,5 +552,32 @@ RSpec.describe Bulwark::Import do
         expect(Nokogiri::XML(File.read(File.join(working_dir, repo.metadata_subdirectory, 'mets.xml')))).to be_equivalent_to(expected_mets).ignoring_attr_values('OBJID').ignoring_content_of('mods|identifier')
       end
     end
+
+    context 'when creating a new digital object with incorrect structural metadata' do
+      let(:structural_metadata) do
+        {
+          'sequence' => [
+            { 'sequence' => '1', 'filename' => 'front_1.tif' },
+            { 'sequence' => '2', 'filename' => 'back_2.tif' }
+          ]
+        }
+      end
+      let(:import) do
+        described_class.new(
+          action: Bulwark::Import::CREATE,
+          directive_name: 'object_one',
+          assets: { drive: 'test', path: 'object_one' },
+          metadata: { title: ['Object One'] },
+          structural: { filenames: 'front_1.tif; back_2.tif' },
+          created_by: created_by
+        )
+      end
+
+      let(:result) { import.process }
+
+      it 'import was not successful' do
+        expect(result.errors).to contain_exactly('Structural metadata contains the following invalid filenames: front_1.tif, back_2.tif')
+      end
+    end
   end
 end
