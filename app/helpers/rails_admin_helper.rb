@@ -20,11 +20,6 @@ module RailsAdminHelper
     render_ingested_list
   end
 
-  def render_review_box
-    repo = Repo.where('unique_identifier = ?', @document.id.reverse_fedorafy).first
-    render_review_status(repo)
-  end
-
   def render_status_based_template(unique_identifier, process)
     render :partial => job_based_partial(unique_identifier, process)
   end
