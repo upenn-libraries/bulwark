@@ -1,7 +1,7 @@
 module StructuralMetadataSources
   extend ActiveSupport::Concern
 
-  VALID_STRUCTURAL_METADATA_FIELDS = ['sequence', 'filename', 'label', 'viewing_direction'].freeze
+  VALID_STRUCTURAL_METADATA_FIELDS = ['sequence', 'filename', 'label', 'viewing_direction', 'text_annotation'].freeze
 
   def structural_metadata(working_path)
     self.metadata_builder.repo.version_control_agent.get({ location: path }, working_path)
@@ -14,7 +14,7 @@ module StructuralMetadataSources
     metadata_path = File.join(working_path, path)
     csv = File.open(metadata_path).read
 
-    metadata = CSV.parse(csv, headers: true).map(&:to_h)
+    metadata = Bulwark::StructuredCSV.parse(csv)
     ordered_metadata = metadata.sort_by { |row| row['sequence'].to_i }
 
     self.original_mappings = { 'sequence' => ordered_metadata }

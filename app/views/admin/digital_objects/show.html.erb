@@ -38,12 +38,14 @@
       <hr>
       <h4>Extracted Metadata</h4>
       <table class="table">
-        <% @digital_object.descriptive_metadata.user_defined_mappings.each do |field, values| %>
-          <tr>
-            <td><%= field.gsub('_', ' ').titlecase %></td>
-            <td><%= values.join('<br>').html_safe %></td>
-          </tr>
-        <% end %>
+        <tbody>
+          <% @digital_object.descriptive_metadata.user_defined_mappings.each do |field, values| %>
+            <tr>
+              <th><%= field.gsub('_', ' ').titlecase %></th>
+              <td><%= values.join('<br>').html_safe %></td>
+            </tr>
+          <% end %>
+        </tbody>
       </table>
     <% else %>
       <p>Descriptive metadata not available</p>
@@ -55,19 +57,23 @@
       <%= link_to 'structural_metadata.csv', special_remote_download_url(@digital_object.structural_metadata.remote_location) %>
       <hr>
       <h4>Extracted Metadata</h4>
-      <table class="table">
-        <tr>
-          <% MetadataSource::VALID_STRUCTURAL_METADATA_FIELDS.each do |field| %>
-            <th><%= field %></th>
-          <% end %>
-        </tr>
-        <% @digital_object.structural_metadata.user_defined_mappings.fetch('sequence', []).each do |values| %>
+      <table class="table table-striped">
+        <thead>
           <tr>
             <% MetadataSource::VALID_STRUCTURAL_METADATA_FIELDS.each do |field| %>
-              <td><%= values[field] %></td>
+              <th><%= field.gsub('_', ' ').titlecase %></th>
             <% end %>
           </tr>
-        <% end %>
+        </thead>
+        <tbody>
+          <% @digital_object.structural_metadata.user_defined_mappings.fetch('sequence', []).each do |values| %>
+            <tr>
+              <% MetadataSource::VALID_STRUCTURAL_METADATA_FIELDS.each do |field| %>
+                <td><%= Array.wrap(values[field]).join('<br>').html_safe %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
       </table>
     <% else %>
       <p>Structural metadata not available</p>
