@@ -368,7 +368,7 @@ module Bulwark
 
       def update_digital_object(repo)
         repo.update!(
-          description: 'Generated from CSV through automated workflow',
+          description: 'Generated from CSV through bulk import',
           last_external_update: Time.current,
           owner: created_by.email
         )
