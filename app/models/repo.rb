@@ -3,6 +3,7 @@ require 'sanitize'
 
 class Repo < ActiveRecord::Base
   scope :new_format, -> { where(new_format: true) }
+  scope :old_format, -> { where(new_format: false) }
   scope :name_search, ->(query) { where_like(:human_readable_name, query) }
   scope :id_search, ->(query) { where_like(:unique_identifier, query) }
 

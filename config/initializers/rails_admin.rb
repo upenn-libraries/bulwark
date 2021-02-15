@@ -223,6 +223,7 @@ RailsAdmin.config do |config|
       help I18n.t('colenda.rails_admin.new_repo.preservation_filename.help')
     end
     list do
+      scopes [:old_format]
       field :metadata_subdirectory do
         visible false
       end
