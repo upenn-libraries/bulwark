@@ -25,6 +25,9 @@
   <li role="presentation">
     <a href="#generated-xml" aria-controls="generated-xml" role="tab" data-toggle="tab">Generated XML</a>
   </li>
+  <li role="presentation">
+    <a href="#publish" aria-controls="publish" role="tab" data-toggle="tab">Publish</a>
+  </li>
 </ul>
 
 <div class="tab-content">
@@ -82,5 +85,17 @@
         </tr>
       <% end %>
     </table>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="publish">
+
+    <h4>Publish</h4>
+    <p>Publishing makes this digital object available in the public website.</p>
+    <p><strong>First published at:</strong> <%= @digital_object.first_published_at&.to_s(:display) || '[None]' %></p>
+    <p><strong>Last published at:</strong> <%= @digital_object.last_published_at&.to_s(:display) || '[None]' %></p>
+
+    <%= bootstrap_form_tag(url: publish_admin_digital_object_path(@digital_object), method: :post) do |f| %>
+      <%= f.submit 'Publish Now', class: 'btn btn-primary' %>
+    <% end %>
+
   </div>
 </div>

@@ -199,4 +199,122 @@ RSpec.describe Repo, type: :model do
       expect(repo.thumbnail_link).to eql "https://storage.library.upenn.edu/#{repo.names.bucket}/file_one.jpeg"
     end
   end
+
+  describe '#solr_document' do
+    let(:repo) { FactoryBot.create(:repo, :with_assets, :with_descriptive_metadata, :published) }
+    let(:current_time) { Time.current }
+    let(:document) do
+      {
+        "active_fedora_model_ssi" => "Manuscript",
+        "call_number_sim" => ["Ms. Coll 200 box 180 folder 8576 item 2"],
+        "call_number_ssim" => ["Ms. Coll 200 box 180 folder 8576 item 2"],
+        "call_number_tesim" => ["Ms. Coll 200 box 180 folder 8576 item 2"],
+        "collection_sim" => ["Marian Anderson Papers (University of Pennsylvania)"],
+        "collection_ssim" => ["Marian Anderson Papers (University of Pennsylvania)"],
+        "collection_tesim" => ["Marian Anderson Papers (University of Pennsylvania)"],
+        "corporate_name_sim" => ["McMillin Academic Theater, Columbia University", "Hurok Attractions, Inc. ", "Institute of Arts and Sciences, Columbia University"],
+        "corporate_name_ssim" => ["McMillin Academic Theater, Columbia University", "Hurok Attractions, Inc. ", "Institute of Arts and Sciences, Columbia University"],
+        "corporate_name_tesim" => ["McMillin Academic Theater, Columbia University", "Hurok Attractions, Inc. ", "Institute of Arts and Sciences, Columbia University"],
+        "date_sim" => ["1941-12-20T20:30:00"],
+        "date_ssim" => ["1941-12-20T20:30:00"],
+        "date_tesim" => ["1941-12-20T20:30:00"],
+        "description_sim" => ["Handel, George Frideric: Tutta raccolta ancor; Martini, Johann Paul Aegidius: Plaisir d'amour; Bassani, Giovanni Battista: Dormi, bella, dormi tu?; Carissimi, Giacomo: No, no, non si speri!; Schubert, Franz: Fragment aus dem Aeschylus, D 450; Schubert, Franz: Fischerweise : D881; Schubert, Franz: Der Doppelgänger; Schubert, Franz: Der Erlkönig; Massenet, Jules: Pleurez, pleurez mes yeux, from Le Cid; Dvořák, Antonín: Als die alte Mutter: Songs my mother taught me; Rachmaninoff, Sergei: Christ is risen : op. 26, no. 6; Quilter, Roger: O mistress mine; Quilter, Roger: Blow, blow, thou winter wind; Burleigh, Harry Thacker (arr.): Go down, Moses: Let my people go; Lawrence, William (arr.): Let us break bread together; Boatner, Edward (arr.): Trampin'; Johnson, Hall (arr.): Honor, honor"],
+        "description_ssim" => ["Handel, George Frideric: Tutta raccolta ancor; Martini, Johann Paul Aegidius: Plaisir d'amour; Bassani, Giovanni Battista: Dormi, bella, dormi tu?; Carissimi, Giacomo: No, no, non si speri!; Schubert, Franz: Fragment aus dem Aeschylus, D 450; Schubert, Franz: Fischerweise : D881; Schubert, Franz: Der Doppelgänger; Schubert, Franz: Der Erlkönig; Massenet, Jules: Pleurez, pleurez mes yeux, from Le Cid; Dvořák, Antonín: Als die alte Mutter: Songs my mother taught me; Rachmaninoff, Sergei: Christ is risen : op. 26, no. 6; Quilter, Roger: O mistress mine; Quilter, Roger: Blow, blow, thou winter wind; Burleigh, Harry Thacker (arr.): Go down, Moses: Let my people go; Lawrence, William (arr.): Let us break bread together; Boatner, Edward (arr.): Trampin'; Johnson, Hall (arr.): Honor, honor"],
+        "description_tesim" => ["Handel, George Frideric: Tutta raccolta ancor; Martini, Johann Paul Aegidius: Plaisir d'amour; Bassani, Giovanni Battista: Dormi, bella, dormi tu?; Carissimi, Giacomo: No, no, non si speri!; Schubert, Franz: Fragment aus dem Aeschylus, D 450; Schubert, Franz: Fischerweise : D881; Schubert, Franz: Der Doppelgänger; Schubert, Franz: Der Erlkönig; Massenet, Jules: Pleurez, pleurez mes yeux, from Le Cid; Dvořák, Antonín: Als die alte Mutter: Songs my mother taught me; Rachmaninoff, Sergei: Christ is risen : op. 26, no. 6; Quilter, Roger: O mistress mine; Quilter, Roger: Blow, blow, thou winter wind; Burleigh, Harry Thacker (arr.): Go down, Moses: Let my people go; Lawrence, William (arr.): Let us break bread together; Boatner, Edward (arr.): Trampin'; Johnson, Hall (arr.): Honor, honor"],
+        "format_sim" => ["2 p. ; 24 cm"],
+        "format_ssim" => ["2 p. ; 24 cm"],
+        "format_tesim" => ["2 p. ; 24 cm"],
+        "geographic_subject_sim" => ["New York City, New York, United States"],
+        "geographic_subject_ssim" => ["New York City, New York, United States"],
+        "geographic_subject_tesim" => ["New York City, New York, United States"],
+        "id" => repo.names.fedora,
+        "has_model_ssim" => ["Manuscript"],
+        "item_type_sim" => ["Programs"],
+        "item_type_ssim" => ["Programs"],
+        "item_type_tesim" => ["Programs"],
+        "language_sim" => ["English"],
+        "language_ssim" => ["English"],
+        "language_tesim" => ["English"],
+        "personal_name_sim" => ["Anderson, Marian", "Rupp, Franz", "Hurok, Sol"],
+        "personal_name_ssim" => ["Anderson, Marian", "Rupp, Franz", "Hurok, Sol"],
+        "personal_name_tesim" => ["Anderson, Marian", "Rupp, Franz", "Hurok, Sol"],
+        "rights_sim" => ["https://creativecommons.org/publicdomain/zero/1.0/"],
+        "rights_ssim" => ["https://creativecommons.org/publicdomain/zero/1.0/"],
+        "rights_tesim" => ["https://creativecommons.org/publicdomain/zero/1.0/"],
+        "system_create_dtsi" => repo.first_published_at.utc.iso8601,
+        "system_modified_dtsi" => repo.last_published_at.utc.iso8601,
+        "title_sim" => ["[Concert program 1941-12-20]"],
+        "title_ssim" => ["[Concert program 1941-12-20]"],
+        "title_tesim" => ["[Concert program 1941-12-20]"],
+        "unique_identifier_tesim" => repo.unique_identifier
+      }
+    end
+
+    it 'generates expected document' do
+      expect(repo.solr_document).to eql document
+    end
+  end
+
+  describe '#publish' do
+    let(:repo) { FactoryBot.create(:repo, :with_assets, :with_descriptive_metadata) }
+    let(:current_time) { Time.current }
+
+    context 'when solr is available' do
+      it 'return true' do
+        expect(repo.publish).to be true
+      end
+
+      it 'adds document to solr' do
+        repo.publish
+        solr = RSolr.connect(url: Bulwark::Config.solr[:url])
+        response = solr.get('select', params: { id: repo.names.fedora })
+        expect(response['response']['numFound']).to be 1
+      end
+
+      it 'sets first_published_at and last_published_at' do
+        travel_to(current_time) do
+          repo.publish
+          repo.reload
+          expect(repo.first_published_at).to be_within(1.second).of current_time
+          expect(repo.last_published_at).to be_within(1.second).of current_time
+        end
+      end
+    end
+
+    context 'when solr is unavailable' do
+      before do
+        allow(Bulwark::Config).to receive(:solr).and_return({})
+      end
+
+      it 'does not save first_published_at or last_published_at' do
+        repo.publish
+        repo.reload
+        expect(repo.first_published_at).to be nil
+        expect(repo.last_published_at).to be nil
+      end
+
+      it 'returns false' do
+        expect(repo.publish).to be false
+      end
+    end
+
+    context 'when publishing for a second time' do
+      let(:first_publish) { current_time - 1.day }
+
+      before do
+        repo.update(
+          first_published_at: first_publish,
+          last_published_at: first_publish
+        )
+      end
+
+      it 'only updates_last_published_at' do
+        travel_to(current_time) do
+          expect(repo.publish).to be true
+          expect(repo.last_published_at).to be_within(1.second).of current_time
+          expect(repo.first_published_at).to be_within(1.second).of first_publish
+        end
+      end
+    end
+  end
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210209170510) do
+ActiveRecord::Schema.define(version: 20210211161517) do
 
   create_table "assets", force: :cascade do |t|
     t.integer  "repo_id",                 limit: 4
@@ -170,6 +170,8 @@ ActiveRecord::Schema.define(version: 20210209170510) do
     t.string   "queued",                     limit: 255
     t.text     "thumbnail_location",         limit: 65535
     t.boolean  "new_format",                                    default: false
+    t.datetime "first_published_at"
+    t.datetime "last_published_at"
   end
 
   add_index "repos", ["endpoint_id"], name: "index_repos_on_endpoint_id", using: :btree

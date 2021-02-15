@@ -30,6 +30,7 @@ ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
   config.include FixtureHelpers
+  config.include ActiveSupport::Testing::TimeHelpers
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
@@ -58,4 +59,11 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+
+  # Before each tests clean out Solr core.
+  config.before(:each) do
+    solr = RSolr.connect(url: Bulwark::Config.solr[:url])
+    solr.delete_by_query('*:*')
+    solr.commit
+  end
 end

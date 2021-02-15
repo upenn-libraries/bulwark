@@ -107,7 +107,8 @@ class CatalogController < ApplicationController
 
     # Catalog
     config.add_index_field solr_name('collection', :stored_searchable), :label => 'Collection'
-    config.add_index_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number'
+    config.add_index_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number' # TODO: delete when all digital objects are migrated.
+    config.add_index_field solr_name('call_number', :stored_searchable, type: :string), :label => 'Call Number'
 
     # solr fields to be displayed in the show (single result) view
     #   The ordering of the field names is the order of the display
@@ -137,7 +138,9 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('notes', :stored_searchable, type: :string), :label => 'Notes'
 
     # Catalog
-    config.add_show_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number'
+    config.add_show_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number' # TODO: remove when all digital objects are migrated.
+    config.add_show_field solr_name('call_number', :stored_searchable, type: :string), :label => 'Call Number'
+
     config.add_show_field solr_name('collection', :stored_searchable, type: :string), :label => 'Collection'
 
     # "fielded" search configuration. Used by pulldown among other places.
