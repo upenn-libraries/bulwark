@@ -86,7 +86,6 @@ remove_image:
   stage: .post
   extends:
     - .remove_docker_image
-  when:
-    always
+  when: always
   tags:
     - build
