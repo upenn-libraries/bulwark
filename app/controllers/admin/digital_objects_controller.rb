@@ -19,7 +19,8 @@ module Admin
       success = @digital_object.publish
 
       if success
-        flash[:success] = 'Publishing was successful.'
+        public_link = catalog_url(@digital_object.names.fedora)
+        flash[:success] = "Publishing was successful. View at <a class=\"alert-link\" href=\"#{public_link}\" target=\"_blank\">#{public_link}</a>"
       else
         flash[:error] = 'Error publishing digital object. Please see logs.'
       end
