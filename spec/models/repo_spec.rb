@@ -275,6 +275,7 @@ RSpec.describe Repo, type: :model do
         travel_to(current_time) do
           repo.publish
           repo.reload
+          expect(repo.published).to be true
           expect(repo.first_published_at).to be_within(1.second).of current_time
           expect(repo.last_published_at).to be_within(1.second).of current_time
         end
@@ -289,6 +290,7 @@ RSpec.describe Repo, type: :model do
       it 'does not save first_published_at or last_published_at' do
         repo.publish
         repo.reload
+        expect(repo.published).to be false
         expect(repo.first_published_at).to be nil
         expect(repo.last_published_at).to be nil
       end
@@ -311,6 +313,7 @@ RSpec.describe Repo, type: :model do
       it 'only updates_last_published_at' do
         travel_to(current_time) do
           expect(repo.publish).to be true
+          expect(repo.published).to be true
           expect(repo.last_published_at).to be_within(1.second).of current_time
           expect(repo.first_published_at).to be_within(1.second).of first_publish
         end

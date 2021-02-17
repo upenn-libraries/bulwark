@@ -10,21 +10,25 @@
 
 <div class="table-responsive">
   <table class="table table-striped">
-    <tr>
-      <th>Name</th>
-      <th>Unique Identifier</th>
-      <th>Description</th>
-      <th>Owner</th>
-    </tr>
-
-    <% @digital_objects.each do |digital_object| %>
+    <thead>
       <tr>
-        <td><%= link_to(digital_object.human_readable_name, admin_digital_object_path(digital_object.id)) %></td>
-        <td><%= digital_object.unique_identifier %></td>
-        <td><%= digital_object.description %></td>
-        <td><%= digital_object.owner %></td>
+        <th>Name</th>
+        <th>Unique Identifier</th>
+        <th>Owner</th>
+        <th>Published?</th>
       </tr>
-    <% end %>
+    </thead>
+
+    <tbody>
+      <% @digital_objects.each do |digital_object| %>
+        <tr>
+          <td><%= link_to(digital_object.human_readable_name, admin_digital_object_path(digital_object.id)) %></td>
+          <td><%= digital_object.unique_identifier %></td>
+          <td><%= digital_object.owner %></td>
+          <td><%= digital_object.published ? 'Yes' : 'No' %></td>
+        </tr>
+      <% end %>
+    </tbody>
   </table>
 </div>
 
