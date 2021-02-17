@@ -32,7 +32,7 @@
               <%= link_to 'Digital Objects', admin_digital_objects_path %>
             </li>
             <li class="<%= request.path.starts_with?('/admin/bulk_imports') ? 'active' : nil %>">
-              <%= link_to 'Bulk Import Jobs', admin_bulk_imports_path %>
+              <%= link_to 'Bulk Imports', admin_bulk_imports_path %>
             </li>
           </ul>
           <p class="navbar-text navbar-right"><%= current_user.email%></p>
