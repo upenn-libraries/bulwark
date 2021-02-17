@@ -7,8 +7,9 @@
   </div>
 
   <div class="col-sm-4">
-    <p><strong>label:</strong> <%= metadata.fetch('label', '[None]') %></p>
-    <p><strong>viewing direction:</strong> <%= metadata.fetch('viewing_direction', '[None]') %></p>
+    <p><strong>Label:</strong> <%= metadata.fetch('label', '[None]') %></p>
+    <p><strong>Viewing Direction:</strong> <%= metadata.fetch('viewing_direction', '[None]') %></p>
+    <p><strong>Text Annotations:</strong> <%= metadata.fetch('text_annotation', ['[None]'])&.join(', ') %></p>
   </div>
 
   <div class="col-sm-4">

@@ -59,17 +59,6 @@ module RepoHelper
     end
   end
 
-  def render_review_status(repo)
-    return unless repo.present?
-    if repo.ingested
-      render :partial => 'review/review_status', :locals => { :stats => repo.review_status.reverse, :repo_id => repo.id }
-    end
-  end
-
-  def render_review_link(repo_id)
-    link_to(t('colenda.links.review_status'), "#{root_url}/admin_repo/repo/#{repo_id}/ingest")
-  end
-
   def problem_files(problem_type)
     selected_problem_files ||= []
     @object.problem_files.find_all do |key, value|

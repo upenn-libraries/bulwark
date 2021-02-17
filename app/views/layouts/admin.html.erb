@@ -52,7 +52,7 @@
               <% end %>
             </ul>
           <% else %>
-            <%= msg %>
+            <%= sanitize(msg, attributes: ['class', 'target', 'href']) %>
           <% end %>
         </div>
       <% end %>
