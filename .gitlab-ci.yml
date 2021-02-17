@@ -12,7 +12,7 @@ include:
     ref: "master"
     file: ".rspec.yml"
   - project: "devops/gitlab/ci-templates/ruby"
-    ref: "rubocop"
+    ref: "master"
     file: ".rubocop.yml"
   - project: "devops/gitlab/ci-templates/sast"
     ref: "master"
@@ -35,14 +35,18 @@ build_image:
   tags:
     - build
 
-# rspec_test:
-#   stage: test
-#   extends:
-#     - .rspec
-#   variables:
-#     RSPEC_TEST_DOCKER_ENV_VARS: "-e SECRET_KEY_BASE=x -e ALMA_API_KEY=${ALMA_API_KEY}"
-#   tags:
-#     - build
+rspec_test:
+  stage: test
+  services:
+    - mysql:5.7.31
+  extends:
+    - .rspec
+  variables:
+    RSPEC_TEST_DOCKER_ENV_VARS: "-e SECRET_KEY_BASE=x --env-file .env"
+  before_script:
+    - cp ${CI_PROJECT_DIR}/.env.example ${CI_PROJECT_DIR}/.env
+  tags:
+    - build
 
 rubocop:
   stage: test
