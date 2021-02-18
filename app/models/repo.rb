@@ -469,6 +469,7 @@ class Repo < ActiveRecord::Base
       now = Time.current
       self.first_published_at = now if first_published_at.blank?
       self.last_published_at = now
+      self.published = true
       save!
       # Add Solr Document to Solr Core -- raise error if cannot be added to Solr Core
       solr = RSolr.connect(url: Bulwark::Config.solr[:url])
