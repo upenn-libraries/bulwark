@@ -36,9 +36,17 @@
       </tbody>
     </table>
   </div>
-  <%# TODO: match bootstrap styles, clean up %>
-  <%= page_entries_info @bulk_imports %>
-  <%= paginate @bulk_imports %>
+
+  <div class="row">
+    <div class="col-md-6">
+      <%= paginate @bulk_imports, remote: true %>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <%= page_entries_info @bulk_imports %>
+      </div>
+    </div>
+  </div>
 <% else %>
   <p>No bulk imports yet!</p>
 <% end %>
