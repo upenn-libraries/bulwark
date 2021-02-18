@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210211161517) do
+ActiveRecord::Schema.define(version: 20210217185854) do
 
   create_table "assets", force: :cascade do |t|
     t.integer  "repo_id",                 limit: 4
@@ -51,9 +51,10 @@ ActiveRecord::Schema.define(version: 20210211161517) do
   add_index "bookmarks", ["user_id"], name: "index_bookmarks_on_user_id", using: :btree
 
   create_table "bulk_imports", force: :cascade do |t|
-    t.integer  "created_by_id", limit: 4
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.integer  "created_by_id",     limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.text     "original_filename", limit: 65535
   end
 
   create_table "digital_object_imports", force: :cascade do |t|
@@ -172,6 +173,7 @@ ActiveRecord::Schema.define(version: 20210211161517) do
     t.boolean  "new_format",                                    default: false
     t.datetime "first_published_at"
     t.datetime "last_published_at"
+    t.boolean  "published",                                     default: false
   end
 
   add_index "repos", ["endpoint_id"], name: "index_repos_on_endpoint_id", using: :btree

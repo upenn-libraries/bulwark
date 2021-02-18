@@ -11,26 +11,26 @@
       <thead>
         <tr>
           <th>ID</th>
+          <th>Original Filename</th>
           <th>Created At</th>
           <th>Created By</th>
           <th>Digital Object Imports</th>
           <th>Status</th>
           <th>Errors</th>
-          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
       <% @bulk_imports.each do |bulk_import| %>
         <tr>
           <td><%= bulk_import.id %></td>
+          <td>
+            <%= link_to (bulk_import.original_filename || '[Unknown]'), admin_bulk_import_path(bulk_import) %>
+          </td>
           <td><%= bulk_import.created_at.to_s(:display) %></td>
           <td><%= bulk_import.created_by.email %></td>
           <td><%= bulk_import.digital_object_imports.length %></td>
           <td><%= bulk_import.status.nil? ? 'No Imports' : bulk_import.status.titlecase %></td>
           <td><%= bulk_import.number_of_errors %></td>
-          <td>
-            <%= link_to 'Details', admin_bulk_import_path(bulk_import), class: 'btn btn-sm btn-default' %>
-          </td>
         </tr>
       <% end %>
       </tbody>
