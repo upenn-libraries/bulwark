@@ -14,7 +14,7 @@
       <tr>
         <th>Name</th>
         <th>Unique Identifier</th>
-        <th>Owner</th>
+        <th>Created By</th>
         <th>Published?</th>
       </tr>
     </thead>
@@ -24,7 +24,7 @@
         <tr>
           <td><%= link_to(digital_object.human_readable_name, admin_digital_object_path(digital_object.id)) %></td>
           <td><%= digital_object.unique_identifier %></td>
-          <td><%= digital_object.owner %></td>
+          <td><%= digital_object.created_by&.email %></td>
           <td><%= digital_object.published ? 'Yes' : 'No' %></td>
         </tr>
       <% end %>

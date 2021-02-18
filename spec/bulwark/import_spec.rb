@@ -202,6 +202,11 @@ RSpec.describe Bulwark::Import do
         expect(repo.new_format).to be true
       end
 
+      it 'sets created_by and updated_by' do
+        expect(repo.created_by).to be created_by
+        expect(repo.updated_by).to be created_by
+      end
+
       it 'creates descriptive metadata source' do
         metadata_source = repo.descriptive_metadata
         expect(metadata_source.source_type).to eql 'descriptive'

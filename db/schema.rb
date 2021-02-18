@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210217185854) do
+ActiveRecord::Schema.define(version: 20210218180416) do
 
   create_table "assets", force: :cascade do |t|
     t.integer  "repo_id",                 limit: 4
@@ -173,13 +173,17 @@ ActiveRecord::Schema.define(version: 20210217185854) do
     t.boolean  "new_format",                                    default: false
     t.datetime "first_published_at"
     t.datetime "last_published_at"
+    t.integer  "created_by_id",              limit: 4
+    t.integer  "updated_by_id",              limit: 4
     t.boolean  "published",                                     default: false
   end
 
+  add_index "repos", ["created_by_id"], name: "fk_rails_ce6f5fa5f4", using: :btree
   add_index "repos", ["endpoint_id"], name: "index_repos_on_endpoint_id", using: :btree
   add_index "repos", ["human_readable_name"], name: "index_repos_on_human_readable_name", using: :btree
   add_index "repos", ["metadata_builder_id"], name: "index_repos_on_metadata_builder_id", using: :btree
   add_index "repos", ["unique_identifier"], name: "index_repos_on_unique_identifier", using: :btree
+  add_index "repos", ["updated_by_id"], name: "fk_rails_5998984773", using: :btree
   add_index "repos", ["version_control_agent_id"], name: "index_repos_on_version_control_agent_id", using: :btree
 
   create_table "roles", force: :cascade do |t|
@@ -244,6 +248,8 @@ ActiveRecord::Schema.define(version: 20210217185854) do
   add_foreign_key "metadata_sources", "metadata_builders"
   add_foreign_key "repos", "endpoints"
   add_foreign_key "repos", "metadata_builders"
+  add_foreign_key "repos", "users", column: "created_by_id"
+  add_foreign_key "repos", "users", column: "updated_by_id"
   add_foreign_key "repos", "version_control_agents"
   add_foreign_key "version_control_agents", "repos"
 end

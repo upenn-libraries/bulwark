@@ -11,9 +11,9 @@
           <%= text_field_tag :name_search, params[:name_search]  %>
         </div>
         <div class="col-md-4">
-          <%= label_tag :owner_search, 'Owner' %>
-          <%= select_tag :owner_search,
-                         options_from_collection_for_select(Repo.select(:owner).distinct, :owner, :owner, selected: params[:owner_search]), include_blank: 'Any' %>
+          <%= label_tag :created_by_search, 'Created By' %>
+          <%= select_tag :created_by_search,
+                         options_from_collection_for_select(Repo.includes(:created_by).distinct.map(&:created_by), :id, :email, selected: params[:created_by_search]), include_blank: 'Any' %>
         </div>
         <div class="col-md-2">
           <div class="btn-group pull-right">

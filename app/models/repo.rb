@@ -18,6 +18,9 @@ class Repo < ActiveRecord::Base
   has_many :digital_object_imports, dependent: :nullify
   validates_associated :endpoint
 
+  belongs_to :created_by, class_name: 'User'
+  belongs_to :updated_by, class_name: 'User'
+
   around_create :set_version_control_agent_and_repo # this is essentially an after_create
 
   validates :human_readable_name, presence: true
@@ -55,7 +58,6 @@ class Repo < ActiveRecord::Base
   end
 
   def set_defaults
-    self[:owner] = User.current
     self[:unique_identifier] = mint_ezid unless self[:unique_identifier].present?
     self[:unique_identifier].strip!
     self[:derivatives_subdirectory] = "#{Utils.config[:object_derivatives_path]}"

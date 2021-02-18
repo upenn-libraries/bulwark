@@ -359,7 +359,8 @@ module Bulwark
           file_extensions: ['tif', 'TIF'],
           metadata_source_extensions: ['csv'],
           preservation_filename: 'preservation.xml',
-          new_format: true # Setting to differentiate from previously created repos
+          new_format: true, # Setting to differentiate from previously created repos
+          created_by: created_by
         )
         repo.unique_identifier = unique_identifier if unique_identifier
         repo.save!
@@ -370,7 +371,7 @@ module Bulwark
         repo.update!(
           description: 'Generated from CSV through bulk import',
           last_external_update: Time.current,
-          owner: created_by.email
+          updated_by: created_by
         )
       end
 
