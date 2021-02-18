@@ -18,8 +18,8 @@ class Repo < ActiveRecord::Base
   has_many :digital_object_imports, dependent: :nullify
   validates_associated :endpoint
 
-  belongs_to :created_by, class_name: User
-  belongs_to :updated_by, class_name: User
+  belongs_to :created_by, class_name: 'User'
+  belongs_to :updated_by, class_name: 'User'
 
   around_create :set_version_control_agent_and_repo # this is essentially an after_create
 

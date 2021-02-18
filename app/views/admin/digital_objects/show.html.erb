@@ -7,9 +7,12 @@
 
 <h2><%= @digital_object.human_readable_name %></h2>
 
-<p><strong>Unique Identifier:</strong> <%= @digital_object.unique_identifier %></p>
-<p><strong>Description</strong>: <%= @digital_object.description %></p>
-
+<ul class="list-unstyled">
+  <li><strong>Unique Identifier:</strong> <%= @digital_object.unique_identifier %></li>
+  <li><strong>Description:</strong> <%= @digital_object.description %></li>
+  <li><strong>Created By:</strong> <%= @digital_object.created_by&.email %></li>
+  <li><strong>Updated By:</strong> <%= @digital_object.updated_by&.email %></li>
+</ul>
 <%# repo directory? %>
 
 <ul class="nav nav-tabs" role="tablist">

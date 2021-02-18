@@ -175,6 +175,7 @@ ActiveRecord::Schema.define(version: 20210218180416) do
     t.datetime "last_published_at"
     t.integer  "created_by_id",              limit: 4
     t.integer  "updated_by_id",              limit: 4
+    t.boolean  "published",                                     default: false
   end
 
   add_index "repos", ["created_by_id"], name: "fk_rails_ce6f5fa5f4", using: :btree
