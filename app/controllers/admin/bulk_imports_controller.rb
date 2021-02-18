@@ -21,6 +21,7 @@ module Admin
         flash[:error] = errors_array
         redirect_to new_admin_bulk_import_path
       else # If no validation errors, create imports.
+        @bulk_import.original_filename = uploaded_file.original_filename
         @bulk_import.save
         @bulk_import.create_imports(csv)
 
