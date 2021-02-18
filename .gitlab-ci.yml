@@ -21,6 +21,12 @@ include:
     ref: "master"
     file: ".trivy_container_scanning.yml"
 
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_TAG
+    - if: $CI_MERGE_REQUEST_ID
+
 stages:
   - .pre
   - test
@@ -91,6 +97,7 @@ remove_image:
   stage: .post
   extends:
     - .remove_docker_image
-  when: always
+  rules:
+    - when: always
   tags:
     - build
