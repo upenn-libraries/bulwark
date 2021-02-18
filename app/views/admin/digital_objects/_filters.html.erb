@@ -13,7 +13,7 @@
         <div class="col-md-4">
           <%= label_tag :created_by_search, 'Created By' %>
           <%= select_tag :created_by_search,
-                         options_from_collection_for_select(Repo.includes(:created_by).distinct.map(&:created_by), :id, :email, selected: params[:created_by_search]), include_blank: 'Any' %>
+                         options_from_collection_for_select(User.find(Repo.distinct.pluck(:created_by_id).compact), :id, :email, selected: params[:created_by_search]), include_blank: 'Any' %>
         </div>
         <div class="col-md-2">
           <div class="btn-group pull-right">
