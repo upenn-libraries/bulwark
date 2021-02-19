@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Colenda Admin</title>
+
+    <!-- Javascript and CSS -->
+    <%= stylesheet_link_tag 'admin', media: 'all' %>
+    <%= javascript_include_tag 'admin' %>
+  </head>
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <%= link_to 'Colenda Admin', admin_path, class: 'navbar-brand' %>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li class="<%= request.path.starts_with?('/admin/digital_objects') ? 'active' : nil %>">
+              <%= link_to 'Digital Objects', admin_digital_objects_path %>
+            </li>
+            <li class="<%= request.path.starts_with?('/admin/bulk_imports') ? 'active' : nil %>">
+              <%= link_to 'Bulk Imports', admin_bulk_imports_path %>
+            </li>
+          </ul>
+          <p class="navbar-text navbar-right"><%= current_user.email%></p>
+        </div>
+      </div>
+    </nav>
+
+    <div id="main-container" class="container">
+      <%# Flash Messages #%>
+      <% flash.each do |type, msg| %>
+        <div class="alert alert-<%= type == 'error' ? 'danger' : 'info' %>">
+          <%= '<h4>Error(s):</h4>'.html_safe if type == 'error' %>
+          <% if msg.is_a? Array %>
+            <ul>
+              <% msg.each do |m| %>
+                <li><%= m %></li>
+              <% end %>
+            </ul>
+          <% else %>
+            <%= sanitize(msg, attributes: ['class', 'target', 'href']) %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div class="row">
+        <div class="col-xs-12">
+          <%= yield %>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -14,7 +14,7 @@ module CatalogHelper
 
   def thumbnail(document, options)
     repo = Repo.find_by(unique_identifier: document['unique_identifier_tesim'].first)
-    repo&.thumbnail_link.present? ? image_tag(repo.thumbnail_link) : ''
+    repo.thumbnail_location.present? ? image_tag(special_remote_download_url(repo.thumbnail_location)) : ''
   end
 
   def current_user?
@@ -50,4 +50,19 @@ module CatalogHelper
     return decoder.decode(string_to_decode)
   end
 
+  def render_admin_actions
+    repo = Repo.find_by(unique_identifier: @document.unique_identifier)
+    return unless repo.present?
+
+    render 'admin_actions', { repo: repo }
+  end
+
+  def render_admin_link(repo)
+    link = if repo.new_format
+              admin_digital_object_path(repo)
+            else
+              "admin_repo/repo/#{repo.id}/ingest"
+            end
+    link_to('View in Colenda Admin', link)
+  end
 end

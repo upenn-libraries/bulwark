@@ -2,6 +2,7 @@ module ApplicationHelper
 
   include RailsAdmin::ApplicationHelper
 
+  # Doesn't seem to be used?
   def render_image_list
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
     return '' unless repo.present? && repo.images_to_render.present?
@@ -50,12 +51,6 @@ module ApplicationHelper
     return ingested_hash
   end
 
-  def resolve_reading_direction(repo)
-    reading_direction = repo.images_to_render['iiif'].present? ? repo.images_to_render['iiif']['reading_direction'] : legacy_reading_direction(repo)
-    return 'ltr' unless reading_direction.present?
-    return 'ltr' if %w[left-to-right ltr].include?(reading_direction)
-  end
-
   def render_ableplayer
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
     partials = ''
@@ -88,26 +83,25 @@ module ApplicationHelper
   end
 
   def render_uv
-    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
+    repo = Repo.find_by(unique_identifier: @document.id.reverse_fedorafy)
     partials = ''
     partials += render :partial => 'other_display/uv'
-    return partials.html_safe if repo.images_to_render.present?
+    return partials.html_safe if repo.has_images?
   end
 
   def render_iiif_manifest_link
     repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
-    return repo.images_to_render.present? ? link_to("IIIF presentation manifest", "#{ENV['UV_URL']}/#{@document.id}/manifest") : ''
+    return repo.has_images? ? link_to("IIIF presentation manifest", "#{ENV['UV_URL']}/#{@document.id}/manifest") : ''
   end
 
   def render_catalog_link
-    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
-    return repo.metadata_builder.metadata_source.first.original_mappings["bibid"].present? ? link_to("Franklin record", "https://franklin.library.upenn.edu/catalog/FRANKLIN_#{validate_bib_id(repo.metadata_builder.metadata_source.first.original_mappings["bibid"])}") : ''
+    repo = Repo.find_by(unique_identifier: @document.id.reverse_fedorafy)
+    return repo.bibid.present? ? link_to("Franklin record", "https://franklin.library.upenn.edu/catalog/FRANKLIN_#{validate_bib_id(repo.bibid)}") : ''
   end
 
   def additional_resources
-    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
-    return true if repo.metadata_builder.metadata_source.first.original_mappings["bibid"].present? ||
-        repo.images_to_render.present?
+    repo = Repo.find_by(unique_identifier: @document.id.reverse_fedorafy)
+    return true if repo.bibid.present? || repo.has_images?
   end
 
   def validate_bib_id(bib_id)

@@ -1,0 +1,53 @@
+<ol class="breadcrumb">
+  <li>Admin</li>
+  <li><a href="/admin/bulk_imports">Bulk Imports</a></li>
+  <li class="active"><%= @bulk_import.id %></li>
+</ol>
+
+<h2>Bulk Import</h2>
+<dl class="dl-horizontal">
+  <dt>ID</dt>
+  <dd><%= @bulk_import.id %></dd>
+  <dt>Created By</dt>
+  <dd><%= @bulk_import.created_by_email %></dd>
+  <dt>Created At</dt>
+  <dd><%= @bulk_import.created_at.to_s(:display) %></dd>
+  <dt>Updated At</dt>
+  <dd><%= @bulk_import.updated_at.to_s(:display) %></dd>
+</dl>
+
+<% number_of_imports = @bulk_import.digital_object_imports.length %>
+<h4>Digital Object Imports</h4>
+<% if number_of_imports.zero? %>
+  <p>None</p>
+<% else %>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Status</th>
+          <th>Digital Object Changed<th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @bulk_import.digital_object_imports.each do |digital_object_import| %>
+          <tr>
+            <td><%= digital_object_import.id %></td>
+            <td><%= digital_object_import.status.titlecase %></td>
+            <td>
+              <% if digital_object_import.repo%>
+                <%= link_to(digital_object_import.repo.unique_identifier, admin_digital_object_path(digital_object_import.repo.id)) %>
+              <% end %>
+            </td>
+            <td>
+              <%= link_to 'Details', admin_bulk_import_digital_object_import_path(@bulk_import, digital_object_import), class: 'btn btn-sm btn-default' %>
+            </td>
+          <tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <p><strong>Total:</strong> <%= number_of_imports %>
+<% end %>

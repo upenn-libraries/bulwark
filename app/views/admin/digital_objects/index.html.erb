@@ -1,0 +1,44 @@
+
+<ol class="breadcrumb">
+  <li>Admin</li>
+  <li class="active"><a href="/admin/digital_objects">Digital Objects</a></li>
+</ol>
+
+<h2>Digital Objects</h2>
+
+<%= render 'filters' %>
+
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Unique Identifier</th>
+        <th>Created By</th>
+        <th>Published?</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @digital_objects.each do |digital_object| %>
+        <tr>
+          <td><%= link_to(digital_object.human_readable_name, admin_digital_object_path(digital_object.id)) %></td>
+          <td><%= digital_object.unique_identifier %></td>
+          <td><%= digital_object.created_by&.email %></td>
+          <td><%= digital_object.published ? 'Yes' : 'No' %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <%= paginate @digital_objects, remote: true %>
+  </div>
+  <div class="col-md-6">
+    <div class="pull-right">
+      <%= render 'shared/per_page' %>
+    </div>
+  </div>
+</div>

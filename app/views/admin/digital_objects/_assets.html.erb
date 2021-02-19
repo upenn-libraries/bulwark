@@ -1,0 +1,26 @@
+<h3>With Structural Metadata</h3>
+
+<% files_with_structural = [] %>
+
+<% if @digital_object.structural_metadata %>
+  <% @digital_object.structural_metadata.user_defined_mappings['sequence'].each do |values| %>
+    <% if asset = @digital_object.assets.find_by(filename: values['filename']) %>
+      <% files_with_structural << asset.filename %>
+      <%= render partial: 'asset', locals: { asset: asset, metadata: values } %>
+    <% else %>
+      <p>Warning: <%= values['filename'] %> is not a correct asset filename</p>
+    <% end %>
+    <hr>
+  <% end %>
+<% end %>
+
+<% all_assets = @digital_object.assets.map(&:filename) %>
+<% files_without_structural = all_assets - files_with_structural %>
+
+<% unless files_without_structural.blank? %>
+  <h3>Without Structural Metadata</h3>
+  <% files_without_structural.each do |filename| %>
+    <% asset = @digital_object.assets.find_by(filename: filename) %>
+    <%= render partial: 'asset', locals: { asset: asset, metadata: {} } %>
+  <% end %>
+<% end %>

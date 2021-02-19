@@ -69,7 +69,7 @@ namespace :bulwark do
         end
 
         # Checks for Solr document,
-        if Blacklight.default_index.search(q:"id:#{repo.names.fedora}", fl: 'id').docs.count == 1
+        if Blacklight.default_index.search(q: "id:#{repo.names.fedora}", fl: 'id').docs.count == 1
           puts Rainbow("  Solr Object: Found for id #{repo.names.fedora}").red
         else
           puts "  Solr Object: Not Found"
@@ -79,7 +79,6 @@ namespace :bulwark do
         success = repo.destroy
         puts "  Database Record: #{success ? 'Removed' : "Error deleting id=#{repo.id}"}\n"
       end
-
     end
   end
 end

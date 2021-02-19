@@ -1,13 +1,14 @@
 :concurrency: 1
 :logfile: ./log/sidekiq.log
 :queues:
-  - [file_checks, 1]
-  - [ingest, 1]
-  - [validate_manifest, 1]
-  - [create_repos, 1]
-  - [process_manifest, 1]
-  - [process_batch, 1]
-  - [maintenance, 1]
-  - [xml, 1]
-  - [metadata_extraction, 1]
+  - [file_checks, 2]
+  - [ingest, 2]
+  - [validate_manifest, 2]
+  - [create_repos, 2]
+  - [process_manifest, 2]
+  - [process_batch, 2]
+  - [maintenance, 2]
+  - [xml, 2]
+  - [metadata_extraction, 2]
+  - [low, 1]
 :max_retries: 0

@@ -11,7 +11,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20201109210929) do
+ActiveRecord::Schema.define(version: 20210218180416) do
+
+  create_table "assets", force: :cascade do |t|
+    t.integer  "repo_id",                 limit: 4
+    t.string   "filename",                limit: 255
+    t.integer  "size",                    limit: 8
+    t.text     "original_file_location",  limit: 65535
+    t.text     "access_file_location",    limit: 65535
+    t.text     "thumbnail_file_location", limit: 65535
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.string   "mime_type",               limit: 255
+  end
+
+  add_index "assets", ["filename", "repo_id"], name: "index_assets_on_filename_and_repo_id", unique: true, using: :btree
 
   create_table "batches", force: :cascade do |t|
     t.text     "queue_list",      limit: 4294967295
@@ -35,6 +49,25 @@ ActiveRecord::Schema.define(version: 20201109210929) do
   end
 
   add_index "bookmarks", ["user_id"], name: "index_bookmarks_on_user_id", using: :btree
+
+  create_table "bulk_imports", force: :cascade do |t|
+    t.integer  "created_by_id",     limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.text     "original_filename", limit: 65535
+  end
+
+  create_table "digital_object_imports", force: :cascade do |t|
+    t.integer  "bulk_import_id", limit: 4
+    t.string   "status",         limit: 255
+    t.text     "process_errors", limit: 65535
+    t.text     "import_data",    limit: 16777215
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.integer  "repo_id",        limit: 4
+  end
+
+  add_index "digital_object_imports", ["repo_id"], name: "fk_rails_0f30a10968", using: :btree
 
   create_table "endpoints", force: :cascade do |t|
     t.string   "source",       limit: 255
@@ -63,16 +96,17 @@ ActiveRecord::Schema.define(version: 20201109210929) do
   end
 
   create_table "metadata_builders", force: :cascade do |t|
-    t.string   "parent_repo",        limit: 255
-    t.string   "source",             limit: 255
-    t.string   "preserve",           limit: 255
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-    t.integer  "repo_id",            limit: 4
-    t.integer  "metadata_source_id", limit: 4
+    t.string   "parent_repo",              limit: 255
+    t.string   "source",                   limit: 255
+    t.string   "preserve",                 limit: 255
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+    t.integer  "repo_id",                  limit: 4
+    t.integer  "metadata_source_id",       limit: 4
     t.datetime "last_xml_generated"
-    t.text     "xml_preview",        limit: 4294967295
+    t.text     "xml_preview",              limit: 4294967295
     t.datetime "last_file_checks"
+    t.text     "generated_metadata_files", limit: 65535
   end
 
   add_index "metadata_builders", ["metadata_source_id"], name: "index_metadata_builders_on_metadata_source_id", using: :btree
@@ -102,6 +136,7 @@ ActiveRecord::Schema.define(version: 20201109210929) do
     t.string   "input_source",          limit: 255
     t.string   "identifier",            limit: 255
     t.string   "file_field",            limit: 255
+    t.text     "remote_location",       limit: 65535
   end
 
   add_index "metadata_sources", ["metadata_builder_id"], name: "index_metadata_sources_on_metadata_builder_id", using: :btree
@@ -109,8 +144,8 @@ ActiveRecord::Schema.define(version: 20201109210929) do
   create_table "repos", force: :cascade do |t|
     t.string   "human_readable_name",        limit: 255
     t.string   "description",                limit: 255
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
+    t.datetime "created_at",                                                    null: false
+    t.datetime "updated_at",                                                    null: false
     t.string   "metadata_subdirectory",      limit: 255
     t.string   "assets_subdirectory",        limit: 255
     t.string   "derivatives_subdirectory",   limit: 255
@@ -135,10 +170,20 @@ ActiveRecord::Schema.define(version: 20201109210929) do
     t.string   "last_action_performed",      limit: 255
     t.string   "queued",                     limit: 255
     t.text     "thumbnail_location",         limit: 65535
+    t.boolean  "new_format",                                    default: false
+    t.datetime "first_published_at"
+    t.datetime "last_published_at"
+    t.integer  "created_by_id",              limit: 4
+    t.integer  "updated_by_id",              limit: 4
+    t.boolean  "published",                                     default: false
   end
 
+  add_index "repos", ["created_by_id"], name: "fk_rails_ce6f5fa5f4", using: :btree
   add_index "repos", ["endpoint_id"], name: "index_repos_on_endpoint_id", using: :btree
+  add_index "repos", ["human_readable_name"], name: "index_repos_on_human_readable_name", using: :btree
   add_index "repos", ["metadata_builder_id"], name: "index_repos_on_metadata_builder_id", using: :btree
+  add_index "repos", ["unique_identifier"], name: "index_repos_on_unique_identifier", using: :btree
+  add_index "repos", ["updated_by_id"], name: "fk_rails_5998984773", using: :btree
   add_index "repos", ["version_control_agent_id"], name: "index_repos_on_version_control_agent_id", using: :btree
 
   create_table "roles", force: :cascade do |t|
@@ -196,12 +241,15 @@ ActiveRecord::Schema.define(version: 20201109210929) do
 
   add_index "version_control_agents", ["repo_id"], name: "index_version_control_agents_on_repo_id", using: :btree
 
+  add_foreign_key "digital_object_imports", "repos"
   add_foreign_key "endpoints", "repos"
   add_foreign_key "metadata_builders", "metadata_sources"
   add_foreign_key "metadata_builders", "repos"
   add_foreign_key "metadata_sources", "metadata_builders"
   add_foreign_key "repos", "endpoints"
   add_foreign_key "repos", "metadata_builders"
+  add_foreign_key "repos", "users", column: "created_by_id"
+  add_foreign_key "repos", "users", column: "updated_by_id"
   add_foreign_key "repos", "version_control_agents"
   add_foreign_key "version_control_agents", "repos"
 end

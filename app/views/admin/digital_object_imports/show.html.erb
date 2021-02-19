@@ -1,0 +1,30 @@
+<ol class="breadcrumb">
+  <li>Admin</li>
+  <li><a href="/admin/bulk_imports">Bulk Imports</a></li>
+  <li><%= link_to @digital_object_import.bulk_import.id, admin_bulk_import_path(@digital_object_import.bulk_import) %></li>
+  <li>Digital Object Import</li>
+  <li class="active"><%= @digital_object_import.id %></li>
+</ol>
+
+
+<h2>Digital Object Import: <%= @digital_object_import.id %></h2>
+
+<h4>Status</h4>
+<%= @digital_object_import.status.titlecase %>
+
+<% if @digital_object_import.repo %>
+  <h4>Digital Object Changed</h4>
+  <%= link_to @digital_object_import.repo.unique_identifier, admin_digital_object_path(@digital_object_import.repo.id) %>
+<% end %>
+
+<% unless @digital_object_import.process_errors.blank? %>
+  <h4>Errors</h4>
+  <ul>
+    <% @digital_object_import.process_errors.each do |error| %>
+      <li><%= error %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<h4>Import Data</h4>
+<pre class="pre-scrollable"><%= JSON.pretty_generate(@digital_object_import.import_data) %></pre>

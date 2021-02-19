@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <record>
+    <uuid></uuid>
+    <call_number>Arc.MS.56</call_number>
+    <collection>Arnold and Deanne Kaplan Collection of Early American Judaica (University of Pennsylvania)</collection>
+    <corporate_name>J. Rosenblatt &amp; Co.</corporate_name>
+    <date>undated</date>
+    <description>J. Rosenblatt &amp; Co.: Importers: Earthenware, China, Majolica, Novelties</description>
+    <description>32 South Howard Street, Baltimore, MD</description>
+    <geographic_subject>Baltimore, Maryland, United States</geographic_subject>
+    <geographic_subject>Maryland, United States</geographic_subject>
+    <item_type>Trade cards</item_type>
+    <language>English</language>
+    <rights>http://rightsstatements.org/page/NoC-US/1.0/?</rights>
+    <subject>House furnishings</subject>
+    <subject>Jewish merchants</subject>
+    <subject>Trade cards (advertising)</subject>
+    <title>Trade card; J. Rosenblatt &amp; Co.; Baltimore, Maryland, United States; undated;</title>
+    <pages>
+      <page>
+        <filename>front.tif</filename>
+        <sequence>1</sequence>
+      </page>
+      <page>
+        <filename>back.tif</filename>
+        <sequence>2</sequence>
+      </page>
+    </pages>
+  </record>
+</root>

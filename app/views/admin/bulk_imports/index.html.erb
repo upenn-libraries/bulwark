@@ -1,0 +1,52 @@
+<ol class="breadcrumb">
+  <li>Admin</li>
+  <li active="true"><a href="/admin/bulk_imports">Bulk Imports</a></li>
+</ol>
+
+<h2>Bulk Imports</h2>
+<%= link_to 'New Bulk Import', new_admin_bulk_import_path, class: 'btn btn-primary' %>
+<% if @bulk_imports.any? %>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Original Filename</th>
+          <th>Created At</th>
+          <th>Created By</th>
+          <th>Digital Object Imports</th>
+          <th>Status</th>
+          <th>Errors</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% @bulk_imports.each do |bulk_import| %>
+        <tr>
+          <td><%= bulk_import.id %></td>
+          <td>
+            <%= link_to (bulk_import.original_filename || '[Unknown]'), admin_bulk_import_path(bulk_import) %>
+          </td>
+          <td><%= bulk_import.created_at.to_s(:display) %></td>
+          <td><%= bulk_import.created_by.email %></td>
+          <td><%= bulk_import.digital_object_imports.length %></td>
+          <td><%= bulk_import.status.nil? ? 'No Imports' : bulk_import.status.titlecase %></td>
+          <td><%= bulk_import.number_of_errors %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <%= paginate @bulk_imports, remote: true %>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <%= page_entries_info @bulk_imports %>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <p>No bulk imports yet!</p>
+<% end %>

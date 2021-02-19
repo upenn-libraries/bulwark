@@ -1,0 +1,147 @@
+<marc:records xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+  <marc:record>
+    <marc:leader>02732cam a2200433 a 4500</marc:leader>
+    <marc:controlfield tag="001">9923478503503681</marc:controlfield>
+    <marc:controlfield tag="005">20201123145832.0</marc:controlfield>
+    <marc:controlfield tag="008">981007s1598 gw a 000 0 ger </marc:controlfield>
+    <marc:datafield ind1=" " ind2=" " tag="010">
+      <marc:subfield code="a">11007812</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="026">
+      <marc:subfield code="e">sts- n.r* n.n. di12 (3) 1598 (A)</marc:subfield>
+      <marc:subfield code="2">fei</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="035">
+      <marc:subfield code="a">(OCoLC)ocm16660686</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="035">
+      <marc:subfield code="a">(OCoLC)16660686</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="035">
+      <marc:subfield code="a">2347850</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="035">
+      <marc:subfield code="a">(PU)2347850-penndb-Voyager</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="040">
+      <marc:subfield code="a">DLC</marc:subfield>
+      <marc:subfield code="c">LRU</marc:subfield>
+      <marc:subfield code="d">PU</marc:subfield>
+      <marc:subfield code="e">dcrb</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="0" ind2=" " tag="050">
+      <marc:subfield code="a">TN664</marc:subfield>
+      <marc:subfield code="b">.E7</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="4" tag="050">
+      <marc:subfield code="a">TN664</marc:subfield>
+      <marc:subfield code="b">.E7 1598</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="1" ind2=" " tag="100">
+      <marc:subfield code="a">Ercker, Lazarus,</marc:subfield>
+      <marc:subfield code="d">d. 1594.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="1" ind2="0" tag="245">
+      <marc:subfield code="a">Beschreibung aller fürnemisten Mineralischen Ertzt vnnd Berckwercksarten :</marc:subfield>
+      <marc:subfield code="b">wie dieselbigen vnd eine jede in Sonderheit jrer Natur vnd Eygenschafft nach, auff alle Metalla probirt, vnd im kleinen Fewr sollen versucht werden, mit Erklärung etlicher fürnemer nützlicher Schmeltzwerck im grossen Feuwer, auch Scheidung Goldts, Silbers, vnd anderer Metalln, sampt einem Bericht des Kupffer Saigerns, Messing brennens, vnd Salpeter Siedens, auch aller saltzigen Minerischen proben, vnd was denen allen anhengig : in fünff Bücher verfast, dessgleichen zuvorn niemals in Druck kommen ... : auffs newe an vielen Orten mit besserer Aussführung, vnd mehreren Figurn erklärt /</marc:subfield>
+      <marc:subfield code="c">durch den weitberühmten Lazarum Erckern, der Röm. Kay. May. Obersten Bergkmeister vnd Buchhalter in Königreich Böhem &c. ...</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="260">
+      <marc:subfield code="a">Gedruckt zu Franckfurt am Mayn :</marc:subfield>
+      <marc:subfield code="b">Durch Johan Feyerabendt,</marc:subfield>
+      <marc:subfield code="c">1598.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="300">
+      <marc:subfield code="a">[4], 134, [4] leaves :</marc:subfield>
+      <marc:subfield code="b">ill. ;</marc:subfield>
+      <marc:subfield code="c">31 cm. (fol.)</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Leaves printed on both sides.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Signatures: )(⁴ A-Z⁴ a-k⁴ l⁶.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">The last leaf is blank.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Woodcut illustrations, initials and tail-pieces.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Title page printed in black and red.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Printed marginalia.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">"Erratum" on verso of last printed leaf.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Online version available via Colenda</marc:subfield>
+      <marc:subfield code="u">https://colenda.library.upenn.edu/catalog/81431-p3df6k90j</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="561">
+      <marc:subfield code="a">Smith, Edgar Fahs, 1854-1928 (autograph, 1917)</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="561">
+      <marc:subfield code="a">Wright, H. (autograph, 1870)</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="590">
+      <marc:subfield code="a">Penn Libraries copy has Edgar Fahs Smith's autograph on front free endpaper; autograph of H. Wright on front free endpaper; effaced ms. inscription (autograph?) on title leaf.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="0" tag="650">
+      <marc:subfield code="a">Metallurgy</marc:subfield>
+      <marc:subfield code="v">Early works to 1800.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="0" tag="650">
+      <marc:subfield code="a">Assaying</marc:subfield>
+      <marc:subfield code="v">Early works to 1800.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="4" tag="650">
+      <marc:subfield code="5">PU</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="4" tag="650">
+      <marc:subfield code="5">PU</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="4" tag="650">
+      <marc:subfield code="5">PU</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="651">
+      <marc:subfield code="y">1598</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="1" ind2=" " tag="700">
+      <marc:subfield code="a">Feyerabend, Johann,</marc:subfield>
+      <marc:subfield code="d">1550-1599,</marc:subfield>
+      <marc:subfield code="e">printer.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="2" ind2=" " tag="710">
+      <marc:subfield code="a">Edgar Fahs Smith Memorial Collection (University of Pennsylvania)</marc:subfield>
+      <marc:subfield code="5">PU</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="752">
+      <marc:subfield code="a">Germany</marc:subfield>
+      <marc:subfield code="d">Frankfurt am Main.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="0" ind2="0" tag="773">
+      <marc:subfield code="t">Edgar Fahs Smith Memorial Collection (University of Pennsylvania)</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="4" ind2="1" tag="856">
+      <marc:subfield code="z">Facsimile</marc:subfield>
+      <marc:subfield code="u">https://colenda.library.upenn.edu/catalog/81431-p3df6k90j</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="999">
+      <marc:subfield code="z">CHR 1598</marc:subfield>
+      <marc:subfield code="z">PRO Smith, Edgar Fahs, 1854-1928 (autograph, 1917)</marc:subfield>
+      <marc:subfield code="z">PRO Wright, H. (autograph, 1870)</marc:subfield>
+    </marc:datafield>
+    <marc:holdings>
+      <marc:holding>
+        <marc:holding_id>22252299940003681</marc:holding_id>
+        <marc:call_number>Folio TN664 .E7 1598</marc:call_number>
+        <marc:library>KislakCntr</marc:library>
+        <marc:location>scsmith</marc:location>
+      </marc:holding>
+    </marc:holdings>
+  </marc:record>
+</marc:records>

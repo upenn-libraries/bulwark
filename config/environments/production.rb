@@ -85,4 +85,11 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  # Configuring job queue
+  config.active_job.queue_adapter = :sidekiq
+
+  # Configuring cache store to use for ActiveJob::Status.
+  config.cache_store = :redis_store, ENV['CACHE_URL'], { namespace: 'sidekiq::cache',  expires_in: 90.minutes }
+
 end

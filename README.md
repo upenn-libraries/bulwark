@@ -47,6 +47,18 @@ sudo apt-get install imagemagick git-annex
   rake bulwark:start
   ```
 
+### Adding Data
+
+#### To add administrative user
+  ```
+  rake bulwark:setup:create_admin
+  ```
+
+#### To add digital object and administrative user
+  ```
+  rake bulwark:setup:create_digital_object
+  ```
+
 ## Configuration Files
 
 #### filesystem.yml

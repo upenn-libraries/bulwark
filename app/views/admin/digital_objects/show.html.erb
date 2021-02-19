@@ -1,0 +1,110 @@
+<%# Breadcrumbs %>
+<ol class="breadcrumb">
+  <li>Admin</li>
+  <li><a href="/admin/digital_objects">Digital Objects</a></li>
+  <li class="active"><%= @digital_object.human_readable_name %></li>
+</ol>
+
+<h2><%= @digital_object.human_readable_name %></h2>
+
+<ul class="list-unstyled">
+  <li><strong>Unique Identifier:</strong> <%= @digital_object.unique_identifier %></li>
+  <li><strong>Description:</strong> <%= @digital_object.description %></li>
+  <li><strong>Created By:</strong> <%= @digital_object.created_by&.email %></li>
+  <li><strong>Updated By:</strong> <%= @digital_object.updated_by&.email %></li>
+</ul>
+<%# repo directory? %>
+
+<ul class="nav nav-tabs" role="tablist">
+  <li role="presentation" class="active">
+    <a href="#descriptive-metadata" aria-controls="descriptive-metadata" role="tab" data-toggle="tab">Descriptive Metadata</a>
+  </li>
+  <li role="presentation">
+    <a href="#structural-metadata" aria-controls="structural-metadata" role="tab" data-toggle="tab">Structural Metadata</a>
+  </li>
+  <li role="presentation">
+    <a href="#assets" aria-controls="assets" role="tab" data-toggle="tab">Assets</a>
+  </li>
+  <li role="presentation">
+    <a href="#generated-xml" aria-controls="generated-xml" role="tab" data-toggle="tab">Generated XML</a>
+  </li>
+  <li role="presentation">
+    <a href="#publish" aria-controls="publish" role="tab" data-toggle="tab">Publish</a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="descriptive-metadata">
+    <% if @digital_object.descriptive_metadata %>
+      <h4>Metadata Provided</h4>
+      <%= link_to 'descriptive_metadata.csv', special_remote_download_url(@digital_object.descriptive_metadata.remote_location) %>
+      <hr>
+      <h4>Extracted Metadata</h4>
+      <table class="table">
+        <tbody>
+          <% @digital_object.descriptive_metadata.user_defined_mappings.each do |field, values| %>
+            <tr>
+              <th><%= field.gsub('_', ' ').titlecase %></th>
+              <td><%= values.join('<br>').html_safe %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p>Descriptive metadata not available</p>
+    <% end %>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="structural-metadata">
+    <% if @digital_object.structural_metadata %>
+      <h4>Metadata Provided</h4>
+      <%= link_to 'structural_metadata.csv', special_remote_download_url(@digital_object.structural_metadata.remote_location) %>
+      <hr>
+      <h4>Extracted Metadata</h4>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <% MetadataSource::VALID_STRUCTURAL_METADATA_FIELDS.each do |field| %>
+              <th><%= field.gsub('_', ' ').titlecase %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% @digital_object.structural_metadata.user_defined_mappings.fetch('sequence', []).each do |values| %>
+            <tr>
+              <% MetadataSource::VALID_STRUCTURAL_METADATA_FIELDS.each do |field| %>
+                <td><%= Array.wrap(values[field]).join('<br>').html_safe %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p>Structural metadata not available</p>
+    <% end %>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="assets">
+    <%= render 'assets' %>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="generated-xml">
+    <table class="table">
+      <% (@digital_object.metadata_builder.generated_metadata_files || {}).each do |filepath, remote_location| %>
+        <tr>
+          <td><%= File.basename(filepath) %></td>
+          <td><%= link_to 'download', special_remote_download_url(remote_location) %>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="publish">
+
+    <h4>Publish</h4>
+    <p>Publishing makes this digital object available in the public website.</p>
+    <p><strong>First published at:</strong> <%= @digital_object.first_published_at&.to_s(:display) || '[None]' %></p>
+    <p><strong>Last published at:</strong> <%= @digital_object.last_published_at&.to_s(:display) || '[None]' %></p>
+
+    <%= bootstrap_form_tag(url: publish_admin_digital_object_path(@digital_object), method: :post) do |f| %>
+      <%= f.submit 'Publish Now', class: 'btn btn-primary' %>
+    <% end %>
+
+  </div>
+</div>

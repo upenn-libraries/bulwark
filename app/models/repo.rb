@@ -2,6 +2,10 @@ require "net/http"
 require 'sanitize'
 
 class Repo < ActiveRecord::Base
+  scope :new_format, -> { where(new_format: true) }
+  scope :old_format, -> { where(new_format: false) }
+  scope :name_search, ->(query) { where_like(:human_readable_name, query) }
+  scope :id_search, ->(query) { where_like(:unique_identifier, query) }
 
   include ModelNamingExtensions::Naming
   include Utils::Artifacts::ProblemsLog
@@ -10,7 +14,12 @@ class Repo < ActiveRecord::Base
   has_one :version_control_agent, dependent: :destroy, :validate => false
 
   has_many :endpoint, dependent: :destroy
+  has_many :assets, dependent: :destroy
+  has_many :digital_object_imports, dependent: :nullify
   validates_associated :endpoint
+
+  belongs_to :created_by, class_name: 'User'
+  belongs_to :updated_by, class_name: 'User'
 
   around_create :set_version_control_agent_and_repo # this is essentially an after_create
 
@@ -36,6 +45,10 @@ class Repo < ActiveRecord::Base
   serialize :images_to_render, Hash
   serialize :last_action_performed, Hash
 
+  # kamanari config
+  paginates_per 25
+  max_paginates_per 200
+
   def set_version_control_agent_and_repo
     yield
     set_defaults
@@ -45,7 +58,6 @@ class Repo < ActiveRecord::Base
   end
 
   def set_defaults
-    self[:owner] = User.current
     self[:unique_identifier] = mint_ezid unless self[:unique_identifier].present?
     self[:unique_identifier].strip!
     self[:derivatives_subdirectory] = "#{Utils.config[:object_derivatives_path]}"
@@ -360,6 +372,14 @@ class Repo < ActiveRecord::Base
     User.where(guest: false).pluck(:email, :email)
   end
 
+  # Could be put into a concern for other models to be searched
+  # @param [Symbol] column_name
+  # @param [String] query
+  def self.where_like(column_name, query)
+    column = self.arel_table[column_name]
+    where(column.matches("%#{sanitize_sql_like(query)}%"))
+  end
+
   def format_types(extensions_array)
     formatted_types = ''
     if extensions_array.length > 1
@@ -399,6 +419,15 @@ class Repo < ActiveRecord::Base
     metadata_builder.metadata_source.find_by(source_type: MetadataSource::DESCRIPTIVE_TYPES)
   end
 
+  # Return true if the repo has at least one image as an asset.
+  def has_images?
+    images_to_render.present? || assets.where(mime_type: ['image/jpeg', 'image/tiff']).count > 0
+  end
+
+  def bibid
+    descriptive_metadata.original_mappings["bibid"] || descriptive_metadata.original_mappings["bibnumber"]&.first
+  end
+
   def thumbnail_link
     return '' unless thumbnail_location
 
@@ -407,6 +436,53 @@ class Repo < ActiveRecord::Base
       host: Utils::Storage::Ceph.config.read_host,
       scheme: Utils::Storage::Ceph.config.read_protocol.gsub('://', '')
     ).to_s
+  end
+
+  def solr_document
+    document = {
+      'id' => names.fedora,
+      'active_fedora_model_ssi' => 'Manuscript', # TODO: Can remove once Blacklight doesn't depend on these fields
+      'has_model_ssim' => ['Manuscript'],
+      'unique_identifier_tesim' => unique_identifier,
+      'system_create_dtsi' => first_published_at.utc.iso8601,
+      'system_modified_dtsi' => last_published_at.utc.iso8601
+    }
+
+    MetadataSource::VALID_DESCRIPTIVE_METADATA_FIELDS.each do |field|
+      values = descriptive_metadata.user_defined_mappings.fetch(field, [])
+      next if values.blank?
+
+      document["#{field}_tesim"] = values
+      document["#{field}_ssim"] = values
+      document["#{field}_sim"] = values
+    end
+
+    document
+  end
+
+  # @return [True] if publish was successful
+  # @return [False] if publish was not successful
+  def publish
+    # TODO: check that iiif manifest is available?
+    # TODO: check that descriptive metadata and structural metadata are present?
+
+    # Rollback first_published_at and last_published_at, if solr requests are not successful.
+    self.transaction do
+      now = Time.current
+      self.first_published_at = now if first_published_at.blank?
+      self.last_published_at = now
+      self.published = true
+      save!
+      # Add Solr Document to Solr Core -- raise error if cannot be added to Solr Core
+      solr = RSolr.connect(url: Bulwark::Config.solr[:url])
+      solr.add(self.solr_document)
+      solr.commit
+    end
+
+    true
+  rescue => e
+    Honeybadger.notify(e)
+    false
   end
 
   private
