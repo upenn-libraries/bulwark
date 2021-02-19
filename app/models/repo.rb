@@ -485,7 +485,27 @@ class Repo < ActiveRecord::Base
     false
   end
 
+  def unpublish
+    return false unless published
+
+    self.transaction do
+      self.published = false
+      save!
+      solr = RSolr.connect(url: Bulwark::Config.solr[:url])
+      solr.delete_by_query "id:#{names.fedora}"
+      solr.commit
+    end
+    true
+  rescue => e
+    Honeybadger.notify(e)
+    false
+  end
+
   private
+
+  def solr
+    @solr ||= RSolr.connect(url: Bulwark::Config.solr[:url])
+  end
 
   def _build_and_populate_directories(working_path)
     admin_directory = File.join(working_path, Utils.config[:object_admin_path])
