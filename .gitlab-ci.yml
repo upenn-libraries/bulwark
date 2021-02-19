@@ -3,7 +3,7 @@ include:
     ref: "master"
     file: ".build_docker_image.yml"
   - project: "devops/gitlab/ci-templates/docker"
-    ref: "tagging-in-merge-request-pipelines"
+    ref: "master"
     file: ".push_docker_image.yml"
   - project: "devops/gitlab/ci-templates/docker"
     ref: "master"
