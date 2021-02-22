@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # This class will eventually replace Utils::Derivatives.
 module Bulwark
   module Derivatives

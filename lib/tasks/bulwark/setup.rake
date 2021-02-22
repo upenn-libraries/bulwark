@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 namespace :bulwark do
   namespace :setup do
     desc 'Creates an admin user, to be used in local development environment'
     task create_admin: :environment do
       User.find_or_create_by!(email: 'admin@example.com') do |admin|
-         admin.password = 'theadmin'
-         admin.password_confirmation = 'theadmin'
-       end
+        admin.password = 'theadmin'
+        admin.password_confirmation = 'theadmin'
+      end
     end
 
     desc 'Loads one digital object, to be used in local development environment'
@@ -22,7 +24,7 @@ namespace :bulwark do
           'date' => ['undated'],
           'corporate_name' => ['J. Rosenblatt & Co.'],
           'geographic_subject' => ['Baltimore, Maryland, United States', 'Maryland, United States'],
-          'description' =>['J. Rosenblatt & Co.: Importers: Earthenware, China, Majolica, Novelties', '32 South Howard Street, Baltimore, MD'],
+          'description' => ['J. Rosenblatt & Co.: Importers: Earthenware, China, Majolica, Novelties', '32 South Howard Street, Baltimore, MD'],
           'rights' => ['http://rightsstatements.org/page/NoC-US/1.0/?'],
           'subject' => ['House furnishings', 'Jewish merchants', 'Trade cards (advertising)'],
           'title' => ['Trade card; J. Rosenblatt & Co.; Baltimore, Maryland, United States; undated;']

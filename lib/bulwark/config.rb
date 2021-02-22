@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bulwark
   module Config
     # Module to centralize calls to retrieve application-wide configuration.
@@ -13,15 +15,17 @@ module Bulwark
     # config/. Eventually we want merge all those file into config/bulwark.yml.
 
     def self.special_remote
-      Rails.application.config_for(:filesystem)
-                       .fetch('special_remote', {})
-                       .with_indifferent_access
+      Rails.application
+           .config_for(:filesystem)
+           .fetch('special_remote', {})
+           .with_indifferent_access
     end
 
     def self.bulk_import
-      Rails.application.config_for(:bulwark)
-                       .fetch('bulk_import', {})
-                       .with_indifferent_access
+      Rails.application
+           .config_for(:bulwark)
+           .fetch('bulk_import', {})
+           .with_indifferent_access
     end
 
     def self.solr

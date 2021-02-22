@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Bulwark::Import do
-
   describe '.new'
 
   describe '.validation' do
@@ -21,40 +20,41 @@ RSpec.describe Bulwark::Import do
     end
 
     context 'when action is invalid' do
-      subject { described_class.new(action: 'invalid') }
+      subject(:import) { described_class.new(action: 'invalid') }
 
       it 'adds error' do
-        expect(subject.validate).to be false
-        expect(subject.errors).to include('"invalid" is not a valid import action')
+        expect(import.validate).to be false
+        expect(import.errors).to include('"invalid" is not a valid import action')
       end
     end
 
     context 'when creating new object without required values' do
-      subject { described_class.new(action: Bulwark::Import::CREATE) }
+      subject(:import) { described_class.new(action: Bulwark::Import::CREATE) }
 
       it 'adds errors' do
-        expect(subject.validate).to be false
-        expect(subject.errors).to include('structural must be provided to create an object')
-        expect(subject.errors).to include('metadata must be provided to create an object')
-        expect(subject.errors).to include('"assets.path" and "assets.drive" must be provided to create an object')
-        expect(subject.errors).to include('"directive_name" must be provided to create an object')
+        expect(import.validate).to be false
+        expect(import.errors).to include('structural must be provided to create an object')
+        expect(import.errors).to include('metadata must be provided to create an object')
+        expect(import.errors).to include('"assets.path" and "assets.drive" must be provided to create an object')
+        expect(import.errors).to include('"directive_name" must be provided to create an object')
       end
     end
 
     context 'when creating a new object with a unique_identifier already in use' do
       include_context 'stub successful EZID requests' # Stubbing EZID request needed when creating a new repo.
 
+      subject(:import) { described_class.new(action: Bulwark::Import::CREATE, unique_identifier: ark) }
       let(:ark) { FactoryBot.create(:repo).unique_identifier }
 
-      subject { described_class.new(action: Bulwark::Import::CREATE, unique_identifier: ark) }
-
       it 'adds errors' do
-        expect(subject.validate).to be false
-        expect(subject.errors).to include("\"#{ark}\" already belongs to an object. Cannot create new object with given unique identifier.")
+        expect(import.validate).to be false
+        expect(import.errors).to include("\"#{ark}\" already belongs to an object. Cannot create new object with given unique identifier.")
       end
     end
 
     context 'when creating a new object with an unminted ark' do
+      subject(:import) { described_class.new(action: Bulwark::Import::CREATE, unique_identifier: 'ark:/99999/fk4invalid') }
+
       before do
         # Stub request to get EZID
         stub_request(:get, /#{Ezid::Client.config.host}\/id\/ark:\/99999\/fk4invalid/)
@@ -62,83 +62,80 @@ RSpec.describe Bulwark::Import do
             basic_auth: [Ezid::Client.config.user, Ezid::Client.config.password],
             headers: { 'Content-Type': 'text/plain; charset=UTF-8' }
           )
-          .to_return { |request|
-            {
-              status: 400,
-              headers: { 'Content-Type': 'text/plain; charset=UTF-8' },
-              body: "error: bad request - invalid identifier"
-            }
-          }
+          .to_return(
+            status: 400,
+            headers: { 'Content-Type': 'text/plain; charset=UTF-8' },
+            body: "error: bad request - invalid identifier"
+          )
       end
-      subject { described_class.new(action: Bulwark::Import::CREATE, unique_identifier: 'ark:/99999/fk4invalid') }
 
       it 'adds error' do
-        expect(subject.validate).to be false
-        expect(subject.errors).to include('"ark:/99999/fk4invalid" is not minted')
+        expect(import.validate).to be false
+        expect(import.errors).to include('"ark:/99999/fk4invalid" is not minted')
       end
     end
 
     context 'when updating an object without a unique_identifier' do
-      subject { described_class.new(action: Bulwark::Import::UPDATE) }
+      subject(:import) { described_class.new(action: Bulwark::Import::UPDATE) }
 
       it 'adds error' do
-        expect(subject.validate).to be false
-        expect(subject.errors).to include '"unique_identifier" must be provided when updating an object'
+        expect(import.validate).to be false
+        expect(import.errors).to include '"unique_identifier" must be provided when updating an object'
       end
     end
 
     context 'when updating an object with an invalid unique_identifier' do
-      subject { described_class.new(action: Bulwark::Import::UPDATE, unique_identifier: 'ark:/99999/fk4invalid') }
+      subject(:import) { described_class.new(action: Bulwark::Import::UPDATE, unique_identifier: 'ark:/99999/fk4invalid') }
       it 'adds error' do
-        expect(subject.validate).to be false
-        expect(subject.errors).to include '"unique_identifier" does not belong to an object. Cannot update object.'
+        expect(import.validate).to be false
+        expect(import.errors).to include '"unique_identifier" does not belong to an object. Cannot update object.'
       end
     end
 
     context 'when asset drive is invalid' do
-      subject { described_class.new(assets: { 'drive' => 'invalid' }) }
+      subject(:import) { described_class.new(assets: { 'drive' => 'invalid' }) }
 
       it 'adds error' do
-        expect(subject.validate).to be false
-        expect(subject.errors).to include 'assets drive invalid'
+        expect(import.validate).to be false
+        expect(import.errors).to include 'assets drive invalid'
       end
     end
 
     context 'when asset path is invalid' do
-      subject { described_class.new('assets' => { 'drive' => 'test', 'path' => 'invalid/something' }) }
+      subject(:import) { described_class.new('assets' => { 'drive' => 'test', 'path' => 'invalid/something' }) }
 
       it 'adds error' do
         pending('path validity is being checked in .process')
-        expect(subject.validate).to be false
-        expect(subject.errors).to include 'asset path invalid'
+        expect(import.validate).to be false
+        expect(import.errors).to include 'asset path invalid'
       end
     end
 
     context 'when structural filenames and file are provided' do
-      subject { described_class.new(structural: { filenames: 'something', asset: 'something', drive: 'test' }) }
+      subject(:import) { described_class.new(structural: { filenames: 'something', asset: 'something', drive: 'test' }) }
 
       it 'adds error' do
-        expect(subject.validate).to be false
-        expect(subject.errors).to include 'cannot provide structural metadata two different ways'
+        expect(import.validate).to be false
+        expect(import.errors).to include 'cannot provide structural metadata two different ways'
       end
     end
 
     context 'when structural drive is invalid' do
-      subject { described_class.new(structural: { 'drive' => 'invalid' }) }
+      subject(:import) { described_class.new(structural: { 'drive' => 'invalid' }) }
 
       it 'adds error' do
-        expect(subject.validate).to be false
-        expect(subject.errors).to include 'structural drive invalid'
+        expect(import.validate).to be false
+        expect(import.errors).to include 'structural drive invalid'
       end
     end
 
     context 'when structural path is invalid' do
-      subject { described_class.new(structural: { drive: 'test', path: 'invalid/something' }) }
+      subject(:import) { described_class.new(structural: { drive: 'test', path: 'invalid/something' }) }
 
       it 'adds error' do
         pending('path validity is being checked in .process')
-        expect(subject.validate).to be false
-        expect(subject.errors).to include 'structural path invalid'
+        expect(import.validate).to be false
+        expect(import.errors).to include 'structural path invalid'
       end
     end
   end
@@ -158,7 +155,7 @@ RSpec.describe Bulwark::Import do
           'date' => ['undated'],
           'corporate_name' => ['J. Rosenblatt & Co.'],
           'geographic_subject' => ['Baltimore, Maryland, United States', 'Maryland, United States'],
-          'description' =>['J. Rosenblatt & Co.: Importers: Earthenware, China, Majolica, Novelties', '32 South Howard Street, Baltimore, MD'],
+          'description' => ['J. Rosenblatt & Co.: Importers: Earthenware, China, Majolica, Novelties', '32 South Howard Street, Baltimore, MD'],
           'rights' => ['http://rightsstatements.org/page/NoC-US/1.0/?'],
           'subject' => ['House furnishings', 'Jewish merchants', 'Trade cards (advertising)'],
           'title' => ['Trade card; J. Rosenblatt & Co.; Baltimore, Maryland, United States; undated;']
@@ -252,8 +249,12 @@ RSpec.describe Bulwark::Import do
 
       it 'generated metadata files contain expected data' do
         git.annex.get(repo.metadata_subdirectory)
-        expect(Nokogiri::XML(File.read(File.join(working_dir, repo.metadata_subdirectory, 'preservation.xml')))).to be_equivalent_to(expected_preservation).ignoring_content_of('uuid')
-        expect(Nokogiri::XML(File.read(File.join(working_dir, repo.metadata_subdirectory, 'mets.xml')))).to be_equivalent_to(expected_mets).ignoring_attr_values('OBJID').ignoring_content_of('mods|identifier')
+        expect(
+          Nokogiri::XML(File.read(File.join(working_dir, repo.metadata_subdirectory, 'preservation.xml')))
+        ).to be_equivalent_to(expected_preservation).ignoring_content_of('uuid')
+        expect(
+          Nokogiri::XML(File.read(File.join(working_dir, repo.metadata_subdirectory, 'mets.xml')))
+        ).to be_equivalent_to(expected_mets).ignoring_attr_values('OBJID').ignoring_content_of('mods|identifier')
       end
 
       it 'links to generated metadata files are stored' do
@@ -282,14 +283,14 @@ RSpec.describe Bulwark::Import do
         back = repo.assets.find_by(filename: 'back.tif')
 
         expect(front).not_to be_nil
-        expect(front.size).to be 42421
+        expect(front.size).to be 42_421
         expect(front.mime_type).to eql 'image/jpeg'
         expect(front.original_file_location).to eql git.annex.lookupkey('data/assets/front.tif')
         expect(front.access_file_location).to eql git.annex.lookupkey('.derivs/access/front.jpeg')
         expect(front.thumbnail_file_location).to eql git.annex.lookupkey('.derivs/thumbnails/front.jpeg')
 
         expect(back).not_to be_nil
-        expect(back.size).to be 33079
+        expect(back.size).to be 33_079
         expect(back.mime_type).to eql 'image/jpeg'
         expect(back.original_file_location).to eql git.annex.lookupkey('data/assets/back.tif')
         expect(back.access_file_location).to eql git.annex.lookupkey('.derivs/access/back.jpeg')
@@ -298,7 +299,7 @@ RSpec.describe Bulwark::Import do
 
       context 'when creating a iiif presentation manifest' do
         before do
-          allow(Bulwark::Config).to receive(:bulk_import).and_return({ create_iiif_manifest: true })
+          allow(Bulwark::Config).to receive(:bulk_import).and_return(create_iiif_manifest: true)
         end
 
         it 'makes requests to generate iiif manifest' do
@@ -392,8 +393,12 @@ RSpec.describe Bulwark::Import do
 
         it 'contains updated generated metadata' do
           updated_git.annex.get(updated_repo.metadata_subdirectory)
-          expect(Nokogiri::XML(File.read(File.join(updated_working_dir, updated_repo.metadata_subdirectory, 'mets.xml')))).to be_equivalent_to(updated_mets).ignoring_attr_values('OBJID').ignoring_content_of('mods|identifier')
-          expect(Nokogiri::XML(File.read(File.join(updated_working_dir, updated_repo.metadata_subdirectory, 'preservation.xml')))).to be_equivalent_to(updated_preservation).ignoring_content_of('uuid')
+          expect(
+            Nokogiri::XML(File.read(File.join(updated_working_dir, updated_repo.metadata_subdirectory, 'mets.xml')))
+          ).to be_equivalent_to(updated_mets).ignoring_attr_values('OBJID').ignoring_content_of('mods|identifier')
+          expect(
+            Nokogiri::XML(File.read(File.join(updated_working_dir, updated_repo.metadata_subdirectory, 'preservation.xml')))
+          ).to be_equivalent_to(updated_preservation).ignoring_content_of('uuid')
         end
       end
     end
@@ -437,7 +442,7 @@ RSpec.describe Bulwark::Import do
       let(:structural_metadata) do
         {
           'sequence' => [
-            { 'sequence' => '1', 'filename' => 'front.tif', 'label' => 'p. 1', 'viewing_direction' => 'top-to-bottom', 'text_annotation' => ['a very descriptive annotation', 'an additional annotation']  },
+            { 'sequence' => '1', 'filename' => 'front.tif', 'label' => 'p. 1', 'viewing_direction' => 'top-to-bottom', 'text_annotation' => ['a very descriptive annotation', 'an additional annotation'] },
             { 'sequence' => '2', 'filename' => 'back.tif', 'label' => 'p. 2', 'viewing_direction' => 'top-to-bottom' }
           ]
         }
@@ -541,7 +546,7 @@ RSpec.describe Bulwark::Import do
       it 'creates descriptive metadata source' do
         metadata_source = repo.descriptive_metadata
         expect(metadata_source.source_type).to eql 'descriptive'
-        expect(metadata_source.original_mappings).to eql({ 'bibnumber' => [bibnumber], 'item_type' => ['Manuscript'] })
+        expect(metadata_source.original_mappings).to eql('bibnumber' => [bibnumber], 'item_type' => ['Manuscript'])
         expect(metadata_source.user_defined_mappings).to eql descriptive_metadata
         expect(metadata_source.remote_location).to eql "#{repo.names.bucket}/#{git.annex.lookupkey('data/metadata/descriptive_metadata.csv')}"
       end
@@ -553,8 +558,12 @@ RSpec.describe Bulwark::Import do
 
       it 'generated metadata files contain expected data' do
         git.annex.get(repo.metadata_subdirectory)
-        expect(Nokogiri::XML(File.read(File.join(working_dir, repo.metadata_subdirectory, 'preservation.xml')))).to be_equivalent_to(expected_preservation).ignoring_content_of('uuid')
-        expect(Nokogiri::XML(File.read(File.join(working_dir, repo.metadata_subdirectory, 'mets.xml')))).to be_equivalent_to(expected_mets).ignoring_attr_values('OBJID').ignoring_content_of('mods|identifier')
+        expect(
+          Nokogiri::XML(File.read(File.join(working_dir, repo.metadata_subdirectory, 'preservation.xml')))
+        ).to be_equivalent_to(expected_preservation).ignoring_content_of('uuid')
+        expect(
+          Nokogiri::XML(File.read(File.join(working_dir, repo.metadata_subdirectory, 'mets.xml')))
+        ).to be_equivalent_to(expected_mets).ignoring_attr_values('OBJID').ignoring_content_of('mods|identifier')
       end
     end
 

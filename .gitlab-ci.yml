@@ -66,7 +66,6 @@ rubocop:
     - cp ${CI_PROJECT_DIR}/.env.example ${CI_PROJECT_DIR}/.env
   tags:
     - build
-  allow_failure: true
 
 shiftleft_container_scanning:
   stage: sast
@@ -88,7 +87,7 @@ push_image_to_registry:
   stage: push
   extends:
     - .push_docker_image
-  rules: 
+  rules:
     - if: $CI_MERGE_REQUEST_IID
     - if: $CI_COMMIT_TAG
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

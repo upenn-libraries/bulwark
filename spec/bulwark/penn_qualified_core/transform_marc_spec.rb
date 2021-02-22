@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Bulwark::PennQualifiedCore::TransformMarc do
@@ -28,13 +30,13 @@ RSpec.describe Bulwark::PennQualifiedCore::TransformMarc do
 
   it 'generates_expected_xml' do
     expect(
-      Bulwark::PennQualifiedCore::TransformMarc.from_marc_xml(xml)
+      described_class.from_marc_xml(xml)
     ).to eq expected_pqc
   end
 
   it 'raises error when xml is invalid' do
     expect {
-      Bulwark::PennQualifiedCore::TransformMarc.from_marc_xml('')
+      described_class.from_marc_xml('')
     }.to raise_error StandardError, 'Error mapping MARC XML to PQC: NoMethodError undefined method `text\' for nil:NilClass'
   end
 end

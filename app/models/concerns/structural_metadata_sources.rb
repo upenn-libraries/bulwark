@@ -20,7 +20,7 @@ module StructuralMetadataSources
     self.original_mappings = { 'sequence' => ordered_metadata }
 
     self.user_defined_mappings = {
-      'sequence' => ordered_metadata.map { |row| row.keep_if { |k, v| VALID_STRUCTURAL_METADATA_FIELDS.include?(k) } }
+      'sequence' => ordered_metadata.map { |row| row.keep_if { |k, _v| VALID_STRUCTURAL_METADATA_FIELDS.include?(k) } }
     }
   end
 

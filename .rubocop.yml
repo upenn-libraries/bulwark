@@ -3,6 +3,17 @@ inherit_from: .rubocop_todo.yml
 inherit_gem:
   bixby: bixby_default.yml
 
+inherit_mode:
+  merge:
+    - Exclude
+
 AllCops:
   TargetRubyVersion: 2.3.3
   TargetRailsVersion: 4.2.5
+
+Style/BlockDelimiters:
+  EnforcedStyle: braces_for_chaining
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'

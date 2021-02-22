@@ -19,7 +19,7 @@ class DigitalObjectImport < ActiveRecord::Base
 
   # status helpers
   STATUSES.each do |s|
-    define_method "#{s.gsub(' ', '_')}?" do
+    define_method "#{s.tr(' ', '_')}?" do
       status == s
     end
   end
