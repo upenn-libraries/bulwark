@@ -5,8 +5,7 @@ require 'rails_helper'
 RSpec.describe DigitalObjectImport, type: :model do
   let(:bulk_import) { FactoryBot.create :bulk_import }
   let(:digital_object_import) do
-    FactoryBot.create :digital_object_import,
-                     bulk_import: bulk_import
+    FactoryBot.create :digital_object_import, bulk_import: bulk_import
   end
 
   it 'has one BulkImport' do

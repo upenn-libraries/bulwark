@@ -75,13 +75,15 @@ class MetadataBuilder < ActiveRecord::Base
     self.save!
   end
 
+  # rubocop:disable Style/BlockDelimiters
+
   # Creates preservation xml. This xml file represents both the descriptive and
   # structural metadata.
   def preservation_xml
     descriptive_metadata = metadata_source.find_by(source_type: 'descriptive').user_defined_mappings
     structural_metadata = metadata_source.find_by(source_type: 'structural').user_defined_mappings
 
-    xml_content = Nokogiri::XML::Builder.new(encoding: 'UTF-8') { |xml|
+    Nokogiri::XML::Builder.new(encoding: 'UTF-8') { |xml|
       xml.root {
         xml.record {
           xml.uuid { xml.text repo.unique_identifier }
@@ -104,7 +106,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   def mets_xml
     descriptive_metadata = metadata_source.find_by(source_type: 'descriptive').user_defined_mappings
-    xml_content = Nokogiri::XML::Builder.new { |xml|
+    Nokogiri::XML::Builder.new { |xml|
       xml['METS'].mets(
         'xmlns:METS' => 'http://www.loc.gov/METS/',
         'xmlns:mods' => 'http://www.loc.gov/mods/v3',
@@ -201,6 +203,7 @@ class MetadataBuilder < ActiveRecord::Base
       }
     }.to_xml
   end
+  # rubocop:enable Style/BlockDelimiters
 
   # Doesn't seem to be called anywhere.
   def save_input_sources(working_path)
@@ -248,7 +251,6 @@ class MetadataBuilder < ActiveRecord::Base
         end
       end
     end
-
 
     self.repo.save!
     self.last_file_checks = DateTime.now

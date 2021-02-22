@@ -32,7 +32,7 @@ module DescriptiveMetadataSources
 
       self.original_mappings = metadata
 
-      if bibnumber = metadata['bibnumber']&.first
+      if (bibnumber = metadata['bibnumber']&.first)
         # Pull metadata from Marmite.
         # Merge metadata provided with metadata from catalog. Metadata provided via CSV take precedent over catalog metadata.
         self.user_defined_mappings = catalog_metadata(bibnumber).merge(metadata)
@@ -40,7 +40,7 @@ module DescriptiveMetadataSources
         # Remove any invalid column headers, TODO: maybe add a warning about an invalid column being used?
 
         # process data provided in hash. and save it to user_defined_mappings?
-        self.user_defined_mappings = metadata.keep_if { |k, v| VALID_DESCRIPTIVE_METADATA_FIELDS.include?(k) }
+        self.user_defined_mappings = metadata.keep_if { |k, _v| VALID_DESCRIPTIVE_METADATA_FIELDS.include?(k) }
       end
     end
 

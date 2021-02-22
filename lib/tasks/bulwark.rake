@@ -20,9 +20,7 @@ namespace :bulwark do
     puts Rainbow('        rake bulwark:setup:create_admin')
     puts Rainbow('    a digital object and admin users').green
     puts Rainbow('        rake bulwark:setup:create_digital_object')
-
   end
-
 
   desc 'Cleans development/test environment'
   task :clean do

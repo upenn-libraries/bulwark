@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 # Cleaning up storage directories.
 #

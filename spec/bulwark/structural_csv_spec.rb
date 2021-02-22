@@ -56,13 +56,13 @@ RSpec.describe Bulwark::StructuredCSV do
 
   describe '.parse' do
     it 'parses data as expected' do
-      expect(Bulwark::StructuredCSV.parse(csv_string_data)).to eql csv_hash_data
+      expect(described_class.parse(csv_string_data)).to eql csv_hash_data
     end
   end
 
   describe '.generate' do
     it 'generates data as expected' do
-      expect(Bulwark::StructuredCSV.generate(csv_hash_data)).to eql sorted_csv_string_data
+      expect(described_class.generate(csv_hash_data)).to eql sorted_csv_string_data
     end
   end
 end

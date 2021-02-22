@@ -222,10 +222,11 @@ module Bulwark
     end
 
     private
+
       def validate_structural_metadata
         valid_filenames = repo.assets.pluck(:filename)
         filenames = repo.structural_metadata.filenames
-        invalid_filenames  = filenames - valid_filenames
+        invalid_filenames = filenames - valid_filenames
         if invalid_filenames.present?
           raise "Structural metadata contains the following invalid filenames: #{invalid_filenames.join(', ')}"
         end
@@ -233,8 +234,8 @@ module Bulwark
 
       def create_or_update_assets(clone_location)
         # All files in assets folder
-        glob_path = File.join(clone_location, repo.assets_subdirectory, "*.{#{repo.file_extensions.join(",")}}")
-        assets_paths = Dir.glob(glob_path) #full paths
+        glob_path = File.join(clone_location, repo.assets_subdirectory, "*.{#{repo.file_extensions.join(',')}}")
+        assets_paths = Dir.glob(glob_path) # full paths
 
         # Get jhove output in order to get the mime type and size for each asset.
         repo.version_control_agent.get({ location: File.join(repo.metadata_subdirectory, JHOVE_OUTPUT_FILENAME) }, clone_location)
@@ -278,21 +279,21 @@ module Bulwark
 
           access_filepath = Derivatives::Image.access_copy(file_path, access_dir_path)
           access_relative_path = Pathname.new(access_filepath).relative_path_from(Pathname.new(clone_location)).to_s
-          repo.version_control_agent.add({content: access_relative_path, include_dotfiles: true}, clone_location)
+          repo.version_control_agent.add({ content: access_relative_path, include_dotfiles: true }, clone_location)
           asset.access_file_location = repo.version_control_agent.look_up_key(access_relative_path, clone_location)
 
           thumbnail_filepath = Derivatives::Image.thumbnail(file_path, thumbnail_dir_path)
           thumbnail_relative_path = Pathname.new(thumbnail_filepath).relative_path_from(Pathname.new(clone_location)).to_s
-          repo.version_control_agent.add({content: thumbnail_relative_path, include_dotfiles: true}, clone_location)
+          repo.version_control_agent.add({ content: thumbnail_relative_path, include_dotfiles: true }, clone_location)
           asset.thumbnail_file_location = repo.version_control_agent.look_up_key(thumbnail_relative_path, clone_location)
 
           asset.save!
 
-          repo.version_control_agent.add({content: file_path}, clone_location)
+          repo.version_control_agent.add({ content: file_path }, clone_location)
           repo.version_control_agent.lock(file_path, clone_location)
         end
 
-        repo.metadata_builder.update!(last_file_checks: DateTime.now)
+        repo.metadata_builder.update!(last_file_checks: DateTime.current)
 
         repo.version_control_agent.add({ content: repo.derivatives_subdirectory, include_dotfiles: true }, clone_location)
         repo.version_control_agent.lock(repo.derivatives_subdirectory, clone_location)
@@ -302,7 +303,7 @@ module Bulwark
 
       def characterize_assets(clone_location)
         repo.version_control_agent.get({ location: repo.assets_subdirectory }, clone_location)
-        repo.version_control_agent.unlock({ content: repo.assets_subdirectory}, clone_location)
+        repo.version_control_agent.unlock({ content: repo.assets_subdirectory }, clone_location)
 
         # Retrieve the jhove output file if present in order to update it.
         jhove_output_filepath = File.join(repo.metadata_subdirectory, JHOVE_OUTPUT_FILENAME)
@@ -318,7 +319,7 @@ module Bulwark
                                    .run_jhove(File.join(clone_location, repo.assets_subdirectory))
 
         repo.version_control_agent.lock(repo.assets_subdirectory, clone_location)
-        repo.version_control_agent.add({:content => "#{repo.metadata_subdirectory}/#{File.basename(jhove_output)}"}, clone_location)
+        repo.version_control_agent.add({ content: "#{repo.metadata_subdirectory}/#{File.basename(jhove_output)}" }, clone_location)
         repo.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_preservation_metadata', object_id: repo.names.fedora), clone_location)
         repo.version_control_agent.push(clone_location)
       end
@@ -348,8 +349,8 @@ module Bulwark
         # Save link to xml files in metadata_builder
         repo.metadata_builder.update(
           generated_metadata_files: {
-            "#{preservation_filepath}" => File.join(repo.names.bucket, repo.version_control_agent.look_up_key(preservation_filepath, clone_location)).to_s,
-            "#{mets_filepath}" => File.join(repo.names.bucket, repo.version_control_agent.look_up_key(mets_filepath, clone_location)).to_s
+            preservation_filepath.to_s => File.join(repo.names.bucket, repo.version_control_agent.look_up_key(preservation_filepath, clone_location)).to_s,
+            mets_filepath.to_s => File.join(repo.names.bucket, repo.version_control_agent.look_up_key(mets_filepath, clone_location)).to_s
           }
         )
       end

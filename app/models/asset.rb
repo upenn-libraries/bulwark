@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Asset < ActiveRecord::Base
   belongs_to :repo, required: true
 

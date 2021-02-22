@@ -421,7 +421,7 @@ class Repo < ActiveRecord::Base
 
   # Return true if the repo has at least one image as an asset.
   def has_images?
-    images_to_render.present? || assets.where(mime_type: ['image/jpeg', 'image/tiff']).count > 0
+    images_to_render.present? || assets.where(mime_type: ['image/jpeg', 'image/tiff']).count.positive?
   end
 
   def bibid

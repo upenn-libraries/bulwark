@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bulwark
   class Import
     module Utilities
@@ -5,7 +7,7 @@ module Bulwark
       # directory all the contents within that directory are copied to the new
       # location, if it's a file only that file will be copied over to the new location.
       def self.copy_files(source, destination, extensions)
-        raise Error, "#{source} not found" unless File.exists?(source)
+        raise Error, "#{source} not found" unless File.exist?(source)
 
         # Adding a trailing slash if source is a directory to copy all contents
         # within the directory and not the directory itself.

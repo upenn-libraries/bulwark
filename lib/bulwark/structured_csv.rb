@@ -79,7 +79,7 @@ module Bulwark
           generate_field("#{field}.#{k}", v, hash)
         end
       elsif value.is_a? Array
-        value.each_with_index { |v, i| hash["#{field}[#{i+1}]"] = v }
+        value.each_with_index { |v, i| hash["#{field}[#{i + 1}]"] = v }
       else
         hash[field] = value
       end

@@ -90,6 +90,5 @@ Rails.application.configure do
   config.active_job.queue_adapter = :sidekiq
 
   # Configuring cache store to use for ActiveJob::Status.
-  config.cache_store = :redis_store, ENV['CACHE_URL'], { namespace: 'sidekiq::cache',  expires_in: 90.minutes }
-
+  config.cache_store = :redis_store, ENV['CACHE_URL'], { namespace: 'sidekiq::cache', expires_in: 90.minutes }
 end

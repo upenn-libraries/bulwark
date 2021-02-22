@@ -6,3 +6,10 @@ inherit_gem:
 AllCops:
   TargetRubyVersion: 2.3.3
   TargetRailsVersion: 4.2.5
+
+Style/BlockDelimiters:
+  EnforcedStyle: braces_for_chaining
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'

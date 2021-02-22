@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Admin
   class BulkImportsController < AdminController
     def index
@@ -16,7 +18,7 @@ module Admin
       uploaded_file.tempfile.set_encoding('UTF-8') # CSVs ingested are UTF-8
       csv = uploaded_file.read
 
-      if errors = @bulk_import.validation_errors(csv) # Validate CSV.
+      if (errors = @bulk_import.validation_errors(csv)) # Validate CSV.
         errors_array = errors.map { |r, errors| errors.map { |e| "#{r}: #{e}" } }.flatten
         flash[:error] = errors_array
         redirect_to new_admin_bulk_import_path
