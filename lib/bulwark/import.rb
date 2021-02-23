@@ -244,11 +244,11 @@ module Bulwark
         # Updating or creating asset record for each asset file
         assets_paths.each do |asset_path|
           filename = File.basename(asset_path)
-          repo.assets.find_or_create_by(filename: filename) do |asset|
-            asset.original_file_location = repo.version_control_agent.look_up_key(File.join(repo.assets_subdirectory, filename), clone_location)
-            asset.size = jhove_output.size_for(filename) # In bytes
-            asset.mime_type = jhove_output.mime_type_for(filename)
-          end
+          asset = repo.assets.find_or_initialize_by(filename: filename)
+          asset.original_file_location = repo.version_control_agent.look_up_key(File.join(repo.assets_subdirectory, filename), clone_location)
+          asset.size = jhove_output.size_for(filename) # In bytes
+          asset.mime_type = jhove_output.mime_type_for(filename)
+          asset.save!
         end
 
         # Removing references to files that have been removed.
