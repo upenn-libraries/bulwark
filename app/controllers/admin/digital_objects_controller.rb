@@ -27,5 +27,20 @@ module Admin
 
       redirect_to action: :show
     end
+
+    # POST unpublish
+    # Removes digital object from public front-end.
+    def unpublish
+      @digital_object = Repo.find(params[:id])
+      success = @digital_object.unpublish
+
+      if success
+        flash[:success] = "Un-publishing was successful."
+      else
+        flash[:error] = 'Error un-publishing digital object. Please see logs.'
+      end
+
+      redirect_to action: :show
+    end
   end
 end

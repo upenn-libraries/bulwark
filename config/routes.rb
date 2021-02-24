@@ -56,6 +56,7 @@ Rails.application.routes.draw do
     resources :digital_objects, only: [:index, :show] do
       member do
         post :publish
+        post :unpublish
       end
     end
 
