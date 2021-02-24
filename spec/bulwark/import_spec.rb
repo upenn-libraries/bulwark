@@ -474,7 +474,7 @@ RSpec.describe Bulwark::Import do
           ]
         }
       end
-      let(:expected_structural) { fixture_to_str('example_manifest_loads', 'object_one', 'structural_metadata.csv') }
+      let(:expected_structural) { fixture_to_str('example_bulk_imports', 'object_one', 'structural_metadata.csv') }
       let(:import) do
         described_class.new(
           action: Bulwark::Import::CREATE,
