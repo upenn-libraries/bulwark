@@ -503,10 +503,6 @@ class Repo < ActiveRecord::Base
 
   private
 
-  def solr
-    @solr ||= RSolr.connect(url: Bulwark::Config.solr[:url])
-  end
-
   def _build_and_populate_directories(working_path)
     admin_directory = File.join(working_path, Utils.config[:object_admin_path])
     data_directory = File.join(working_path, Utils.config[:object_data_path])
