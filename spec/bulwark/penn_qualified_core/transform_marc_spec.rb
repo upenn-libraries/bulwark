@@ -23,7 +23,7 @@ RSpec.describe Bulwark::PennQualifiedCore::TransformMarc do
       "personal_name" => ["Feyerabend, Johann,"],
       "geographic_subject" => ["Germany -- Frankfurt am Main."],
       "collection" => ["Edgar Fahs Smith Memorial Collection (University of Pennsylvania)"],
-      "display_call_number" => ["Folio TN664 .E7 1598"]
+      "call_number" => ["Folio TN664 .E7 1598"]
     }
   end
   let(:xml) { fixture_to_str('marmite', 'marc_xml', '9923478503503681.xml') }
