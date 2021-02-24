@@ -311,7 +311,7 @@ RSpec.describe Bulwark::Import do
         end
       end
 
-      # Updating digital object with additional metadata and an additional asset.
+      # Updating digital object with additional metadata, one new asset and one updated asset file.
       context 'when updating a digital object' do
         let(:updated_descriptive_metadata) do
           {
@@ -340,7 +340,7 @@ RSpec.describe Bulwark::Import do
             action: Bulwark::Import::UPDATE,
             unique_identifier: result.repo.unique_identifier,
             metadata: updated_descriptive_metadata,
-            assets: { drive: 'test', path: 'object_one_update/new.tif' },
+            assets: { drive: 'test', path: 'object_one_update' },
             structural: { filenames: 'new.tif; front.tif; back.tif' },
             created_by: created_by
           ).process
@@ -353,6 +353,33 @@ RSpec.describe Bulwark::Import do
 
         it 'update is successful' do
           expect(updated_result.status).to be DigitalObjectImport::SUCCESSFUL
+        end
+
+        it 'updates asset records' do
+          front = updated_repo.assets.find_by(filename: 'front.tif')
+          back = updated_repo.assets.find_by(filename: 'back.tif')
+          new_file = updated_repo.assets.find_by(filename: 'new.tif')
+
+          expect(new_file).not_to be_nil
+          expect(new_file.size).to be 33_079
+          expect(new_file.mime_type).to eql 'image/jpeg'
+          expect(new_file.original_file_location).to eql updated_git.annex.lookupkey('data/assets/new.tif')
+          expect(new_file.access_file_location).to eql updated_git.annex.lookupkey('.derivs/access/new.jpeg')
+          expect(new_file.thumbnail_file_location).to eql updated_git.annex.lookupkey('.derivs/thumbnails/new.jpeg')
+
+          expect(front).not_to be_nil
+          expect(front.size).to be 41_751
+          expect(front.mime_type).to eql 'image/jpeg'
+          expect(front.original_file_location).to eql updated_git.annex.lookupkey('data/assets/front.tif')
+          expect(front.access_file_location).to eql updated_git.annex.lookupkey('.derivs/access/front.jpeg')
+          expect(front.thumbnail_file_location).to eql updated_git.annex.lookupkey('.derivs/thumbnails/front.jpeg')
+
+          expect(back).not_to be_nil
+          expect(back.size).to be 33_079
+          expect(back.mime_type).to eql 'image/jpeg'
+          expect(back.original_file_location).to eql updated_git.annex.lookupkey('data/assets/back.tif')
+          expect(back.access_file_location).to eql updated_git.annex.lookupkey('.derivs/access/back.jpeg')
+          expect(back.thumbnail_file_location).to eql updated_git.annex.lookupkey('.derivs/thumbnails/back.jpeg')
         end
 
         it 'contains additional asset and derivatives' do
@@ -447,7 +474,7 @@ RSpec.describe Bulwark::Import do
           ]
         }
       end
-      let(:expected_structural) { fixture_to_str('example_manifest_loads', 'object_one', 'structural_metadata.csv') }
+      let(:expected_structural) { fixture_to_str('example_bulk_imports', 'object_one', 'structural_metadata.csv') }
       let(:import) do
         described_class.new(
           action: Bulwark::Import::CREATE,

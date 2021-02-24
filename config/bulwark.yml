@@ -1,6 +1,6 @@
 development:
   mounted_drives:
-    test: <%= Rails.root.join('spec', 'fixtures', 'example_manifest_loads') %>
+    test: <%= Rails.root.join('spec', 'fixtures', 'example_bulk_imports') %>
   marmite:
     url: http://marmite.library.upenn.edu:9292
   bulk_import:
@@ -8,7 +8,7 @@ development:
 
 test:
   mounted_drives:
-    test: <%= Rails.root.join('spec', 'fixtures', 'example_manifest_loads') %>
+    test: <%= Rails.root.join('spec', 'fixtures', 'example_bulk_imports') %>
   marmite:
     url: https://marmite.library.upenn.edu:9292
   bulk_import:
