@@ -23,8 +23,8 @@ module MarmiteClient
   def self.iiif_presentation(formatted_ark)
     # Create IIIF Presentation 2.0 Manifest
     Faraday.get(url("records/#{formatted_ark}/create?format=iiif_presentation")) do |request|
-      # Increating timeout of request, because the generation of a IIIF presentation manifest can take a while.
-      request.options.timeout = 180
+      # Increasing timeout of request, because the generation of a IIIF presentation manifest can take a while.
+      request.options.timeout = 360
     end
 
     response = Faraday.get(url("records/#{formatted_ark}/show?format=iiif_presentation"))

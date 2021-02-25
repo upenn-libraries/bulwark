@@ -58,9 +58,9 @@ module Bulwark
 
         bibnumber = data.at_xpath('//records/record/controlfield[@tag=001]').text
         mapped_values['identifier'] ||= ["#{Utils.config[:repository_prefix]}_#{bibnumber}"]
-        mapped_values['display_call_number'] = data.xpath('//records/record/holdings/holding/call_number')
-                                                   .map(&:text)
-                                                   .compact
+        mapped_values['call_number'] = data.xpath('//records/record/holdings/holding/call_number')
+                                           .map(&:text)
+                                           .compact
         # Cleanup
         mapped_values.transform_values! { |values| values.map(&:strip).reject(&:empty?) }
 

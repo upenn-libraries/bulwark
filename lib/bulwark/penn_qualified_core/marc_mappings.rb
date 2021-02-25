@@ -13,7 +13,7 @@ module Bulwark
       TAGS = {
         '026' => { 'e' => 'identifier' },
         '035' => { 'a' => 'identifier' },
-        '099' => { 'a' => 'display_call_number' }, # TODO: Should this be `call_number`?
+        '099' => { 'a' => 'call_number' },
         '100' => { 'a' => 'creator' },
         '110' => { 'a' => 'corporate_name' },
         '245' => {

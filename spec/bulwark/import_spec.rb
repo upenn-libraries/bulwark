@@ -537,7 +537,7 @@ RSpec.describe Bulwark::Import do
           'personal_name' => ['Feyerabend, Johann,'],
           'geographic_subject' => ['Germany -- Frankfurt am Main.'],
           'collection' => ['Edgar Fahs Smith Memorial Collection (University of Pennsylvania)'],
-          'display_call_number' => ['Folio TN664 .E7 1598'],
+          'call_number' => ['Folio TN664 .E7 1598'],
           'relation' => ['https://colenda.library.upenn.edu/catalog/81431-p3df6k90j'],
           'item_type' => ['Manuscript']
         }
