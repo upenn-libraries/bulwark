@@ -1,6 +1,6 @@
+# frozen_string_literal: true
 module Bulwark
   module FileUtilities
-    
     class Error < StandardError; end
 
     # Rsyncing files from one location to another. If the source path is a

@@ -446,9 +446,8 @@ class Repo < ActiveRecord::Base
     valid_filenames = assets.pluck(:filename)
     filenames = structural_metadata.filenames
     invalid_filenames = filenames - valid_filenames
-    if invalid_filenames.present?
-      raise "Structural metadata contains the following invalid filenames: #{invalid_filenames.join(', ')}"
-    end
+    return unless invalid_filenames.present?
+    raise "Structural metadata contains the following invalid filenames: #{invalid_filenames.join(', ')}"
   end
 
   def solr_document

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Cloneable
   extend ActiveSupport::Concern
 
@@ -21,8 +22,7 @@ module Cloneable
   def merge_descriptive_metadata(metadata)
     if (metadata_source = metadata_builder.metadata_source.find_by(source_type: 'descriptive'))
       desc_metadata_file = metadata_source.path
-      version_control_agent.get({ location: desc_metadata_file }, clone_location)
-      version_control_agent.unlock({ content: desc_metadata_file }, clone_location)
+      get_and_unlock(desc_metadata_file)
 
       # Read in current metadata
       metadata_csv = File.open(File.join(clone_location, desc_metadata_file)).read
@@ -59,8 +59,7 @@ module Cloneable
   def add_structural_metadata(metadata)
     if (metadata_source = metadata_builder.metadata_source.find_by(source_type: 'structural'))
       struct_metadata_file = metadata_source.path
-      version_control_agent.get({ location: struct_metadata_file }, clone_location)
-      version_control_agent.unlock({ content: struct_metadata_file }, clone_location)
+      get_and_unlock(struct_metadata_file)
 
       File.write(File.join(clone_location, struct_metadata_file), metadata)
     else
@@ -89,8 +88,7 @@ module Cloneable
 
   def generate_derivatives
     version_control_agent.get({ location: assets_subdirectory }, clone_location)
-    version_control_agent.get({ location: derivatives_subdirectory }, clone_location)
-    version_control_agent.unlock({ content: derivatives_subdirectory }, clone_location)
+    get_and_unlock(derivatives_subdirectory)
 
     # Create 'thumbnails' and 'access' directories if they arent present already.
     access_dir_path = File.join(clone_location, derivatives_subdirectory, 'access')
@@ -138,8 +136,7 @@ module Cloneable
     # If preservation and mets xml files are already present, retrieve and unlock them.
     [preservation_filepath, mets_filepath].each do |relative_path|
       if ExtendedGit.open(clone_location).annex.whereis.includes_file?(relative_path)
-        version_control_agent.get({ location: relative_path }, clone_location)
-        version_control_agent.unlock({ content: relative_path }, clone_location)
+        get_and_unlock(relative_path)
       end
     end
 
@@ -178,10 +175,9 @@ module Cloneable
       version_control_agent.push({}, clone_location)
     end
 
-  # File characterization via jhove.
-  def characterize_assets
-      version_control_agent.get({ location: assets_subdirectory }, clone_location)
-      version_control_agent.unlock({ content: assets_subdirectory }, clone_location)
+    # File characterization via jhove.
+    def characterize_assets
+      get_and_unlock(assets_subdirectory)
 
       # Retrieve the jhove output file if present in order to update it.
       jhove_output_filepath = File.join(metadata_subdirectory, JHOVE_OUTPUT_FILENAME)
@@ -202,9 +198,8 @@ module Cloneable
       version_control_agent.push(clone_location)
     end
 
-  # Create or update asset records.
-
-  def create_or_update_assets
+    # Create or update asset records.
+    def create_or_update_assets
       # All files in assets folder
       glob_path = File.join(clone_location, assets_subdirectory, "*.{#{file_extensions.join(',')}}")
       assets_paths = Dir.glob(glob_path) # full paths
@@ -228,5 +223,13 @@ module Cloneable
       assets.each do |asset|
         asset.destroy unless asset_filenames.include?(asset.filename)
       end
+    end
+
+    # Helper methods for frequently used git-annex tasks
+    # Retrieving file and unlocking it. Usually needed before trying to access git-annex'ed files.
+    # Should provide a relative path from the root of the cloned repository.
+    def get_and_unlock(relative_path)
+      version_control_agent.get({ location: relative_path }, clone_location)
+      version_control_agent.unlock({ content: relative_path }, clone_location)
     end
 end
