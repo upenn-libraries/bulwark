@@ -118,7 +118,7 @@ module Bulwark
         # Generate structural metadata file based on contents in Bulk import csv given or path given.
         new_structural = CSV.generate do |csv|
           csv << ['filename', 'sequence']
-          ordered_filenames.split('; ').each_with_index do |f, i|
+          ordered_filenames.split(';').map(&:strip).each_with_index do |f, i|
             csv << [f, i + 1]
           end
         end
