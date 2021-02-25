@@ -171,7 +171,7 @@ module Cloneable
     def copy_assets(path)
       assets_directory = File.join(clone_location, assets_subdirectory)
 
-      Bulwark::Import::Utilities.copy_files(path, assets_directory, file_extensions)
+      Bulwark::FileUtilities.copy_files(path, assets_directory, file_extensions)
 
       version_control_agent.add({}, clone_location)
       version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.automated.added_assets'), clone_location)
@@ -211,7 +211,7 @@ module Cloneable
 
       # Get jhove output in order to get the mime type and size for each asset.
       version_control_agent.get({ location: File.join(metadata_subdirectory, JHOVE_OUTPUT_FILENAME) }, clone_location)
-      jhove_output = Bulwark::Import::JhoveOutput.new(File.join(clone_location, metadata_subdirectory, JHOVE_OUTPUT_FILENAME))
+      jhove_output = Bulwark::JhoveOutput.new(File.join(clone_location, metadata_subdirectory, JHOVE_OUTPUT_FILENAME))
 
       # Updating or creating asset record for each asset file
       assets_paths.each do |asset_path|
