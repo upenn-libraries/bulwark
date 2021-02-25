@@ -280,6 +280,7 @@ RSpec.describe Repo, type: :model do
           expect(repo.last_published_at).to be_within(1.second).of current_time
         end
       end
+
     end
 
     context 'when solr is unavailable' do
@@ -319,5 +320,56 @@ RSpec.describe Repo, type: :model do
         end
       end
     end
+  end
+
+  describe '#unpublish' do
+    let(:repo) { FactoryBot.create(:repo, :with_assets, :with_descriptive_metadata) }
+
+    context 'when Repo is not yet published' do
+      it 'returns false and makes no changes' do
+        outcome = repo.unpublish
+        repo.reload
+        expect(outcome).to be false
+        expect(repo.published).to be false
+      end
+    end
+
+    context 'when Repo is published' do
+
+      before { repo.publish }
+
+      context 'when solr is available' do
+
+        it 'removes document from solr' do
+          unpublished = repo.unpublish
+          solr = RSolr.connect(url: Bulwark::Config.solr[:url])
+          response = solr.get('select', params: { id: repo.names.fedora })
+          expect(response['response']['numFound']).to be 0
+          expect(unpublished).to be true
+          expect(repo.published).to be false
+        end
+
+      end
+
+      context 'when solr is unavailable' do
+        before do
+          allow(Bulwark::Config).to receive(:solr).and_return({})
+        end
+
+        it 'does not alter published, first_published_at or last_published_at' do
+          first_published_at = repo.first_published_at
+          repo.unpublish
+          repo.reload
+          expect(repo.published).to be true
+          expect(repo.first_published_at).to be_within(1.second).of first_published_at
+          expect(repo.last_published_at).to be_within(1.second).of first_published_at
+        end
+
+        it 'returns false' do
+          expect(repo.unpublish).to be false
+        end
+      end
+    end
+
   end
 end

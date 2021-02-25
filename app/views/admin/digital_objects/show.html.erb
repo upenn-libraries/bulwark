@@ -98,13 +98,23 @@
   <div role="tabpanel" class="tab-pane" id="publish">
 
     <h4>Publish</h4>
-    <p>Publishing makes this digital object available in the public website.</p>
     <p><strong>First published at:</strong> <%= @digital_object.first_published_at&.to_s(:display) || '[None]' %></p>
     <p><strong>Last published at:</strong> <%= @digital_object.last_published_at&.to_s(:display) || '[None]' %></p>
 
-    <%= bootstrap_form_tag(url: publish_admin_digital_object_path(@digital_object), method: :post) do |f| %>
-      <%= f.submit 'Publish Now', class: 'btn btn-primary' %>
+    <% if @digital_object.published? %>
+      <p>This object is currently <strong>available</strong> in the public website at <%= link_to catalog_url(@digital_object.names.fedora), catalog_path(@digital_object.names.fedora), target: '_blank' %>.</p>
+      <p>Unpublishing makes this digital object <strong>unavailable</strong> in the public website.</p>
+      <%= bootstrap_form_tag(url: unpublish_admin_digital_object_path(@digital_object), method: :post) do |f| %>
+        <%= f.submit 'Unpublish', class: 'btn btn-danger' %>
+      <% end %>
+    <% else %>
+      <p>
+        This object is currently <strong>unavailable</strong> in the public website. Publishing makes this digital
+        object <strong>available</strong> in the public website.
+      </p>
+      <%= bootstrap_form_tag(url: publish_admin_digital_object_path(@digital_object), method: :post) do |f| %>
+        <%= f.submit 'Publish Now', class: 'btn btn-primary' %>
+      <% end %>
     <% end %>
-
   </div>
 </div>
