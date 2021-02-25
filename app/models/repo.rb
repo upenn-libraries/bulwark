@@ -2,6 +2,8 @@ require "net/http"
 require 'sanitize'
 
 class Repo < ActiveRecord::Base
+  include Cloneable
+
   scope :new_format, -> { where(new_format: true) }
   scope :old_format, -> { where(new_format: false) }
   scope :name_search, ->(query) { where_like(:human_readable_name, query) }
@@ -319,6 +321,7 @@ class Repo < ActiveRecord::Base
     self.save!
   end
 
+  # Not used
   def push_artifacts(working_path)
     begin
       self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.post_ingest_artifacts'), working_path)
@@ -436,6 +439,16 @@ class Repo < ActiveRecord::Base
       host: Utils::Storage::Ceph.config.read_host,
       scheme: Utils::Storage::Ceph.config.read_protocol.gsub('://', '')
     ).to_s
+  end
+
+  # Validates that all the filenames referenced in the structural metadata are valid.
+  def validate_structural_metadata!
+    valid_filenames = assets.pluck(:filename)
+    filenames = structural_metadata.filenames
+    invalid_filenames = filenames - valid_filenames
+    if invalid_filenames.present?
+      raise "Structural metadata contains the following invalid filenames: #{invalid_filenames.join(', ')}"
+    end
   end
 
   def solr_document
