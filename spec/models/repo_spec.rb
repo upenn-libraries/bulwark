@@ -280,7 +280,6 @@ RSpec.describe Repo, type: :model do
           expect(repo.last_published_at).to be_within(1.second).of current_time
         end
       end
-
     end
 
     context 'when solr is unavailable' do
@@ -335,11 +334,9 @@ RSpec.describe Repo, type: :model do
     end
 
     context 'when Repo is published' do
-
       before { repo.publish }
 
       context 'when solr is available' do
-
         it 'removes document from solr' do
           unpublished = repo.unpublish
           solr = RSolr.connect(url: Bulwark::Config.solr[:url])
@@ -348,7 +345,6 @@ RSpec.describe Repo, type: :model do
           expect(unpublished).to be true
           expect(repo.published).to be false
         end
-
       end
 
       context 'when solr is unavailable' do
@@ -370,6 +366,5 @@ RSpec.describe Repo, type: :model do
         end
       end
     end
-
   end
 end
