@@ -164,7 +164,7 @@ module Bulwark
           human_readable_name: directive_name,
           metadata_subdirectory: 'metadata',
           assets_subdirectory: 'assets',
-          file_extensions: ['tif', 'TIF'],
+          file_extensions: ['tif', 'TIF', 'tiff', 'jpeg', 'jpg'],
           metadata_source_extensions: ['csv'],
           preservation_filename: 'preservation.xml',
           new_format: true, # Setting to differentiate from previously created repos
