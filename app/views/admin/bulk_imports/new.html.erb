@@ -8,5 +8,8 @@
 <%= bootstrap_form_for [:admin, @bulk_import] do |f| %>
   <%= f.static_control :created_by_email, label: 'Created By' %>
   <%= f.file_field :bulk_import_csv, label: 'Bulk Import CSV' %>
+  <%= f.select :job_priority,
+               options_for_select(Bulwark::Queues::PRIORITY_QUEUES, Bulwark::Queues::DEFAULT_PRIORITY),
+               label: 'Priority' %>
   <%= f.submit 'Create' %>
 <% end %>
