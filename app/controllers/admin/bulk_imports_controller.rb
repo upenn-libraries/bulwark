@@ -23,10 +23,9 @@ module Admin
         flash[:error] = errors_array
         redirect_to new_admin_bulk_import_path
       else # If no validation errors, create imports.
-        queue = safe_queue_name_from params[:bulk_import][:job_priority].to_s
         @bulk_import.original_filename = uploaded_file.original_filename
         @bulk_import.save
-        @bulk_import.create_imports(csv, queue)
+        @bulk_import.create_imports csv, safe_queue_name_from(params[:bulk_import][:job_priority].to_s)
 
         redirect_to admin_bulk_import_path(@bulk_import)
       end
@@ -38,14 +37,14 @@ module Admin
 
     private
 
-    # @param [String] priority_param
-    # @return [String]
-    def safe_queue_name_from(priority_param)
-      if priority_param.in?(Bulwark::Queues::PRIORITY_QUEUES)
-        priority_param
-      else
-        Bulwark::Queues::DEFAULT_PRIORITY
+      # @param [String] priority_param
+      # @return [String]
+      def safe_queue_name_from(priority_param)
+        if priority_param.in?(Bulwark::Queues::PRIORITY_QUEUES)
+          priority_param
+        else
+          Bulwark::Queues::DEFAULT_PRIORITY
+        end
       end
-    end
   end
 end
