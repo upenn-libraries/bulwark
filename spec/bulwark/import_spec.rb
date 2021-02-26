@@ -620,5 +620,70 @@ RSpec.describe Bulwark::Import do
         expect(result.errors).to contain_exactly('Structural metadata contains the following invalid filenames: front_1.tif, back_2.tif')
       end
     end
+
+    context 'when creating a new digital object with PDFs' do
+      let(:descriptive_metadata) do
+        {
+          'collection' => ['Corporate reports online'],
+          'corporate_name' => ['Beatrice Creamery Company'],
+          'date' => ['1935'],
+          'subject' => ['Food'],
+          'title' => ['Annual report, 1935.']
+        }
+      end
+      let(:structural_metadata) do
+        { 'sequence' => [{ 'sequence' => '1', 'filename' => 'dummy.pdf' }] }
+      end
+      let(:import) do
+        described_class.new(
+          action: Bulwark::Import::CREATE,
+          directive_name: 'object_three',
+          assets: { 'drive' => 'test', 'path' => 'object_three' },
+          metadata: descriptive_metadata,
+          structural: { 'filenames' => 'dummy.pdf' },
+          created_by: created_by
+        )
+      end
+      let(:repo) { result.repo }
+      let(:working_dir) { repo.version_control_agent.clone }
+      let(:git) { ExtendedGit.open(working_dir) }
+      let(:whereis_result) { git.annex.whereis }
+
+      let(:result) { import.process }
+
+      it 'result is successful' do
+        expect(result.status).to be DigitalObjectImport::SUCCESSFUL
+      end
+
+      it 'creates structural metadata source' do
+        metadata_source = repo.structural_metadata
+        expect(metadata_source.source_type).to eql 'structural'
+        expect(metadata_source.original_mappings).to eql structural_metadata
+        expect(metadata_source.user_defined_mappings).to eql structural_metadata
+        expect(metadata_source.remote_location).to eql "#{repo.names.bucket}/#{git.annex.lookupkey('data/metadata/structural_metadata.csv')}"
+      end
+
+      it 'creates thumbnail' do
+        expect(whereis_result.map(&:filepath)).not_to include('.derivs/thumbnails/dummy.pdf')
+        expect(repo.thumbnail).to eql 'dummy.pdf'
+        expect(repo.thumbnail_location).to be_nil
+      end
+
+      it 'contains assets files' do
+        expect(whereis_result.map(&:filepath)).to include('data/assets/dummy.pdf')
+        expect(whereis_result['data/assets/dummy.pdf'].locations.map(&:description)).to include '[local]'
+      end
+
+      it 'creates expected asset records' do
+        dummy = repo.assets.find_by(filename: 'dummy.pdf')
+
+        expect(dummy).not_to be_nil
+        expect(dummy.size).to be 13_264
+        expect(dummy.mime_type).to eql 'application/pdf'
+        expect(dummy.original_file_location).to eql git.annex.lookupkey('data/assets/dummy.pdf')
+        expect(dummy.access_file_location).to be_nil
+        expect(dummy.thumbnail_file_location).to be_nil
+      end
+    end
   end
 end
