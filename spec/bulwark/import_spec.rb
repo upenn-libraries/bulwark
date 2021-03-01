@@ -622,6 +622,10 @@ RSpec.describe Bulwark::Import do
     end
 
     context 'when creating a new digital object with PDFs' do
+      before do
+        allow(Bulwark::Config).to receive(:bulk_import).and_return(create_iiif_manifest: true)
+      end
+
       let(:descriptive_metadata) do
         {
           'collection' => ['Corporate reports online'],

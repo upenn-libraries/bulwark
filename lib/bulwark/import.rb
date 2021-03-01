@@ -147,7 +147,7 @@ module Bulwark
       repo.delete_clone
 
       # Create Marmite IIIF Manifest
-      MarmiteClient.iiif_presentation(repo.names.fedora) if Bulwark::Config.bulk_import[:create_iiif_manifest]
+      repo.create_iiif_manifest if Bulwark::Config.bulk_import[:create_iiif_manifest]
 
       # TODO: Publish if publish flag is set to true.
 
