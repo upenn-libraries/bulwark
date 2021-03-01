@@ -13,6 +13,10 @@ class BulkImport < ActiveRecord::Base
   paginates_per 10
   max_paginates_per 100
 
+  # We shouldn't need to persist the job priority/queue,
+  # we just need it when enqueueing the import jobs
+  attr_accessor :job_priority
+
   delegate :email, to: :created_by, prefix: true
 
   # Returns 'completed', 'completed with errors', 'in progress', 'queued'
@@ -54,11 +58,13 @@ class BulkImport < ActiveRecord::Base
     validation_errors.blank? ? nil : validation_errors
   end
 
-  def create_imports(csv)
+  # @param [String] csv file content
+  # @param [String] queue
+  def create_imports(csv, queue = Bulwark::Queues::DEFAULT_PRIORITY)
     rows = Bulwark::StructuredCSV.parse(csv)
     rows.each do |row|
       digital_object_import = DigitalObjectImport.create(bulk_import: self, import_data: row)
-      ProcessDigitalObjectImportJob.perform_later(digital_object_import)
+      ProcessDigitalObjectImportJob.set(queue: queue).perform_later(digital_object_import)
     end
   end
 
