@@ -35,14 +35,13 @@ namespace :bulwark do
         descriptive = r.metadata_builder.metadata_source.where(source_type: 'kaplan').first.original_mappings
         structural = r.metadata_builder.metadata_source.where(source_type: 'kaplan_structural').first.user_defined_mappings
 
-        metadata = descriptive.transform_keys { |k| k.downcase.tr(' ', '_') }
         filenames = []
         structural.each { |key, value| filenames[key] = value['file_name'] }
 
         {
           'unique_identifier' => r.unique_identifier,
           'action' => 'MIGRATE',
-          'metadata' => metadata,
+          'metadata' => descriptive,
           'structural' => { 'filenames' => filenames.compact.join('; ') }
         }
       end
