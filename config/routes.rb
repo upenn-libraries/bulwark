@@ -61,7 +61,7 @@ Rails.application.routes.draw do
     end
 
     if Rails.env.development? || Rails.env.test?
-      get 'special_remote_download/:bucket/:key', to: :special_remote_download, as: :special_remote_download, constraints: { key: /[^\/]+/ }
+      get 'special_remote_download/:bucket/:key', action: :special_remote_download, as: :special_remote_download, constraints: { key: /[^\/]+/ }
     end
   end
 
