@@ -10,5 +10,7 @@
   - [maintenance, 2]
   - [xml, 2]
   - [metadata_extraction, 2]
+  - [high, 4]
+  - [medium, 2]
   - [low, 1]
 :max_retries: 0
