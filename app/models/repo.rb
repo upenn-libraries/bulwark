@@ -431,6 +431,18 @@ class Repo < ActiveRecord::Base
     descriptive_metadata.original_mappings["bibid"] || descriptive_metadata.original_mappings["bibnumber"]&.first
   end
 
+  # Deprecating the use of thumbnail_location for repos in the new format. In the new format, we
+  # can calculate the thumbnail_location from data stored in the asset records.
+  def thumbnail_location
+    if new_format
+      return nil if thumbnail.blank?
+      location = assets.find_by!(filename: thumbnail)&.thumbnail_file_location
+      location ? File.join(names.bucket, location) : nil
+    else
+      self[:thumbnail_location]
+    end
+  end
+
   def thumbnail_link
     return '' unless thumbnail_location
 
