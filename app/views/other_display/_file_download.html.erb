@@ -1,0 +1,18 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Files</h3>
+  </div>
+
+  <ul class="list-group">
+    <% assets.each do |asset| %>
+      <li class="list-group-item">
+        <span><%= asset.filename %></span>
+        <span class="pull-right">
+          <a href="<%= special_remote_download_url("#{asset.repo.names.bucket}/#{asset.original_file_location}") %>">
+            <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download
+          </a>
+        </span>
+      </li>
+    <% end %>
+  </ul>
+</div>

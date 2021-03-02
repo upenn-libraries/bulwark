@@ -78,16 +78,10 @@ module ApplicationHelper
     return '' if repo.nil?
 
     if repo.new_format
-      if repo.assets.where(mime_type: 'application/pdf').count.positive?
-        ordered_filenames = repo.structural_metadata.user_defined_mappings['sequence'].map { |a| a['filename'] }
-
-        ordered_filenames.each do |filename|
-          asset = repo.assets.find_by(mime_type: 'application/pdf', filename: filename)
-          next if asset.nil?
-
-          partials += render partial: 'other_display/pdf', locals: { pdf_url: special_remote_download_url("#{repo.names.bucket}/#{asset.original_file_location}") }
-        end
-      end
+      assets = repo.assets.where(mime_type: 'application/pdf') # FIXME: need to be in the order the structural metadata dictates
+      ordered_files = repo.structural_metadata.user_defined_mappings['sequence'].map { |i| i['filename'] }
+      assets = assets.sort_by { |a| ordered_files.index(a.filename) }
+      partials = render partial: 'other_display/file_download', locals: { assets: assets }
     else
       repo.file_display_attributes.each do |key, value|
         partials += render :partial => 'other_display/pdf', :locals => {:pdf_url => value[:pdf_url]} if value[:content_type] == 'pdf'
