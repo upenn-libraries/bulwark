@@ -1,0 +1,26 @@
+<h3>Repair</h3>
+
+<p>Tasks to repair various issues that might happen to a Digital Object. Please run these with caution.</p>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Task</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <%= bootstrap_form_tag(url: regenerate_derivatives_admin_digital_object_path(@digital_object), method: :post) do |f| %>
+          <%= f.submit 'Regenerate Derivatives', class: 'btn btn-primary' %>
+        <% end %>
+      </td>
+      <td>
+        Regenerate derivatives and IIIF manifest.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
