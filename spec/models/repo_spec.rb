@@ -200,6 +200,27 @@ RSpec.describe Repo, type: :model do
     end
   end
 
+  describe '#thumbnail_location' do
+    context 'when new_format is true' do
+      let(:repo) { FactoryBot.create(:repo, :with_assets) }
+
+      before { repo.update(thumbnail: repo.assets.first.filename) }
+
+      it 'returns correct thumbnail_location' do
+        thumbnail_location = repo.assets.find_by(filename: repo.thumbnail).thumbnail_file_location
+        expect(repo.thumbnail_location).to eql "#{repo.names.bucket}/#{thumbnail_location}"
+      end
+    end
+
+    context `when new_format is false` do
+      let(:repo) { FactoryBot.create(:repo, thumbnail_location: 'a_cool_location') }
+
+      it 'returns correct thumbnail_location' do
+        expect(repo.thumbnail_location).to eql "a_cool_location"
+      end
+    end
+  end
+
   describe '#solr_document' do
     let(:repo) { FactoryBot.create(:repo, :with_assets, :with_descriptive_metadata, :published) }
     let(:current_time) { Time.current }

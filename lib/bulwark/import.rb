@@ -138,12 +138,7 @@ module Bulwark
 
       # Create Thumbnail
       thumbnail = repo.structural_metadata.user_defined_mappings['sequence'].sort_by { |file| file['sequence'] }.first['filename']
-      thumbnail_file_location = repo.assets.find_by!(filename: thumbnail)&.thumbnail_file_location
-      thumbnail_location = thumbnail_file_location ? File.join(repo.names.bucket, thumbnail_file_location) : nil
-      repo.update!(
-        thumbnail: thumbnail,
-        thumbnail_location: thumbnail_location
-      )
+      repo.update!(thumbnail: thumbnail)
 
       # Generate xml: generate mets.xml and preservation.xml (can be moved to earlier in the process)
       repo.add_preservation_and_mets_xml
