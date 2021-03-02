@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210218180416) do
+ActiveRecord::Schema.define(version: 20210302203359) do
 
   create_table "assets", force: :cascade do |t|
     t.integer  "repo_id",                 limit: 4
@@ -65,6 +65,7 @@ ActiveRecord::Schema.define(version: 20210218180416) do
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
     t.integer  "repo_id",        limit: 4
+    t.integer  "duration",       limit: 4
   end
 
   add_index "digital_object_imports", ["repo_id"], name: "fk_rails_0f30a10968", using: :btree
