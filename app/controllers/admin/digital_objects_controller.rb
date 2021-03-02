@@ -44,5 +44,15 @@ module Admin
 
       redirect_to action: :show
     end
+
+    # POST regenerate_derivatives
+    # Regenerates derivatives for object
+    def regenerate_derivatives
+      @digital_object = Repo.find(params[:id])
+      RegenerateDerivativesJob.perform_later(@digital_object)
+
+      flash[:success] = "Job to regenerate derivatives queued."
+      redirect_to action: :show
+    end
   end
 end
