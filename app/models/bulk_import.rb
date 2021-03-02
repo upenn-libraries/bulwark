@@ -74,8 +74,8 @@ class BulkImport < ActiveRecord::Base
     # @return [TrueClass, FalseClass]
     def imports_finished_with_failures?
       digital_object_imports.where(status: DigitalObjectImport::FAILED).exists? &&
-        digital_object_imports.where.not(
+        digital_object_imports.where(
           status: [DigitalObjectImport::QUEUED, DigitalObjectImport::IN_PROGRESS]
-        ).exists?
+        ).blank?
     end
 end
