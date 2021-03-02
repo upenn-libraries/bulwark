@@ -90,5 +90,29 @@ RSpec.describe BulkImport, type: :model do
         expect(bulk_import.status).to eql BulkImport::COMPLETED_WITH_ERRORS
       end
     end
+
+    context 'when all completed imports have failed but some are still running' do
+      let(:import_1) { FactoryBot.build(:digital_object_import, :failed) }
+      let(:import_2) { FactoryBot.build(:digital_object_import, :in_progress) }
+      let(:import_3) { FactoryBot.build(:digital_object_import, :queued) }
+
+      let(:bulk_import) { FactoryBot.create(:bulk_import, digital_object_imports: [import_1, import_2, import_3]) }
+
+      it 'returns in progress' do
+        expect(bulk_import.status).to eql BulkImport::IN_PROGRESS
+      end
+    end
+
+    context 'when all completed imports have succeeded but some are still running' do
+      let(:import_1) { FactoryBot.build(:digital_object_import, :successful) }
+      let(:import_2) { FactoryBot.build(:digital_object_import, :in_progress) }
+      let(:import_3) { FactoryBot.build(:digital_object_import, :queued) }
+
+      let(:bulk_import) { FactoryBot.create(:bulk_import, digital_object_imports: [import_1, import_2, import_3]) }
+
+      it 'returns in progress' do
+        expect(bulk_import.status).to eql BulkImport::IN_PROGRESS
+      end
+    end
   end
 end

@@ -43,7 +43,7 @@ class BulkImport < ActiveRecord::Base
   end
 
   # Returns Hash with validation errors. Errors are organized by row number. The
-  # keys in the hash are the rows and the values are the errors correspoinding to
+  # keys in the hash are the rows and the values are the errors corresponding to
   # that row.
   def validation_errors(csv)
     validation_errors = {}
@@ -74,8 +74,8 @@ class BulkImport < ActiveRecord::Base
     # @return [TrueClass, FalseClass]
     def imports_finished_with_failures?
       digital_object_imports.where(status: DigitalObjectImport::FAILED).exists? &&
-        digital_object_imports.where.not(
+        digital_object_imports.where(
           status: [DigitalObjectImport::QUEUED, DigitalObjectImport::IN_PROGRESS]
-        ).exists?
+        ).blank?
     end
 end
