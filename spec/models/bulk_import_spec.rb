@@ -103,7 +103,7 @@ RSpec.describe BulkImport, type: :model do
       end
     end
 
-    context 'when all completed imports have succeded but some are still running' do
+    context 'when all completed imports have succeeded but some are still running' do
       let(:import_1) { FactoryBot.build(:digital_object_import, :successful) }
       let(:import_2) { FactoryBot.build(:digital_object_import, :in_progress) }
       let(:import_3) { FactoryBot.build(:digital_object_import, :queued) }
