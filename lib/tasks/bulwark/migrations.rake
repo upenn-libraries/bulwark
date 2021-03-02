@@ -22,7 +22,7 @@ namespace :bulwark do
     desc 'Export of "Kaplan-style" objects'
     task export_kaplan_style_items: :environment do
       # Param to limit the number of results returned.
-      limit = ENV['limit'].present? ? ENV['limit'] : nil
+      limit = ENV['limit'].present? ? ENV['limit'].to_i : nil
 
       kaplan_style_items = Repo.where(ingested: true).select do |r|
         types = r.metadata_builder.metadata_source.map(&:source_type)
