@@ -21,6 +21,16 @@ RSpec.describe BulkImport, type: :model do
     expect(bulk_import).to respond_to :created_at, :updated_at
   end
 
+  describe '.aggregate_processing_time' do
+    let(:import_1) { FactoryBot.build(:digital_object_import, :successful, duration: 60) }
+    let(:import_2) { FactoryBot.build(:digital_object_import, :successful, duration: 120) }
+    let(:bulk_import) { FactoryBot.create(:bulk_import, digital_object_imports: [import_1, import_2]) }
+
+    it 'sums the processing time of child DigitalObjectImports' do
+      expect(bulk_import.aggregate_processing_time).to eq 180
+    end
+  end
+
   describe '.valid?' do
     context 'when created_by not present' do
       let(:bulk_import) { FactoryBot.build(:bulk_import, created_by: nil) }
