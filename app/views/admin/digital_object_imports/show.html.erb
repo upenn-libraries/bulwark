@@ -13,7 +13,7 @@
 <%= @digital_object_import.status.titlecase %>
 
 <h4>Import Processing Time</h4>
-<%= distance_of_time_in_words Time.zone.now, Time.zone.now + @digital_object_import.duration.seconds %>
+<%= duration_in_words @digital_object_import.duration %>
 
 <% if @digital_object_import.repo %>
   <h4>Digital Object Changed</h4>

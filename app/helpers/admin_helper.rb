@@ -13,4 +13,10 @@ module AdminHelper
       ).to_s
     end
   end
+
+  # Return a human-friendly string describing the duration
+  # @param [Integer] duration in seconds
+  def duration_in_words(duration)
+    distance_of_time_in_words Time.zone.now, Time.zone.now + duration.to_i
+  end
 end
