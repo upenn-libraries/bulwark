@@ -73,22 +73,16 @@ module ApplicationHelper
   end
 
   def render_pdf
-    repo = Repo.find_by(unique_identifier: @document.id.reverse_fedorafy)
-    partials = ''
+    repo = Repo.find_by(unique_identifier: @document.id.reverse_fedorafy, new_format: true)
     return '' if repo.nil?
 
-    if repo.new_format
-      assets = repo.assets.where(mime_type: 'application/pdf') # FIXME: need to be in the order the structural metadata dictates
-      ordered_files = repo.structural_metadata.user_defined_mappings['sequence'].map { |i| i['filename'] }
-      assets = assets.sort_by { |a| ordered_files.index(a.filename) }
-      partials = render partial: 'other_display/file_download', locals: { assets: assets }
-    else
-      repo.file_display_attributes.each do |key, value|
-        partials += render :partial => 'other_display/pdf', :locals => {:pdf_url => value[:pdf_url]} if value[:content_type] == 'pdf'
-      end
-    end
+    assets = repo.assets.where(mime_type: 'application/pdf')
+    return '' if assets.blank?
 
-    partials.html_safe
+    ordered_files = repo.structural_metadata.user_defined_mappings['sequence'].map { |i| i['filename'] }
+    assets = assets.sort_by { |a| ordered_files.index(a.filename) }
+
+    render partial: 'other_display/file_download', locals: { assets: assets }
   end
 
   def render_uv
