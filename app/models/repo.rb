@@ -442,7 +442,7 @@ class Repo < ActiveRecord::Base
       self[:thumbnail_location]
     end
   end
-  
+
   def create_iiif_manifest
     return if assets.where(mime_type: ['image/jpeg', 'image/tiff']).count.zero?
     MarmiteClient.iiif_presentation(names.fedora)
