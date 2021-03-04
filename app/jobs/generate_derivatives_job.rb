@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-class RegenerateDerivativesJob < ActiveJob::Base
+class GenerateDerivativesJob < ActiveJob::Base
   queue_as :high
 
   # Need to catch error in case digital_object import no longer exists
@@ -11,7 +11,6 @@ class RegenerateDerivativesJob < ActiveJob::Base
 
   def perform(repo)
     repo.generate_derivatives
-    # TODO: thumbnail location should be updated.
-    repo.create_iiif_manifest
+    repo.create_iiif_manifest # Need to wait for PR to get merged.
   end
 end
