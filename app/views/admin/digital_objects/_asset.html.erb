@@ -2,9 +2,11 @@
   <div class="col-sm-12">
     <h4><%= asset.filename %> <small>(<%= number_to_human_size(asset.size) %>, <%= asset.mime_type %>)</small></h4>
   </div>
-  <div class="col-sm-4">
-    <img src="<%= special_remote_download_url("#{@digital_object.names.bucket}/#{asset.thumbnail_file_location}") %>"></img>
-  </div>
+  <% if asset.thumbnail_file_location %>
+    <div class="col-sm-4">
+      <img src="<%= special_remote_download_url("#{@digital_object.names.bucket}/#{asset.thumbnail_file_location}") %>"></img>
+    </div>
+  <% end %>
 
   <div class="col-sm-4">
     <p><strong>Label:</strong> <%= metadata.fetch('label', '[None]') %></p>
@@ -16,8 +18,10 @@
     <a class="btn btn-link" href="<%= special_remote_download_url("#{@digital_object.names.bucket}/#{asset.original_file_location}") %>">
       <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Original
     </a>
-    <a class="btn btn-link" href="<%= special_remote_download_url("#{@digital_object.names.bucket}/#{asset.access_file_location}") %>">
-       <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Access Copy
-    </a>
+    <% if asset.access_file_location %>
+      <a class="btn btn-link" href="<%= special_remote_download_url("#{@digital_object.names.bucket}/#{asset.access_file_location}") %>">
+         <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Access Copy
+      </a>
+    <% end %>
   </div>
 </div>

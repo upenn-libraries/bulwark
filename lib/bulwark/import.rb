@@ -147,7 +147,7 @@ module Bulwark
       repo.delete_clone
 
       # Create Marmite IIIF Manifest
-      MarmiteClient.iiif_presentation(repo.names.fedora) if Bulwark::Config.bulk_import[:create_iiif_manifest]
+      repo.create_iiif_manifest if Bulwark::Config.bulk_import[:create_iiif_manifest]
 
       # TODO: Publish if publish flag is set to true.
 
@@ -164,7 +164,7 @@ module Bulwark
           human_readable_name: directive_name,
           metadata_subdirectory: 'metadata',
           assets_subdirectory: 'assets',
-          file_extensions: ['tif', 'TIF'],
+          file_extensions: ['tif', 'TIF', 'tiff', 'jpeg', 'jpg', 'pdf'],
           metadata_source_extensions: ['csv'],
           preservation_filename: 'preservation.xml',
           new_format: true, # Setting to differentiate from previously created repos
