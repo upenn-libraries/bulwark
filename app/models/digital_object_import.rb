@@ -27,12 +27,13 @@ class DigitalObjectImport < ActiveRecord::Base
   def process
     update(status: IN_PROGRESS)
 
+    begin_time = Time.zone.now
     result = Bulwark::Import.new(created_by: bulk_import.created_by, **import_data.symbolize_keys).process
-
     update(
       status: result.status,
       process_errors: result.errors,
-      repo: result.repo
+      repo: result.repo,
+      duration: (Time.zone.now - begin_time).to_i
     )
   end
 

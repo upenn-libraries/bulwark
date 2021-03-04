@@ -42,6 +42,11 @@ class BulkImport < ActiveRecord::Base
     digital_object_imports.where(status: DigitalObjectImport::FAILED).count
   end
 
+  # @return [Integer]
+  def aggregate_processing_time
+    digital_object_imports.sum(:duration)
+  end
+
   # Returns Hash with validation errors. Errors are organized by row number. The
   # keys in the hash are the rows and the values are the errors corresponding to
   # that row.
