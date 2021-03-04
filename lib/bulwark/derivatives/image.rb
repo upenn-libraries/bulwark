@@ -15,13 +15,14 @@ module Bulwark
         raise Bulwark::Derivatives::Error, "#{write_to} does not exist" unless File.exist?(write_to)
 
         image = MiniMagick::Image.open(original)
-        image.quality(90)
-        image.resize("#{width}x#{height}")
-        image.format(format)
-
-        if File.directory?(write_to)
-          write_to = File.join(write_to, "#{File.basename(original, '.*')}.#{format}").to_s
+        image.format(format) do |convert|
+          convert.quality(90)
+          convert.resize("#{width}x#{height}")
+          convert.auto_orient # Rotate image to reflect EXIF orientation
+          convert.strip       # Strip color profiles
         end
+
+        write_to = File.join(write_to, "#{File.basename(original, '.*')}.#{format}").to_s if File.directory?(write_to)
 
         image.write(write_to)
         File.chmod(0644, write_to)
