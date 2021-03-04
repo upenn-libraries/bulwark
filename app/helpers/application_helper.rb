@@ -1,6 +1,7 @@
 module ApplicationHelper
 
   include RailsAdmin::ApplicationHelper
+  include DOTIW::Methods # makes distance_of_time helper available in views
 
   # Doesn't seem to be used?
   def render_image_list

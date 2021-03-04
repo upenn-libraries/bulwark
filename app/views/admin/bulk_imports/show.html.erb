@@ -51,6 +51,6 @@
   </div>
   <p><strong>Total:</strong> <%= number_of_imports %>
   <% if @bulk_import.status.in? [BulkImport::COMPLETED, BulkImport::COMPLETED_WITH_ERRORS] %>
-    <p><strong>Aggregate Processing Time:</strong> <%= duration_in_words @bulk_import.aggregate_processing_time %></p>
+    <p><strong>Aggregate Processing Time:</strong> <%= distance_of_time @bulk_import.aggregate_processing_time %></p>
   <% end %>
 <% end %>
