@@ -133,8 +133,8 @@ module Bulwark
       # Check that all filenames referenced in the structural metadata are valid.
       repo.validate_structural_metadata!
 
-      # Derivative generation
-      repo.generate_derivatives
+      # Derivative generation (only if an asset location has been provided)
+      repo.generate_derivatives unless assets.empty?
 
       # Create Thumbnail
       thumbnail = repo.structural_metadata.user_defined_mappings['sequence'].sort_by { |file| file['sequence'] }.first['filename']

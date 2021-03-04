@@ -11,6 +11,6 @@ class GenerateDerivativesJob < ActiveJob::Base
 
   def perform(repo)
     repo.generate_derivatives
-    repo.create_iiif_manifest # Need to wait for PR to get merged.
+    repo.create_iiif_manifest
   end
 end

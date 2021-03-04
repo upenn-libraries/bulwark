@@ -10,6 +10,6 @@ class GenerateIIIFManifestJob < ActiveJob::Base
   end
 
   def perform(repo)
-    repo.create_iiif_manifest # Need to wait for PR to get merged.
+    repo.create_iiif_manifest
   end
 end
