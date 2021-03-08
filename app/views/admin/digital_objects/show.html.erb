@@ -31,6 +31,9 @@
   <li role="presentation">
     <a href="#publish" aria-controls="publish" role="tab" data-toggle="tab">Publish</a>
   </li>
+  <li role="presentation">
+    <a href="#repair" aria-controls="repair" role="tab" data-toggle="tab">Repair</a>
+  </li>
 </ul>
 
 <div class="tab-content">
@@ -116,5 +119,8 @@
         <%= f.submit 'Publish Now', class: 'btn btn-primary' %>
       <% end %>
     <% end %>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="repair">
+    <%= render 'repair' %>
   </div>
 </div>

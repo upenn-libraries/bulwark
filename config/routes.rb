@@ -57,6 +57,8 @@ Rails.application.routes.draw do
       member do
         post :publish
         post :unpublish
+        post :generate_derivatives
+        post :generate_iiif_manifest
       end
     end
 

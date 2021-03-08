@@ -44,5 +44,25 @@ module Admin
 
       redirect_to action: :show
     end
+
+    # POST generate_derivatives
+    # Generates derivatives for object
+    def generate_derivatives
+      @digital_object = Repo.find(params[:id])
+      GenerateDerivativesJob.perform_later(@digital_object)
+
+      flash[:success] = "Job to regenerate derivatives queued."
+      redirect_to action: :show
+    end
+
+    # POST generate_iiif_manifest
+    # Generate IIIF manifest for object
+    def generate_iiif_manifest
+      @digital_object = Repo.find(params[:id])
+      GenerateIIIFManifestJob.perform_later(@digital_object)
+
+      flash[:success] = "Job to regenerate IIIF manifest queued."
+      redirect_to action: :show
+    end
   end
 end
