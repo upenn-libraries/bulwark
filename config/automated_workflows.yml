@@ -88,7 +88,7 @@ development:
 test:
   kaplan:
     csv:
-      owner: testuser@email.edu
+      owner: test@example.com
       description: 'Generated from CSV through automated workflow'
       initial_stop: xml
       metadata_suffix: ''
