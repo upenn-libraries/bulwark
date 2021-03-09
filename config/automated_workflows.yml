@@ -31,11 +31,11 @@ development:
          structural_filename: MM_struct_metadata.xlsx
   kaplan:
     csv:
-     owner: <%= ENV['KAPLAN_OWNER'] %>
+     owner: test@example.com
      description: <%= ENV['KAPLAN_DESCRIPTION'] || 'Generated from CSV through automated workflow' %>
-     initial_stop: <%= ENV['KAPLAN_INITIAL_STOP'] || 'create' %>
-     metadata_suffix: <%= ENV['KAPLAN_METADATA_SUFFIX'] || '' %>
-     assets_suffix: <%= ENV['KAPLAN_ASSETS_SUFFIX'] || 'data/' %>
+     initial_stop: xml
+     metadata_suffix: ''
+     assets_suffix: 'data/'
      endpoints:
        metadata_fetch_method: rsync
        metadata_protocol: smb
@@ -45,45 +45,13 @@ development:
        descriptive_filename: metadata.xlsx
        structural_filename: struct_metadata.xlsx
      nonstandard:
-       kaplan-rescue:
-         endpoint: <%= ENV['KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
-         metadata_suffix: ''
-         assets_suffix: ''
-       scanstore-rescue:
-         endpoint: <%= ENV['SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
-         metadata_suffix: ''
-         assets_suffix: ''
-       managed-masters:
-         endpoint: <%= ENV['OPENN_HARVESTING_ENDPOINT_REMOTE'] %>
-         metadata_suffix: ''
-         assets_suffix: ''
-       sceti-completed:
-         endpoint: <%= ENV['PAP_HARVESTING_ENDPOINT_REMOTE'] %>
-         metadata_suffix: ''
-         assets_suffix: ''
-       sceti-completed-2:
-         endpoint: <%= ENV['SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE'] %>
-         metadata_suffix: ''
-         assets_suffix: ''
-       sceti-completed-3:
-         endpoint: <%= ENV['SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE'] %>
-         metadata_suffix: ''
-         assets_suffix: ''
-       sceti-completed-4:
-         endpoint: <%= ENV['SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE'] %>
-         metadata_suffix: ''
-         assets_suffix: ''
-       oceanus-sceti:
-         endpoint: <%= ENV['OCEANUS_SCETI_HARVESTING_ENDPOINT_REMOTE'] %>
-         metadata_suffix: ''
-         assets_suffix: ''
-       mastersrbm:
-         endpoint: <%= ENV['MASTERSRBM_HARVESTING_ENDPOINT_REMOTE'] %>
+       test:
+         endpoint: <%= Rails.root.join('spec', 'fixtures', 'example_manifest_loads') %>
          metadata_suffix: ''
          assets_suffix: ''
   ingest_only:
-     initial_stop: <%= ENV['INGEST_INITIAL_STOP'] || 'ingest' %>
-     steps_to_skip: <%= ENV['INGEST_STEPS_TO_SKIP'] || ['fetch_metadata','fetch_assets','extract','file_check','xml'] %>
+     initial_stop: 'ingest'
+     steps_to_skip: ['fetch_metadata','fetch_assets','extract','file_check','xml']
 
 test:
   kaplan:
