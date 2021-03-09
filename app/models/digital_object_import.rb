@@ -28,7 +28,12 @@ class DigitalObjectImport < ActiveRecord::Base
     update(status: IN_PROGRESS)
 
     begin_time = Time.zone.now
-    result = Bulwark::Import.new(created_by: bulk_import.created_by, **import_data.symbolize_keys).process
+    data = import_data.symbolize_keys
+    result = if data[:action]&.downcase == Bulwark::Migrate::ACTION
+               Bulwark::Migrate.new(migrated_by: bulk_import.created_by, **data).process
+             else
+               Bulwark::Import.new(created_by: bulk_import.created_by, **data).process
+             end
     update(
       status: result.status,
       process_errors: result.errors,
