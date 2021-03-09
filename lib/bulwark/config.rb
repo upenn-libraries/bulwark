@@ -28,6 +28,13 @@ module Bulwark
            .with_indifferent_access
     end
 
+    def self.digital_object
+      Rails.application
+           .config_for(:bulwark)
+           .fetch('digital_object', {})
+           .with_indifferent_access
+    end
+
     def self.solr
       Rails.application.config_for(:solr).with_indifferent_access
     end

@@ -1,3 +1,11 @@
+asset_extensions: &valid_asset_extensions
+  - 'tif'
+  - 'TIF'
+  - 'tiff'
+  - 'jpeg'
+  - 'jpg'
+  - 'pdf'
+
 development:
   mounted_drives:
     test: <%= Rails.root.join('spec', 'fixtures', 'example_bulk_imports') %>
@@ -5,6 +13,8 @@ development:
     url: http://marmite.library.upenn.edu:9292
   bulk_import:
     create_iiif_manifest: false
+  digital_object:
+    file_extensions: *valid_asset_extensions
 
 test:
   mounted_drives:
@@ -13,6 +23,8 @@ test:
     url: https://marmite.library.upenn.edu:9292
   bulk_import:
     create_iiif_manifest: false
+  digital_object:
+    file_extensions: *valid_asset_extensions
 
 production:
   mounted_drives:
@@ -27,3 +39,5 @@ production:
     url: <%= ENV['MARMITE_URL'] %>
   bulk_import:
     create_iiif_manifest: true
+  digital_object:
+    file_extensions: *valid_asset_extensions
