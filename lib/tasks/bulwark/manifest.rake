@@ -2,7 +2,6 @@
 namespace :bulwark do
   namespace :manifest do
     task load: :environment do
-
       # Create manifest file.
       manifest = <<~MANIFEST
         share,path,unique_identifier,timestamp,directive_name,status
