@@ -56,8 +56,13 @@ module Bulwark
       end
 
       if action == UPDATE
-        @errors << "\"unique_identifier\" must be provided when updating an object" unless unique_identifier
-        @errors << "\"unique_identifier\" does not belong to an object. Cannot update object." if unique_identifier && !Repo.find_by(unique_identifier: unique_identifier)
+        if unique_identifier
+          repo = Repo.find_by(unique_identifier: unique_identifier)
+          @errors << "\"unique_identifier\" does not belong to an object. Cannot update object." unless repo
+          @errors << "Object has not been migrated" if repo && !repo.new_format
+        else
+          @errors << "\"unique_identifier\" must be provided when updating an object"
+        end
       end
 
       if assets

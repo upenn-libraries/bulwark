@@ -92,6 +92,18 @@ RSpec.describe Bulwark::Import do
       end
     end
 
+    context 'when updating an object that has not been migrated' do
+      include_context 'stub successful EZID requests'
+
+      subject(:import) { described_class.new(action: Bulwark::Import::UPDATE, unique_identifier: repo.unique_identifier) }
+      let(:repo) { FactoryBot.create(:repo, new_format: false) }
+
+      it 'adds error' do
+        expect(import.validate).to be false
+        expect(import.errors).to include "Object has not been migrated"
+      end
+    end
+
     context 'when asset drive is invalid' do
       subject(:import) { described_class.new(assets: { 'drive' => 'invalid' }) }
 
