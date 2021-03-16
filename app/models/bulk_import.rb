@@ -31,10 +31,10 @@ class BulkImport < ActiveRecord::Base
       COMPLETED
     elsif imports_finished_with_failures?
       COMPLETED_WITH_ERRORS
-    elsif digital_object_imports.any?(&:in_progress?)
-      IN_PROGRESS
     elsif digital_object_imports.all?(&:queued?)
       QUEUED
+    else
+      IN_PROGRESS
     end
   end
 
