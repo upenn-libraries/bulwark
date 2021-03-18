@@ -107,9 +107,9 @@ namespace :bulwark do
 
         Bulwark::StructuredCSV.parse(contents).each do |item|
           metadata = item['metadata']
-          kaplan = metadata.fetch('collection', []).include?('Arnold and Deanne Kaplan Collection of Early American Judaica (University of Pennsylvania)') ||
-            metadata.fetch('collection', []).include?('Arnold and Deanne Kaplan Collection of Modern American Judaica (University of Pennsylvania)') ||
-            metadata.fetch('provenance', []).include?('Gift of Arnold and Deanne Kaplan')
+          kaplan = metadata.fetch('collection', []).include?('Arnold and Deanne Kaplan Collection of Modern American Judaica (University of Pennsylvania)') ||
+                   metadata.fetch('collection', []).include?('Arnold and Deanne Kaplan Collection of Early American Judaica (University of Pennsylvania)') ||
+                   metadata.fetch('provenance', []).include?('Gift of Arnold and Deanne Kaplan')
 
           if kaplan
             kaplan_material << item
