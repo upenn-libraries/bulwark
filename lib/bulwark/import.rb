@@ -118,21 +118,7 @@ module Bulwark
       # Add structural metadata. Replace structural metadata if its already present.
       # FIXME: This isn't a great solution because there is a potential for
       # data loss if more detailed structural metadata is already available.
-      new_structural = nil
-      if (ordered_filenames = structural_metadata[:filenames])
-        # Generate structural metadata file based on contents in Bulk import csv given or path given.
-        new_structural = CSV.generate do |csv|
-          csv << ['filename', 'sequence']
-          ordered_filenames.split(';').map(&:strip).each_with_index do |f, i|
-            csv << [f, i + 1]
-          end
-        end
-      elsif structural_metadata[:drive] && structural_metadata[:path]
-        filepath = File.join(MountedDrives.path_to(structural_metadata[:drive]), structural_metadata[:path])
-        raise 'structural metadata path must lead to a file.' unless File.file?(filepath)
-        new_structural = File.read(filepath)
-      end
-
+      new_structural = Bulwark::Import::Utilities.structural_metadata_csv(structural_metadata)
       repo.add_structural_metadata(new_structural) if new_structural
 
       # Check that all filenames referenced in the structural metadata are valid.

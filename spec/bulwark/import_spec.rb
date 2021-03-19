@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Bulwark::Import do
   describe '.new'
 
-  describe '.validation' do
+  describe '.validate' do
     before do
       stub_request(:get, /#{Ezid::Client.config.host}\/id\/.*/)
         .with(
