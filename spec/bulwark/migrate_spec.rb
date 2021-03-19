@@ -264,7 +264,7 @@ RSpec.describe Bulwark::Migrate do
         end
       end
 
-      context 'when contains invalid filenames in structural.filenames' do
+      context 'when object contains invalid filenames in structural filenames' do
         let(:migration_result) do
           described_class.new(
             action: 'migrate',

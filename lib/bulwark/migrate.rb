@@ -106,7 +106,7 @@ module Bulwark
       without_extension = asset_filenames.map { |f| File.basename(f, '.*') }
       @errors << "There are assets that share the same name but different extension" if without_extension.any? { |f| without_extension.count(f) > 1 }
 
-      return Bulwark::Import::Result.new(status: DigitalObjectImport::FAILED, errors: errors) unless @errors.empty?
+      return Bulwark::Import::Result.new(status: DigitalObjectImport::FAILED, errors: errors) if @errors.any?
 
       # -- Cleanup before migration --
 
