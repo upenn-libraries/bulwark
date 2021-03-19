@@ -1,6 +1,6 @@
 <section id="index_filters">
   <div class="well">
-    <%= bootstrap_form_tag(url: admin_digital_objects_path, method: :get, class: 'well') do |f| %>
+    <%= bootstrap_form_tag(url: admin_digital_objects_path, method: :get) do |f| %>
       <div class="row form-group-sm">
         <div class="col-sm-3">
           <%= f.text_field :id_search, value: params[:id_search], label: 'Identifier' %>
