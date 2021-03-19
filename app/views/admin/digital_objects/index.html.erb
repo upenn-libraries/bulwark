@@ -33,11 +33,12 @@
 </div>
 
 <div class="row">
-  <div class="col-md-6">
+  <div class="col-sm-9">
     <%= paginate @digital_objects, remote: true %>
   </div>
-  <div class="col-md-6">
+  <div class="col-sm-3">
     <div class="pull-right">
+      <p class="text-right"><%= page_entries_info @digital_objects %></p>
       <%= render 'shared/per_page' %>
     </div>
   </div>

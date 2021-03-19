@@ -10,6 +10,9 @@ class DigitalObjectImport < ActiveRecord::Base
   belongs_to :bulk_import
   belongs_to :repo
 
+  paginates_per 10
+  max_paginates_per 100
+
   serialize :process_errors, Array
   serialize :import_data, JSON
 

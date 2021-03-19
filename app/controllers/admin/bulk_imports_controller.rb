@@ -5,7 +5,7 @@ module Admin
     def index
       @bulk_imports = BulkImport.order(created_at: :desc)
                                 .page(params[:page])
-                                .includes(:digital_object_imports)
+                                .includes(:digital_object_imports, :created_by)
     end
 
     def new
@@ -33,6 +33,8 @@ module Admin
 
     def show
       @bulk_import = BulkImport.find(params[:id])
+      @digital_object_imports = @bulk_import.digital_object_imports
+                                            .page(params[:digital_object_import_page])
     end
 
     private
