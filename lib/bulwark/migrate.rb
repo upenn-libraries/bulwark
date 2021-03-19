@@ -6,7 +6,7 @@ module Bulwark
     ACTION = 'migrate'
 
     attr_reader :unique_identifier, :action, :migrated_by, :descriptive_metadata,
-                :structural_metadata, :repo, :errors
+                :structural_metadata, :errors
 
     # Initializes object to migrate digital objects.
     #
@@ -49,8 +49,6 @@ module Bulwark
 
       # Check that repo can be retrieved.
       if unique_identifier.present?
-        @repo = Repo.find_by(unique_identifier: unique_identifier, new_format: false)
-
         if repo
           # Check that items have been "ingested"
           @errors << "Repo has not been ingested" unless repo.ingested
@@ -87,9 +85,6 @@ module Bulwark
       validate # Validate before processing data.
 
       return Bulwark::Import::Result.new(status: DigitalObjectImport::FAILED, errors: errors) unless @errors.empty?
-
-      # Retrieve Repo
-      @repo = Repo.find_by(unique_identifier: unique_identifier, new_format: false)
 
       # -- Additional validations that require the git repo to be present. --
 
@@ -174,6 +169,10 @@ module Bulwark
     end
 
     private
+
+      def repo
+        @repo ||= Repo.find_by(unique_identifier: unique_identifier, new_format: false)
+      end
 
       def solr_document_present?
         Blacklight.default_index.search(q: "id:#{repo.names.fedora}", fl: 'id').docs.count == 1
