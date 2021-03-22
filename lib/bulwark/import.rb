@@ -94,7 +94,7 @@ module Bulwark
         @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
       end
 
-      return Result.new(status: DigitalObjectImport::FAILED, errors: errors) unless @errors.empty?
+      return error_result(@errors) unless @errors.empty?
 
       # Retrieve or create repo.
       @repo = case action.downcase
@@ -143,15 +143,26 @@ module Bulwark
       repo.create_iiif_manifest if Bulwark::Config.bulk_import[:create_iiif_manifest]
 
       # Publish if publish flag is set to true.
-      repo.publish if @publish # TODO: what if publish returns false?
+      if @publish
+        unless repo.publish
+          @errors << 'Problem when attempting to publish the Digital Object.'
+          return error_result @errors, repo
+        end
+      end
 
       Result.new(status: DigitalObjectImport::SUCCESSFUL, repo: repo)
     rescue => e
       Honeybadger.notify(e) # Sending full error to Honeybadger.
-      Result.new(status: DigitalObjectImport::FAILED, errors: [e.message], repo: repo)
+      error_result [e.message], repo
     end
 
     private
+
+      # @param [Array] errors
+      # @param [Repo, nil] repository
+      def error_result(errors, repository = nil)
+        Result.new(status: DigitalObjectImport::FAILED, errors: errors, repo: repository)
+      end
 
       def create_digital_object
         repo = Repo.new(
