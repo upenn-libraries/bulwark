@@ -1,7 +1,7 @@
 module StructuralMetadataSources
   extend ActiveSupport::Concern
 
-  VALID_STRUCTURAL_METADATA_FIELDS = ['sequence', 'filename', 'label', 'viewing_direction', 'text_annotation'].freeze
+  VALID_STRUCTURAL_METADATA_FIELDS = ['sequence', 'filename', 'label', 'viewing_direction', 'table_of_contents'].freeze
 
   def structural_metadata(working_path)
     self.metadata_builder.repo.version_control_agent.get({ location: path }, working_path)

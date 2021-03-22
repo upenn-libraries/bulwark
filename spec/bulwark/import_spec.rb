@@ -481,7 +481,7 @@ RSpec.describe Bulwark::Import do
       let(:structural_metadata) do
         {
           'sequence' => [
-            { 'sequence' => '1', 'filename' => 'front.tif', 'label' => 'p. 1', 'viewing_direction' => 'top-to-bottom', 'text_annotation' => ['a very descriptive annotation', 'an additional annotation'] },
+            { 'sequence' => '1', 'filename' => 'front.tif', 'label' => 'p. 1', 'viewing_direction' => 'top-to-bottom', 'table_of_contents' => ['a very important illustration', 'an additional illustration'] },
             { 'sequence' => '2', 'filename' => 'back.tif', 'label' => 'p. 2', 'viewing_direction' => 'top-to-bottom' }
           ]
         }
