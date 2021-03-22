@@ -5,56 +5,77 @@
 </ol>
 
 <h2>Bulk Import</h2>
-<dl class="dl-horizontal">
-  <dt>ID</dt>
-  <dd><%= @bulk_import.id %></dd>
-  <dt>Created By</dt>
-  <dd><%= @bulk_import.created_by_email %></dd>
-  <dt>Created At</dt>
-  <dd><%= @bulk_import.created_at.to_s(:display) %></dd>
-  <dt>Updated At</dt>
-  <dd><%= @bulk_import.updated_at.to_s(:display) %></dd>
-</dl>
+<div class="row">
+  <div class="col-xs-6">
+    <dl class="dl-horizontal">
+      <dt>Original Filename</dt>
+      <dd><%= @bulk_import.original_filename || '[Unknown]' %></dd>
+      <dt>Total Imports</dt>
+      <dd><%= @bulk_import.digital_object_imports.count %></dd>
+      <dt>Total Processing Time</dt>
+      <dd>
+        <% if @bulk_import.status.in? [BulkImport::COMPLETED, BulkImport::COMPLETED_WITH_ERRORS] %>
+          <% processing_time = @bulk_import.aggregate_processing_time %>
+          <%= processing_time.zero? ? '[Unknown]' : distance_of_time(processing_time) %>
+        <% else %>
+          [Unknown]
+        <% end %>
+      </dd>
 
-<% number_of_imports = @bulk_import.digital_object_imports.length %>
+    </dl>
+  </div>
+  <div class="col-xs-6">
+    <dl class="dl-horizontal">
+      <dt>ID</dt>
+      <dd><%= @bulk_import.id %></dd>
+      <dt>Created By</dt>
+      <dd><%= @bulk_import.created_by_email %></dd>
+      <dt>Created At</dt>
+      <dd><%= @bulk_import.created_at.to_s(:display) %></dd>
+    </dl>
+  </div>
+</div>
+
 <h4>Digital Object Imports</h4>
-<% if number_of_imports.zero? %>
+<% if @digital_object_imports.empty? %>
   <p>None</p>
 <% else %>
   <div class="table-responsive">
     <table class="table table-striped">
       <thead>
-        <tr>
-          <th>ID</th>
-          <th>Status</th>
-          <th>Digital Object Changed<th>
-          <th></th>
-        </tr>
+      <tr>
+        <th>ID</th>
+        <th>Status</th>
+        <th>Digital Object Changed</th>
+        <th></th>
+      </tr>
       </thead>
       <tbody>
-        <% @bulk_import.digital_object_imports.each do |digital_object_import| %>
-          <tr>
-            <td><%= digital_object_import.id %></td>
-            <td><%= digital_object_import.status.titlecase %></td>
-            <td>
-              <% if digital_object_import.repo %>
-                <%= link_to(digital_object_import.repo.unique_identifier, admin_digital_object_path(digital_object_import.repo.id)) %>
-              <% end %>
-            </td>
-            <td>
-              <%= link_to 'Details', admin_bulk_import_digital_object_import_path(@bulk_import, digital_object_import), class: 'btn btn-sm btn-default' %>
-            </td>
-          <tr>
-        <% end %>
+      <% @digital_object_imports.each do |digital_object_import| %>
+        <tr>
+          <td><%= digital_object_import.id %></td>
+          <td><%= digital_object_import.status.titlecase %></td>
+          <td>
+            <% if digital_object_import.repo %>
+              <%= link_to(digital_object_import.repo.unique_identifier, admin_digital_object_path(digital_object_import.repo.id)) %>
+            <% end %>
+          </td>
+          <td>
+            <%= link_to 'Details', admin_bulk_import_digital_object_import_path(@bulk_import, digital_object_import), class: 'btn btn-sm btn-default' %>
+          </td>
+        <tr>
+      <% end %>
       </tbody>
     </table>
   </div>
-  <p><strong>Total:</strong> <%= number_of_imports %>
-  <% if @bulk_import.status.in? [BulkImport::COMPLETED, BulkImport::COMPLETED_WITH_ERRORS] %>
-    <% aggregate_processing_time = @bulk_import.aggregate_processing_time %>
-    <p>
-      <strong>Aggregate Processing Time:</strong>
-      <%= aggregate_processing_time.zero? ? '[Unknown]' : distance_of_time(aggregate_processing_time) %>
-    </p>
-  <% end %>
+  <div class="row">
+    <div class="col-md-6">
+      <%= paginate @digital_object_imports, remote: true, param_name: :digital_object_import_page %>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <%= page_entries_info @digital_object_imports %>
+      </div>
+    </div>
+  </div>
 <% end %>

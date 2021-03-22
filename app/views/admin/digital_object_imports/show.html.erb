@@ -7,18 +7,34 @@
 </ol>
 
 
-<h2>Digital Object Import: <%= @digital_object_import.id %></h2>
+<h2>Digital Object Import</h2>
+<div class="row">
+  <div class="col-xs-6">
+    <dl class="dl-horizontal">
+      <dt>Status</dt>
+      <dd><%= @digital_object_import.status.titlecase %></dd>
 
-<h4>Status</h4>
-<%= @digital_object_import.status.titlecase %>
+      <dt>Processing Time</dt>
+      <dd><%= @digital_object_import.duration ? distance_of_time(@digital_object_import.duration) : '[Unknown]' %></dd>
 
-<h4>Import Processing Time</h4>
-<%= @digital_object_import.duration ? distance_of_time(@digital_object_import.duration) : '[Unknown]' %>
+      <% if @digital_object_import.repo %>
+        <dt>Digital Object Changed</dt>
+        <dd><%= link_to @digital_object_import.repo.unique_identifier, admin_digital_object_path(@digital_object_import.repo.id) %></dd>
+      <% end %>
+    </dl>
+  </div>
+  <div class="col-xs-6">
+    <dl class="dl-horizontal">
+      <dt>ID</dt>
+      <dd><%= @digital_object_import.id %></dd>
+      <dt>Created At</dt>
+      <dd><%= @digital_object_import.created_at.to_s(:display) %></dd>
+      <dt>Updated At</dt>
+      <dd><%= @digital_object_import.updated_at.to_s(:display) %></dd>
+    </dl>
+  </div>
+</div>
 
-<% if @digital_object_import.repo %>
-  <h4>Digital Object Changed</h4>
-  <%= link_to @digital_object_import.repo.unique_identifier, admin_digital_object_path(@digital_object_import.repo.id) %>
-<% end %>
 
 <% unless @digital_object_import.process_errors.blank? %>
   <h4>Errors</h4>
