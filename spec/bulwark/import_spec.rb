@@ -188,6 +188,7 @@ RSpec.describe Bulwark::Import do
           assets: { 'drive' => 'test', 'path' => 'object_one' },
           metadata: descriptive_metadata,
           structural: { 'filenames' => 'front.tif; back.tif' },
+          publish: 'true',
           created_by: created_by
         )
       end
@@ -209,6 +210,10 @@ RSpec.describe Bulwark::Import do
 
       it 'sets flag on repo' do
         expect(repo.new_format).to be true
+      end
+
+      it 'set published_at' do
+        expect(repo.last_published_at).not_to be_nil
       end
 
       it 'sets created_by and updated_by' do

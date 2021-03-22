@@ -13,12 +13,13 @@ module Bulwark
 
     # Initializes object to import digital objects.
     #
-    # @param [Hash] arguments passed in to create/update digital objects
+    # @param [Hash] args passed in to create/update digital objects
     # @options opts [String] :action
     # @options opts [User] :created_by
     # @options opts [String] :directive_name
     # @options opts [String] :unique_identifier
     # @options opts [Hash] :assets
+    # @options opts [TrueClass, FalseClass] :publish
     # @options opts [Hash] :metadata  # gets mapped to descriptive_metadata
     # @options opts [Hash] :structural  # gets mapped to structural_metadata
     def initialize(args)
@@ -28,6 +29,7 @@ module Bulwark
       @unique_identifier = args[:unique_identifier]
       @directive_name = args[:directive_name]
       @created_by = args[:created_by]
+      @publish = args.fetch(:publish, FALSE)
       @descriptive_metadata = args.fetch(:metadata, {})
       @structural_metadata = args.fetch(:structural, {})
       @assets = args.fetch(:assets, {})
@@ -40,7 +42,7 @@ module Bulwark
     # missing or incorrect information. Errors are stored in an instance variable.
     #
     # @return [True] if no errors were generated
-    # @ return [False] if errors were generated
+    # @return [False] if errors were generated
     def validate
       @errors << "\"#{action}\" is not a valid import action" unless IMPORT_ACTIONS.include?(action)
 
@@ -140,7 +142,8 @@ module Bulwark
       # Create Marmite IIIF Manifest
       repo.create_iiif_manifest if Bulwark::Config.bulk_import[:create_iiif_manifest]
 
-      # TODO: Publish if publish flag is set to true.
+      # Publish if publish flag is set to true.
+      repo.publish if @publish # TODO: what if publish returns false?
 
       Result.new(status: DigitalObjectImport::SUCCESSFUL, repo: repo)
     rescue => e
