@@ -29,7 +29,7 @@ module Bulwark
       @unique_identifier = args[:unique_identifier]
       @directive_name = args[:directive_name]
       @created_by = args[:created_by]
-      @publish = args.fetch(:publish, FALSE)
+      @publish = args.fetch(:publish, 'false').downcase == 'true'
       @descriptive_metadata = args.fetch(:metadata, {})
       @structural_metadata = args.fetch(:structural, {})
       @assets = args.fetch(:assets, {})
