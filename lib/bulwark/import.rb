@@ -13,12 +13,13 @@ module Bulwark
 
     # Initializes object to import digital objects.
     #
-    # @param [Hash] arguments passed in to create/update digital objects
+    # @param [Hash] args passed in to create/update digital objects
     # @options opts [String] :action
     # @options opts [User] :created_by
     # @options opts [String] :directive_name
     # @options opts [String] :unique_identifier
     # @options opts [Hash] :assets
+    # @options opts [TrueClass, FalseClass] :publish
     # @options opts [Hash] :metadata  # gets mapped to descriptive_metadata
     # @options opts [Hash] :structural  # gets mapped to structural_metadata
     def initialize(args)
@@ -28,6 +29,7 @@ module Bulwark
       @unique_identifier = args[:unique_identifier]
       @directive_name = args[:directive_name]
       @created_by = args[:created_by]
+      @publish = args.fetch(:publish, 'false').casecmp('true').zero?
       @descriptive_metadata = args.fetch(:metadata, {})
       @structural_metadata = args.fetch(:structural, {})
       @assets = args.fetch(:assets, {})
@@ -40,7 +42,7 @@ module Bulwark
     # missing or incorrect information. Errors are stored in an instance variable.
     #
     # @return [True] if no errors were generated
-    # @ return [False] if errors were generated
+    # @return [False] if errors were generated
     def validate
       @errors << "\"#{action}\" is not a valid import action" unless IMPORT_ACTIONS.include?(action)
 
@@ -92,7 +94,7 @@ module Bulwark
         @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
       end
 
-      return Result.new(status: DigitalObjectImport::FAILED, errors: errors) unless @errors.empty?
+      return error_result(@errors) unless @errors.empty?
 
       # Retrieve or create repo.
       @repo = case action.downcase
@@ -140,15 +142,27 @@ module Bulwark
       # Create Marmite IIIF Manifest
       repo.create_iiif_manifest if Bulwark::Config.bulk_import[:create_iiif_manifest]
 
-      # TODO: Publish if publish flag is set to true.
+      # Publish if publish flag is set to true.
+      if @publish
+        unless repo.publish
+          @errors << 'Problem when attempting to publish the Digital Object.'
+          return error_result @errors, repo
+        end
+      end
 
       Result.new(status: DigitalObjectImport::SUCCESSFUL, repo: repo)
     rescue => e
       Honeybadger.notify(e) # Sending full error to Honeybadger.
-      Result.new(status: DigitalObjectImport::FAILED, errors: [e.message], repo: repo)
+      error_result [e.message], repo
     end
 
     private
+
+      # @param [Array] errors
+      # @param [Repo, nil] repository
+      def error_result(errors, repository = nil)
+        Result.new(status: DigitalObjectImport::FAILED, errors: errors, repo: repository)
+      end
 
       def create_digital_object
         repo = Repo.new(

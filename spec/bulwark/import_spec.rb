@@ -188,6 +188,7 @@ RSpec.describe Bulwark::Import do
           assets: { 'drive' => 'test', 'path' => 'object_one' },
           metadata: descriptive_metadata,
           structural: { 'filenames' => 'front.tif; back.tif' },
+          publish: 'true',
           created_by: created_by
         )
       end
@@ -209,6 +210,10 @@ RSpec.describe Bulwark::Import do
 
       it 'sets flag on repo' do
         expect(repo.new_format).to be true
+      end
+
+      it 'set published_at' do
+        expect(repo.last_published_at).not_to be_nil
       end
 
       it 'sets created_by and updated_by' do
@@ -442,7 +447,7 @@ RSpec.describe Bulwark::Import do
       end
     end
 
-    context 'when creating a new digital object with one asset' do
+    context 'when creating a new digital object with one asset and not publishing' do
       let(:descriptive_metadata) do
         { 'title' => ['Trade card; J. Rosenblatt & Co.; Baltimore, Maryland, United States; undated;'] }
       end
@@ -453,7 +458,8 @@ RSpec.describe Bulwark::Import do
           assets: { 'drive' => 'test', 'path' => 'object_one/front.tif' },
           metadata: descriptive_metadata,
           structural: { 'filenames' => 'front.tif' },
-          created_by: created_by
+          created_by: created_by,
+          publish: 'false'
         )
       end
       let(:repo) { result.repo }
@@ -462,6 +468,10 @@ RSpec.describe Bulwark::Import do
       let(:whereis_result) { git.annex.whereis }
 
       let(:result) { import.process }
+
+      it 'does not have first_published_at set' do
+        expect(repo.first_published_at).to be_nil
+      end
 
       it 'contains assets file' do
         expect(whereis_result.map(&:filepath)).to include('data/assets/front.tif')
