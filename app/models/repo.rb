@@ -428,7 +428,7 @@ class Repo < ActiveRecord::Base
   end
 
   def bibid
-    descriptive_metadata.original_mappings["bibid"] || descriptive_metadata.original_mappings["bibnumber"]&.first
+    descriptive_metadata&.original_mappings["bibid"] || descriptive_metadata&.original_mappings["bibnumber"]&.first
   end
 
   # Deprecating the use of thumbnail_location for repos in the new format. In the new format, we
