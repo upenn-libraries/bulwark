@@ -68,18 +68,6 @@ RSpec.describe Bulwark::Migrate do
       end
     end
 
-    context 'when Repo has invalid file_extension configured' do
-      include_context 'stub successful EZID requests'
-
-      subject(:migration) { described_class.new(action: 'migrate', unique_identifier: repo.unique_identifier) }
-      let(:repo) { FactoryBot.create(:repo, file_extensions: ['sh']) }
-
-      it 'adds error' do
-        expect(migration.validate).to be false
-        expect(migration.errors).to include 'Invalid file extensions present in model: sh'
-      end
-    end
-
     context 'when Repo does not have a valid solr record' do
       include_context 'stub successful EZID requests'
 

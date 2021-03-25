@@ -56,10 +56,6 @@ module Bulwark
           # Check for solr record
           @errors << "Solr document for this object is not present" unless solr_document_present?
 
-          # Check that all extensions in repo.file_extensions are supported.
-          invalid_extensions = repo.file_extensions - valid_file_extensions
-          @errors << "Invalid file extensions present in model: #{invalid_extensions.join(', ')}" unless invalid_extensions.blank?
-
           # Check that there are only two metadata sources, one kaplan and one structural_kaplan (eventually extend this)
           metadata_sources = repo.metadata_builder.metadata_source.map(&:source_type)
           @errors << "Repo has more than two metadata sources" if metadata_sources.count > 2
