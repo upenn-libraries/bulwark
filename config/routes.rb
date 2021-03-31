@@ -60,13 +60,17 @@ Rails.application.routes.draw do
         post :generate_iiif_manifest
       end
     end
-
-    if Rails.env.development? || Rails.env.test?
-      get 'special_remote_download/:bucket/:key', action: :special_remote_download, as: :special_remote_download, constraints: { key: /[^\/]+/ }
-    end
   end
 
   get '/admin', to: redirect('/admin/digital_objects')
+
+  if Rails.env.development? || Rails.env.test?
+    get 'special_remote_download/:bucket/:key',
+        action: :special_remote_download,
+        controller: :application,
+        as: :special_remote_download,
+        constraints: { key: /[^\/]+/ }
+  end
 
   mount RailsAdmin::Engine => '/admin_repo', as: 'rails_admin'
 

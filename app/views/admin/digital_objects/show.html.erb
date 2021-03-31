@@ -40,7 +40,9 @@
   <div role="tabpanel" class="tab-pane active" id="descriptive-metadata">
     <% if @digital_object.descriptive_metadata %>
       <h4>Metadata Provided</h4>
-      <%= link_to 'descriptive_metadata.csv', special_remote_download_url(@digital_object.descriptive_metadata.remote_location) %>
+      <%= link_to 'descriptive_metadata.csv',
+                  download_link(*@digital_object.descriptive_metadata.remote_location.split('/', 2), filename: 'descriptive_metadata', disposition: :inline),
+                  target: '_blank' %>
       <hr>
       <h4>Extracted Metadata</h4>
       <table class="table">
@@ -60,7 +62,9 @@
   <div role="tabpanel" class="tab-pane" id="structural-metadata">
     <% if @digital_object.structural_metadata %>
       <h4>Metadata Provided</h4>
-      <%= link_to 'structural_metadata.csv', special_remote_download_url(@digital_object.structural_metadata.remote_location) %>
+      <%= link_to 'structural_metadata.csv',
+                  download_link(*@digital_object.structural_metadata.remote_location.split('/', 2), filename: 'structural_metadata', disposition: :inline),
+                  target: '_blank'%>
       <hr>
       <h4>Extracted Metadata</h4>
       <table class="table table-striped">
@@ -93,7 +97,9 @@
       <% (@digital_object.metadata_builder.generated_metadata_files || {}).each do |filepath, remote_location| %>
         <tr>
           <td><%= File.basename(filepath) %></td>
-          <td><%= link_to 'download', special_remote_download_url(remote_location) %>
+          <td><%= link_to 'download',
+                          download_link(*remote_location.split('/', 2), filename: File.basename(filepath, '.*'), disposition: :inline),
+                          target: '_blank' %>
         </tr>
       <% end %>
     </table>

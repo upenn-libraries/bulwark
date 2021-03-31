@@ -17,6 +17,19 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :null_session
 
+  # ****This action should only be available for local development and test environments.****
+  #
+  # This action mimics the file download that would be available if the special remote
+  # for development and test environments were S3.
+  def special_remote_download
+    if Bulwark::Config.special_remote[:type] == 'directory'
+      glob_path = File.join(Bulwark::Config.special_remote[:directory], params[:bucket], '**', '**', params[:key], params[:key])
+      path = Dir.glob(glob_path).first
+      filename = params[:filename] + File.extname(params[:key]) if params[:filename].present?
+      send_file(path, disposition: params[:disposition], filename: filename)
+    end
+  end
+
   private
   def _set_current_user
     User.current = current_user.email if current_user

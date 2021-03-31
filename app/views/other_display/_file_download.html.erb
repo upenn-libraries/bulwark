@@ -8,7 +8,7 @@
       <li class="list-group-item">
         <span><%= asset.filename %></span>
         <span class="pull-right">
-          <a href="<%= special_remote_download_url("#{asset.repo.names.bucket}/#{asset.original_file_location}") %>">
+          <a href="<%= download_link(asset.repo.names.bucket, asset.original_file_location, disposition: :attachment, filename: File.basename(asset.filename, ".*")) %>" target="_blank">
             <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download
           </a>
         </span>
