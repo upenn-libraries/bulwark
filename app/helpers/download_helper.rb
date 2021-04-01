@@ -1,5 +1,9 @@
 module DownloadHelper
-  # TODO: Add documentation
+  # Returns download url for file.
+  #
+  # Based on the special remote generates correct download link. When using a S3 based
+  # special remote (CEPH) downloads file from Phalt. When using directory special remote
+  # uses internal download endpoint.
   def download_link(bucket, file, disposition: nil, filename: nil)
     special_remote_config = Bulwark::Config.special_remote
     case special_remote_config[:type]
@@ -17,12 +21,28 @@ module DownloadHelper
     end
   end
 
-  def asset_download_link(asset)
+  def original_file_link(asset)
     download_link(
-      asset.digital_object.names.bucket,
+      asset.repo.names.bucket,
       asset.original_file_location,
-      disposition: :inline,
-      filename: File.basename(asset.filename)
+      disposition: :attachment,
+      filename: File.basename(asset.filename, '.*')
+    )
+  end
+
+  def access_file_link(asset)
+    download_link(
+      asset.repo.names.bucket,
+      asset.access_file_location,
+      disposition: :attachment,
+      filename: File.basename(asset.filename, '.*')
+    )
+  end
+
+  def thumbnail_file_link(asset)
+    download_link(
+      asset.repo.names.bucket,
+      asset.thumbnail_file_location
     )
   end
 

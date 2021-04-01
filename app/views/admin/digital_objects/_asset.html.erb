@@ -4,7 +4,7 @@
   </div>
   <% if asset.thumbnail_file_location %>
     <div class="col-sm-4">
-      <img src="<%= download_link(@digital_object.names.bucket, asset.thumbnail_file_location) %>"></img>
+      <img src="<%= thumbnail_file_link(asset) %>"></img>
     </div>
   <% end %>
 
@@ -17,11 +17,11 @@
   <div class="col-sm-4">
     <a
       class="btn btn-link"
-      href="<%= download_link(@digital_object.names.bucket, asset.original_file_location, disposition: :inline, filename: File.basename(asset.filename, '.*')) %>">
+      href="<%= original_file_link(asset) %>">
       <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Original
     </a>
     <% if asset.access_file_location %>
-      <a class="btn btn-link" href="<%= download_link(@digital_object.names.bucket, asset.access_file_location, disposition: :inline, filename: File.basename(asset.filename, '.*')) %>" target="_blank">
+      <a class="btn btn-link" href="<%= access_file_link(asset) %>" target="_blank">
          <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Access Copy
       </a>
     <% end %>
