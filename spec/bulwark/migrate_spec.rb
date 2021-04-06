@@ -38,6 +38,15 @@ RSpec.describe Bulwark::Migrate do
       end
     end
 
+    context 'when structural.bibnumber is provided' do
+      subject(:migration) { described_class.new(action: 'migrate', structural: { bibnumber: '12483934' }) }
+
+      it 'adds error' do
+        expect(migration.validate).to be false
+        expect(migration.errors).to include 'structural.bibnumber not a valid field'
+      end
+    end
+
     context 'when unique_identifier is missing' do
       subject(:migration) { described_class.new(action: 'migrate') }
 
@@ -95,40 +104,6 @@ RSpec.describe Bulwark::Migrate do
       it 'adds error' do
         expect(migration.validate).to be false
         expect(migration.errors).to include 'Repo has more than two metadata sources'
-      end
-    end
-
-    context 'when Repo does not have kaplan_structural MetadataSource' do
-      include_context 'stub successful EZID requests'
-
-      subject(:migration) { described_class.new(action: 'migrate', unique_identifier: repo.unique_identifier) }
-      let(:repo) { FactoryBot.create(:repo) }
-
-      before do
-        MetadataSource.create(source_type: 'kaplan', metadata_builder: repo.metadata_builder)
-        MetadataSource.create(source_type: 'voyager', metadata_builder: repo.metadata_builder)
-      end
-
-      it 'adds error' do
-        expect(migration.validate).to be false
-        expect(migration.errors).to include 'Metadata sources does not include kaplan_structural'
-      end
-    end
-
-    context 'when Repo does not have kaplan MetadataSource' do
-      include_context 'stub successful EZID requests'
-
-      subject(:migration) { described_class.new(action: 'migrate', unique_identifier: repo.unique_identifier) }
-      let(:repo) { FactoryBot.create(:repo) }
-
-      before do
-        MetadataSource.create(source_type: 'kaplan_structural', metadata_builder: repo.metadata_builder)
-        MetadataSource.create(source_type: 'voyager', metadata_builder: repo.metadata_builder)
-      end
-
-      it 'adds error' do
-        expect(migration.validate).to be false
-        expect(migration.errors).to include 'Metadata sources does not include kaplan'
       end
     end
 
@@ -266,6 +241,57 @@ RSpec.describe Bulwark::Migrate do
         it 'returns error' do
           expect(migration_result.status).to be DigitalObjectImport::FAILED
           expect(migration_result.errors).to match_array ['Structural metadata contains the following invalid filenames: incorrect.tif']
+        end
+      end
+
+      context 'when object contains empty derivative and metadata folder' do
+        # Deleting contents of .derivs and data/metadata.
+        before do
+          repo = Repo.find_by(unique_identifier: ark)
+          git = ExtendedGit.open(repo.clone_location)
+          git.remove(['data/metadata', ':(exclude)*/.keep'], recursive: true)
+          git.remove(['.derivs', ':(exclude)*/.keep'], recursive: true)
+          git.commit('Removing .derivs and data/metadata directories.')
+          git.push('origin', 'master')
+          git.push('origin', 'git-annex')
+          git.annex.sync(content: true)
+          repo.delete_clone
+        end
+
+        let(:migration_result) do
+          described_class.new(
+            action: 'migrate',
+            unique_identifier: ark,
+            structural: { filenames: 'front.tif; back.tif' },
+            metadata: { title: ['A new item'] },
+            migrated_by: User.find_by(email: migrated_by)
+          ).process
+        end
+        let(:repo) { migration_result.repo }
+        let(:working_dir) { repo.clone_location }
+        let(:git) { ExtendedGit.open(working_dir) }
+
+        it 'expect migration to be successful' do
+          expect(migration_result.errors).to be_empty
+          expect(migration_result.status).to be DigitalObjectImport::SUCCESSFUL
+        end
+
+        it 'contains expected generated derivatives (does not contain previously created derivatives)' do
+          whereis_result = git.annex.whereis(repo.derivatives_subdirectory)
+          derivatives = ['.derivs/access/back.jpeg', '.derivs/thumbnails/back.jpeg', '.derivs/access/front.jpeg', '.derivs/thumbnails/front.jpeg']
+          expect(whereis_result.map(&:filepath)).to match_array derivatives
+          derivatives.each do |filepath|
+            expect(whereis_result[filepath].locations.map(&:description)).to include '[local]'
+          end
+        end
+
+        it 'contains metadata files' do
+          whereis_result = git.annex.whereis(repo.metadata_subdirectory)
+          metadata_filepaths = [
+            'data/metadata/jhove_output.xml', 'data/metadata/preservation.xml', 'data/metadata/mets.xml',
+            'data/metadata/descriptive_metadata.csv', 'data/metadata/structural_metadata.csv'
+          ]
+          expect(whereis_result.map(&:filepath)).to match_array(metadata_filepaths)
         end
       end
 
@@ -410,7 +436,7 @@ RSpec.describe Bulwark::Migrate do
           ).to match_array [".keep", "back.tif", "front.tif"]
         end
 
-        it 'contains extracted metadata files' do
+        it 'contains metadata files' do
           whereis_result = git.annex.whereis(repo.metadata_subdirectory)
           metadata_filepaths = [
             'data/metadata/jhove_output.xml', 'data/metadata/preservation.xml', 'data/metadata/mets.xml',

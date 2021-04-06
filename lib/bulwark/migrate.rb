@@ -42,6 +42,7 @@ module Bulwark
 
       # Check that structural and descriptive metadata is present
       @errors << "Missing structural metadata" if structural_metadata.blank?
+      @errors << "structural.bibnumber not a valid field" if !structural_metadata.blank? && structural_metadata.key?(:bibnumber)
       @errors << "Missing metadata" if descriptive_metadata.blank?
 
       # Check that unique_identifier is present.
@@ -59,8 +60,6 @@ module Bulwark
           # Check that there are only two metadata sources, one kaplan and one structural_kaplan (eventually extend this)
           metadata_sources = repo.metadata_builder.metadata_source.map(&:source_type)
           @errors << "Repo has more than two metadata sources" if metadata_sources.count > 2
-          @errors << "Metadata sources does not include kaplan" unless metadata_sources.include?('kaplan')
-          @errors << "Metadata sources does not include kaplan_structural" unless metadata_sources.include?('kaplan_structural')
 
           # Check that a User record for owner can be found.
           owner = User.find_by(email: repo.owner)
@@ -106,8 +105,8 @@ module Bulwark
       repo.endpoint.destroy_all
 
       # Delete all files in the derivative and metadata directories
-      remove_directory("#{repo.metadata_subdirectory}/*", "Removing all metadata files as part of migration")
-      remove_directory("#{repo.derivatives_subdirectory}/*", "Removing all derivative files as part of migration")
+      remove_directory(repo.metadata_subdirectory, "Removing all metadata files as part of migration")
+      remove_directory(repo.derivatives_subdirectory, "Removing all derivative files as part of migration")
 
       # Update published_at, created_by and updated by
       repo.update!(
@@ -179,8 +178,12 @@ module Bulwark
       end
 
       def remove_directory(path, message)
+        # Skip if there aren't any files to delete.
+        absolute_path = File.join(repo.clone_location, path)
+        return if Dir.entries(absolute_path).delete_if { |entry| ['.', '..', '.keep'].include?(entry) }.blank?
+
         git = ExtendedGit.open(repo.clone_location)
-        git.remove([path, ':(exclude)*/.keep'], recursive: true)
+        git.remove(["#{path}/*", ':(exclude)*/.keep'], recursive: true)
         git.commit(message)
         git.push('origin', 'master')
         git.push('origin', 'git-annex')
