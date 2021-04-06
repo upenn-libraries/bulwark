@@ -41,3 +41,6 @@ production:
     create_iiif_manifest: true
   digital_object:
     file_extensions: *valid_asset_extensions
+  phalt:
+    url: <%= ENV['PHALT_ENDPOINT'] %>
+

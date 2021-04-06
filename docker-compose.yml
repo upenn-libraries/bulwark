@@ -56,7 +56,7 @@ services:
     volumes:
       - 'db:/var/lib/mysql'
   phalt_app:
-    image: 'phalt:latest'
+    image: 'gitlab.library.upenn.edu/digital-repository/phalt:${PHALT_IMAGE_TAG}'
     environment:
       IIIF:
       IIIF_BASE:
@@ -67,6 +67,7 @@ services:
       DOWNLOAD_PORT:
       MARMITE_BASE:
       MARMITE_FORMAT:
+      STORAGE_HOST:
     ports:
       - '9292'
   web:

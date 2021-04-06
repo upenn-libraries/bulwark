@@ -48,10 +48,6 @@ class ReposController < ApplicationController
     redirect_to "#{root_url}admin_repo/repo/#{@repo.id}/generate_metadata"
   end
 
-  def download
-    redirect_to "http://localhost:9292/files/#{params[:filename]}?filename=#{params[:download_url]}"
-  end
-
   def fetch_image_ids
     repo = Repo.find_by(unique_identifier: "ark:/#{params[:id].tr('-','/')}")
 
