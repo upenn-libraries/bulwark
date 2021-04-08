@@ -139,6 +139,9 @@ module Bulwark
       # Recreate preservation.xml and mets.xml
       repo.add_preservation_and_mets_xml
 
+      # Remove clone
+      repo.delete_clone
+
       # Regenerate IIIF manifest
       repo.create_iiif_manifest if Bulwark::Config.bulk_import[:create_iiif_manifest]
 
