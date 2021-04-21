@@ -37,12 +37,12 @@ module Cloneable
     else
       # If metadata is not already present, create new metadata file
       csv_data = Bulwark::StructuredCSV.generate([metadata])
-      File.write(File.join(clone_location, metadata_subdirectory, DESCRIPTIVE_METADATA_FILENAME), csv_data)
+      desc_metadata_file = File.join(clone_location, metadata_subdirectory, DESCRIPTIVE_METADATA_FILENAME)
+      File.write(desc_metadata_file, csv_data)
     end
 
     # add, commit, push descriptive  metadata
-    version_control_agent.add({}, clone_location)
-    version_control_agent.lock('.', clone_location)
+    version_control_agent.add({ content: desc_metadata_file }, clone_location)
     version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.automated.added_metadata'), clone_location)
     version_control_agent.push({}, clone_location)
 
@@ -66,8 +66,7 @@ module Cloneable
       File.write(File.join(clone_location, metadata_subdirectory, STRUCTURAL_METADATA_FILENAME), metadata)
     end
 
-    version_control_agent.add({}, clone_location)
-    version_control_agent.lock('.', clone_location)
+    version_control_agent.add({ content: struct_metadata_file }, clone_location)
     version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.automated.added_metadata'), clone_location)
     version_control_agent.push({}, clone_location)
 
@@ -116,13 +115,11 @@ module Cloneable
 
       asset.save!
 
-      version_control_agent.add({ content: file_path }, clone_location)
       version_control_agent.lock(file_path, clone_location)
     end
 
     metadata_builder.update!(last_file_checks: DateTime.current)
 
-    version_control_agent.add({ content: derivatives_subdirectory, include_dotfiles: true }, clone_location)
     version_control_agent.lock(derivatives_subdirectory, clone_location)
     version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives', object_id: names.fedora), clone_location)
     version_control_agent.push(clone_location)
@@ -181,7 +178,8 @@ module Cloneable
                                .run_jhove(File.join(clone_location, assets_subdirectory))
 
     version_control_agent.lock(assets_subdirectory, clone_location)
-    version_control_agent.add({ content: "#{metadata_subdirectory}/#{File.basename(jhove_output)}" }, clone_location)
+
+    version_control_agent.add({ content: File.join(metadata_subdirectory, File.basename(jhove_output)) }, clone_location)
     version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_preservation_metadata', object_id: names.fedora), clone_location)
     version_control_agent.push(clone_location)
   end
