@@ -142,23 +142,21 @@ module Bulwark
       # Remove clone
       repo.delete_clone
 
-      # Regenerate IIIF manifest
-      repo.create_iiif_manifest if Bulwark::Config.bulk_import[:create_iiif_manifest]
-
       # Make sure thumbnail is set and make sure current thumbnail is valid
       if repo.thumbnail.blank? || !repo.assets.map(&:filename).include?(repo.thumbnail)
         thumbnail = repo.structural_metadata.user_defined_mappings['sequence'].sort_by { |file| file['sequence'] }.first['filename']
         repo.update!(thumbnail: thumbnail)
       end
 
-      # Publish
-      repo.publish
-
-      # -- Post migration processing --
-
-      # Cleanup models
+      # Cleanup models. Need to clean up models before IIIF manifest is generated.
       repo.update!(file_display_attributes: nil, images_to_render: nil, new_format: true)
       repo.metadata_builder.update(xml_preview: nil, preserve: nil)
+
+      # Regenerate IIIF manifest
+      repo.create_iiif_manifest if Bulwark::Config.bulk_import[:create_iiif_manifest]
+
+      # Publish
+      repo.publish
 
       Bulwark::Import::Result.new(status: DigitalObjectImport::SUCCESSFUL, repo: repo)
     rescue => e
