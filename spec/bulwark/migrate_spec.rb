@@ -38,15 +38,6 @@ RSpec.describe Bulwark::Migrate do
       end
     end
 
-    context 'when structural.bibnumber is provided' do
-      subject(:migration) { described_class.new(action: 'migrate', structural: { bibnumber: '12483934' }) }
-
-      it 'adds error' do
-        expect(migration.validate).to be false
-        expect(migration.errors).to include 'structural.bibnumber not a valid field'
-      end
-    end
-
     context 'when unique_identifier is missing' do
       subject(:migration) { described_class.new(action: 'migrate') }
 

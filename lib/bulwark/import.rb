@@ -25,15 +25,15 @@ module Bulwark
     def initialize(args)
       args = args.deep_symbolize_keys
 
-      @action = args[:action]&.downcase
-      @unique_identifier = args[:unique_identifier]
-      @directive_name = args[:directive_name]
-      @created_by = args[:created_by]
-      @publish = args.fetch(:publish, 'false').casecmp('true').zero?
+      @action               = args[:action]&.downcase
+      @unique_identifier    = args[:unique_identifier]
+      @directive_name       = args[:directive_name]
+      @created_by           = args[:created_by]
+      @publish              = args.fetch(:publish, 'false').casecmp('true').zero?
       @descriptive_metadata = args.fetch(:metadata, {})
-      @structural_metadata = args.fetch(:structural, {})
-      @assets = args.fetch(:assets, {})
-      @errors = []
+      @structural_metadata  = args[:structural].blank? ? nil : StructuralMetadataGenerator.new(args[:structural])
+      @assets               = args.fetch(:assets, {})
+      @errors               = []
     end
 
     # Validates that digital object can be created or updated with all the information
@@ -48,7 +48,7 @@ module Bulwark
 
       if action == CREATE
         @errors << "\"directive_name\" must be provided to create an object" unless directive_name
-        @errors << "structural must be provided to create an object" unless structural_metadata && (structural_metadata[:filenames] || (structural_metadata[:drive] && structural_metadata[:path]))
+        @errors << "structural must be provided to create an object" unless structural_metadata
         @errors << "\"assets.path\" and \"assets.drive\" must be provided to create an object" if assets && (!assets[:drive] || !assets[:path])
         @errors << "metadata must be provided to create an object" if descriptive_metadata.blank?
         if unique_identifier
@@ -72,10 +72,9 @@ module Bulwark
         # @errors << "asset path invalid" if assets[:drive] && assets[:path] && !MountedDrives.valid_path?(assets[:drive], assets[:path])
       end
 
-      if structural_metadata
-        @errors << "cannot provide structural metadata two different ways" if (structural_metadata[:drive] || structural_metadata[:path]) && structural_metadata[:filenames]
-        @errors << "structural drive invalid" if structural_metadata[:drive] && !MountedDrives.valid?(structural_metadata[:drive])
-        # @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
+      if structural_metadata && !structural_metadata.valid?
+        @errors.concat structural_metadata.errors
+        # # @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
       end
 
       @errors << "created_by must always be provided" unless created_by
@@ -91,7 +90,7 @@ module Bulwark
       end
 
       if structural_metadata
-        @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
+        @errors << "structural path invalid" if structural_metadata.drive && structural_metadata.path && !MountedDrives.valid_path?(structural_metadata.drive, structural_metadata.path)
       end
 
       return error_result(@errors) unless @errors.empty?
@@ -120,11 +119,13 @@ module Bulwark
       # Add structural metadata. Replace structural metadata if its already present.
       # FIXME: This isn't a great solution because there is a potential for
       # data loss if more detailed structural metadata is already available.
-      new_structural = Bulwark::Import::Utilities.structural_metadata_csv(structural_metadata)
-      repo.add_structural_metadata(new_structural) if new_structural
+      if structural_metadata
+        new_structural = structural_metadata.csv
+        repo.add_structural_metadata(new_structural)
 
-      # Check that all filenames referenced in the structural metadata are valid.
-      repo.validate_structural_metadata!
+        # Check that all filenames referenced in the structural metadata are valid.
+        repo.validate_structural_metadata!
+      end
 
       # Derivative generation (only if an asset location has been provided)
       repo.generate_derivatives unless assets.empty?

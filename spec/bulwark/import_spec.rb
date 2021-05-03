@@ -128,7 +128,43 @@ RSpec.describe Bulwark::Import do
 
       it 'adds error' do
         expect(import.validate).to be false
-        expect(import.errors).to include 'cannot provide structural metadata two different ways'
+        expect(import.errors).to include 'structural metadata cannot be provided multiple ways'
+      end
+    end
+
+    context 'when structural filenames and bibnumber are provided' do
+      subject(:import) { described_class.new(structural: { filenames: 'something', bibnumber: '1234567890' }) }
+
+      it 'adds error' do
+        expect(import.validate).to be false
+        expect(import.errors).to include 'structural metadata cannot be provided multiple ways'
+      end
+    end
+
+    context 'when structural file and bibnumber are provided' do
+      subject(:import) { described_class.new(structural: { asset: 'something', drive: 'test', bibnumber: '1234567890' }) }
+
+      it 'adds error' do
+        expect(import.validate).to be false
+        expect(import.errors).to include 'structural metadata cannot be provided multiple ways'
+      end
+    end
+
+    context 'when structural viewing_direction is provided without filenames' do
+      subject(:import) { described_class.new(structural: { viewing_direction: 'top-to-bottom', bibnumber: '1234567890' }) }
+
+      it 'adds error' do
+        expect(import.validate).to be false
+        expect(import.errors).to include 'structural viewing_direction cannot be provided without filenames'
+      end
+    end
+
+    context 'when structural display is provided without filenames' do
+      subject(:import) { described_class.new(structural: { display: 'paged', bibnumber: '1234567890' }) }
+
+      it 'adds error' do
+        expect(import.validate).to be false
+        expect(import.errors).to include 'structural display cannot be provided without filenames'
       end
     end
 
@@ -497,6 +533,33 @@ RSpec.describe Bulwark::Import do
         }
       end
       let(:expected_structural) { fixture_to_str('example_bulk_imports', 'object_one', 'structural_metadata.csv') }
+      let(:expected_preservation) do
+        <<~PRESERVATION
+          <?xml version="1.0" encoding="UTF-8"?>
+          <root>
+            <record>
+              <uuid></uuid>
+              <title>Object One</title>
+              <pages>
+                <page>
+                  <filename>front.tif</filename>
+                  <label>p. 1</label>
+                  <sequence>1</sequence>
+                  <table_of_contents>a very important illustration</table_of_contents>
+                  <table_of_contents>an additional illustration</table_of_contents>
+                  <viewing_direction>top-to-bottom</viewing_direction>
+                </page>
+                <page>
+                  <filename>back.tif</filename>
+                  <label>p. 2</label>
+                  <sequence>2</sequence>
+                  <viewing_direction>top-to-bottom</viewing_direction>
+                </page>
+              </pages>
+            </record>
+          </root>
+        PRESERVATION
+      end
       let(:import) do
         described_class.new(
           action: Bulwark::Import::CREATE,
@@ -530,11 +593,31 @@ RSpec.describe Bulwark::Import do
         git.annex.get(repo.metadata_subdirectory)
         expect(File.read(File.join(working_dir, repo.metadata_subdirectory, 'structural_metadata.csv'))).to eql expected_structural
       end
+
+      it 'preservation.xml contains expected data' do
+        git.annex.get(repo.metadata_subdirectory)
+        expect(
+          Nokogiri::XML(File.read(File.join(working_dir, repo.metadata_subdirectory, 'preservation.xml')))
+        ).to be_equivalent_to(expected_preservation).ignoring_content_of('uuid')
+      end
     end
 
     # TODO: Once Marc mapping has been reviewed, these tests need to be revisited.
-    context 'when creating a new digital object with metadata from Alma' do
+    context 'when creating a new digital object with descriptive and structural metadata from Marmite' do
       let(:bibnumber) { '9923478503503681' }
+      let(:structural_xml) do
+        <<~STRUCTURAL
+          <record>
+            <bib_id>9923478503503681</bib_id>
+            <pages>
+              <page number="1" id="9960927563503681_1515253" seq="1" side="recto" image.id="front" image="front" visiblepage="First Page"/>
+              <page number="2" id="9960927563503681_1515254" seq="2" side="verso" image.id="back" image="back" visiblepage="Second Page">
+                <tocentry name="ill">Seller's description, Inside front cover</tocentry>
+              </page>
+            </pages>
+          </record>
+        STRUCTURAL
+      end
       let(:descriptive_metadata) do
         {
           'bibnumber' => [bibnumber],
@@ -564,19 +647,28 @@ RSpec.describe Bulwark::Import do
           'item_type' => ['Manuscript']
         }
       end
+      let(:structural_metadata) do
+        {
+          'sequence' => [
+            { "display" => "paged", "filename" => "front.tif", "label" => "First Page", "sequence" => "1", "viewing_direction" => "left-to-right" },
+            { "display" => "paged", "filename" => "back.tif", "label" => "Second Page", "sequence" => "2", "table_of_contents" => ["Seller's description, Inside front cover"], "viewing_direction" => "left-to-right" }
+          ]
+        }
+      end
       let(:import) do
         described_class.new(
           action: Bulwark::Import::CREATE,
           directive_name: 'object_one',
           assets: { drive: 'test', path: 'object_one' },
           metadata: { 'bibnumber' => [bibnumber], 'item_type' => ['Manuscript'] },
-          structural: { 'filenames' => 'front.tif; back.tif' },
+          structural: { 'bibnumber' => bibnumber },
           created_by: created_by
         )
       end
       let(:expected_mets) { fixture_to_xml('example_objects', 'object_two', 'mets.xml') }
       let(:expected_preservation) { fixture_to_xml('example_objects', 'object_two', 'preservation.xml') }
       let(:expected_descriptive) { fixture_to_str('example_objects', 'object_two', 'descriptive_metadata.csv') }
+      let(:expected_structural) { fixture_to_str('example_objects', 'object_two', 'structural_metadata.csv') }
 
       let(:repo) { result.repo }
       let(:working_dir) { repo.version_control_agent.clone }
@@ -585,11 +677,18 @@ RSpec.describe Bulwark::Import do
 
       let(:result) { import.process }
 
-      # Stub marmite request
+      # Stub Marmite requests
       before do
         stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=marc21").to_return(status: 302)
         stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=marc21")
           .to_return(status: 200, body: fixture_to_str('marmite', 'marc_xml', "#{bibnumber}.xml"), headers: {})
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=structural").to_return(status: 302)
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=structural")
+          .to_return(status: 200, body: structural_xml, headers: {})
+      end
+
+      it 'expect result to be successful' do
+        expect(result.status).to be DigitalObjectImport::SUCCESSFUL
       end
 
       it 'creates descriptive metadata source' do
@@ -600,9 +699,18 @@ RSpec.describe Bulwark::Import do
         expect(metadata_source.remote_location).to eql "#{repo.names.bucket}/#{git.annex.lookupkey('data/metadata/descriptive_metadata.csv')}"
       end
 
-      it 'descriptive metadata csv contains expected data' do
+      it 'creates structural metadata source' do
+        metadata_source = repo.structural_metadata
+        expect(metadata_source.source_type).to eql 'structural'
+        expect(metadata_source.original_mappings).to eql structural_metadata
+        expect(metadata_source.user_defined_mappings).to eql structural_metadata
+        expect(metadata_source.remote_location).to eql "#{repo.names.bucket}/#{git.annex.lookupkey('data/metadata/structural_metadata.csv')}"
+      end
+
+      it 'descriptive and structural metadata csv contains expected data' do
         git.annex.get(repo.metadata_subdirectory)
         expect(File.read(File.join(working_dir, repo.metadata_subdirectory, 'descriptive_metadata.csv'))).to eql expected_descriptive
+        expect(File.read(File.join(working_dir, repo.metadata_subdirectory, 'structural_metadata.csv'))).to eql expected_structural
       end
 
       it 'generated metadata files contain expected data' do

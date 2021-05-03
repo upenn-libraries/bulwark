@@ -1,7 +1,19 @@
+# frozen_string_literal: true
+
 module StructuralMetadataSources
   extend ActiveSupport::Concern
 
-  VALID_STRUCTURAL_METADATA_FIELDS = ['sequence', 'filename', 'label', 'viewing_direction', 'table_of_contents'].freeze
+  VALID_STRUCTURAL_METADATA_FIELDS = ['sequence', 'filename', 'label', 'viewing_direction', 'table_of_contents', 'display'].freeze
+
+  PAGED = 'paged'
+  INDIVIDUALS = 'individuals'
+  VIEWING_HINTS = [PAGED, INDIVIDUALS].freeze
+
+  RIGHT_TO_LEFT = 'right-to-left'
+  LEFT_TO_RIGHT = 'left-to-right'
+  TOP_TO_BOTTOM = 'top-to-bottom'
+  BOTTOM_TO_TOP = 'bottom-to-top'
+  VIEWING_DIRECTIONS = [LEFT_TO_RIGHT, RIGHT_TO_LEFT, TOP_TO_BOTTOM, BOTTOM_TO_TOP].freeze
 
   def structural_metadata(working_path)
     self.metadata_builder.repo.version_control_agent.get({ location: path }, working_path)
@@ -28,6 +40,6 @@ module StructuralMetadataSources
     return nil unless source_type == 'structural'
     direction = user_defined_mappings['sequence'].map { |asset| asset['viewing_direction'] }.uniq
     raise 'Conflicting viewing_directions. Viewing direction must be the same for all assets' if direction.length > 1
-    direction.first || 'left-to-right'
+    direction.first || LEFT_TO_RIGHT
   end
 end

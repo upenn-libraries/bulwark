@@ -32,12 +32,19 @@
     <item_type>Manuscript</item_type>
     <pages>
       <page>
+        <display>paged</display>
         <filename>front.tif</filename>
+        <label>First Page</label>
         <sequence>1</sequence>
+        <viewing_direction>left-to-right</viewing_direction>
       </page>
       <page>
+        <display>paged</display>
         <filename>back.tif</filename>
+        <label>Second Page</label>
         <sequence>2</sequence>
+        <table_of_contents>Seller's description, Inside front cover</table_of_contents>
+        <viewing_direction>left-to-right</viewing_direction>
       </page>
     </pages>
   </record>
