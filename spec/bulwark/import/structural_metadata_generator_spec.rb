@@ -74,6 +74,24 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
         expect(generator.errors).to include 'structural drive invalid'
       end
     end
+
+    context 'when structural viewing_direction is invalid' do
+      subject(:generator) { described_class.new(viewing_direction: 'invalid') }
+
+      it 'adds error' do
+        expect(generator.valid?).to be false
+        expect(generator.errors).to include 'structural viewing direction is not valid'
+      end
+    end
+
+    context 'when structural display is invalid' do
+      subject(:generator) { described_class.new(display: 'invalid') }
+
+      it 'adds error' do
+        expect(generator.valid?).to be false
+        expect(generator.errors).to include 'structural display is not valid'
+      end
+    end
   end
 
   describe '#csv'

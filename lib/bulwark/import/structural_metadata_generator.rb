@@ -23,6 +23,9 @@ module Bulwark
         @errors << 'structural display cannot be provided without filenames' if display && !filenames
         @errors << 'structural drive invalid' if drive && !MountedDrives.valid?(drive)
         @errors << 'structural metadata cannot be provided multiple ways' unless [filenames, (drive || path), bibnumber].one?
+        @errors << 'structural viewing direction is not valid' unless MetadataSource::VIEWING_DIRECTIONS.include?(viewing_direction)
+        @errors << 'structural display is not valid' unless MetadataSource::VIEWING_HINTS.include?(display)
+
         # @errors << "structural path invalid" if drive && path && !MountedDrives.valid_path?(drive, path)
 
         errors.empty?
