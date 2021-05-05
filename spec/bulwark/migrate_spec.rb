@@ -450,6 +450,127 @@ RSpec.describe Bulwark::Migrate do
           expect(repo.metadata_builder.preserve).to be_blank
         end
       end
+
+
+      context 'when migration an object with descriptive and structural metadata from Marmite' do
+        let(:bibnumber) { '9923478503503681' }
+        let(:structural_xml) do
+          <<~STRUCTURAL
+          <record>
+            <bib_id>9923478503503681</bib_id>
+            <pages>
+              <page number="1" id="9960927563503681_1515253" seq="1" side="recto" image.id="front" image="front" visiblepage="First Page"/>
+              <page number="2" id="9960927563503681_1515254" seq="2" side="verso" image.id="back" image="back" visiblepage="Second Page">
+                <tocentry name="ill">Seller's description, Inside front cover</tocentry>
+              </page>
+            </pages>
+          </record>
+          STRUCTURAL
+        end
+        let(:descriptive_metadata) do
+          {
+            'bibnumber' => [bibnumber],
+            'identifier' => [
+              'sts- n.r* n.n. di12 (3) 1598 (A)', '(OCoLC)ocm16660686', '(OCoLC)16660686', '2347850', '(PU)2347850-penndb-Voyager'
+            ],
+            'creator' => ['Ercker, Lazarus,'],
+            'title' => [
+              "Beschreibung aller fürnemisten Mineralischen Ertzt vnnd Berckwercksarten :",
+              "wie dieselbigen vnd eine jede in Sonderheit jrer Natur vnd Eygenschafft nach, auff alle Metalla probirt, vnd im kleinen Fewr sollen versucht werden, mit Erklärung etlicher fürnemer nützlicher Schmeltzwerck im grossen Feuwer, auch Scheidung Goldts, Silbers, vnd anderer Metalln, sampt einem Bericht des Kupffer Saigerns, Messing brennens, vnd Salpeter Siedens, auch aller saltzigen Minerischen proben, vnd was denen allen anhengig : in fünff Bücher verfast, dessgleichen zuvorn niemals in Druck kommen ... : auffs newe an vielen Orten mit besserer Aussführung, vnd mehreren Figurn erklärt /",
+              "durch den weitberühmten Lazarum Erckern, der Röm. Kay. May. Obersten Bergkmeister vnd Buchhalter in Königreich Böhem  ..."
+            ],
+            'publisher' => ["Gedruckt zu Franckfurt am Mayn : Durch Johan Feyerabendt, 1598."],
+            'format' => ['[4], 134, [4] leaves : ill. ; 31 cm. (fol.)'],
+            'bibliographic_note' => [
+              'Leaves printed on both sides. Signatures: )(⁴ A-Z⁴ a-k⁴ l⁶. The last leaf is blank. Woodcut illustrations, initials and tail-pieces. Title page printed in black and red. Printed marginalia. "Erratum" on verso of last printed leaf. Online version available via Colenda https://colenda.library.upenn.edu/catalog/81431-p3df6k90j'
+            ],
+            'provenance' => ["Smith, Edgar Fahs, 1854-1928 (autograph, 1917)", "Wright, H. (autograph, 1870)"],
+            'description' => ["Penn Libraries copy has Edgar Fahs Smith's autograph on front free endpaper; autograph of H. Wright on front free endpaper; effaced ms. inscription (autograph?) on title leaf."],
+            'subject' => ['Metallurgy -- Early works to 1800.', 'Assaying -- Early works to 1800.', 'PU', 'PU', 'PU'],
+            'date' => ['1598'],
+            'personal_name' => ['Feyerabend, Johann,'],
+            'geographic_subject' => ['Germany -- Frankfurt am Main.'],
+            'collection' => ['Edgar Fahs Smith Memorial Collection (University of Pennsylvania)'],
+            'call_number' => ['Folio TN664 .E7 1598'],
+            'relation' => ['https://colenda.library.upenn.edu/catalog/81431-p3df6k90j'],
+            'item_type' => ['Manuscript']
+          }
+        end
+        let(:structural_metadata) do
+          {
+            'sequence' => [
+              { "display" => "paged", "filename" => "front.tif", "label" => "First Page", "sequence" => "1", "viewing_direction" => "left-to-right" },
+              { "display" => "paged", "filename" => "back.tif", "label" => "Second Page", "sequence" => "2", "table_of_contents" => ["Seller's description, Inside front cover"], "viewing_direction" => "left-to-right" }
+            ]
+          }
+        end
+
+        let(:expected_mets) { fixture_to_xml('example_objects', 'object_two', 'mets.xml') }
+        let(:expected_preservation) { fixture_to_xml('example_objects', 'object_two', 'preservation.xml') }
+        let(:expected_descriptive) { fixture_to_str('example_objects', 'object_two', 'descriptive_metadata.csv') }
+        let(:expected_structural) { fixture_to_str('example_objects', 'object_two', 'structural_metadata.csv') }
+
+
+        let(:migration_result) do
+          described_class.new(
+            action: 'migrate',
+            unique_identifier: ark,
+            metadata: { 'bibnumber' => [bibnumber], 'item_type' => ['Manuscript'] },
+            structural: { 'bibnumber' => bibnumber },
+            migrated_by: User.find_by(email: migrated_by)
+          ).process
+        end
+        let(:repo) { migration_result.repo }
+        let(:working_dir) { repo.clone_location }
+        let(:git) { ExtendedGit.open(working_dir) }
+        let(:whereis_result) { git.annex.whereis }
+
+        # Stub Marmite requests
+        before do
+          stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=marc21").to_return(status: 302)
+          stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=marc21")
+            .to_return(status: 200, body: fixture_to_str('marmite', 'marc_xml', "#{bibnumber}.xml"), headers: {})
+          stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=structural").to_return(status: 302)
+          stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=structural")
+            .to_return(status: 200, body: structural_xml, headers: {})
+        end
+
+        it 'expect result to be successful' do
+          expect(migration_result.status).to be DigitalObjectImport::SUCCESSFUL
+        end
+
+        it 'creates descriptive metadata source' do
+          metadata_source = repo.descriptive_metadata
+          expect(metadata_source.source_type).to eql 'descriptive'
+          expect(metadata_source.original_mappings).to eql('bibnumber' => [bibnumber], 'item_type' => ['Manuscript'])
+          expect(metadata_source.user_defined_mappings).to eql descriptive_metadata
+          expect(metadata_source.remote_location).to eql "#{repo.names.bucket}/#{git.annex.lookupkey('data/metadata/descriptive_metadata.csv')}"
+        end
+
+        it 'creates structural metadata source' do
+          metadata_source = repo.structural_metadata
+          expect(metadata_source.source_type).to eql 'structural'
+          expect(metadata_source.original_mappings).to eql structural_metadata
+          expect(metadata_source.user_defined_mappings).to eql structural_metadata
+          expect(metadata_source.remote_location).to eql "#{repo.names.bucket}/#{git.annex.lookupkey('data/metadata/structural_metadata.csv')}"
+        end
+
+        it 'descriptive and structural metadata csv contains expected data' do
+          git.annex.get(repo.metadata_subdirectory)
+          expect(File.read(File.join(working_dir, repo.metadata_subdirectory, 'descriptive_metadata.csv'))).to eql expected_descriptive
+          expect(File.read(File.join(working_dir, repo.metadata_subdirectory, 'structural_metadata.csv'))).to eql expected_structural
+        end
+
+        it 'generated metadata files contain expected data' do
+          git.annex.get(repo.metadata_subdirectory)
+          expect(
+            Nokogiri::XML(File.read(File.join(working_dir, repo.metadata_subdirectory, 'preservation.xml')))
+          ).to be_equivalent_to(expected_preservation).ignoring_content_of('uuid')
+          expect(
+            Nokogiri::XML(File.read(File.join(working_dir, repo.metadata_subdirectory, 'mets.xml')))
+          ).to be_equivalent_to(expected_mets).ignoring_attr_values('OBJID').ignoring_content_of('mods|identifier')
+        end
+      end
     end
   end
 end
