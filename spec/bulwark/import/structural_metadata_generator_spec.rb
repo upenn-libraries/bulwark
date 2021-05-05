@@ -99,7 +99,7 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
       let(:generator) { described_class.new(bibnumber: '1234567890') }
 
       it 'calls from_bibnumber' do
-        expect(generator).to have_received(:from_bibnumber).with('1234567890')
+        expect(generator).to receive(:from_bibnumber).with('1234567890')
         generator.csv
       end
     end
@@ -108,7 +108,7 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
       let(:generator) { described_class.new(drive: 'test', path: 'to/file.csv') }
 
       it 'calls from_file' do
-        expect(generator).to have_received(:from_file).with(File.join(Bulwark::Import::MountedDrives.path_to('test'), 'to/file.csv'))
+        expect(generator).to receive(:from_file).with(File.join(Bulwark::Import::MountedDrives.path_to('test'), 'to/file.csv'))
         generator.csv
       end
     end
@@ -117,7 +117,7 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
       let(:generator) { described_class.new(filenames: 'something') }
 
       it 'calls from_ordered_filenames' do
-        expect(generator).to have_received(:from_ordered_filenames).with('something', nil, nil)
+        expect(generator).to receive(:from_ordered_filenames).with('something', nil, nil)
         generator.csv
       end
     end

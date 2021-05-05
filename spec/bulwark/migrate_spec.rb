@@ -451,7 +451,6 @@ RSpec.describe Bulwark::Migrate do
         end
       end
 
-
       context 'when migration an object with descriptive and structural metadata from Marmite' do
         let(:bibnumber) { '9923478503503681' }
         let(:structural_xml) do
@@ -509,7 +508,6 @@ RSpec.describe Bulwark::Migrate do
         let(:expected_preservation) { fixture_to_xml('example_objects', 'object_two', 'preservation.xml') }
         let(:expected_descriptive) { fixture_to_str('example_objects', 'object_two', 'descriptive_metadata.csv') }
         let(:expected_structural) { fixture_to_str('example_objects', 'object_two', 'structural_metadata.csv') }
-
 
         let(:migration_result) do
           described_class.new(
