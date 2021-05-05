@@ -94,128 +94,169 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
     end
   end
 
-  describe '#csv'
+  describe '#csv' do
+    context 'when generating csv with bibnumber' do
+      let(:generator) { described_class.new(bibnumber: '1234567890') }
+
+      it 'calls from_bibnumber' do
+        expect(generator).to have_received(:from_bibnumber).with('1234567890')
+        generator.csv
+      end
+    end
+
+    context 'when generating csv with file' do
+      let(:generator) { described_class.new(drive: 'test', path: 'to/file.csv') }
+
+      it 'calls from_file' do
+        expect(generator).to have_received(:from_file).with(File.join(Bulwark::Import::MountedDrives.path_to('test'), 'to/file.csv'))
+        generator.csv
+      end
+    end
+
+    context 'when generating csv with filenames' do
+      let(:generator) { described_class.new(filenames: 'something') }
+
+      it 'calls from_ordered_filenames' do
+        expect(generator).to have_received(:from_ordered_filenames).with('something', nil, nil)
+        generator.csv
+      end
+    end
+  end
 
   describe '#from_bibnumber' do
     let(:bibnumber) { '9960927563503681' }
     let(:generator) { described_class.new }
 
-    before do
-      # Mock structural metadata request to Marmite
-      stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=structural").to_return(status: 302)
-      stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=structural")
-        .to_return(status: 200, body: fixture_to_str('marmite', 'structural', "with_table_of_contents.xml"), headers: {})
-
-      # Mock descriptive metadata request to Marmite
-      stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=marc21").to_return(status: 302)
-      stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=marc21")
-        .to_return(status: 200, body: descriptive_metadata, headers: {})
-    end
-
-    context 'when descriptive metadata does not contain reading direction' do
-      let(:descriptive_metadata) do
-        <<~METADATA
-          <marc:records xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
-            <marc:record></marc:record>
-          </marc:records>
-        METADATA
+    context 'when invalid bibnumber' do
+      before do
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=marc21").to_return(status: 404)
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=marc21")
+          .to_return(status: 404, body: "Record #{bibnumber} in marc21 format not found", headers: {})
       end
 
-      let(:expected_data) do
-        <<~CSV
-          display,filename,label,sequence,table_of_contents[1],table_of_contents[2],viewing_direction
-          paged,ljs501_wk1_front0001.tif,Front cover,1,,,left-to-right
-          paged,ljs501_wk1_front0002.tif,Inside front cover,2,"Seller's description, Inside front cover",,left-to-right
-          paged,ljs501_wk1_front0003.tif,[Flyleaf 1 recto],3,"Seller's note, Flyleaf 1 recto",,left-to-right
-          paged,ljs501_wk1_front0004.tif,[Flyleaf 1 verso],4,,,left-to-right
-          paged,ljs501_wk1_body0001.tif,1r,5,"Historiated initial, Initial I, Woman and monk holding armillary sphere, f. 1r","Puzzle initial, Initial C, f. 1r",left-to-right
-          paged,ljs501_wk1_body0002.tif,1v,6,"Decorated initial, Initial C, f. 1v",,left-to-right
-          paged,ljs501_wk1_body0003.tif,2r,7,,,left-to-right
-          paged,ljs501_wk1_body0004.tif,2v,8,,,left-to-right
-          paged,ljs501_wk1_back0001.tif,[Flyleaf 1 recto],9,,,left-to-right
-          paged,ljs501_wk1_back0002.tif,[Flyleaf 1 verso],10,,,left-to-right
-          paged,ljs501_wk1_back0003.tif,Inside back cover,11,,,left-to-right
-          paged,ljs501_wk1_back0004.tif,Back cover,12,,,left-to-right
-          paged,ljs501_wk1_back0005.tif,Spine,13,,,left-to-right
-        CSV
-      end
-
-      it 'generates expected csv data' do
-        expect(generator.send(:from_bibnumber, bibnumber)).to eql expected_data
+      it 'raises error' do
+        expect { generator.send(:from_bibnumber, bibnumber) }.to raise_error MarmiteClient::Error
       end
     end
 
-    context 'when descriptive metadata contains a reading direction in the 996 field' do
-      let(:descriptive_metadata) do
-        <<~METADATA
-          <marc:records xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
-            <marc:record>
-              <marc:datafield ind1=" " ind2=" " tag="996">
-                <marc:subfield code="a">hinge-right</marc:subfield>
-              </marc:datafield>
-            </marc:record>
-          </marc:records>
-        METADATA
+    context 'when valid bibnumber' do
+      before do
+        # Mock structural metadata request to Marmite
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=structural").to_return(status: 302)
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=structural")
+          .to_return(status: 200, body: fixture_to_str('marmite', 'structural', "with_table_of_contents.xml"), headers: {})
+
+        # Mock descriptive metadata request to Marmite
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=marc21").to_return(status: 302)
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=marc21")
+          .to_return(status: 200, body: descriptive_metadata, headers: {})
       end
 
-      let(:expected_data) do
-        <<~CSV
-          display,filename,label,sequence,table_of_contents[1],table_of_contents[2],viewing_direction
-          paged,ljs501_wk1_front0001.tif,Front cover,1,,,right-to-left
-          paged,ljs501_wk1_front0002.tif,Inside front cover,2,"Seller's description, Inside front cover",,right-to-left
-          paged,ljs501_wk1_front0003.tif,[Flyleaf 1 recto],3,"Seller's note, Flyleaf 1 recto",,right-to-left
-          paged,ljs501_wk1_front0004.tif,[Flyleaf 1 verso],4,,,right-to-left
-          paged,ljs501_wk1_body0001.tif,1r,5,"Historiated initial, Initial I, Woman and monk holding armillary sphere, f. 1r","Puzzle initial, Initial C, f. 1r",right-to-left
-          paged,ljs501_wk1_body0002.tif,1v,6,"Decorated initial, Initial C, f. 1v",,right-to-left
-          paged,ljs501_wk1_body0003.tif,2r,7,,,right-to-left
-          paged,ljs501_wk1_body0004.tif,2v,8,,,right-to-left
-          paged,ljs501_wk1_back0001.tif,[Flyleaf 1 recto],9,,,right-to-left
-          paged,ljs501_wk1_back0002.tif,[Flyleaf 1 verso],10,,,right-to-left
-          paged,ljs501_wk1_back0003.tif,Inside back cover,11,,,right-to-left
-          paged,ljs501_wk1_back0004.tif,Back cover,12,,,right-to-left
-          paged,ljs501_wk1_back0005.tif,Spine,13,,,right-to-left
-        CSV
+      context 'when descriptive metadata does not contain reading direction' do
+        let(:descriptive_metadata) do
+          <<~METADATA
+            <marc:records xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+              <marc:record></marc:record>
+            </marc:records>
+          METADATA
+        end
+
+        let(:expected_data) do
+          <<~CSV
+            display,filename,label,sequence,table_of_contents[1],table_of_contents[2],viewing_direction
+            paged,ljs501_wk1_front0001.tif,Front cover,1,,,left-to-right
+            paged,ljs501_wk1_front0002.tif,Inside front cover,2,"Seller's description, Inside front cover",,left-to-right
+            paged,ljs501_wk1_front0003.tif,[Flyleaf 1 recto],3,"Seller's note, Flyleaf 1 recto",,left-to-right
+            paged,ljs501_wk1_front0004.tif,[Flyleaf 1 verso],4,,,left-to-right
+            paged,ljs501_wk1_body0001.tif,1r,5,"Historiated initial, Initial I, Woman and monk holding armillary sphere, f. 1r","Puzzle initial, Initial C, f. 1r",left-to-right
+            paged,ljs501_wk1_body0002.tif,1v,6,"Decorated initial, Initial C, f. 1v",,left-to-right
+            paged,ljs501_wk1_body0003.tif,2r,7,,,left-to-right
+            paged,ljs501_wk1_body0004.tif,2v,8,,,left-to-right
+            paged,ljs501_wk1_back0001.tif,[Flyleaf 1 recto],9,,,left-to-right
+            paged,ljs501_wk1_back0002.tif,[Flyleaf 1 verso],10,,,left-to-right
+            paged,ljs501_wk1_back0003.tif,Inside back cover,11,,,left-to-right
+            paged,ljs501_wk1_back0004.tif,Back cover,12,,,left-to-right
+            paged,ljs501_wk1_back0005.tif,Spine,13,,,left-to-right
+          CSV
+        end
+
+        it 'generates expected csv data' do
+          expect(generator.send(:from_bibnumber, bibnumber)).to eql expected_data
+        end
       end
 
-      it 'generates expected csv data' do
-        expect(generator.send(:from_bibnumber, bibnumber)).to eql expected_data
-      end
-    end
+      context 'when descriptive metadata contains a reading direction in the 996 field' do
+        let(:descriptive_metadata) do
+          <<~METADATA
+            <marc:records xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+              <marc:record>
+                <marc:datafield ind1=" " ind2=" " tag="996">
+                  <marc:subfield code="a">hinge-right</marc:subfield>
+                </marc:datafield>
+              </marc:record>
+            </marc:records>
+          METADATA
+        end
 
-    context 'when descriptive metadata contains "unbound" in the 996 field' do
-      let(:descriptive_metadata) do
-        <<~METADATA
-          <marc:records xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
-            <marc:record>
-              <marc:datafield ind1=" " ind2=" " tag="996">
-                <marc:subfield code="a">unbound</marc:subfield>
-              </marc:datafield>
-            </marc:record>
-          </marc:records>
-        METADATA
+        let(:expected_data) do
+          <<~CSV
+            display,filename,label,sequence,table_of_contents[1],table_of_contents[2],viewing_direction
+            paged,ljs501_wk1_front0001.tif,Front cover,1,,,right-to-left
+            paged,ljs501_wk1_front0002.tif,Inside front cover,2,"Seller's description, Inside front cover",,right-to-left
+            paged,ljs501_wk1_front0003.tif,[Flyleaf 1 recto],3,"Seller's note, Flyleaf 1 recto",,right-to-left
+            paged,ljs501_wk1_front0004.tif,[Flyleaf 1 verso],4,,,right-to-left
+            paged,ljs501_wk1_body0001.tif,1r,5,"Historiated initial, Initial I, Woman and monk holding armillary sphere, f. 1r","Puzzle initial, Initial C, f. 1r",right-to-left
+            paged,ljs501_wk1_body0002.tif,1v,6,"Decorated initial, Initial C, f. 1v",,right-to-left
+            paged,ljs501_wk1_body0003.tif,2r,7,,,right-to-left
+            paged,ljs501_wk1_body0004.tif,2v,8,,,right-to-left
+            paged,ljs501_wk1_back0001.tif,[Flyleaf 1 recto],9,,,right-to-left
+            paged,ljs501_wk1_back0002.tif,[Flyleaf 1 verso],10,,,right-to-left
+            paged,ljs501_wk1_back0003.tif,Inside back cover,11,,,right-to-left
+            paged,ljs501_wk1_back0004.tif,Back cover,12,,,right-to-left
+            paged,ljs501_wk1_back0005.tif,Spine,13,,,right-to-left
+          CSV
+        end
+
+        it 'generates expected csv data' do
+          expect(generator.send(:from_bibnumber, bibnumber)).to eql expected_data
+        end
       end
 
-      let(:expected_data) do
-        <<~CSV
-          display,filename,label,sequence,table_of_contents[1],table_of_contents[2],viewing_direction
-          individuals,ljs501_wk1_front0001.tif,Front cover,1,,,left-to-right
-          individuals,ljs501_wk1_front0002.tif,Inside front cover,2,"Seller's description, Inside front cover",,left-to-right
-          individuals,ljs501_wk1_front0003.tif,[Flyleaf 1 recto],3,"Seller's note, Flyleaf 1 recto",,left-to-right
-          individuals,ljs501_wk1_front0004.tif,[Flyleaf 1 verso],4,,,left-to-right
-          individuals,ljs501_wk1_body0001.tif,1r,5,"Historiated initial, Initial I, Woman and monk holding armillary sphere, f. 1r","Puzzle initial, Initial C, f. 1r",left-to-right
-          individuals,ljs501_wk1_body0002.tif,1v,6,"Decorated initial, Initial C, f. 1v",,left-to-right
-          individuals,ljs501_wk1_body0003.tif,2r,7,,,left-to-right
-          individuals,ljs501_wk1_body0004.tif,2v,8,,,left-to-right
-          individuals,ljs501_wk1_back0001.tif,[Flyleaf 1 recto],9,,,left-to-right
-          individuals,ljs501_wk1_back0002.tif,[Flyleaf 1 verso],10,,,left-to-right
-          individuals,ljs501_wk1_back0003.tif,Inside back cover,11,,,left-to-right
-          individuals,ljs501_wk1_back0004.tif,Back cover,12,,,left-to-right
-          individuals,ljs501_wk1_back0005.tif,Spine,13,,,left-to-right
-        CSV
-      end
+      context 'when descriptive metadata contains "unbound" in the 996 field' do
+        let(:descriptive_metadata) do
+          <<~METADATA
+            <marc:records xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+              <marc:record>
+                <marc:datafield ind1=" " ind2=" " tag="996">
+                  <marc:subfield code="a">unbound</marc:subfield>
+                </marc:datafield>
+              </marc:record>
+            </marc:records>
+          METADATA
+        end
 
-      it 'generates expected csv data' do
-        expect(generator.send(:from_bibnumber, bibnumber)).to eql expected_data
+        let(:expected_data) do
+          <<~CSV
+            display,filename,label,sequence,table_of_contents[1],table_of_contents[2],viewing_direction
+            individuals,ljs501_wk1_front0001.tif,Front cover,1,,,left-to-right
+            individuals,ljs501_wk1_front0002.tif,Inside front cover,2,"Seller's description, Inside front cover",,left-to-right
+            individuals,ljs501_wk1_front0003.tif,[Flyleaf 1 recto],3,"Seller's note, Flyleaf 1 recto",,left-to-right
+            individuals,ljs501_wk1_front0004.tif,[Flyleaf 1 verso],4,,,left-to-right
+            individuals,ljs501_wk1_body0001.tif,1r,5,"Historiated initial, Initial I, Woman and monk holding armillary sphere, f. 1r","Puzzle initial, Initial C, f. 1r",left-to-right
+            individuals,ljs501_wk1_body0002.tif,1v,6,"Decorated initial, Initial C, f. 1v",,left-to-right
+            individuals,ljs501_wk1_body0003.tif,2r,7,,,left-to-right
+            individuals,ljs501_wk1_body0004.tif,2v,8,,,left-to-right
+            individuals,ljs501_wk1_back0001.tif,[Flyleaf 1 recto],9,,,left-to-right
+            individuals,ljs501_wk1_back0002.tif,[Flyleaf 1 verso],10,,,left-to-right
+            individuals,ljs501_wk1_back0003.tif,Inside back cover,11,,,left-to-right
+            individuals,ljs501_wk1_back0004.tif,Back cover,12,,,left-to-right
+            individuals,ljs501_wk1_back0005.tif,Spine,13,,,left-to-right
+          CSV
+        end
+
+        it 'generates expected csv data' do
+          expect(generator.send(:from_bibnumber, bibnumber)).to eql expected_data
+        end
       end
     end
   end

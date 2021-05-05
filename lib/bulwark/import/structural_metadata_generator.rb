@@ -5,6 +5,8 @@ module Bulwark
       attr_reader :filenames, :bibnumber, :drive, :path, :viewing_direction, :display, :errors
 
       def initialize(options = {})
+        options = options.deep_symbolize_keys
+
         @filenames         = options[:filenames]
         @bibnumber         = options[:bibnumber]
         @drive             = options[:drive]
@@ -23,8 +25,8 @@ module Bulwark
         @errors << 'structural display cannot be provided without filenames' if display && !filenames
         @errors << 'structural drive invalid' if drive && !MountedDrives.valid?(drive)
         @errors << 'structural metadata cannot be provided multiple ways' unless [filenames, (drive || path), bibnumber].one?
-        @errors << 'structural viewing direction is not valid' unless MetadataSource::VIEWING_DIRECTIONS.include?(viewing_direction)
-        @errors << 'structural display is not valid' unless MetadataSource::VIEWING_HINTS.include?(display)
+        @errors << 'structural viewing direction is not valid' if viewing_direction && !MetadataSource::VIEWING_DIRECTIONS.include?(viewing_direction)
+        @errors << 'structural display is not valid' if display && !MetadataSource::VIEWING_HINTS.include?(display)
 
         # @errors << "structural path invalid" if drive && path && !MountedDrives.valid_path?(drive, path)
 
