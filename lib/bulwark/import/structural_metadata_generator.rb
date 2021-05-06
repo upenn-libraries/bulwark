@@ -57,7 +57,7 @@ module Bulwark
 
         # Generating structural metadata csv from ordered filenames.
         #
-        # @param Array<String> filenames in order
+        # @param [Array<String>] filenames in order
         def from_ordered_filenames(filenames, display = nil, viewing_direction = nil)
           CSV.generate do |csv|
             headers = ['filename', 'sequence']
@@ -73,7 +73,7 @@ module Bulwark
 
         # Reading in structural metadata csv from filesystem.
         #
-        # @param String path to metadata
+        # @param [String] path to metadata
         def from_file(filepath)
           raise 'structural metadata path must lead to a file.' unless File.file?(filepath)
           File.read(filepath)
