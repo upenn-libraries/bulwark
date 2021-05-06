@@ -56,30 +56,6 @@ RSpec.describe Bulwark::Migrate do
       end
     end
 
-    context 'when Repo\'s ingested flag is false' do
-      include_context 'stub successful EZID requests'
-
-      subject(:migration) { described_class.new(action: 'migrate', unique_identifier: repo.unique_identifier) }
-      let(:repo) { FactoryBot.create(:repo) }
-
-      it 'adds error' do
-        expect(migration.validate).to be false
-        expect(migration.errors).to include 'Repo has not been ingested'
-      end
-    end
-
-    context 'when Repo does not have a valid solr record' do
-      include_context 'stub successful EZID requests'
-
-      subject(:migration) { described_class.new(action: 'migrate', unique_identifier: repo.unique_identifier) }
-      let(:repo) { FactoryBot.create(:repo) }
-
-      it 'adds error' do
-        expect(migration.validate).to be false
-        expect(migration.errors).to include 'Solr document for this object is not present'
-      end
-    end
-
     context 'when Repo has more than two metadata sources' do
       include_context 'stub successful EZID requests'
 

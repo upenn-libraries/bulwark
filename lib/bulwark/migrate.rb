@@ -50,13 +50,7 @@ module Bulwark
       # Check that repo can be retrieved.
       if unique_identifier.present?
         if repo
-          # Check that items have been "ingested"
-          @errors << "Repo has not been ingested" unless repo.ingested
-
-          # Check for solr record
-          @errors << "Solr document for this object is not present" unless solr_document_present?
-
-          # Check that there are only two metadata sources, one kaplan and one structural_kaplan (eventually extend this)
+          # Check that there are at maximum two metadata sources, one kaplan and one structural_kaplan (eventually extend this)
           metadata_sources = repo.metadata_builder.metadata_source.map(&:source_type)
           @errors << "Repo has more than two metadata sources" if metadata_sources.count > 2
 
@@ -174,10 +168,6 @@ module Bulwark
 
       def repo
         @repo ||= Repo.find_by(unique_identifier: unique_identifier, new_format: false)
-      end
-
-      def solr_document_present?
-        Blacklight.default_index.search(q: "id:#{repo.names.fedora}", fl: 'id').docs.count == 1
       end
 
       def valid_file_extensions
