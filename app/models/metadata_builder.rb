@@ -95,7 +95,9 @@ class MetadataBuilder < ActiveRecord::Base
           xml.pages {
             structural_metadata['sequence'].map do |asset|
               xml.page {
-                asset.map { |field, value| xml.send(field, value) }
+                asset.map do |field, value|
+                  Array.wrap(value).each { |v| xml.send(field + '_', v) }
+                end
               }
             end
           }

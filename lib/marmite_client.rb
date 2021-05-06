@@ -34,8 +34,19 @@ module MarmiteClient
     response.body
   end
 
-  # TODO: Structural metadata will also be fetched from Marmite.
-  # def structural(bibnumber); end
+  # Fetches structural metadata from Marmite.
+  #
+  # @param [String] bibnumber
+  # @return [String] XML containing structural metadata
+  def self.structural(bibnumber)
+    Faraday.get(url("records/#{bibnumber}/create?format=structural")) # Create structural record.
+
+    response = Faraday.get(url("records/#{bibnumber}/show?format=structural"))
+
+    raise Error, "Could not retrieve Structural for #{bibnumber}. Error: #{response.body}" unless response.success?
+
+    response.body
+  end
 
   def self.config
     config = Rails.application.config_for(:bulwark)['marmite']

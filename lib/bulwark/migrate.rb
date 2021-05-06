@@ -19,12 +19,12 @@ module Bulwark
     def initialize(args)
       args = args.deep_symbolize_keys
 
-      @action = args[:action]&.downcase
-      @unique_identifier = args[:unique_identifier]
-      @migrated_by = args[:migrated_by]
+      @action               = args[:action]&.downcase
+      @unique_identifier    = args[:unique_identifier]
+      @migrated_by          = args[:migrated_by]
       @descriptive_metadata = args.fetch(:metadata, {})
-      @structural_metadata = args.fetch(:structural, {})
-      @errors = []
+      @structural_metadata  = args[:structural].blank? ? nil : Import::StructuralMetadataGenerator.new(args[:structural])
+      @errors               = []
     end
 
     # Validates that digital object can be migrated. These checks are meant to be
@@ -42,7 +42,6 @@ module Bulwark
 
       # Check that structural and descriptive metadata is present
       @errors << "Missing structural metadata" if structural_metadata.blank?
-      @errors << "structural.bibnumber not a valid field" if !structural_metadata.blank? && structural_metadata.key?(:bibnumber)
       @errors << "Missing metadata" if descriptive_metadata.blank?
 
       # Check that unique_identifier is present.
@@ -72,12 +71,19 @@ module Bulwark
         end
       end
 
+      @errors.concat(structural_metadata.errors) if structural_metadata && !structural_metadata.valid?
+
       errors.empty?
     end
 
     # Processing migration of objects from old format to new format.
     def process
       validate # Validate before processing data.
+
+      ## Manually validate path and drive for structural.
+      if structural_metadata
+        @errors << "structural path invalid" if structural_metadata.drive && structural_metadata.path && !MountedDrives.valid_path?(structural_metadata.drive, structural_metadata.path)
+      end
 
       return Bulwark::Import::Result.new(status: DigitalObjectImport::FAILED, errors: errors) unless @errors.empty?
 
@@ -130,7 +136,7 @@ module Bulwark
       repo.merge_descriptive_metadata(descriptive_metadata.deep_stringify_keys)
 
       # Add metadata source for structural
-      new_structural = Bulwark::Import::Utilities.structural_metadata_csv(structural_metadata)
+      new_structural = structural_metadata.csv
       repo.add_structural_metadata(new_structural)
 
       # Validate structural metadata

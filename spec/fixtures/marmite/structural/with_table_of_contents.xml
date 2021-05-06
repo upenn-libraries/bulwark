@@ -1,0 +1,27 @@
+<record>
+  <bib_id>9960927563503681</bib_id>
+  <pages>
+    <page number="1" id="9960927563503681_1515253" seq="1" side="recto" image.id="ljs501_wk1_front0001" image="ljs501_wk1_front0001" visiblepage="Front cover"/>
+    <page number="2" id="9960927563503681_1515254" seq="2" side="verso" image.id="ljs501_wk1_front0002" image="ljs501_wk1_front0002" visiblepage="Inside front cover">
+      <tocentry name="ill">Seller's description, Inside front cover</tocentry>
+    </page>
+    <page number="3" id="9960927563503681_1515255" seq="3" side="recto" image.id="ljs501_wk1_front0003" image="ljs501_wk1_front0003" visiblepage="[Flyleaf 1 recto]">
+      <tocentry name="ill">Seller's note, Flyleaf 1 recto</tocentry>
+    </page>
+    <page number="4" id="9960927563503681_1515256" seq="4" side="verso" image.id="ljs501_wk1_front0004" image="ljs501_wk1_front0004" visiblepage="[Flyleaf 1 verso]"/>
+    <page number="5" id="9960927563503681_1515257" seq="5" side="recto" image.id="ljs501_wk1_body0001" image="ljs501_wk1_body0001" visiblepage="1r">
+      <tocentry name="ill">Historiated initial, Initial I, Woman and monk holding armillary sphere, f. 1r</tocentry>
+      <tocentry name="ill">Puzzle initial, Initial C, f. 1r</tocentry>
+    </page>
+    <page number="6" id="9960927563503681_1515258" seq="6" side="verso" image.id="ljs501_wk1_body0002" image="ljs501_wk1_body0002" visiblepage="1v">
+      <tocentry name="ill">Decorated initial, Initial C, f. 1v</tocentry>
+    </page>
+    <page number="7" id="9960927563503681_1515259" seq="7" side="recto" image.id="ljs501_wk1_body0003" image="ljs501_wk1_body0003" visiblepage="2r"/>
+    <page number="8" id="9960927563503681_1515260" seq="8" side="verso" image.id="ljs501_wk1_body0004" image="ljs501_wk1_body0004" visiblepage="2v"/>
+    <page number="9" id="9960927563503681_1515261" seq="9" side="recto" image.id="ljs501_wk1_back0001" image="ljs501_wk1_back0001" visiblepage="[Flyleaf 1 recto]"/>
+    <page number="10" id="9960927563503681_1515262" seq="10" side="verso" image.id="ljs501_wk1_back0002" image="ljs501_wk1_back0002" visiblepage="[Flyleaf 1 verso]"/>
+    <page number="11" id="9960927563503681_1515263" seq="11" side="recto" image.id="ljs501_wk1_back0003" image="ljs501_wk1_back0003" visiblepage="Inside back cover"/>
+    <page number="12" id="9960927563503681_1515264" seq="12" side="verso" image.id="ljs501_wk1_back0004" image="ljs501_wk1_back0004" visiblepage="Back cover"/>
+    <page number="13" id="9960927563503681_1515265" seq="13" side="recto" image.id="ljs501_wk1_back0005" image="ljs501_wk1_back0005" visiblepage="Spine"/>
+  </pages>
+</record>

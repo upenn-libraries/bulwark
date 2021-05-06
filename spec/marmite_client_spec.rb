@@ -63,6 +63,37 @@ RSpec.describe MarmiteClient do
     end
   end
 
+  describe '#structural' do
+    let(:bibnumber) { '9960927563503681' }
+
+    context 'when request is successful' do
+      let(:xml) { fixture_to_str('marmite', 'structural', "with_table_of_contents.xml") }
+      before do
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=structural").to_return(status: 302)
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=structural")
+          .to_return(status: 200, body: xml, headers: {})
+      end
+
+      it 'returns expected XML' do
+        expect(described_class.structural(bibnumber)).to eql xml
+      end
+    end
+
+    context 'when request is unsuccessful' do
+      before do
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=structural").to_return(status: 404)
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=structural")
+          .to_return(status: 404, body: "Record #{bibnumber} in structural format not found", headers: {})
+      end
+
+      it 'raises exception' do
+        expect {
+          described_class.structural(bibnumber)
+        }.to raise_error(MarmiteClient::Error, "Could not retrieve Structural for #{bibnumber}. Error: Record #{bibnumber} in structural format not found")
+      end
+    end
+  end
+
   describe '#config' do
     context 'when all configuration is present' do
       it 'returns configuration' do

@@ -9,7 +9,7 @@ module Bulwark
         all[drive]
       end
 
-      # Returns true if the given drive is configured
+      # Returns true if the given drive is configured.
       def self.valid?(drive)
         all.keys.include?(drive) && all[drive].present?
       end
@@ -20,7 +20,7 @@ module Bulwark
         valid?(drive) && File.exist?(File.join(path_to(drive), path))
       end
 
-      # Returns all configured drives
+      # Returns all configured drives.
       def self.all
         Rails.application.config_for(:bulwark)['mounted_drives']
       end
