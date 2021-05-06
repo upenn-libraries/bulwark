@@ -153,8 +153,8 @@ production:
          endpoint: <%= ENV['SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE'] %>
          metadata_suffix: ''
          assets_suffix: ''
-       oceanus-sceti:
-         endpoint: <%= ENV['OCEANUS_SCETI_HARVESTING_ENDPOINT_REMOTE'] %>
+       sceti:
+         endpoint: <%= ENV['SCETI_HARVESTING_ENDPOINT_REMOTE'] %>
          metadata_suffix: ''
          assets_suffix: ''
        mastersrbm:
