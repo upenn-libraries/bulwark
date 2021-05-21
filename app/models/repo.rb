@@ -446,7 +446,25 @@ class Repo < ActiveRecord::Base
 
   def create_iiif_manifest
     return if assets.where(mime_type: ['image/jpeg', 'image/tiff']).count.zero?
-    MarmiteClient.iiif_presentation(names.fedora)
+
+    sequence = structural_metadata.user_defined_mappings['sequence'].map do |info|
+      {
+        file: assets.find_by(filename: info['filename']).access_file_location,
+        label: info.fetch('label', nil),
+        table_of_contents: info.fetch('table_of_contents', []).map { |t| { text: t } }
+      }.delete_if { |_,v| v.blank? }
+    end
+
+    payload = {
+      id: names.fedora,
+      title: descriptive_metadata.user_defined_mappings['title'].join('; '),
+      viewing_direction: structural_metadata.viewing_direction,
+      viewing_hint: structural_metadata.viewing_hint,
+      image_server: Bulwark::Config.iiif[:image_server],
+      sequence: sequence
+    }.to_json
+
+    MarmiteClient.iiif_presentation(names.fedora, payload)
   end
 
   def thumbnail_link

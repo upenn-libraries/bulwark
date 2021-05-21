@@ -18,6 +18,31 @@ FactoryBot.define do
       end
     end
 
+    trait :with_structural_metadata do
+      with_assets
+
+      after(:create) do |repo|
+        structural_metadata = repo.assets.map.with_index do |asset, index|
+          {
+            'sequence' => index,
+            'viewing_direction' => MetadataSource::LEFT_TO_RIGHT,
+            'display' => MetadataSource::PAGED,
+            'label' => "Page #{index}",
+            'table_of_contents' => ["Image #{index}"],
+            'filename' => asset.filename
+          }
+        end
+
+        MetadataSource.create(
+          source_type: 'structural',
+          metadata_builder: repo.metadata_builder,
+          user_defined_mappings: {
+            'sequence' => structural_metadata
+          }
+        )
+      end
+    end
+
     trait :with_descriptive_metadata do
       after(:create) do |repo|
         MetadataSource.create(

@@ -42,4 +42,11 @@ module StructuralMetadataSources
     raise 'Conflicting viewing_directions. Viewing direction must be the same for all assets' if direction.length > 1
     direction.first || LEFT_TO_RIGHT
   end
+
+  def viewing_hint
+    return nil unless source_type == 'structural'
+    display = user_defined_mappings['sequence'].map { |asset| asset['display'] }.uniq
+    raise 'Conflicting viewing hint. Viewing hint must be the same for all assets' if display.length > 1
+    display.first || INDIVIDUALS
+  end
 end

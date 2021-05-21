@@ -388,4 +388,43 @@ RSpec.describe Repo, type: :model do
       end
     end
   end
+
+  describe '#create_iiif_manifest' do
+    context 'when images are present' do
+      before do
+        allow(Bulwark::Config).to receive(:iiif).and_return(image_server: 'https://images.library.upenn/iiif/2')
+      end
+
+      let(:repo) do
+        FactoryBot.create(:repo, :with_descriptive_metadata, :with_structural_metadata)
+      end
+
+      let(:expected_payload) do
+        {
+          id: repo.names.fedora,
+          title: "[Concert program 1941-12-20]",
+          viewing_direction: "left-to-right",
+          viewing_hint: "paged",
+          image_server: "https://images.library.upenn/iiif/2",
+          sequence: [
+            {
+              file: repo.assets.find_by(filename: repo.structural_metadata.user_defined_mappings['sequence'][0]['filename']).access_file_location,
+              label: 'Page 0',
+              table_of_contents: [{ text: 'Image 0' }]
+            },
+            {
+              file: repo.assets.find_by(filename: repo.structural_metadata.user_defined_mappings['sequence'][1]['filename']).access_file_location,
+              label: 'Page 1',
+              table_of_contents: [{ text: 'Image 1' }]
+            }
+          ]
+        }.to_json
+      end
+
+      it 'makes expected call to MarmiteClient' do
+        expect(MarmiteClient).to receive(:iiif_presentation).with(repo.names.fedora, expected_payload)
+        repo.create_iiif_manifest
+      end
+    end
+  end
 end
