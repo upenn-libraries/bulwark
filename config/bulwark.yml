@@ -5,6 +5,7 @@ asset_extensions: &valid_asset_extensions
   - 'jpeg'
   - 'jpg'
   - 'pdf'
+  - 'gz'
 
 development:
   mounted_drives:

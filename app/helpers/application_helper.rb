@@ -73,11 +73,12 @@ module ApplicationHelper
     return partials.html_safe
   end
 
-  def render_pdf
+  # Rendering files that don't have a specific viewer that should be used. These files just get a download link.
+  def render_other
     repo = Repo.find_by(unique_identifier: @document.id.reverse_fedorafy, new_format: true)
     return '' if repo.nil?
 
-    assets = repo.assets.where(mime_type: 'application/pdf')
+    assets = repo.assets.where(mime_type: ['application/pdf', 'application/gzip'])
     return '' if assets.blank?
 
     ordered_files = repo.structural_metadata.user_defined_mappings['sequence'].map { |i| i['filename'] }
