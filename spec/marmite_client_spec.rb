@@ -38,26 +38,24 @@ RSpec.describe MarmiteClient do
 
     context 'when request is successful' do
       before do
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{repo.names.fedora}/create?format=iiif_presentation").to_return(status: 302)
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{repo.names.fedora}/show?format=iiif_presentation")
-          .to_return(status: 200, body: "{}")
+        stub_request(:post, "https://marmite.library.upenn.edu:9292/api/v2/records/#{repo.names.fedora}/iiif_presentation")
+          .with(body: "{}").to_return(status: 201, body: "{}")
       end
 
       it 'returns response body' do
-        expect(described_class.iiif_presentation(repo.names.fedora)).to eql "{}"
+        expect(described_class.iiif_presentation(repo.names.fedora, "{}")).to eql "{}"
       end
     end
 
     context 'when request is unsuccessful' do
       before do
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{repo.names.fedora}/create?format=iiif_presentation").to_return(status: 500)
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{repo.names.fedora}/show?format=iiif_presentation")
-          .to_return(status: 404, body: "Record #{repo.names.fedora} in iiif_presentation format not found")
+        stub_request(:post, "https://marmite.library.upenn.edu:9292/api/v2/records/#{repo.names.fedora}/iiif_presentation")
+          .with(body: "{}").to_return(status: 404, body: "Record #{repo.names.fedora} in iiif_presentation format not found")
       end
 
       it 'raises exception' do
         expect {
-          described_class.iiif_presentation(repo.names.fedora)
+          described_class.iiif_presentation(repo.names.fedora, "{}")
         }.to raise_error(MarmiteClient::Error, "Could not create IIIF Presentation Manifest for #{repo.names.fedora}. Error: Record #{repo.names.fedora} in iiif_presentation format not found")
       end
     end

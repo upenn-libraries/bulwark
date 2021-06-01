@@ -45,5 +45,12 @@ module Bulwark
            .fetch('phalt', {})
            .with_indifferent_access
     end
+
+    def self.iiif
+      Rails.application
+           .config_for(:bulwark)
+           .fetch('iiif', {})
+           .with_indifferent_access
+    end
   end
 end

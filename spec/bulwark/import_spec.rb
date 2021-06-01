@@ -356,11 +356,9 @@ RSpec.describe Bulwark::Import do
         end
 
         it 'makes requests to generate iiif manifest' do
-          stub_create = stub_request(:get, /https\:\/\/marmite\.library\.upenn\.edu\:9292\/records\/.*\/create\?format=iiif_presentation/)
-          stub_show = stub_request(:get, /https\:\/\/marmite\.library\.upenn\.edu\:9292\/records\/.*\/show\?format=iiif_presentation/)
+          stub_create = stub_request(:post, /https\:\/\/marmite\.library\.upenn\.edu\:9292\/api\/v2\/records\/.*\/iiif_presentation/)
           result
           expect(stub_create).to have_been_requested
-          expect(stub_show).to have_been_requested
         end
       end
 

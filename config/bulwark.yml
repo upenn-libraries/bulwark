@@ -45,4 +45,6 @@ production:
     file_extensions: *valid_asset_extensions
   phalt:
     url: <%= ENV['PHALT_ENDPOINT'] %>
+  iiif:
+    image_server: <%= ENV['IIIF_IMAGE_SERVER'] %>
 

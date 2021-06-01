@@ -18,16 +18,15 @@ module MarmiteClient
     response.body
   end
 
+  # Generating IIIF Presentation Manifest.
+  #
   # @return [MarmiteClient::Error] if unable to create iiif manifest
   # @return [String] body of iiif manifest if successfully created
-  def self.iiif_presentation(formatted_ark)
-    # Create IIIF Presentation 2.0 Manifest
-    Faraday.get(url("records/#{formatted_ark}/create?format=iiif_presentation")) do |request|
-      # Increasing timeout of request, because the generation of a IIIF presentation manifest can take a while.
-      request.options.timeout = 720
+  def self.iiif_presentation(formatted_ark, payload)
+    # Create IIIF Presentation 2.0 manifest
+    response = Faraday.post(url("/api/v2/records/#{formatted_ark}/iiif_presentation"), payload) do |request|
+      request.options.timeout = 600 # Wait for up to 10 minutes for response to come back.
     end
-
-    response = Faraday.get(url("records/#{formatted_ark}/show?format=iiif_presentation"))
 
     raise Error, "Could not create IIIF Presentation Manifest for #{formatted_ark}. Error: #{response.body}" unless response.success?
 
