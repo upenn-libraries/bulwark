@@ -449,7 +449,7 @@ class Repo < ActiveRecord::Base
 
     sequence = structural_metadata.user_defined_mappings['sequence'].map do |info|
       {
-        file: assets.find_by(filename: info['filename']).access_file_location,
+        file: names.bucket + '/' + assets.find_by(filename: info['filename']).access_file_location,
         label: info.fetch('label', nil),
         table_of_contents: info.fetch('table_of_contents', []).map { |t| { text: t } }
       }.delete_if { |_,v| v.blank? }

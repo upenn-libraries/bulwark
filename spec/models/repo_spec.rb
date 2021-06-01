@@ -408,12 +408,12 @@ RSpec.describe Repo, type: :model do
           image_server: "https://images.library.upenn/iiif/2",
           sequence: [
             {
-              file: repo.assets.find_by(filename: repo.structural_metadata.user_defined_mappings['sequence'][0]['filename']).access_file_location,
+              file: repo.names.bucket + '/' + repo.assets.find_by(filename: repo.structural_metadata.user_defined_mappings['sequence'][0]['filename']).access_file_location,
               label: 'Page 0',
               table_of_contents: [{ text: 'Image 0' }]
             },
             {
-              file: repo.assets.find_by(filename: repo.structural_metadata.user_defined_mappings['sequence'][1]['filename']).access_file_location,
+              file: repo.names.bucket + '/' + repo.assets.find_by(filename: repo.structural_metadata.user_defined_mappings['sequence'][1]['filename']).access_file_location,
               label: 'Page 1',
               table_of_contents: [{ text: 'Image 1' }]
             }
