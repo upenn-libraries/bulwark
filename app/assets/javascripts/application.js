@@ -16,8 +16,6 @@
 //= require bxslider
 //= require_tree .
 //= require blacklight/blacklight
-//= require openseadragon
-//= require colenda
 //= require js.cookie
 //= require modernizr.custom
 //= require ableplayer

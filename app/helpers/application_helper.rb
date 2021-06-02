@@ -3,14 +3,6 @@ module ApplicationHelper
   include RailsAdmin::ApplicationHelper
   include DOTIW::Methods # makes distance_of_time helper available in views
 
-  # Doesn't seem to be used?
-  def render_image_list
-    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
-    return '' unless repo.present? && repo.images_to_render.present?
-    images_list = repo.images_to_render['iiif'].present? ? repo.images_to_render['iiif']['images'] : legacy_image_list(repo)
-    return content_tag(:div, '', id: 'pages', data: images_list.to_json ) + render_openseadragon(repo)
-  end
-
   def render_featured_list
     items = ''
     Dir.glob("#{Rails.root}/public/assets/featured/manifests/*.yml").each do |manifest|
