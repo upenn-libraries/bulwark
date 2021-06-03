@@ -56,6 +56,10 @@ module Bulwark
           end
         end
 
+        # Adding item_type = `Manuscript` when conditions are met
+        mapped_values['item_type'] = ['Manuscript'] if manuscript?(data)
+
+        # Adding bibnumber and call number
         bibnumber = data.at_xpath('//records/record/controlfield[@tag=001]').text
         mapped_values['identifier'] ||= ["#{Utils.config[:repository_prefix]}_#{bibnumber}"]
         mapped_values['call_number'] = data.xpath('//records/record/holdings/holding/call_number')
@@ -73,6 +77,21 @@ module Bulwark
         mapped_values
       rescue => e
         raise StandardError, "Error mapping MARC XML to PQC: #{e.class} #{e.message}", e.backtrace
+      end
+
+      # Returns true if the MARC data describes the item as a Manuscript
+      def self.manuscript?(data)
+        manuscript = false
+
+        # Checking for values in field 040 subfield e
+        subfield_e = data.xpath("//records/record/datafield[@tag=040]/subfield[@code='e']").map(&:text)
+        manuscript = true if subfield_e.any? { |s| ["appm", "appm2", "amremm", "dacs", "dcrmmss"].include? s.downcase }
+
+        # Checking for value in all subfield of field 040
+        all_subfields = data.xpath("//records/record/datafield[@tag=040]/subfield").map(&:text)
+        manuscript = true if all_subfields.any? { |s| s.casecmp('paulm').zero? }
+
+        manuscript
       end
 
       def self.pqc_field(marc_field, code = '*')

@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<marc:records xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+  <marc:record>
+    <marc:leader>02615ctm a2200457Ia 4500</marc:leader>
+    <marc:controlfield tag="001">9961263533503681</marc:controlfield>
+    <marc:controlfield tag="005">20171208142802.0</marc:controlfield>
+    <marc:controlfield tag="008">140318q14751499pau           000 0 lat d</marc:controlfield>
+    <marc:datafield ind1=" " ind2=" " tag="035">
+      <marc:subfield code="a">(OCoLC)ocn873818335</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="035">
+      <marc:subfield code="a">(OCoLC)873818335</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="035">
+      <marc:subfield code="a">(PU)6126353-penndb-Voyager</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="040">
+      <marc:subfield code="a">PAULM</marc:subfield>
+      <marc:subfield code="b">eng</marc:subfield>
+      <marc:subfield code="c">PAULM</marc:subfield>
+      <marc:subfield code="e">amremm</marc:subfield>
+      <marc:subfield code="d">PAULM</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="049">
+      <marc:subfield code="a">PAUM</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="079">
+      <marc:subfield code="a">ocn873818334</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="9" tag="099">
+      <marc:subfield code="a">Folio GrC St812 Ef512g</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="0" ind2=" " tag="100">
+      <marc:subfield code="a">Sigebert,</marc:subfield>
+      <marc:subfield code="c">of Gembloux,</marc:subfield>
+      <marc:subfield code="d">approximately 1030-1112.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="1" ind2="0" tag="245">
+      <marc:subfield code="a">[Partial copy of Chronicon]</marc:subfield>
+      <marc:subfield code="h">[manuscript].</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="3" ind2="8" tag="246">
+      <marc:subfield code="a">Initium Chronici Siceberti.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="260">
+      <marc:subfield code="a">[Belgium],</marc:subfield>
+      <marc:subfield code="c">[between 1475 and 1499?]</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="300">
+      <marc:subfield code="a">10 leaves :</marc:subfield>
+      <marc:subfield code="b">paper ;</marc:subfield>
+      <marc:subfield code="c">263 x 190 mm. bound to 218 x 155 mm.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Ms. gathering.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Title supplied by cataloger.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Collation:  Paper, 10; 1&#xB2; 2&#x2078; (f. 7-10 blank).</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Layout:  Written in 47-50 long lines; frame-ruled in lead.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Script:  Written in Gothic cursive script.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Decoration: 4-line initial (f. 2r) and 3-line initial (f. 1r) in red; paragraph marks in red followed by initials slashed with red on first page (f. 1r).</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Binding:  Bound with Strabo's Geographia (Paris:  Gourmont, 1512) in 18th-century calf including gilt spine title Initium Chronic[i] Sicebert[i] MS.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Origin:  Probably written in Belgium, possibly in Gembloux (inscription on title page of printed work, Bibliotheca Gemblacensis), in the late 15th century (Zacour-Hirsch).</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="4" ind2=" " tag="510">
+      <marc:subfield code="a">Described in Zacour, Norman P. and Hirsch, Rudolf. Catalogue of Manuscripts in the Libraries of the University of Pennsylvania to 1800 (Philadelphia: University of Pennsylvania Press, 1965), Supplement A (1) Library Chronicle 35 (1969),</marc:subfield>
+      <marc:subfield code="c">p. 5 (Ms. Latin 203).</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="520">
+      <marc:subfield code="a">Beginning of Sigebert of Gembloux's continuation of the chronicle of Jerome, in which he traces the reigns of kings of various kingdoms.  The last reference is to Pope Zosimus (417 CE; f. 6v).</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="546">
+      <marc:subfield code="a">Latin.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="1" ind2=" " tag="561">
+      <marc:subfield code="a">Sold by Bernard M. Rosenthal (New York), 1964.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="0" tag="650">
+      <marc:subfield code="a">World history</marc:subfield>
+      <marc:subfield code="v">Early works to 1800.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="7" tag="655">
+      <marc:subfield code="a">Chronicles.</marc:subfield>
+      <marc:subfield code="2">aat</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="0" tag="655">
+      <marc:subfield code="a">Manuscripts, Latin</marc:subfield>
+      <marc:subfield code="y">15th century.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="0" tag="655">
+      <marc:subfield code="a">Manuscripts, Renaissance.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="0" ind2=" " tag="700">
+      <marc:subfield code="a">Sigebert,</marc:subfield>
+      <marc:subfield code="c">of Gembloux,</marc:subfield>
+      <marc:subfield code="d">approximately 1030-1112.</marc:subfield>
+      <marc:subfield code="t">Chronicon.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="852">
+      <marc:subfield code="a">Rare Book &amp; Manuscript Library</marc:subfield>
+      <marc:subfield code="b">University of Pennsylvania</marc:subfield>
+      <marc:subfield code="e">3420 Walnut Street, Philadelphia, Pennsylvania 19104-6206.</marc:subfield>
+      <marc:subfield code="j">Folio GrC St812 Ef512g</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="4" ind2="1" tag="856">
+      <marc:subfield code="z">Facsimile</marc:subfield>
+      <marc:subfield code="u">http://hdl.library.upenn.edu/1017/d/medren/9961263533503681</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="994">
+      <marc:subfield code="a">C0</marc:subfield>
+      <marc:subfield code="b">PAULM</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="999">
+      <marc:subfield code="a">DLA</marc:subfield>
+      <marc:subfield code="b">20170524</marc:subfield>
+    </marc:datafield>
+    <marc:holdings>
+      <marc:holding>
+        <marc:holding_id>22289064530003681</marc:holding_id>
+        <marc:call_number>Folio GrC St812 Ef512g</marc:call_number>
+        <marc:library>KislakCntr</marc:library>
+        <marc:location>scmss</marc:location>
+      </marc:holding>
+    </marc:holdings>
+  </marc:record>
+</marc:records>
