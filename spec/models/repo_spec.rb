@@ -410,7 +410,7 @@ RSpec.describe Repo, type: :model do
           image_server: "https://images.library.upenn/iiif/2",
           sequence: [
             {
-              file: repo.names.bucket + '/' + first_asset.access_file_location,
+              file: repo.names.bucket + '%2F' + first_asset.access_file_location,
               label: 'Page 0',
               table_of_contents: [{ text: 'Image 0' }],
               additional_downloads: [
@@ -423,7 +423,7 @@ RSpec.describe Repo, type: :model do
               ]
             },
             {
-              file: repo.names.bucket + '/' + second_asset.access_file_location,
+              file: repo.names.bucket + '%2F' + second_asset.access_file_location,
               label: 'Page 1',
               table_of_contents: [{ text: 'Image 1' }],
               additional_downloads: [
