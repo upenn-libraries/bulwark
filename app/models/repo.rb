@@ -450,7 +450,7 @@ class Repo < ActiveRecord::Base
     sequence = structural_metadata.user_defined_mappings['sequence'].map do |info|
       asset = assets.find_by(filename: info['filename'])
       {
-        file: names.bucket + '/' + asset.access_file_location,
+        file: names.bucket + '%2F' + asset.access_file_location,
         label: info.fetch('label', nil),
         table_of_contents: info.fetch('table_of_contents', []).map { |t| { text: t } },
         additional_downloads: [
