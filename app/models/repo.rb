@@ -448,10 +448,19 @@ class Repo < ActiveRecord::Base
     return if assets.where(mime_type: ['image/jpeg', 'image/tiff']).count.zero?
 
     sequence = structural_metadata.user_defined_mappings['sequence'].map do |info|
+      asset = assets.find_by(filename: info['filename'])
       {
-        file: names.bucket + '/' + assets.find_by(filename: info['filename']).access_file_location,
+        file: names.bucket + '/' + asset.access_file_location,
         label: info.fetch('label', nil),
-        table_of_contents: info.fetch('table_of_contents', []).map { |t| { text: t } }
+        table_of_contents: info.fetch('table_of_contents', []).map { |t| { text: t } },
+        additional_downloads: [
+          {
+            link: asset.original_file_link,
+            label: "Original File",
+            size: asset.size,
+            format: asset.mime_type
+          }
+        ]
       }.delete_if { |_,v| v.blank? }
     end
 

@@ -400,6 +400,8 @@ RSpec.describe Repo, type: :model do
       end
 
       let(:expected_payload) do
+        first_asset = repo.assets.find_by(filename: repo.structural_metadata.user_defined_mappings['sequence'][0]['filename'])
+        second_asset = repo.assets.find_by(filename: repo.structural_metadata.user_defined_mappings['sequence'][1]['filename'])
         {
           id: repo.names.fedora,
           title: "[Concert program 1941-12-20]",
@@ -408,14 +410,30 @@ RSpec.describe Repo, type: :model do
           image_server: "https://images.library.upenn/iiif/2",
           sequence: [
             {
-              file: repo.names.bucket + '/' + repo.assets.find_by(filename: repo.structural_metadata.user_defined_mappings['sequence'][0]['filename']).access_file_location,
+              file: repo.names.bucket + '/' + first_asset.access_file_location,
               label: 'Page 0',
-              table_of_contents: [{ text: 'Image 0' }]
+              table_of_contents: [{ text: 'Image 0' }],
+              additional_downloads: [
+                {
+                  link: first_asset.original_file_link,
+                  label: "Original File",
+                  size: first_asset.size,
+                  format: 'image/tiff'
+                }
+              ]
             },
             {
-              file: repo.names.bucket + '/' + repo.assets.find_by(filename: repo.structural_metadata.user_defined_mappings['sequence'][1]['filename']).access_file_location,
+              file: repo.names.bucket + '/' + second_asset.access_file_location,
               label: 'Page 1',
-              table_of_contents: [{ text: 'Image 1' }]
+              table_of_contents: [{ text: 'Image 1' }],
+              additional_downloads: [
+                {
+                  link: second_asset.original_file_link,
+                  label: "Original File",
+                  size: second_asset.size,
+                  format: 'image/tiff'
+                }
+              ]
             }
           ]
         }.to_json

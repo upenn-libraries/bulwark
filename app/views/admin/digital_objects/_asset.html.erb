@@ -4,7 +4,7 @@
   </div>
   <% if asset.thumbnail_file_location %>
     <div class="col-sm-4">
-      <img src="<%= thumbnail_file_link(asset) %>"></img>
+      <img src="<%= asset.thumbnail_file_link %>"></img>
     </div>
   <% end %>
 
@@ -18,11 +18,11 @@
   <div class="col-sm-4">
     <a
       class="btn btn-link"
-      href="<%= original_file_link(asset) %>">
+      href="<%= asset.original_file_link %>">
       <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Original
     </a>
     <% if asset.access_file_location %>
-      <a class="btn btn-link" href="<%= access_file_link(asset) %>" target="_blank">
+      <a class="btn btn-link" href="<%= asset.access_file_link %>" target="_blank">
          <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Access Copy
       </a>
     <% end %>
