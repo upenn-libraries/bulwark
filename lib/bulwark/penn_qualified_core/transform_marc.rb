@@ -57,7 +57,7 @@ module Bulwark
         end
 
         # Adding item_type = `Manuscript` when conditions are met
-        mapped_values['item_type'] = ['Manuscript'] if manuscript?(data)
+        mapped_values['item_type'] = ['Manuscripts'] if manuscript?(data)
 
         # Adding bibnumber and call number
         bibnumber = data.at_xpath('//records/record/controlfield[@tag=001]').text
