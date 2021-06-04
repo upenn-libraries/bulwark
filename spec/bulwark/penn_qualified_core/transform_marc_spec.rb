@@ -45,7 +45,7 @@ RSpec.describe Bulwark::PennQualifiedCore::TransformMarc do
           "creator" => ["Sigebert,"],
           "format" => ["10 leaves : paper ; 263 x 190 mm. bound to 218 x 155 mm."],
           "identifier" => ["(OCoLC)ocn873818335", "(OCoLC)873818335", "(PU)6126353-penndb-Voyager"],
-          "item_type" => ["Manuscript"],
+          "item_type" => ["Manuscripts"],
           "language" => ["Latin."],
           "personal_name" => ["Sigebert,"],
           "provenance" => ["Sold by Bernard M. Rosenthal (New York), 1964."],
