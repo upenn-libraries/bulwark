@@ -44,7 +44,7 @@ module Cloneable
     # add, commit, push descriptive  metadata
     version_control_agent.add({ content: desc_metadata_file }, clone_location)
     version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.automated.added_metadata'), clone_location)
-    version_control_agent.push({}, clone_location)
+    version_control_agent.push({ content: desc_metadata_file }, clone_location)
 
     # Create or update metadata source for descriptive metadata
     source = metadata_builder.metadata_source.find_or_create_by(source_type: 'descriptive') do |descriptive_source|
@@ -68,7 +68,7 @@ module Cloneable
 
     version_control_agent.add({ content: struct_metadata_file }, clone_location)
     version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.automated.added_metadata'), clone_location)
-    version_control_agent.push({}, clone_location)
+    version_control_agent.push({ content: struct_metadata_file }, clone_location)
 
     # Create or update metadata source for structural metadata
     source = metadata_builder.metadata_source.find_or_create_by(source_type: 'structural') do |structural_source|
@@ -181,7 +181,7 @@ module Cloneable
 
     version_control_agent.add({ content: File.join(metadata_subdirectory, File.basename(jhove_output)) }, clone_location)
     version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_preservation_metadata', object_id: names.fedora), clone_location)
-    version_control_agent.push(clone_location)
+    version_control_agent.push({ content: File.join(metadata_subdirectory, File.basename(jhove_output)) }, clone_location)
   end
 
   # Create or update asset records.
