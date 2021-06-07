@@ -26,7 +26,7 @@ module StructuralMetadataSources
     metadata_path = File.join(working_path, path)
     csv = File.open(metadata_path).read
 
-    metadata = Bulwark::StructuredCSV.parse(csv)
+    metadata = Bulwark::StructuredCSV.parse(csv).map { |m| m.delete_if { |_, v| v.blank? } } # Removing blank values
     ordered_metadata = metadata.sort_by { |row| row['sequence'].to_i }
 
     self.original_mappings = { 'sequence' => ordered_metadata }

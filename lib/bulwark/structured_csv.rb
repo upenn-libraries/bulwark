@@ -27,8 +27,6 @@ module Bulwark
     end
 
     def self.parse_field(field, value, hash)
-      return if value.nil?
-
       if /\./.match(field)
         parent, child = field.split('.', 2)
         hash[parent] ||= {}
@@ -39,9 +37,9 @@ module Bulwark
           key = header[:key]
           index = header[:index].to_i - 1 # Array start at zero
           hash[key] ||= []
-          hash[key][index] = value
+          hash[key][index] = value unless value.nil?
         else
-          hash[field] = value
+          hash[field] = value unless value.nil?
         end
       end
     end

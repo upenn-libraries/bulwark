@@ -370,7 +370,8 @@ RSpec.describe Bulwark::Import do
               'J. Rosenblatt & Co.: Importers: Earthenware, China, Majolica, Novelties', '32 South Howard Street, Baltimore, MD', 'New and important facts.'
             ],
             'subject' => ['Jewish merchants', 'Trade cards (advertising)'],
-            'date' => ['1843']
+            'date' => ['1843'],
+            'rights' => [] # testing removing value
           }
         end
         let(:updated_structural_metadata) do
@@ -450,9 +451,10 @@ RSpec.describe Bulwark::Import do
 
         it 'updated descriptive metadata source' do
           metadata_source = updated_repo.descriptive_metadata
+          expected_descriptive = descriptive_metadata.merge(updated_descriptive_metadata).except('rights')
           expect(metadata_source.source_type).to eql 'descriptive'
-          expect(metadata_source.original_mappings).to eql descriptive_metadata.merge(updated_descriptive_metadata)
-          expect(metadata_source.user_defined_mappings).to eql descriptive_metadata.merge(updated_descriptive_metadata)
+          expect(metadata_source.original_mappings).to eql expected_descriptive
+          expect(metadata_source.user_defined_mappings).to eql expected_descriptive
           expect(metadata_source.remote_location).to eql "#{updated_repo.names.bucket}/#{updated_git.annex.lookupkey('data/metadata/descriptive_metadata.csv')}"
         end
 

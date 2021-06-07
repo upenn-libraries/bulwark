@@ -1,19 +1,20 @@
+# frozen_string_literal: true
 require 'rails_helper'
 
 RSpec.describe Bulwark::StructuredCSV do
   let(:csv_string_data) do
     <<~CSV
-      asset.drive,asset.path,unique_identifier,metadata.creator[1],metadata.creator[2],metadata.description[1],metadata.other data,metadata.date[1],metadata.date[2],structural.files.number
-      test,path/to/assets_1,ark:/9999/test,"person, random first","person, random second",very important item,this is a test item,2020-01-01,2020-01-02,3
-      test,path/to/assets_2,ark:/9999/test2,"person, random third","person, random forth",second most important item,this is a second test item,2020-02-01,,4
+      asset.drive,asset.path,unique_identifier,metadata.creator[1],metadata.creator[2],metadata.description[1],metadata.other data,metadata.date[1],metadata.date[2],metadata.subject[1],structural.files.number
+      test,path/to/assets_1,ark:/9999/test,"person, random first","person, random second",very important item,this is a test item,2020-01-01,2020-01-02,subject one,3
+      test,path/to/assets_2,ark:/9999/test2,"person, random third","person, random forth",second most important item,this is a second test item,2020-02-01,,,4
     CSV
   end
 
   let(:sorted_csv_string_data) do
     <<~CSV
-    asset.drive,asset.path,metadata.creator[1],metadata.creator[2],metadata.date[1],metadata.date[2],metadata.description[1],metadata.other data,structural.files.number,unique_identifier
-    test,path/to/assets_1,"person, random first","person, random second",2020-01-01,2020-01-02,very important item,this is a test item,3,ark:/9999/test
-    test,path/to/assets_2,"person, random third","person, random forth",2020-02-01,,second most important item,this is a second test item,4,ark:/9999/test2
+    asset.drive,asset.path,metadata.creator[1],metadata.creator[2],metadata.date[1],metadata.date[2],metadata.description[1],metadata.other data,metadata.subject[1],structural.files.number,unique_identifier
+    test,path/to/assets_1,"person, random first","person, random second",2020-01-01,2020-01-02,very important item,this is a test item,subject one,3,ark:/9999/test
+    test,path/to/assets_2,"person, random third","person, random forth",2020-02-01,,second most important item,this is a second test item,,4,ark:/9999/test2
     CSV
   end
 
@@ -28,6 +29,7 @@ RSpec.describe Bulwark::StructuredCSV do
         'metadata' => {
           'creator' => ['person, random first', 'person, random second'],
           'description' => ['very important item'],
+          'subject' => ['subject one'],
           'other data' => 'this is a test item',
           'date' => ['2020-01-01', '2020-01-02']
         },
@@ -44,6 +46,7 @@ RSpec.describe Bulwark::StructuredCSV do
         'metadata' => {
           'creator' => ['person, random third', 'person, random forth'],
           'description' => ['second most important item'],
+          'subject' => [],
           'other data' => 'this is a second test item',
           'date' => ['2020-02-01']
         },
