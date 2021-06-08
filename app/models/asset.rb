@@ -8,12 +8,18 @@ class Asset < ActiveRecord::Base
 
   # Helper methods that provide download links for the original file, access copy and thumbnail.
 
+  # Returns filename without extensions. If there are multiple extensions removes all of them.
+  def filename_basename
+    extension = filename.match(/(?<ext>(?:\.[^.]{1,4})+)$/)[:ext]
+    File.basename(filename, extension)
+  end
+
   def original_file_link(disposition: :attachment)
     Bulwark::Storage.url_for(
       repo.names.bucket,
       original_file_location,
       disposition: disposition,
-      filename: File.basename(filename, '.*')
+      filename: filename_basename
     )
   end
 
@@ -22,7 +28,7 @@ class Asset < ActiveRecord::Base
       repo.names.bucket,
       access_file_location,
       disposition: disposition,
-      filename: File.basename(filename, '.*')
+      filename: filename_basename
     )
   end
 

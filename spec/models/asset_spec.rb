@@ -7,7 +7,7 @@ RSpec.describe Asset, type: :model do
 
   let(:repo) { FactoryBot.create(:repo) }
 
-  describe '.valid?' do
+  describe '#valid?' do
     context 'when all required fields are present' do
       let(:asset) { FactoryBot.build(:asset, repo: repo) }
 
@@ -41,6 +41,32 @@ RSpec.describe Asset, type: :model do
       it 'returns error' do
         expect(asset.valid?).to be false
         expect(asset.errors.messages[:filename]).to include "can't be blank"
+      end
+    end
+  end
+
+  describe '#filename_basename' do
+    context 'when filename contains one extension' do
+      let(:asset) { FactoryBot.build(:asset, repo: repo, filename: 'item_1_body_0001.tif') }
+
+      it 'returns correct basename' do
+        expect(asset.filename_basename).to eql 'item_1_body_0001'
+      end
+    end
+
+    context 'when filename contains multiple extensions' do
+      let(:asset) { FactoryBot.build(:asset, repo: repo, filename: 'archive.warc.gz') }
+
+      it 'returns correct basename' do
+        expect(asset.filename_basename).to eql 'archive'
+      end
+    end
+
+    context 'when filename contains a period as part of the filename' do
+      let(:asset) { FactoryBot.build(:asset, repo: repo, filename: 'website.archive.warc.gz') }
+
+      it 'returns correct basename' do
+        expect(asset.filename_basename).to eql 'website.archive'
       end
     end
   end
