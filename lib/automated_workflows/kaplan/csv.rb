@@ -14,12 +14,12 @@ module AutomatedWorkflows
 
 
       def initialize
-        @owner = ENV['KAPLAN_OWNER'] || AutomatedWorkflows.config['kaplan']['csv']['owner']
-        @description = ENV['KAPLAN_DESCRIPTION'] || AutomatedWorkflows.config['kaplan']['csv']['description']
-        @initial_stop = ENV['KAPLAN_INITIAL_STOP'] || AutomatedWorkflows.config['kaplan']['csv']['initial_stop']
-        @endpoint = ENV['KAPLAN_HARVESTING_ENDPOINT_REMOTE'] || ''
-        @metadata_suffix = ENV['KAPLAN_METADATA_SUFFIX'] || AutomatedWorkflows.config['kaplan']['csv']['metadata_suffix']
-        @assets_suffix = ENV['KAPLAN_ASSETS_SUFFIX'] || AutomatedWorkflows.config['kaplan']['csv']['assets_suffix']
+        @owner = AutomatedWorkflows.config['kaplan']['csv']['owner']
+        @description = AutomatedWorkflows.config['kaplan']['csv']['description']
+        @initial_stop = AutomatedWorkflows.config['kaplan']['csv']['initial_stop']
+        @endpoint = ''
+        @metadata_suffix = AutomatedWorkflows.config['kaplan']['csv']['metadata_suffix']
+        @assets_suffix = AutomatedWorkflows.config['kaplan']['csv']['assets_suffix']
         @metadata_fetch_method = AutomatedWorkflows.config['kaplan']['csv']['endpoints']['metadata_fetch_method'] || ''
         @metadata_protocol = AutomatedWorkflows.config['kaplan']['csv']['endpoints']['metadata_protocol'] || ''
         @assets_fetch_method = AutomatedWorkflows.config['kaplan']['csv']['endpoints']['assets_fetch_method'] || ''

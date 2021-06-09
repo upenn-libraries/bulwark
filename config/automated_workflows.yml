@@ -1,38 +1,8 @@
 development:
-  openn:
-    csv:
-     owner: <%= ENV['OPENN_OWNER'] %>
-     description: <%= ENV['OPENN_DESCRIPTION'] || 'Generated from CSV through automated workflow' %>
-     initial_stop: <%= ENV['OPENN_INITIAL_STOP'] || 'create' %>
-     metadata_suffix: <%= ENV['OPENN_METADATA_SUFFIX'] || '' %>
-     assets_suffix: <%= ENV['OPENN_ASSETS_SUFFIX'] || 'data/' %>
-     endpoints:
-       metadata_fetch_method: rsync
-       metadata_protocol: smb
-       assets_fetch_method: rsync
-       assets_protocol: smb
-     metadata:
-       descriptive_filename: MM_Metadata.xlsx
-       structural_filename: MM_struct_metadata.xlsx
-  pap:
-      csv:
-       owner: <%= ENV['PAP_OWNER'] %>
-       description: <%= ENV['PAP_DESCRIPTION'] || 'Generated from CSV through automated workflow' %>
-       initial_stop: <%= ENV['PAP_INITIAL_STOP'] || 'create' %>
-       metadata_suffix: <%= ENV['PAP_METADATA_SUFFIX'] || '' %>
-       assets_suffix: <%= ENV['PAP_ASSETS_SUFFIX'] || 'data/' %>
-       endpoints:
-         metadata_fetch_method: rsync
-         metadata_protocol: smb
-         assets_fetch_method: rsync
-         assets_protocol: smb
-       metadata:
-         descriptive_filename: MM_Metadata.xlsx
-         structural_filename: MM_struct_metadata.xlsx
   kaplan:
     csv:
      owner: test@example.com
-     description: <%= ENV['KAPLAN_DESCRIPTION'] || 'Generated from CSV through automated workflow' %>
+     description: 'Generated from CSV through automated workflow'
      initial_stop: xml
      metadata_suffix: ''
      assets_suffix: 'data/'
@@ -79,43 +49,13 @@ test:
     steps_to_skip: ['fetch_metadata','fetch_assets','extract','file_check','xml']
 
 production:
-  openn:
-    csv:
-     owner: <%= ENV['OPENN_OWNER'] %>
-     description: <%= ENV['OPENN_DESCRIPTION'] || 'Generated from CSV through automated workflow' %>
-     initial_stop: <%= ENV['OPENN_INITIAL_STOP'] || 'create' %>
-     metadata_suffix: <%= ENV['OPENN_METADATA_SUFFIX'] || '' %>
-     assets_suffix: <%= ENV['OPENN_ASSETS_SUFFIX'] || 'data/' %>
-     endpoints:
-       metadata_fetch_method: rsync
-       metadata_protocol: smb
-       assets_fetch_method: rsync
-       assets_protocol: smb
-     metadata:
-       descriptive_filename: MM_Metadata.xlsx
-       structural_filename: MM_struct_metadata.xlsx
-  pap:
-    csv:
-     owner: <%= ENV['PAP_OWNER'] %>
-     description: <%= ENV['PAP_DESCRIPTION'] || 'Generated from CSV through automated workflow' %>
-     initial_stop: <%= ENV['PAP_INITIAL_STOP'] || 'create' %>
-     metadata_suffix: <%= ENV['PAP_METADATA_SUFFIX'] || '' %>
-     assets_suffix: <%= ENV['PAP_ASSETS_SUFFIX'] || 'data/' %>
-     endpoints:
-       metadata_fetch_method: rsync
-       metadata_protocol: smb
-       assets_fetch_method: rsync
-       assets_protocol: smb
-     metadata:
-       descriptive_filename: MM_Metadata.xlsx
-       structural_filename: MM_struct_metadata.xlsx
   kaplan:
     csv:
-     owner: <%= ENV['KAPLAN_OWNER'] %>
-     description: <%= ENV['KAPLAN_DESCRIPTION'] || 'Generated from CSV through automated workflow' %>
-     initial_stop: <%= ENV['KAPLAN_INITIAL_STOP'] || 'create' %>
-     metadata_suffix: <%= ENV['KAPLAN_METADATA_SUFFIX'] || '' %>
-     assets_suffix: <%= ENV['KAPLAN_ASSETS_SUFFIX'] || 'data/' %>
+     owner: 'katherly@upenn.edu'
+     description: 'Generated from CSV through automated workflow'
+     initial_stop: 'xml'
+     metadata_suffix: ''
+     assets_suffix: 'data/'
      endpoints:
        metadata_fetch_method: rsync
        metadata_protocol: smb
@@ -133,12 +73,8 @@ production:
          endpoint: <%= ENV['SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
          metadata_suffix: ''
          assets_suffix: ''
-       managed-masters:
-         endpoint: <%= ENV['OPENN_HARVESTING_ENDPOINT_REMOTE'] %>
-         metadata_suffix: ''
-         assets_suffix: ''
        sceti-completed:
-         endpoint: <%= ENV['PAP_HARVESTING_ENDPOINT_REMOTE'] %>
+         endpoint: <%= ENV['SCETI_COMPLETED_HARVESTING_ENDPOINT_REMOTE'] %>
          metadata_suffix: ''
          assets_suffix: ''
        sceti-completed-2:
