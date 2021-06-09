@@ -31,6 +31,7 @@ production:
   mounted_drives:
     kaplan-rescue: <%= ENV['KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
     scanstore-rescue: <%= ENV['SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
+    sceti-completed: <%= ENV['SCETI_COMPLETED_HARVESTING_ENDPOINT_REMOTE'] %>
     sceti-completed-2: <%= ENV['SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE'] %>
     sceti-completed-3: <%= ENV['SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE'] %>
     sceti-completed-4: <%= ENV['SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE'] %>
