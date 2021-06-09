@@ -161,10 +161,16 @@ module Bulwark
       Bulwark::Import::Result.new(status: DigitalObjectImport::SUCCESSFUL, repo: repo)
     rescue => e
       Honeybadger.notify(e) # Sending full error to Honeybadger.
-      Bulwark::Import::Result.new(status: DigitalObjectImport::FAILED, errors: [e.message], repo: repo)
+      Bulwark::Import::Result.new(status: DigitalObjectImport::FAILED,
+                                  errors: [truncated_error_message(e.message)], repo: repo)
     end
 
     private
+
+      # truncate error message to avoid MySQL TEXT field byte limit
+      def truncated_error_message(message)
+        message.truncate 60_000
+      end
 
       def repo
         @repo ||= Repo.find_by(unique_identifier: unique_identifier, new_format: false)
