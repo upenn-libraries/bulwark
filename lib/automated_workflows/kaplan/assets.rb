@@ -9,7 +9,7 @@ module AutomatedWorkflows
       end
 
       def fetch(working_path, repo)
-        assets_endpoint = AutomatedWorkflows::OPenn::Assets.endpoint(repo)
+        assets_endpoint = AutomatedWorkflows::Kaplan::Assets.endpoint(repo)
         source =  assets_endpoint.source
         destination = "#{working_path}/#{assets_endpoint.destination}"
         result = AutomatedWorkflows::Actions::Binaries.fetch(source, destination, repo.file_extensions)
