@@ -93,7 +93,7 @@ module ApplicationHelper
 
   def render_catalog_link
     repo = Repo.find_by(unique_identifier: @document.id.reverse_fedorafy)
-    return repo.bibid.present? ? link_to("Franklin record", "https://franklin.library.upenn.edu/catalog/FRANKLIN_#{validate_bib_id(repo.bibid)}") : ''
+    return repo.bibid.present? ? link_to("Full Catalog Record (Franklin)", "https://franklin.library.upenn.edu/catalog/FRANKLIN_#{validate_bib_id(repo.bibid)}") : ''
   end
 
   def additional_resources
