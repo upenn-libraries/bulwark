@@ -37,45 +37,57 @@
 </div>
 
 <h4>Digital Object Imports</h4>
-<% if @digital_object_imports.empty? %>
-  <p>None</p>
-<% else %>
-  <div class="table-responsive">
-    <table class="table table-striped">
-      <thead>
+
+<ul class="nav nav-tabs">
+  <li role="presentation" class="<%= @status.nil? ? 'active' : '' %>">
+    <a href="<%= url_for(digital_object_import_status: nil) %>">
+      All <span class="badge"><%=@bulk_import.digital_object_imports.count %></span>
+    </a>
+  </li>
+  <% DigitalObjectImport::STATUSES.each do |s| %>
+    <li role="presentation" class="<%= @status.eql?(s) ? 'active' : '' %>">
+      <a href="<%= url_for(digital_object_import_status: s) %>">
+        <%= s.titlecase %> <span class="badge"><%=@bulk_import.digital_object_imports.where(status: s).count %></span>
+      </a>
+    </li>
+  <% end %>
+</ul>
+
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Status</th>
+      <th>Digital Object Changed</th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @digital_object_imports.each do |digital_object_import| %>
       <tr>
-        <th>ID</th>
-        <th>Status</th>
-        <th>Digital Object Changed</th>
-        <th></th>
-      </tr>
-      </thead>
-      <tbody>
-      <% @digital_object_imports.each do |digital_object_import| %>
-        <tr>
-          <td><%= digital_object_import.id %></td>
-          <td><%= digital_object_import.status.titlecase %></td>
-          <td>
-            <% if digital_object_import.repo %>
-              <%= link_to(digital_object_import.repo.unique_identifier, admin_digital_object_path(digital_object_import.repo.id)) %>
-            <% end %>
-          </td>
-          <td>
-            <%= link_to 'Details', admin_bulk_import_digital_object_import_path(@bulk_import, digital_object_import), class: 'btn btn-sm btn-default' %>
-          </td>
-        <tr>
-      <% end %>
-      </tbody>
-    </table>
+        <td><%= digital_object_import.id %></td>
+        <td><%= digital_object_import.status.titlecase %></td>
+        <td>
+          <% if digital_object_import.repo %>
+            <%= link_to(digital_object_import.repo.unique_identifier, admin_digital_object_path(digital_object_import.repo.id)) %>
+          <% end %>
+        </td>
+        <td>
+          <%= link_to 'Details', admin_bulk_import_digital_object_import_path(@bulk_import, digital_object_import), class: 'btn btn-sm btn-default' %>
+        </td>
+      <tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <%= paginate @digital_object_imports, remote: true, param_name: :digital_object_import_page %>
   </div>
-  <div class="row">
-    <div class="col-md-6">
-      <%= paginate @digital_object_imports, remote: true, param_name: :digital_object_import_page %>
-    </div>
-    <div class="col-md-6">
-      <div class="pull-right">
-        <%= page_entries_info @digital_object_imports %>
-      </div>
+  <div class="col-md-6">
+    <div class="pull-right">
+      <%= page_entries_info @digital_object_imports %>
     </div>
   </div>
-<% end %>
+</div>

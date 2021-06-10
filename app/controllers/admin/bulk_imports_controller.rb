@@ -33,8 +33,10 @@ module Admin
 
     def show
       @bulk_import = BulkImport.find(params[:id])
+      @status = params[:digital_object_import_status]
       @digital_object_imports = @bulk_import.digital_object_imports
                                             .page(params[:digital_object_import_page])
+      @digital_object_imports = @digital_object_imports.where(status: @status) if @status
     end
 
     private
