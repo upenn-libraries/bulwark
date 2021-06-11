@@ -286,3 +286,24 @@ span.site-name {
   width: 100%;
   height:500px;
 }
+
+
+/*************
+*
+* Franklin Link area
+*
+**************/
+
+#view-full-record-area {
+  margin-left: 180px;
+  padding-bottom: 15px;
+}
+
+@media screen and (max-width: 768px) {
+
+  #view-full-record-area {
+    margin-left: 0;
+    padding-bottom: 15px;
+  }
+
+}

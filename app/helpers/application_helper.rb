@@ -91,9 +91,13 @@ module ApplicationHelper
     return repo.has_images? ? link_to("IIIF presentation manifest", "#{ENV['UV_URL']}/#{@document.id}/manifest") : ''
   end
 
-  def render_catalog_link
+  # @param [String] label
+  def render_catalog_link(label: "Full Catalog Record (Franklin)")
     repo = Repo.find_by(unique_identifier: @document.id.reverse_fedorafy)
-    return repo.bibid.present? ? link_to("Franklin record", "https://franklin.library.upenn.edu/catalog/FRANKLIN_#{validate_bib_id(repo.bibid)}") : ''
+    bibid = repo&.bibid
+    return '' unless bibid.present?
+
+    link_to label, "https://franklin.library.upenn.edu/catalog/FRANKLIN_#{validate_bib_id(bibid)}"
   end
 
   def additional_resources
