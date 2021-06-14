@@ -39,6 +39,15 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
       end
     end
 
+    context 'when structural filenames and sequence are provided' do
+      subject(:generator) { described_class.new(filenames: 'something', sequence: [{ filename: 'first.tiff' }]) }
+
+      it 'adds error' do
+        expect(generator.valid?).to be false
+        expect(generator.errors).to include 'structural metadata cannot be provided multiple ways'
+      end
+    end
+
     context 'when structural file and bibnumber are provided' do
       subject(:generator) { described_class.new(drive: 'test', path: 'something', bibnumber: '1234567890') }
 
@@ -53,7 +62,7 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
 
       it 'adds error' do
         expect(generator.valid?).to be false
-        expect(generator.errors).to include 'structural viewing_direction cannot be provided without filenames'
+        expect(generator.errors).to include 'structural viewing_direction cannot be provided without filenames or sequence'
       end
     end
 
@@ -62,7 +71,7 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
 
       it 'adds error' do
         expect(generator.valid?).to be false
-        expect(generator.errors).to include 'structural display cannot be provided without filenames'
+        expect(generator.errors).to include 'structural display cannot be provided without filenames or sequence'
       end
     end
 
@@ -90,6 +99,15 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
       it 'adds error' do
         expect(generator.valid?).to be false
         expect(generator.errors).to include 'structural display is not valid'
+      end
+    end
+
+    context 'when sequence is provided with a missing filename' do
+      subject(:generator) { described_class.new(filenames: 'something', sequence: [{ filename: 'first.tiff' }, { label: 'Second file' }]) }
+
+      it 'adds error' do
+        expect(generator.valid?).to be false
+        expect(generator.errors).to include 'structural sequence must contain filename for every file in sequence'
       end
     end
   end
@@ -321,6 +339,76 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
 
       it 'generates expected csv data' do
         expect(generator.send(:from_ordered_filenames, 'first.tif; second.tif; thrid.tif', 'paged', 'top-to-bottom')).to eql expected_csv
+      end
+    end
+  end
+
+  describe '#from_sequence' do
+    let(:generator) { described_class.new }
+
+    context 'when only providing sequenced files' do
+      let(:sequence) do
+        [
+          { filename: 'first.tif', label: 'First', table_of_contents: ['First Illuminated Image', 'Second Illuminated Image'] },
+          { filename: 'second.tif', label: 'Second' },
+          { filename: 'thrid.tif', label: 'Thrid' }
+        ]
+      end
+      let(:expected_csv) do
+        <<~CSV
+          filename,label,sequence,table_of_contents[1],table_of_contents[2]
+          first.tif,First,1,First Illuminated Image,Second Illuminated Image
+          second.tif,Second,2,,
+          thrid.tif,Thrid,3,,
+        CSV
+      end
+
+      it 'generates expected csv data' do
+        expect(generator.send(:from_sequence, sequence)).to eql expected_csv
+      end
+    end
+
+    context 'when providing sequenced files and viewing_direction' do
+      let(:sequence) do
+        [
+          { filename: 'first.tif', label: 'First', table_of_contents: ['First Illuminated Image', 'Second Illuminated Image'] },
+          { filename: 'second.tif', label: 'Second' },
+          { filename: 'thrid.tif', label: 'Thrid' }
+        ]
+      end
+      let(:expected_csv) do
+        <<~CSV
+          filename,label,sequence,table_of_contents[1],table_of_contents[2],viewing_direction
+          first.tif,First,1,First Illuminated Image,Second Illuminated Image,left-to-right
+          second.tif,Second,2,,,left-to-right
+          thrid.tif,Thrid,3,,,left-to-right
+        CSV
+      end
+
+      it 'generates expected csv data' do
+        expect(generator.send(:from_sequence, sequence, nil, 'left-to-right')).to eql expected_csv
+      end
+    end
+
+    context 'when providing sequenced files, viewing_direction and display' do
+      let(:sequence) do
+        [
+          { filename: 'first.tif', label: 'First', table_of_contents: ['First Illuminated Image', 'Second Illuminated Image'] },
+          { filename: 'second.tif', label: 'Second' },
+          { filename: 'thrid.tif', label: 'Thrid' }
+        ]
+      end
+      let(:expected_csv) do
+        <<~CSV
+          display,filename,label,sequence,table_of_contents[1],table_of_contents[2],viewing_direction
+          paged,first.tif,First,1,First Illuminated Image,Second Illuminated Image,left-to-right
+          paged,second.tif,Second,2,,,left-to-right
+          paged,thrid.tif,Thrid,3,,,left-to-right
+        CSV
+      end
+
+      it 'generates expected csv data' do
+        expect(generator.send(:from_sequence, sequence, 'paged', 'left-to-right')).to eql expected_csv
       end
     end
   end

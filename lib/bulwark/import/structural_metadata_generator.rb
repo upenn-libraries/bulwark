@@ -2,7 +2,7 @@
 module Bulwark
   class Import
     class StructuralMetadataGenerator
-      attr_reader :filenames, :bibnumber, :drive, :path, :viewing_direction, :display, :errors
+      attr_reader :filenames, :bibnumber, :drive, :path, :viewing_direction, :display, :sequence, :errors
 
       def initialize(options = {})
         options = options.deep_symbolize_keys
@@ -13,6 +13,10 @@ module Bulwark
         @path              = options[:path]
         @viewing_direction = options[:viewing_direction]
         @display           = options[:display]
+
+        # Files ordered in sequence, can only be used in conjunction with viewing_direction and display
+        @sequence          = options[:sequence].blank? ? nil : options[:sequence].map(&:deep_symbolize_keys)
+
         @errors            = []
       end
 
@@ -21,12 +25,13 @@ module Bulwark
       # a bibnumber or a file location.
       def valid?
         @errors << 'structural drive and path must both be provided' if (drive && !path) || (path && !drive)
-        @errors << 'structural viewing_direction cannot be provided without filenames' if viewing_direction && !filenames
-        @errors << 'structural display cannot be provided without filenames' if display && !filenames
+        @errors << 'structural viewing_direction cannot be provided without filenames or sequence' if viewing_direction && (!filenames && !sequence)
+        @errors << 'structural display cannot be provided without filenames or sequence' if display && (!filenames && !sequence)
         @errors << 'structural drive invalid' if drive && !MountedDrives.valid?(drive)
-        @errors << 'structural metadata cannot be provided multiple ways' unless [filenames, (drive || path), bibnumber].one?
+        @errors << 'structural metadata cannot be provided multiple ways' unless [filenames, (drive || path), bibnumber, sequence].one?
         @errors << 'structural viewing direction is not valid' if viewing_direction && !MetadataSource::VIEWING_DIRECTIONS.include?(viewing_direction)
         @errors << 'structural display is not valid' if display && !MetadataSource::VIEWING_HINTS.include?(display)
+        @errors << 'structural sequence must contain filename for every file in sequence' if sequence&.any? { |h| h[:filename].blank? }
 
         # @errors << "structural path invalid" if drive && path && !MountedDrives.valid_path?(drive, path)
 
@@ -45,6 +50,8 @@ module Bulwark
 
         if filenames
           from_ordered_filenames(filenames, display, viewing_direction)
+        elsif sequence
+          from_sequence(sequence, display, viewing_direction)
         elsif drive && path
           filepath = File.join(MountedDrives.path_to(drive), path)
           from_file(filepath)
@@ -69,6 +76,21 @@ module Bulwark
               csv << [f, i + 1, display, viewing_direction].compact
             end
           end
+        end
+
+        # Generating structural metadata from sequenced filename with advanced structural metadata.
+        #
+        # @param [Array<Hash>] ordered file information
+        def from_sequence(sequence, display = nil, viewing_direction = nil)
+          sequence.each_with_index do |f, i|
+            f[:sequence] = i + 1
+            f[:viewing_direction] = viewing_direction if viewing_direction
+            f[:display] = display if display
+          end
+          # TODO: each sequence hash must have a filename
+          # TODO: validate that sequence is not provided with other types of structural metadata ingestion
+          # TODO: validations at the top
+          Bulwark::StructuredCSV.generate(sequence)
         end
 
         # Reading in structural metadata csv from filesystem.
