@@ -53,9 +53,6 @@ RUN mkdir -p /home/app/webapp/log && \
     mkdir -p /home/app/webapp/tmp && \
     mkdir -p /fs/pub/data && \
     mkdir -p /fs/priv/workspace && \
-    mkdir -p /fs/automate && \
-    mkdir -p /fs/automate_kaplan && \
-    mkdir -p /fs/automate_pap && \
     mkdir -p /home/app/webapp/string_exts && \
     mkdir -p /home/app/webapp/rails_admin_colenda && \
     mkdir -p /etc/my_init.d
