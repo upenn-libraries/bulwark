@@ -13,9 +13,12 @@ module CatalogHelper
   end
 
   def thumbnail(document, options)
-    repo = Repo.find_by(unique_identifier: document['unique_identifier_tesim'].first)
-    return '' if repo.nil? || repo.thumbnail_location.blank?
-    image_tag download_link(*repo.thumbnail_location.split('/', 2))
+    # TODO: temporarily return empty string for thumbnails while we sort out storage issues
+    ''
+
+    # repo = Repo.find_by(unique_identifier: document['unique_identifier_tesim'].first)
+    # return '' if repo.nil? || repo.thumbnail_location.blank?
+    # image_tag download_link(*repo.thumbnail_location.split('/', 2))
   end
 
   def current_user?
