@@ -7,15 +7,16 @@
 <div class="collapse navbar-collapse" id="user-util-links">
     <%= render :partial=>'/user_util_links' %>
 </div>
-<div id="beta-announcement">
-  <div id="beta-label">
-    <span class="label text">Beta</span>This service is in beta.
-  </div>
-</div>
+<!--<div id="beta-announcement">-->
+<!--  <div id="beta-label">-->
+<!--    <span class="label text">Beta</span>This service is in beta.-->
+    <div class="alert alert-danger">
+      This beta site is currently under maintenance; collections and metadata are viewable but images and audio are temporarily unavailable.
+    </div>
+<!--  </div>-->
+<!--</div>-->
 <div id="search-navbar" class="navbar navbar-default navbar-static-top" role="navigation">
   <div class="container">
     <%= render_search_bar  %>
   </div>
 </div>
-
-
