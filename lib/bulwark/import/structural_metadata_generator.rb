@@ -87,9 +87,7 @@ module Bulwark
             f[:viewing_direction] = viewing_direction if viewing_direction
             f[:display] = display if display
           end
-          # TODO: each sequence hash must have a filename
-          # TODO: validate that sequence is not provided with other types of structural metadata ingestion
-          # TODO: validations at the top
+
           Bulwark::StructuredCSV.generate(sequence)
         end
 
