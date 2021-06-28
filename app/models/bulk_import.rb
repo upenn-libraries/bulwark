@@ -78,6 +78,12 @@ class BulkImport < ActiveRecord::Base
     end
   end
 
+  # Generate CSV for Bulk Import.
+  def csv
+    data = digital_object_imports.map(&:import_data)
+    Bulwark::StructuredCSV.generate(data)
+  end
+
   private
 
     # Determine if the related DO Imports are all complete (_not_ in progress or queued) and has at least one failed

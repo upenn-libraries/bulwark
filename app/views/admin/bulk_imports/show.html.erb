@@ -9,7 +9,12 @@
   <div class="col-xs-6">
     <dl class="dl-horizontal">
       <dt>Original Filename</dt>
-      <dd><%= @bulk_import.original_filename || '[Unknown]' %></dd>
+      <dd>
+        <%= @bulk_import.original_filename || '[Unknown]' %>
+        <a href="<%= csv_admin_bulk_import_path(@bulk_import) %>">
+          (download)
+        </a>
+      </dd>
       <dt>Total Imports</dt>
       <dd><%= @bulk_import.digital_object_imports.count %></dd>
       <dt>Total Processing Time</dt>
