@@ -14,6 +14,12 @@ secrets:
   bulwark_ezid_password:
     external: true
     name: colenda_bulwark_ezid_password_v${EZID_PASSWORD_VERSION}
+  bulwark_git_user_pass:
+    external: true
+    name: colenda_bulwark_git_user_pass_v${GIT_USER_PASS_VERSION}
+  bulwark_imaging_user_pass:
+    external: true
+    name: colenda_bulwark_imaging_user_pass_v${IMAGING_USER_PASS_VERSION}
   bulwark_honeybadger_api_key:
     external: true
     name: colenda_bulwark_honeybadger_api_key_v${HONEYBADGER_API_KEY_VERSION}
@@ -82,10 +88,8 @@ services:
       EZID_DEFAULT_SHOULDER:
       EZID_USER:
       GIT_USER:
-      GIT_USER_PASS:
       IIIF_IMAGE_SERVER:
       IMAGING_USER:
-      IMAGING_USER_PASS:
       KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE:
       MASTERSRBM_HARVESTING_ENDPOINT_REMOTE:
       MARMITE_URL:
@@ -134,6 +138,10 @@ services:
         target: /run/secrets/database_password
       - source: bulwark_ezid_password
         target: /run/secrets/ezid_password
+      - source: bulwark_git_user_pass
+        target: /run/secrets/git_user_pass
+      - source: bulwark_imaging_user_pass
+        target: /run/secrets/imaging_user_pass
       - source: bulwark_honeybadger_api_key
         target: /run/secrets/honeybadger_api_key
       - source: bulwark_secret_key_base
@@ -170,10 +178,8 @@ services:
       EZID_DEFAULT_SHOULDER:
       EZID_USER:
       GIT_USER:
-      GIT_USER_PASS:
       IIIF_IMAGE_SERVER:
       IMAGING_USER:
-      IMAGING_USER_PASS:
       KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE:
       MASTERSRBM_HARVESTING_ENDPOINT_REMOTE:
       MARMITE_URL:
@@ -216,6 +222,10 @@ services:
         target: /run/secrets/ezid_password
       - source: bulwark_honeybadger_api_key
         target: /run/secrets/honeybadger_api_key
+      - source: bulwark_git_user_pass
+        target: /run/secrets/git_user_pass
+      - source: bulwark_imaging_user_pass
+        target: /run/secrets/imaging_user_pass
       - source: bulwark_secret_key_base
         target: /run/secrets/secret_key_base
     volumes:

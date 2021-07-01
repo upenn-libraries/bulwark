@@ -2,7 +2,7 @@
 
 # Create the imaging user
 
-PASSWORD=$IMAGING_USER_PASS
+PASSWORD="$(cat /run/secrets/imaging_user_pass)"
 USER=$IMAGING_USER
 useradd -ms /bin/bash "${USER}"
 echo "${USER}:${PASSWORD}" | chpasswd
