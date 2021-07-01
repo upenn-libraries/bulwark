@@ -11,18 +11,12 @@ secrets:
   bulwark_database_root_password:
     external: true
     name: colenda_bulwark_database_root_password_v${DATABASE_ROOT_PASSWORD_VERSION}
-#  bulwark_database_config:
-#    external: true
-#    name: colenda_bulwark_database_config
   bulwark_honeybadger_api_key:
     external: true
     name: colenda_bulwark_honeybadger_api_key_v${HONEYBADGER_API_KEY_VERSION}
   bulwark_secret_key_base:
     external: true
     name: colenda_bulwark_secret_key_base_v${SECRET_KEY_BASE_VERSION}
-#  bulwark_secrets_config:
-#    external: true
-#    name: colenda_bulwark_secrets_config
 
 services:
   redis:
@@ -45,9 +39,7 @@ services:
       - source: bulwark_database_password
         target: /run/secrets/bulwark_database_password
       - source: bulwark_database_root_password
-      - target: /run/secrets/bulwark_database_root_password
-#      - bulwark_database_password
-#      - bulwark_database_root_password # repeat for root password
+        target: /run/secrets/bulwark_database_root_password
     volumes:
       - 'db:/var/lib/mysql'
   phalt_app:
