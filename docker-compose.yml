@@ -11,6 +11,9 @@ secrets:
   bulwark_database_root_password:
     external: true
     name: colenda_bulwark_database_root_password_v${DATABASE_ROOT_PASSWORD_VERSION}
+  bulwark_ezid_password:
+    external: true
+    name: colenda_bulwark_ezid_password_v${EZID_PASSWORD_VERSION}
   bulwark_honeybadger_api_key:
     external: true
     name: colenda_bulwark_honeybadger_api_key_v${HONEYBADGER_API_KEY_VERSION}
@@ -77,7 +80,6 @@ services:
       DATABASE_USERNAME:
       ERC_DEFAULT_WHO:
       EZID_DEFAULT_SHOULDER:
-      EZID_PASSWORD:
       EZID_USER:
       GIT_USER:
       GIT_USER_PASS:
@@ -130,6 +132,8 @@ services:
     secrets:
       - source: bulwark_database_password
         target: /run/secrets/database_password
+      - source: bulwark_ezid_password
+        target: /run/secrets/ezid_password
       - source: bulwark_honeybadger_api_key
         target: /run/secrets/honeybadger_api_key
       - source: bulwark_secret_key_base
@@ -164,7 +168,6 @@ services:
       DATABASE_USERNAME:
       ERC_DEFAULT_WHO:
       EZID_DEFAULT_SHOULDER:
-      EZID_PASSWORD:
       EZID_USER:
       GIT_USER:
       GIT_USER_PASS:
@@ -209,6 +212,8 @@ services:
     secrets:
       - source: bulwark_database_password
         target: /run/secrets/database_password
+      - source: bulwark_ezid_password
+        target: /run/secrets/ezid_password
       - source: bulwark_honeybadger_api_key
         target: /run/secrets/honeybadger_api_key
       - source: bulwark_secret_key_base
