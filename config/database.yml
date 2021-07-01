@@ -26,4 +26,4 @@ production:
   host: db
   database: <%= ENV['DATABASE_NAME'] %>
   username: <%= ENV['DATABASE_USERNAME'] %>
-  password: <%= ENV['DATABASE_PASSWORD'] %>
+  password: <%= File.read('/run/secrets/database_password').strip %>

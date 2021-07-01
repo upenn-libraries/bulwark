@@ -7,31 +7,19 @@ configs:
 secrets:
   bulwark_database_password:
     external: true
-    name: colenda_bulwark_database_password
+    name: colenda_bulwark_database_password_v${DATABASE_PASSWORD_VERSION}
   bulwark_database_root_password:
     external: true
-    name: colenda_bulwark_database_root_password
-  bulwark_database_config:
-    external: true
-    name: colenda_bulwark_database_config
+    name: colenda_bulwark_database_root_password_v${DATABASE_ROOT_PASSWORD_VERSION}
+#  bulwark_database_config:
+#    external: true
+#    name: colenda_bulwark_database_config
   bulwark_honeybadger_api_key:
     external: true
     name: colenda_bulwark_honeybadger_api_key_v${HONEYBADGER_API_KEY_VERSION}
-  bulwark_secrets_config:
-    external: true
-    name: colenda_bulwark_secrets_config
-  bulwark_ssh_host_dsa_key:
-    external: true
-    name: colenda_bulwark_ssh_host_dsa_key
-  bulwark_ssh_host_ecdsa_key:
-    external: true
-    name: colenda_bulwark_ssh_host_ecdsa_key
-  bulwark_ssh_host_ed25519_key:
-    external: true
-    name: colenda_bulwark_ssh_host_ed25519_key
-  bulwark_ssh_host_rsa_key:
-    external: true
-    name: colenda_bulwark_ssh_host_rsa_key
+#  bulwark_secrets_config:
+#    external: true
+#    name: colenda_bulwark_secrets_config
 
 services:
   redis:
@@ -51,8 +39,12 @@ services:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/bulwark_database_root_password
       MYSQL_USER: ${DATABASE_USERNAME}
     secrets:
-      - bulwark_database_password
-      - bulwark_database_root_password
+      - source: bulwark_database_password
+        target: /run/secrets/bulwark_database_password
+      - source: bulwark_database_root_password
+      - target: /run/secrets/bulwark_database_root_password
+#      - bulwark_database_password
+#      - bulwark_database_root_password # repeat for root password
     volumes:
       - 'db:/var/lib/mysql'
   phalt_app:
@@ -141,24 +133,12 @@ services:
       - '80:80'
       - '${SSH_PORT}:22'
     secrets:
-      - source: bulwark_database_config
-        target: /home/app/webapp/config/database.yml
+      - source: bulwark_database_password
+        target: /run/secrets/database_password
       - source: bulwark_honeybadger_api_key
         target: /run/secrets/honeybadger_api_key
-      - source: bulwark_secrets_config
-        target: /home/app/webapp/config/secrets.yml
-      - source: bulwark_ssh_host_dsa_key
-        target: /etc/ssh/ssh_host_dsa_key
-        mode: 0400
-      - source: bulwark_ssh_host_ecdsa_key
-        target: /etc/ssh/ssh_host_ecdsa_key
-        mode: 0400
-      - source: bulwark_ssh_host_ed25519_key
-        target: /etc/ssh/ssh_host_ed25519_key
-        mode: 0400
-      - source: bulwark_ssh_host_rsa_key
-        target: /etc/ssh/ssh_host_rsa_key
-        mode: 0400
+      - source: bulwark_secret_key_base
+        target: /run/secrets/secret_key_base
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - 'mastersrbm:${MASTERSRBM_HARVESTING_ENDPOINT_REMOTE}'
@@ -232,12 +212,12 @@ services:
       VOYAGER_HTTP_LOOKUP:
       VOYAGER_STRUCTURAL_HTTP_LOOKUP:
     secrets:
-      - source: bulwark_database_config
-        target: /home/app/webapp/config/database.yml
+      - source: bulwark_database_password
+        target: /run/secrets/database_password
       - source: bulwark_honeybadger_api_key
         target: /run/secrets/honeybadger_api_key
-      - source: bulwark_secrets_config
-        target: /home/app/webapp/config/secrets.yml
+      - source: bulwark_secret_key_base
+        target: /run/secrets/secret_key_base
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - 'mastersrbm:${MASTERSRBM_HARVESTING_ENDPOINT_REMOTE}'
