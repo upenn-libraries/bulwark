@@ -153,7 +153,8 @@ module Utils
             ceph_config.special_remote_name, type: ceph_config.storage_type,
             encryption: ceph_config.encryption, requeststyle: ceph_config.request_style,
             host: ceph_config.host, port: ceph_config.port, public: ceph_config.public,
-            bucket: remote_name.bucketize
+            bucket: remote_name.bucketize, aws_secret_access_key: ceph_config.aws_secret_access_key,
+            aws_access_key_id: ceph_config.aws_access_key_id
           )
         when 'directory'
           special_remote = Bulwark::Config.special_remote
@@ -176,7 +177,11 @@ module Utils
         special_remote = Bulwark::Config.special_remote
         case special_remote[:type]
         when 'S3'
-          git.annex.enableremote(special_remote[:name])
+          ceph_config = Utils::Storage::Ceph.config
+          git.annex.enableremote(
+            special_remote[:name], aws_secret_access_key: ceph_config.aws_secret_access_key,
+            aws_access_key_id: ceph_config.aws_access_key_id
+          )
         when 'directory'
           git.annex.enableremote(special_remote[:name], directory: File.join(special_remote[:directory], @repo.unique_identifier.bucketize))
         else

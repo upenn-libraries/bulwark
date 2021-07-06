@@ -5,6 +5,12 @@ configs:
     file: authorized_keys
 
 secrets:
+  bulwark_aws_access_key_id:
+    external: true
+    name: colenda_bulwark_aws_access_key_id_v${DATABASE_PASSWORD_VERSION}
+  bulwark_aws_secret_access_key:
+    external: true
+    name: colenda_bulwark_aws_secret_access_key_v${DATABASE_PASSWORD_VERSION}
   bulwark_database_password:
     external: true
     name: colenda_bulwark_database_password_v${DATABASE_PASSWORD_VERSION}
@@ -79,8 +85,6 @@ services:
       update_config:
         parallelism: 1
     environment:
-      AWS_ACCESS_KEY_ID:
-      AWS_SECRET_ACCESS_KEY:
       BATCH_OPS_EMAIL:
       CACHE_URL:
       CATALOG_CONTROLLER_PROTOCOL:
@@ -136,6 +140,10 @@ services:
       - '80:80'
       - '${SSH_PORT}:22'
     secrets:
+      - source: bulwark_aws_access_key_id
+        target: /run/secrets/aws_access_key_id
+      - source: bulwark_aws_secret_access_key
+        target: /run/secrets/aws_secret_access_key
       - source: bulwark_database_password
         target: /run/secrets/database_password
       - source: bulwark_ezid_password
@@ -171,8 +179,6 @@ services:
       update_config:
         parallelism: 1
     environment:
-      AWS_ACCESS_KEY_ID:
-      AWS_SECRET_ACCESS_KEY:
       BATCH_OPS_EMAIL:
       CACHE_URL:
       CATALOG_CONTROLLER_PROTOCOL:
@@ -219,6 +225,10 @@ services:
       VOYAGER_HTTP_LOOKUP:
       VOYAGER_STRUCTURAL_HTTP_LOOKUP:
     secrets:
+      - source: bulwark_aws_access_key_id
+        target: /run/secrets/aws_access_key_id
+      - source: bulwark_aws_secret_access_key
+        target: /run/secrets/aws_secret_access_key
       - source: bulwark_database_password
         target: /run/secrets/database_password
       - source: bulwark_ezid_password
