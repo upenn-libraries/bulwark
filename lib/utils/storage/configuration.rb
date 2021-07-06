@@ -30,10 +30,13 @@ module Utils
         @port = ENV["STORAGE_PORT"]
         @protocol = ENV["STORAGE_PROTOCOL"]
 
-        # Required for Ceph with S3 gateway
+        # Required for Ceph with S3 gateway.
+        # Reading in secrets via docker secrets
+        @aws_access_key_id = File.exist?('/run/secrets/aws_access_key_id') ? File.read('/run/secrets/aws_access_key_id').strip : nil
+        @aws_secret_access_key = File.exist?('/run/secrets/aws_secret_access_key') ? File.read('/run/secrets/aws_secret_access_key').strip : nil
+
+        # Reading rest of credentials from environment
         @special_remote_name = ENV["SPECIAL_REMOTE_NAME"] || nil
-        @aws_access_key_id = ENV["AWS_ACCESS_KEY_ID"] || nil
-        @aws_secret_access_key = ENV["AWS_SECRET_ACCESS_KEY"] || nil
         @encryption = ENV["STORAGE_ENCRYPTION"] || nil
         @request_style = ENV["REQUEST_STYLE"] || nil
         @public = ENV["STORAGE_PUBLIC"] || nil

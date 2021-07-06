@@ -59,7 +59,15 @@ module ExtendedGit
       array_opts = []
       array_opts << "directory=#{opts[:directory]}" if opts[:directory]
 
-      command("enableremote #{name}", array_opts)
+      # AWS-like credentials required for S3 special remotes. These are not options for
+      # the command, but instead should be environment variables.
+      env_vars = []
+      if opts[:aws_secret_access_key] || opts[:aws_access_key_id]
+        env_vars << "AWS_SECRET_ACCESS_KEY=#{opts[:aws_secret_access_key]}" if opts[:aws_secret_access_key]
+        env_vars << "AWS_ACCESS_KEY_ID=#{opts[:aws_access_key_id]}" if opts[:aws_access_key_id]
+      end
+
+      command("enableremote #{name}", array_opts, env_vars)
     end
 
     def initremote(name, opts = {})
@@ -77,7 +85,15 @@ module ExtendedGit
       array_opts << "public=#{opts[:public]}"             if opts[:public]
       array_opts << "bucket='#{opts[:bucket]}'"           if opts[:bucket]
 
-      command("initremote #{name}", array_opts)
+      # AWS-like credentials required for S3 special remotes. These are not options for
+      # the command, but instead should be environment variables.
+      env_vars = []
+      if opts[:aws_secret_access_key] || opts[:aws_access_key_id]
+        env_vars << "AWS_SECRET_ACCESS_KEY=#{opts[:aws_secret_access_key]}" if opts[:aws_secret_access_key]
+        env_vars << "AWS_ACCESS_KEY_ID=#{opts[:aws_access_key_id]}" if opts[:aws_access_key_id]
+      end
+
+      command("initremote #{name}", array_opts, env_vars)
     end
 
     def fsck(opts = {})
@@ -157,7 +173,7 @@ module ExtendedGit
 
       # Run a git annex command. This method takes a lot of inspiration from
       # the `command` method in `Git::Lib`.
-      def command(cmd, opts = [])
+      def command(cmd, opts = [], env_vars = [])
         # TODO:global config, pointing at correct working path and git dir
         global_opts = []
         global_opts << "--git-dir=#{@git_dir}" if @git_dir
@@ -166,8 +182,9 @@ module ExtendedGit
         global_opts = global_opts.flatten.join(' ') # TODO: should be escaped?
 
         opts = [opts].flatten.join(' ') # TODO: should be escaped?
+        env_vars = [env_vars].flatten.join(' ') # ENV variables
 
-        git_cmd = "git #{global_opts} annex #{cmd} #{opts}"
+        git_cmd = [env_vars, 'git', global_opts, 'annex', cmd, opts].join(' ')
         output, status = Open3.capture2e(git_cmd)
         exitstatus = status.exitstatus
 

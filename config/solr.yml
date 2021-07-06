@@ -4,4 +4,4 @@ development:
 test:
   url: http://bulwark.solr.lndo.site/solr/bulwark-test
 production:
-  url: <%= ENV['PROD_SOLR_URL']%>
+  url: <%= ENV['SOLR_URL']%>

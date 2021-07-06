@@ -2,7 +2,7 @@
 
 # Create the git user
 
-PASSWORD=$GIT_USER_PASS
+PASSWORD="$(cat /run/secrets/git_user_pass)"
 USER=$GIT_USER
 useradd -ms /bin/bash "${USER}"
 echo "${USER}:${PASSWORD}" | chpasswd

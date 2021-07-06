@@ -21,7 +21,7 @@ module ApplicationHelper
 
   def render_collection_names_hash
     collections_hash = Hash.new(0)
-    solr_url = ENV['PROD_SOLR_URL'].present? ? ENV['PROD_SOLR_URL'] : 'http://localhost:8983/solr/blacklight-core'
+    solr_url = ENV['SOLR_URL'].present? ? ENV['SOLR_URL'] : 'http://localhost:8983/solr/blacklight-core'
     collections_url = "#{solr_url}/select?q=*%3A*&fq=-active_fedora_model_ssi%3AImage&fq=-active_fedora_model_ssi%3ACollection&fq=-active_fedora_model_ssi%3A%22ActiveFedora%3A%3ADirectContainer%22&fq=-active_fedora_model_ssi%3A%22ActiveFedora%3A%3AIndirectContainer%22&fq=-active_fedora_model_ssi%3A%22ActiveFedora%3A%3AAggregation%3A%3AProxy%22&rows=0&indent=true&facet=true&facet.field=collection_sim&facet.limit=-1&wt=json"
     collections_uri = URI(collections_url)
     collections_response = Net::HTTP.get(collections_uri)
