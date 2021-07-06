@@ -10,6 +10,6 @@ test:
   base_path: /test
 production:
   user: <%= ENV["PROD_FEDORA_USER"] %>
-  password: <%= ENV["PROD_FEDORA_PW"] %>
+  password: <%= File.exist?('/run/secrets/fedora_password') ? File.read('/run/secrets/fedora_password').strip : ENV['PROD_FEDORA_PW'] %>
   url: <%= ENV["PROD_FEDORA_URL"] %>
   base_path: /prod

@@ -14,6 +14,9 @@ secrets:
   bulwark_ezid_password:
     external: true
     name: colenda_bulwark_ezid_password_v${EZID_PASSWORD_VERSION}
+  bulwark_fedora_password:
+    external: true
+    name: colenda_bulwark_fedora_password_v${FEDORA_PASSWORD_VERSION}
   bulwark_git_user_pass:
     external: true
     name: colenda_bulwark_git_user_pass_v${GIT_USER_PASS_VERSION}
@@ -96,7 +99,6 @@ services:
       PAP_HTTP_LOOKUP:
       PAP_STRUCTURAL_HTTP_LOOKUP:
       PHALT_ENDPOINT:
-      PROD_FEDORA_PW:
       PROD_FEDORA_URL:
       PROD_FEDORA_USER:
       PROD_SOLR_URL:
@@ -138,6 +140,8 @@ services:
         target: /run/secrets/database_password
       - source: bulwark_ezid_password
         target: /run/secrets/ezid_password
+      - source: bulwark_fedora_password
+        target: /run/secrets/fedora_password
       - source: bulwark_git_user_pass
         target: /run/secrets/git_user_pass
       - source: bulwark_imaging_user_pass
@@ -186,7 +190,6 @@ services:
       PAP_HTTP_LOOKUP:
       PAP_STRUCTURAL_HTTP_LOOKUP:
       PHALT_ENDPOINT:
-      PROD_FEDORA_PW:
       PROD_FEDORA_URL:
       PROD_FEDORA_USER:
       PROD_SOLR_URL:
@@ -220,6 +223,8 @@ services:
         target: /run/secrets/database_password
       - source: bulwark_ezid_password
         target: /run/secrets/ezid_password
+      - source: bulwark_fedora_password
+        target: /run/secrets/fedora_password
       - source: bulwark_honeybadger_api_key
         target: /run/secrets/honeybadger_api_key
       - source: bulwark_git_user_pass
