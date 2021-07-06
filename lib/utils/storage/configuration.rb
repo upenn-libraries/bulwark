@@ -33,7 +33,7 @@ module Utils
         # Required for Ceph with S3 gateway.
         # Reading in secrets via docker secrets
         @aws_access_key_id = File.exist?('/run/secrets/aws_access_key_id') ? File.read('/run/secrets/aws_access_key_id').strip : nil
-        @aws_secret_access_key = File.exist?('/run/secrets/aws_secret_access_key') ? File.read('/run/secrets/aws_secret_access_key_id').strip : nil
+        @aws_secret_access_key = File.exist?('/run/secrets/aws_secret_access_key') ? File.read('/run/secrets/aws_secret_access_key').strip : nil
 
         # Reading rest of credentials from environment
         @special_remote_name = ENV["SPECIAL_REMOTE_NAME"] || nil
