@@ -50,8 +50,13 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :bulk_imports, except: %w[edit update destroy] do
+      member do
+        get :csv
+      end
+
       resources :digital_object_imports, only: [:show]
     end
+
     resources :digital_objects, only: [:index, :show] do
       member do
         post :publish

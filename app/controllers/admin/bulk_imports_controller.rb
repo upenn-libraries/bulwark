@@ -39,6 +39,13 @@ module Admin
       @digital_object_imports = @digital_object_imports.where(status: @status) if @status
     end
 
+    # Download original download csv.
+    def csv
+      @bulk_import = BulkImport.find(params[:id])
+
+      send_data @bulk_import.csv, type: 'text/csv', filename: @bulk_import.original_filename, disposition: :download
+    end
+
     private
 
       # @param [String] priority_param
