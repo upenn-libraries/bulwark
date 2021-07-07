@@ -427,7 +427,7 @@ RSpec.describe Bulwark::Migrate do
         end
       end
 
-      context 'when migration an object with descriptive and structural metadata from Marmite' do
+      context 'when migrating an object with descriptive and structural metadata from Marmite' do
         let(:bibnumber) { '9923478503503681' }
         let(:structural_xml) do
           <<~STRUCTURAL
@@ -543,6 +543,62 @@ RSpec.describe Bulwark::Migrate do
           expect(
             Nokogiri::XML(File.read(File.join(working_dir, repo.metadata_subdirectory, 'mets.xml')))
           ).to be_equivalent_to(expected_mets).ignoring_attr_values('OBJID').ignoring_content_of('mods|identifier')
+        end
+      end
+
+      context 'when migrating an object with advanced structural metadata' do
+        let(:structural_metadata) do
+          {
+            'sequence' => [
+              { 'sequence' => '1', 'filename' => 'front.tif', 'label' => 'First Page', 'display' => 'paged', 'viewing_direction' => 'left-to-right' },
+              { 'sequence' => '2', 'filename' => 'back.tif', 'label' => 'Second Page', 'display' => 'paged', 'viewing_direction' => 'left-to-right', 'table_of_contents' => ["Seller's description, Inside front cover"] }
+            ]
+          }
+        end
+
+        let(:descriptive_metadata) do
+          { 'title' => ['Trade card; J. Rosenblatt & Co.; Baltimore, Maryland, United States; undated;'] }
+        end
+
+        let(:expected_structural) { fixture_to_str('example_objects', 'object_two', 'structural_metadata.csv') }
+
+        let(:migration_result) do
+          described_class.new(
+            action: 'migrate',
+            unique_identifier: ark,
+            structural: {
+              display: 'paged',
+              viewing_direction: 'left-to-right',
+              sequence: [
+                { filename: 'front.tif', label: 'First Page' },
+                { filename: 'back.tif', label: 'Second Page', table_of_contents: ["Seller's description, Inside front cover"] }
+              ]
+            },
+            metadata: descriptive_metadata,
+            migrated_by: User.find_by(email: migrated_by)
+          ).process
+        end
+        let(:repo) { migration_result.repo }
+        let(:working_dir) { repo.clone_location }
+        let(:git) { ExtendedGit.open(working_dir) }
+
+        it 'expect migration to be successful' do
+          expect(migration_result.errors).to be_empty
+          expect(migration_result.status).to be DigitalObjectImport::SUCCESSFUL
+        end
+
+        it 'contains structural metadata source' do
+          metadata_source = repo.structural_metadata
+          expect(metadata_source.source_type).to eql 'structural'
+          expect(metadata_source.original_mappings).to eql structural_metadata
+          expect(metadata_source.user_defined_mappings).to eql structural_metadata
+          expect(metadata_source.remote_location).to eql "#{repo.names.bucket}/#{git.annex.lookupkey('data/metadata/structural_metadata.csv')}"
+        end
+
+        # Check metadata files exists and have correct contents
+        it 'contains expected metadata contents for structural_metadata.csv' do
+          git.annex.get(repo.metadata_subdirectory)
+          expect(File.read(File.join(working_dir, repo.metadata_subdirectory, 'structural_metadata.csv'))).to eql expected_structural
         end
       end
     end

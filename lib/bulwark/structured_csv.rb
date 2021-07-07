@@ -27,21 +27,28 @@ module Bulwark
     end
 
     def self.parse_field(field, value, hash)
-      if /\./.match(field)
+      if /\A[^\[\]]+\./.match(field) # if matches field.second_field
         parent, child = field.split('.', 2)
         hash[parent] ||= {}
         parse_field(child, value, hash[parent])
-      else
-        # If header ends in `[1]` it represents a specific location in array, parse out index.
-        if (header = /^(?<key>.+)\[(?<index>\d+)\]$/.match(field))
-          key = header[:key]
-          index = header[:index].to_i - 1 # Array start at zero
-          hash[key] ||= []
-          hash[key][index] = value unless value.nil?
-        else
-          hash[field] = value unless value.nil?
+      elsif (header = /\A(?<key>.+?)\[(?<index>\d+)\](?<rest>\.(?<child>.+))?/.match(field)) # if matches field[1].second_field or field[1]
+        key = header[:key]
+        index = header[:index].to_i - 1 # Array start at zero
+        hash[key] ||= []
+
+        return if value.nil?
+
+        if header[:child] # if matches field[1].second_field
+          hash[key][index] ||= {}
+          parse_field(header[:child], value, hash[key][index])
+        else # if matches field[1]
+          hash[key][index] = value
         end
+      else
+        hash[field] = value unless value.nil?
       end
+    rescue IndexError => e
+      raise "Error parsing field '#{field}': #{e.message}"
     end
 
     # Generates CSV string from an array of hash.
@@ -49,6 +56,8 @@ module Bulwark
     # @param csv_data [Array<Hash>]
     # @return [String] csv formatted string
     def self.generate(csv_data)
+      csv_data = csv_data.map(&:deep_stringify_keys) # Ensure all keys are strings.
+
       hashes = csv_data.map { |hash| generate_row(hash) }
 
       headers = hashes.sum([], &:keys).uniq.sort
@@ -77,7 +86,9 @@ module Bulwark
           generate_field("#{field}.#{k}", v, hash)
         end
       elsif value.is_a? Array
-        value.each_with_index { |v, i| hash["#{field}[#{i + 1}]"] = v }
+        value.each_with_index do |v, i|
+          generate_field("#{field}[#{i + 1}]", v, hash)
+        end
       else
         hash[field] = value
       end

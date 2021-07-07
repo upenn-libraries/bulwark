@@ -155,7 +155,7 @@ RSpec.describe Bulwark::Import do
 
       it 'adds error' do
         expect(import.validate).to be false
-        expect(import.errors).to include 'structural viewing_direction cannot be provided without filenames'
+        expect(import.errors).to include 'structural viewing_direction cannot be provided without filenames or sequence'
       end
     end
 
@@ -164,7 +164,7 @@ RSpec.describe Bulwark::Import do
 
       it 'adds error' do
         expect(import.validate).to be false
-        expect(import.errors).to include 'structural display cannot be provided without filenames'
+        expect(import.errors).to include 'structural display cannot be provided without filenames or sequence'
       end
     end
 
@@ -523,7 +523,7 @@ RSpec.describe Bulwark::Import do
       end
     end
 
-    context 'when creating a new digital object with advanced structural metadata' do
+    context 'when creating a new digital object with advanced structural metadata from a file' do
       let(:structural_metadata) do
         {
           'sequence' => [
@@ -599,6 +599,59 @@ RSpec.describe Bulwark::Import do
         expect(
           Nokogiri::XML(File.read(File.join(working_dir, repo.metadata_subdirectory, 'preservation.xml')))
         ).to be_equivalent_to(expected_preservation).ignoring_content_of('uuid')
+      end
+    end
+
+    context 'when creating a new digital object with advanced structural metadata in CSV' do
+      let(:structural_metadata) do
+        {
+          'sequence' => [
+            { 'display' => 'paged', 'sequence' => '1', 'filename' => 'front.tif', 'label' => 'First Page', 'viewing_direction' => 'left-to-right' },
+            { 'display' => 'paged', 'sequence' => '2', 'filename' => 'back.tif', 'label' => 'Second Page', 'viewing_direction' => 'left-to-right', 'table_of_contents' => ["Seller's description, Inside front cover"] }
+          ]
+        }
+      end
+      let(:expected_structural) { fixture_to_str('example_objects', 'object_two', 'structural_metadata.csv') }
+      let(:import) do
+        described_class.new(
+          action: Bulwark::Import::CREATE,
+          directive_name: 'object_one',
+          assets: { drive: 'test', path: 'object_one' },
+          metadata: { title: ['Object One'] },
+          structural: {
+            display: 'paged',
+            viewing_direction: 'left-to-right',
+            sequence: [
+              { filename: 'front.tif', label: 'First Page' },
+              { filename: 'back.tif', label: 'Second Page', table_of_contents: ["Seller's description, Inside front cover"] }
+            ]
+          },
+          created_by: created_by
+        )
+      end
+      let(:repo) { result.repo }
+      let(:working_dir) { repo.version_control_agent.clone }
+      let(:git) { ExtendedGit.open(working_dir) }
+      let(:whereis_result) { git.annex.whereis }
+
+      let(:result) { import.process }
+
+      it 'import was successful' do
+        expect(result.errors).to be_empty
+        expect(result.status).to be DigitalObjectImport::SUCCESSFUL
+      end
+
+      it 'creates structural metadata source' do
+        metadata_source = repo.structural_metadata
+        expect(metadata_source.source_type).to eql 'structural'
+        expect(metadata_source.original_mappings).to eql structural_metadata
+        expect(metadata_source.user_defined_mappings).to eql structural_metadata
+        expect(metadata_source.remote_location).to eql "#{repo.names.bucket}/#{git.annex.lookupkey('data/metadata/structural_metadata.csv')}"
+      end
+
+      it 'given structural metadata files contain expected data' do
+        git.annex.get(repo.metadata_subdirectory)
+        expect(File.read(File.join(working_dir, repo.metadata_subdirectory, 'structural_metadata.csv'))).to eql expected_structural
       end
     end
 
