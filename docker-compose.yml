@@ -110,6 +110,7 @@ services:
       RAILS_ENV:
       REDIS_URL:
       REQUEST_STYLE:
+      MANAGED_MASTERS_HARVESTING_ENDPOINT_REMOTE:
       SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE:
@@ -161,6 +162,7 @@ services:
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - 'mastersrbm:${MASTERSRBM_HARVESTING_ENDPOINT_REMOTE}'
+      - 'managedmasters:${MANAGED_MASTERS_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed:${SCETI_COMPLETED_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_2:${SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_3:${SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE}'
@@ -203,6 +205,7 @@ services:
       RAILS_ENV:
       REDIS_URL:
       REQUEST_STYLE:
+      MANAGED_MASTERS_HARVESTING_ENDPOINT_REMOTE:
       SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE:
@@ -246,6 +249,7 @@ services:
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - 'mastersrbm:${MASTERSRBM_HARVESTING_ENDPOINT_REMOTE}'
+      - 'managedmasters:${MANAGED_MASTERS_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed:${SCETI_COMPLETED_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_2:${SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_3:${SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE}'
@@ -265,6 +269,8 @@ volumes:
   colenda_workspace:
     external: true
   mastersrbm:
+    external: true
+  managedmasters:
     external: true
   sceti_completed:
     external: true

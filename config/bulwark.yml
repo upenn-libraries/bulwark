@@ -38,6 +38,7 @@ production:
     sceti: <%= ENV['SCETI_HARVESTING_ENDPOINT_REMOTE'] %>
     keffer: <%= ENV['KEFFER_HARVESTING_ENDPOINT_REMOTE'] %>
     mastersrbm:  <%= ENV['MASTERSRBM_HARVESTING_ENDPOINT_REMOTE'] %>
+    managedmasters: <%= ENV['MANAGEDMASTERS_HARVESTING_ENDPOINT_REMOTE'] %>
   marmite:
     url: <%= ENV['MARMITE_URL'] %>
   bulk_import:
