@@ -14,7 +14,8 @@ module Bulwark
         @viewing_direction = options[:viewing_direction]
         @display           = options[:display]
 
-        # Files ordered in sequence, can only be used in conjunction with viewing_direction and display
+        # Files ordered in sequence, can only be used in conjunction with viewing_direction and display.
+        # This object is an array of hashes. Each hash must contain the filename, all other fields are optional.
         @sequence          = options[:sequence].blank? ? nil : options[:sequence].map(&:deep_symbolize_keys)
 
         @errors            = []

@@ -47,6 +47,8 @@ module Bulwark
       else
         hash[field] = value unless value.nil?
       end
+    rescue IndexError => e
+      raise "Error parsing field '#{field}': #{e.message}"
     end
 
     # Generates CSV string from an array of hash.
