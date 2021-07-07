@@ -7,10 +7,10 @@ configs:
 secrets:
   bulwark_aws_access_key_id:
     external: true
-    name: colenda_bulwark_aws_access_key_id_v${DATABASE_PASSWORD_VERSION}
+    name: colenda_bulwark_aws_access_key_id_v${AWS_ACCESS_KEY_ID_VERSION}
   bulwark_aws_secret_access_key:
     external: true
-    name: colenda_bulwark_aws_secret_access_key_v${DATABASE_PASSWORD_VERSION}
+    name: colenda_bulwark_aws_secret_access_key_v${AWS_SECRET_ACCESS_KEY_VERSION}
   bulwark_database_password:
     external: true
     name: colenda_bulwark_database_password_v${DATABASE_PASSWORD_VERSION}
