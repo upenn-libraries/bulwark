@@ -1,0 +1,51 @@
+<ol class="breadcrumb">
+  <li>Admin</li>
+  <li><a href="/admin/alert_messages">Alert Messages</a></li>
+  <li>Create</li>
+</ol>
+
+<h2>Alert Messages</h2>
+<%= link_to 'New Alert Message', new_admin_alert_message_path, class: 'btn btn-primary' %>
+<% if @alert_messages.any? %>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Active?</th>
+          <th>Message</th>
+          <th>Location</th>
+          <th>Level</th>
+          <th>Will Display?</th>
+          <th>Display On</th>
+          <th>Display Until</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      <% @alert_messages.each do |alert_message| %>
+        <tr>
+          <td><%= alert_message.id %></td>
+          <td><%= alert_message.active? ? 'Yes' : 'No' %></td>
+          <td><%= truncate(alert_message.message) %></td>
+          <td><%= alert_message.location %></td>
+          <td><%= alert_message.level %></td>
+          <td><%= alert_message.display? ? 'Yes' : 'No' %></td>
+          <td><%= alert_message.display_on.to_s(:display) %></td>
+          <td><%= alert_message.display_until.to_s(:display) %></td>
+          <td>
+            <div class="btn-group btn-group-xs" role="group" aria-label="Alert Message actions">
+              <%= link_to 'View', admin_alert_message_path(alert_message.id), class: 'btn btn-primary' %>
+              <%= link_to 'Edit', edit_admin_alert_message_path(alert_message.id), class: 'btn btn-primary' %>
+              <%= link_to 'Delete', admin_alert_message_path(alert_message.id), method: :delete,
+                          class: 'btn btn-primary', data: { confirm: 'Are you sure?' } %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p>No Alert Messages yet!</p>
+<% end %>

@@ -49,6 +49,8 @@ Rails.application.routes.draw do
   resources :metadata_sources
 
   namespace :admin do
+    resources :alert_messages
+
     resources :bulk_imports, except: %w[edit update destroy] do
       member do
         get :csv

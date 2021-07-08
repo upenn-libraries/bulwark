@@ -8,7 +8,8 @@ class ApplicationController < ActionController::Base
   # https://github.com/projectblacklight/blacklight/blob/v5.13.0/app/views/layouts/blacklight.html.erb
   layout 'application'
 
-  before_filter :_set_current_user
+  before_action :_set_current_user
+  before_action :header_alert
 
   rescue_from ActiveRecord::RecordNotFound, :with => :rescue_not_found
 
@@ -32,5 +33,12 @@ class ApplicationController < ActionController::Base
   private
   def _set_current_user
     User.current = current_user.email if current_user
+  end
+
+  def header_alert
+    alert = AlertMessage.where(location: 'header').first
+    return unless alert&.display?
+
+    @header_alert = alert
   end
 end

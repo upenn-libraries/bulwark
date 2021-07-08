@@ -11,7 +11,7 @@ RSpec.describe Asset, type: :model do
     context 'when all required fields are present' do
       let(:asset) { FactoryBot.build(:asset, repo: repo) }
 
-      it 'does not return errorrs' do
+      it 'does not return errors' do
         expect(asset.valid?).to be true
       end
     end

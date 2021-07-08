@@ -1,0 +1,25 @@
+<ol class="breadcrumb">
+  <li>Admin</li>
+  <li><a href="/admin/alert_messages">Alert Messages</a></li>
+  <li>Create</li>
+</ol>
+
+<h2>Alert Message</h2>
+<div class="row">
+  <div class="col-xs-12">
+    <dl class="dl-horizontal">
+      <dt>Active?</dt>
+      <dd><%= @alert_message.active %></dd>
+      <dt>Message</dt>
+      <dd><%= @alert_message.message %></dd>
+      <dt>Location</dt>
+      <dd><%= @alert_message.location %></dd>
+      <dt>Level</dt>
+      <dd><%= @alert_message.level %></dd>
+      <dt>Display On</dt>
+      <dd><%= @alert_message.display_on %></dd>
+      <dt>Display Until</dt>
+      <dd><%= @alert_message.display_until %></dd>
+    </dl>
+  </div>
+</div>

@@ -14,6 +14,13 @@
   </div>
 </div>
 
+<%# TODO: clean up display  %>
+<% if @header_alert %>
+  <div class="alert alert-<%= @header_alert.level %>">
+    <%= @header_alert.message %>
+  </div>
+<% end %>
+
 <div id="search-navbar" class="navbar navbar-default navbar-static-top" role="navigation">
   <div class="container">
     <%= render_search_bar  %>
