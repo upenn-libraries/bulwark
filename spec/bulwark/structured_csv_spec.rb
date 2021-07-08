@@ -5,7 +5,7 @@ RSpec.describe Bulwark::StructuredCSV do
   let(:csv_string_data) do
     <<~CSV
       asset.drive,asset.path,unique_identifier,metadata.creator[1],metadata.creator[2],metadata.description[1],metadata.other data,metadata.date[1],metadata.date[2],metadata.subject[1],structural.files.number,structural.sequence[1].label,structural.sequence[1].filename,structural.sequence[1].table_of_contents[1],structural.sequence[2].label,structural.sequence[2].filename,structural.sequence[2].table_of_contents[1]
-      test,path/to/assets_1,ark:/9999/test,"person, random first","person, random second",very important item,this is a test item,2020-01-01,2020-01-02,subject one,3,,,,,
+      test,path/to/assets_1,ark:/9999/test,"person, random first"," person, random second", very important item,this is a test item,2020-01-01,2020-01-02,subject one,3,,,,,
       test,path/to/assets_2,ark:/9999/test2,"person, random third","person, random forth",second most important item,this is a second test item,2020-02-01,,,4,Front,front.jpeg,Illuminated Image,Back,back.jpeg,Second Illuminated Image
     CSV
   end

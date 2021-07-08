@@ -42,10 +42,10 @@ module Bulwark
           hash[key][index] ||= {}
           parse_field(header[:child], value, hash[key][index])
         else # if matches field[1]
-          hash[key][index] = value
+          hash[key][index] = value.strip
         end
       else
-        hash[field] = value unless value.nil?
+        hash[field] = value.strip unless value.nil?
       end
     rescue IndexError => e
       raise "Error parsing field '#{field}': #{e.message}"
