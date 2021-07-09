@@ -10,9 +10,4 @@ FactoryBot.define do
   trait :active do
     active { true }
   end
-
-  trait :date_limited do
-    display_on { Time.zone.now + 1.day }
-    display_until { Time.zone.now + 3.days }
-  end
 end

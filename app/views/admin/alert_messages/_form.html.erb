@@ -1,14 +1,8 @@
-<%= bootstrap_form_for [:admin, @alert_message] do |f| %>
+<%= bootstrap_form_for [:admin, alert_message] do |f| %>
   <%= f.check_box :active %>
-  <%= f.select :location,
-               options_for_select(AlertMessage::LOCATIONS),
-               label: 'Location'
-  %>
   <%= f.select :level,
-               options_for_select(AlertMessage::LEVELS),
+               options_for_select(AlertMessage::LEVELS, alert_message.level),
                label: 'Level' %>
   <%= f.text_area :message %>
-  <%= f.date_select :display_on %>
-  <%= f.date_select :display_until %>
-  <%= f.submit 'Submit' %>
+  <%= f.submit 'Save' %>
 <% end %>

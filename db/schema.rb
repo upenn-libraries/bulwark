@@ -14,14 +14,10 @@
 ActiveRecord::Schema.define(version: 20210708151014) do
 
   create_table "alert_messages", force: :cascade do |t|
-    t.boolean  "active",                    default: false
-    t.datetime "display_on"
-    t.datetime "display_until"
-    t.string   "message",       limit: 255
-    t.string   "level",         limit: 255
-    t.string   "location",      limit: 255
-    t.datetime "created_at",                                null: false
-    t.datetime "updated_at",                                null: false
+    t.boolean "active",               default: false
+    t.string  "message",  limit: 255
+    t.string  "level",    limit: 255
+    t.string  "location", limit: 255
   end
 
   create_table "assets", force: :cascade do |t|

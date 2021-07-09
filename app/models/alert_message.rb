@@ -5,27 +5,18 @@ class AlertMessage < ActiveRecord::Base
   LOCATIONS = %w[header home].freeze
 
   # Level - corresponding to bootstrap alert class - for the message
-  LEVELS = %w[warning info danger].freeze
+  LEVELS = %w[info warning danger].freeze
 
-  validates :message, presence: true
+  # require message content if message is active
+  validates :message, presence: true, if: :active?
 
-  with_options if: :display_date_provided? do
-    validates :display_on, presence: true
-    validates :display_until, presence: true
+  # @return [AlertMessage]
+  def self.header
+    find_by(location: 'header')
   end
 
-  # TODO: validate only one active message per area?
-
-  # @return [TrueClass, FalseClass]
-  def display?
-    return false unless active?
-
-    Time.zone.now.between? display_on, display_until
+  # @return [AlertMessage]
+  def self.home
+    find_by(location: 'home')
   end
-
-  private
-
-    def display_date_provided?
-      display_on || display_until
-    end
 end

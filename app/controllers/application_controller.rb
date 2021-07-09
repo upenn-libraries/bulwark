@@ -36,9 +36,6 @@ class ApplicationController < ActionController::Base
   end
 
   def header_alert
-    alert = AlertMessage.where(location: 'header').first
-    return unless alert&.display?
-
-    @header_alert = alert
+    @header_alert = AlertMessage.header
   end
 end

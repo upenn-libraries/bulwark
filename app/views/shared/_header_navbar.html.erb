@@ -15,8 +15,8 @@
 </div>
 
 <%# TODO: clean up display  %>
-<% if @header_alert %>
-  <div class="alert alert-<%= @header_alert.level %>">
+<% if @header_alert.active? %>
+  <div class="alert header-alert alert-<%= @header_alert.level %>">
     <%= @header_alert.message %>
   </div>
 <% end %>
