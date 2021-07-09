@@ -56,8 +56,12 @@ module Bulwark
           end
         end
 
-        # Adding item_type = `Manuscript` when conditions are met
-        mapped_values['item_type'] = ['Manuscripts'] if manuscript?(data)
+        # Adding item_type when conditions are met
+        mapped_values['item_type'] = if manuscript?(data)
+                                       ['Manuscripts']
+                                     elsif book?(data)
+                                       ['Books']
+                                     end
 
         # Adding bibnumber and call number
         bibnumber = data.at_xpath('//records/record/controlfield[@tag=001]').text
@@ -92,6 +96,13 @@ module Bulwark
         manuscript = true if all_subfields.any? { |s| s.casecmp('paulm').zero? }
 
         manuscript
+      end
+
+      # Returns true if the MARC data describes the item as a Book
+      def self.book?(data)
+        # Checking for `a` in 7th value of the leader field
+        leader = data.at_xpath("//records/record/leader").text
+        leader[6] == 'a'
       end
 
       def self.pqc_field(marc_field, code = '*')
