@@ -8,6 +8,7 @@ RSpec.describe Bulwark::PennQualifiedCore::TransformMarc do
       let(:expected_pqc) do
         {
           "identifier" => ["sts- n.r* n.n. di12 (3) 1598 (A)", "(OCoLC)ocm16660686", "(OCoLC)16660686", "2347850", "(PU)2347850-penndb-Voyager"],
+          "item_type" => ["Books"],
           "creator" => ["Ercker, Lazarus,"],
           "title" => [
             "Beschreibung aller fürnemisten Mineralischen Ertzt vnnd Berckwercksarten :",
@@ -67,6 +68,31 @@ RSpec.describe Bulwark::PennQualifiedCore::TransformMarc do
         expect {
           described_class.from_marc_xml('')
         }.to raise_error StandardError, 'Error mapping MARC XML to PQC: NoMethodError undefined method `text\' for nil:NilClass'
+      end
+    end
+  end
+
+  describe '.book?' do
+    let(:nokogiri_xml) do
+      document = Nokogiri::XML(xml)
+      document.remove_namespaces!
+      document
+    end
+
+    context 'when 7th value in leader field is an `a`' do
+      let(:xml) do
+        <<~XML
+          <?xml version="1.0"?>
+          <marc:records xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+            <marc:record>
+              <marc:leader>03167cam a2200517Ia 4500</marc:leader>
+            </marc:record>
+          </marc:records>
+        XML
+      end
+
+      it 'returns true' do
+        expect(described_class.book?(nokogiri_xml)).to be true
       end
     end
   end
