@@ -6,8 +6,4 @@ FactoryBot.define do
     level { AlertMessage::LEVELS.sample }
     location { AlertMessage::LOCATIONS.sample }
   end
-
-  trait :active do
-    active { true }
-  end
 end

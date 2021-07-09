@@ -21,7 +21,7 @@ module Admin
     private
 
       def alert_message_params
-        params.require(:alert_message).permit(:active, :message, :level, :location)
+        params.require(:alert_message).permit(:active, :message, :level)
       end
   end
 end

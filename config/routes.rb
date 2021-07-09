@@ -49,7 +49,7 @@ Rails.application.routes.draw do
   resources :metadata_sources
 
   namespace :admin do
-    resources :alert_messages
+    resources :alert_messages, only: %w[index update]
 
     resources :bulk_imports, except: %w[edit update destroy] do
       member do

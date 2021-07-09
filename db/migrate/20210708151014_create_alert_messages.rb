@@ -7,7 +7,7 @@ class CreateAlertMessages < ActiveRecord::Migration
       t.string :location
     end
 
-    AlertMessage.create! [{ location: 'header' }, { location: 'home'}]
+    AlertMessage.create! [{ location: 'header' }, { location: 'home'} ]
   end
 
   def down
