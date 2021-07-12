@@ -8,8 +8,11 @@ test:
   password: fedoraAdmin
   url: http://bulwark.fcrepo.lndo.site/fcrepo/rest
   base_path: /test
-production:
+deployed: &deployed
   user: <%= ENV["FEDORA_USER"] %>
   password: <%= ::File.exist?('/run/secrets/fedora_password') ? ::File.read('/run/secrets/fedora_password').strip : ENV['FEDORA_PW'] %>
   url: <%= ENV["FEDORA_URL"] %>
   base_path: /prod
+bulwark_dev: *deployed
+bulwark_test: *deployed
+bulwark_production: *deployed

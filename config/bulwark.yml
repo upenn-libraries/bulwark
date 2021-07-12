@@ -27,7 +27,7 @@ test:
   digital_object:
     file_extensions: *valid_asset_extensions
 
-production:
+deployed: &deployed
   mounted_drives:
     kaplan-rescue: <%= ENV['KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
     scanstore-rescue: <%= ENV['SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
@@ -50,3 +50,6 @@ production:
   iiif:
     image_server: <%= ENV['IIIF_IMAGE_SERVER'] %>
 
+bulwark_dev: *deployed
+bulwark_test: *deployed
+bulwark_production: *deployed

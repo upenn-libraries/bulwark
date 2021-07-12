@@ -10,7 +10,11 @@ test:
     assets: "comma,separated,file,extensions"
     metadata_sources: "comma,separated,file,extensions"
 
-production:
+deployed: &deployed
   allowed_extensions:
     assets: 'tif,tiff,jpeg,jpg,wav,mp3,mp4,zip,gz,pdf'
     metadata_sources: 'xlsx,csv'
+
+bulwark_dev: *deployed
+bulwark_test: *deployed
+bulwark_production: *deployed

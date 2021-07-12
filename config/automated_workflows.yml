@@ -48,7 +48,7 @@ test:
     initial_stop: ingest
     steps_to_skip: ['fetch_metadata','fetch_assets','extract','file_check','xml']
 
-production:
+deployed: &deployed
   kaplan:
     csv:
      owner: 'katherly@upenn.edu'
@@ -100,3 +100,7 @@ production:
   ingest_only:
     initial_stop: <%= ENV['INGEST_INITIAL_STOP'] || 'ingest' %>
     steps_to_skip: <%= ENV['INGEST_STEPS_TO_SKIP'] || ['fetch_metadata','fetch_assets','extract','file_check','xml'] %>
+
+bulwark_dev: *deployed
+bulwark_test: *deployed
+bulwark_production: *deployed

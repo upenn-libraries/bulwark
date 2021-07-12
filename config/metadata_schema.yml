@@ -112,7 +112,7 @@ test:
     multivalue_fields:
       - language
       - subject
-production:
+deployed: &deployed
   root_element_options:
     - records
     - record
@@ -180,3 +180,6 @@ production:
   combined:
     http_lookup: <%= ENV['COMBINED_HTTP_LOOKUP'] %>
     http_lookup_suffix: create?format=combined_ark
+bulwark_dev: *deployed
+bulwark_test: *deployed
+bulwark_production: *deployed

@@ -2,5 +2,9 @@ development:
   email: <%= ENV['BATCH_OPS_EMAIL'] %>
 test:
   email: <%= ENV['BATCH_OPS_EMAIL'] %>
-production:
+
+deployed: &deployed
   email: <%= ENV['BATCH_OPS_EMAIL'] %>
+bulwark_dev: *deployed
+bulwark_test: *deployed
+bulwark_production: *deployed

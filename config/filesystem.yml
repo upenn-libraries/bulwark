@@ -44,7 +44,7 @@ test:
   assets_display_path: <% Rails.root.join('tmp', 'test_storage', 'display') %>
   repository_prefix: TEST
 
-production:
+deployed: &deployed
   special_remote:
     type: <%= ENV['STORAGE_TYPE'] %>
     name: <%= ENV['SPECIAL_REMOTE_NAME'] %>
@@ -67,3 +67,7 @@ production:
   supported_vca_version: 6
   input_source_prefix: input_source
   problem_log: problems_log
+
+bulwark_dev: *deployed
+bulwark_test: *deployed
+bulwark_production: *deployed

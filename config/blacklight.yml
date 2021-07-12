@@ -4,6 +4,9 @@ development:
 test: &test
   adapter: solr
   url: http://bulwark.solr.lndo.site/solr/bulwark-test
-production:
+deployed: &deployed
   adapter: solr
   url: <%= ENV['SOLR_URL'] || "http://127.0.0.1:8983/solr/blacklight-core" %>
+bulwark_dev: *deployed
+bulwark_test: *deployed
+bulwark_production: *deployed

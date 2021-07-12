@@ -14,9 +14,13 @@ test:
   pass: "guest"
   frame_max: "131072"
 
-production:
+deployed: &deployed
   host: "127.0.0.1"
   port: "5672"
   user: "guest"
   pass: "guest"
   frame_max: "131072"
+
+bulwark_dev: *deployed
+bulwark_test: *deployed
+bulwark_production: *deployed

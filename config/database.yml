@@ -19,7 +19,7 @@ test:
   password:
   port: 3307
 
-production:
+deployed: &deployed
   adapter: mysql2
   encoding: utf8
   pool: 5
@@ -27,3 +27,7 @@ production:
   database: <%= ENV['DATABASE_NAME'] %>
   username: <%= ENV['DATABASE_USERNAME'] %>
   password: <%= File.exist?('/run/secrets/database_password') ? File.read('/run/secrets/database_password').strip : ENV['DATABASE_PASSWORD'] %>
+
+bulwark_dev: *deployed
+bulwark_test: *deployed
+bulwark_production: *deployed

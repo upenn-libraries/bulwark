@@ -8,6 +8,10 @@ test:
   iiif:
     image_server: <%= ENV['IIIF_IMAGE_SERVER'] %>
 
-production:
+deployed: &deployed
   iiif:
     image_server: <%= ENV['IIIF_IMAGE_SERVER'] %>
+
+bulwark_dev: *deployed
+bulwark_test: *deployed
+bulwark_production: *deployed

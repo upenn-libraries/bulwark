@@ -91,7 +91,7 @@ RUN bundle install
 
 COPY . /home/app/webapp/
 
-RUN RAILS_ENV=production SECRET_KEY_BASE=x bundle exec rake assets:precompile --trace
+RUN RAILS_ENV=bulwark_production SECRET_KEY_BASE=x bundle exec rake assets:precompile --trace
 
 RUN rm -f /etc/service/nginx/down && \
     rm /etc/nginx/sites-enabled/default

@@ -17,6 +17,9 @@ test:
   patron:
     - patron1@example.com
     - leland_himself@example.com
-production:
+deployed: &deployed
   archivist:
     - archivist1@example.com
+bulwark_dev: *deployed
+bulwark_test: *deployed
+bulwark_production: *deployed

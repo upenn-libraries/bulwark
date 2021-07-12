@@ -4,6 +4,9 @@ development:
 test:
   log_name:
     checksum: "checksums.tsv"
-production:
+deployed: &deployed
   log_name:
     checksum: "checksums.tsv"
+bulwark_dev: *deployed
+bulwark_test: *deployed
+bulwark_production: *deployed
