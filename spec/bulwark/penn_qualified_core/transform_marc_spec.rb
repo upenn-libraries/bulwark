@@ -63,6 +63,14 @@ RSpec.describe Bulwark::PennQualifiedCore::TransformMarc do
       end
     end
 
+    context 'for a non-book' do
+      let(:xml) { fixture_to_str('marmite', 'marc_xml', 'non-book.xml') }
+
+      it 'generates_expected_xml' do
+        expect(described_class.from_marc_xml(xml)['item_type']).to be nil
+      end
+    end
+
     context 'when xml is invalid' do
       it 'raises an error' do
         expect {
