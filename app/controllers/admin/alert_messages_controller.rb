@@ -2,7 +2,7 @@
 
 module Admin
   # alert message application actions
-  class AlertMessagesController < ApplicationController
+  class AlertMessagesController < AdminController
     def index
       @header_alert = AlertMessage.header
       @home_alert = AlertMessage.home
