@@ -1,0 +1,39 @@
+<h3>Import History</h3>
+
+<p>List of Import jobs that have impacted this Digital Object</p>
+
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+    <tr>
+      <th>Status</th>
+      <th>Action</th>
+      <th>Date</th>
+      <th>User</th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @digital_object.digital_object_imports.order(created_at: :asc).each do |import| %>
+    <tr>
+      <td>
+        <%= import.status %>
+      </td>
+      <td>
+        <%= import.import_data.dig('action') %>
+      </td>
+      <td>
+        <%= import.created_at.to_s(:display) %>
+      </td>
+      <td>
+        <%= import.bulk_import.created_by.email %>
+      </td>
+      <td>
+        <%= link_to 'Bulk Import', admin_bulk_import_path(import.bulk_import_id) %><br />
+        <%= link_to 'Digital Object Import', admin_bulk_import_digital_object_import_path(import.bulk_import_id, import.id) %>
+      </td>
+    </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
