@@ -12,11 +12,7 @@
     <%= javascript_include_tag 'admin' %>
   </head>
   <body>
-    <% if @header_alert.active? %>
-      <div class="alert header-alert alert-<%= @header_alert.level %>">
-        <%= @header_alert.message %>
-      </div>
-    <% end %>
+    <%= render partial: 'shared/header_alert' %>
 
     <nav class="navbar navbar-default">
       <div class="container-fluid">

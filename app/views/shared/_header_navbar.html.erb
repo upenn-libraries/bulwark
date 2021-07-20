@@ -1,9 +1,5 @@
 <%# TODO: clean up display  %>
-<% if @header_alert.active? %>
-  <div class="alert header-alert alert-<%= @header_alert.level %>">
-    <%= @header_alert.message %>
-  </div>
-<% end %>
+<%= render partial: 'shared/header_alert' %>
 
 <div id="header-navbar" class="navbar navbar-inverse navbar-static-top" role="navigation">
     <div id="header-brand-links">
