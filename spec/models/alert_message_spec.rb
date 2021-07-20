@@ -27,5 +27,17 @@ RSpec.describe AlertMessage, type: :model do
       expect(alert_message.valid?).to be false
       expect(alert_message.errors.first).to include :message
     end
+
+    it 'raises an error message if location is set to an invalid value' do
+      alert_message.location = 'footer'
+      expect(alert_message.valid?).to be false
+      expect(alert_message.errors.first).to include :location
+    end
+
+    it 'raises an error message if level is set to an invalid value' do
+      alert_message.level = 'armageddon'
+      expect(alert_message.valid?).to be false
+      expect(alert_message.errors.first).to include :level
+    end
   end
 end

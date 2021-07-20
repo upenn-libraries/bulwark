@@ -10,6 +10,9 @@ class AlertMessage < ActiveRecord::Base
   # require message content if message is active
   validates :message, presence: true, if: :active?
 
+  validates :location, inclusion: { in: LOCATIONS }
+  validates :level, inclusion: { in: LEVELS }
+
   # @return [AlertMessage]
   def self.header
     find_by(location: 'header')
