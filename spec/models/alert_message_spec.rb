@@ -39,5 +39,10 @@ RSpec.describe AlertMessage, type: :model do
       expect(alert_message.valid?).to be false
       expect(alert_message.errors.first).to include :level
     end
+
+    it 'does not raise and error if level is not provided' do
+      alert_message.level = nil
+      expect(alert_message.valid?).to be true
+    end
   end
 end

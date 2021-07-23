@@ -11,7 +11,7 @@ class AlertMessage < ActiveRecord::Base
   validates :message, presence: true, if: :active?
 
   validates :location, inclusion: { in: LOCATIONS }
-  validates :level, inclusion: { in: LEVELS }
+  validates :level, inclusion: { in: LEVELS }, allow_blank: true
 
   # @return [AlertMessage]
   def self.header
