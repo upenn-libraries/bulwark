@@ -14,17 +14,17 @@ module Bulwark
       def self.generate(original, write_to, width, height, format)
         raise Bulwark::Derivatives::Error, "#{write_to} does not exist" unless File.exist?(write_to)
 
-        image = MiniMagick::Image.open(original)
-        image.format(format) do |convert|
-          convert.quality(90)
-          convert.resize("#{width}x#{height}")
-          convert.auto_orient # Rotate image to reflect EXIF orientation
-          convert.strip       # Strip color profiles
-        end
-
         write_to = File.join(write_to, "#{File.basename(original, '.*')}.#{format}").to_s if File.directory?(write_to)
 
-        image.write(write_to)
+        # `image_processing` gem wraps an API around both imagemagick and vips. Corrupt images will raise an error
+        # in both libraries. This library auto rotates images by default.
+        ImageProcessing::Vips.source(original)
+                             .loader(page: 0) # Use the first layer, if an image has multiple layers.
+                             .convert(format)
+                             .saver(quality: 90, strip: true) # Strips color profiles
+                             .resize_to_limit(width, height)
+                             .call(destination: write_to)
+
         File.chmod(0644, write_to)
         write_to
       rescue => e
@@ -39,7 +39,7 @@ module Bulwark
 
       # Generates access copy derivative
       def self.access_copy(original, write_to)
-        generate(original, write_to, '3500', '7000', 'jpeg')
+        generate(original, write_to, 3500, 7000, 'jpeg')
       end
     end
   end
