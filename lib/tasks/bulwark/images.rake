@@ -40,7 +40,7 @@ namespace :bulwark do
       FileUtils.mkdir_p(access_directory)
       FileUtils.mkdir_p(thumbnail_directory)
 
-      Dir.glob(File.join(directory,'*.{tif,tiff,jpeg}')).each do |filepath|
+      Dir.glob(File.join(directory, '*.{tif,tiff,jpeg}')).each do |filepath|
         begin
           access_time = Benchmark.measure { Bulwark::Derivatives::Image.access_copy(filepath, access_directory) }
           thumbnail_time = Benchmark.measure { Bulwark::Derivatives::Image.thumbnail(filepath, thumbnail_directory) }
