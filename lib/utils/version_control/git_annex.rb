@@ -191,6 +191,7 @@ module Utils
         git.config('remote.origin.annex-ignore', 'true') # Does not store binary files in origin remote
         git.config('annex.pidlock', 'true') if special_remote[:top_level_pid_lock]
         git.config('annex.largefiles', 'not (include=.repoadmin/bin/*.sh)')
+        git.config('annex.jobs', 'cpus')
         git.annex.fsck(from: special_remote[:name], fast: true) if fsck
       end
 
