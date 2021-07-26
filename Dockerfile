@@ -70,6 +70,25 @@ RUN chmod 0700 \
 
 RUN chown -R app:app /fs
 
+# Compile newer version of libvips
+WORKDIR /tmp
+
+RUN apt-get update && apt-get install -qq -y --no-install-recommends \
+        build-essential \
+        glib2.0-dev \
+        libexif-dev \
+        libexpat1-dev \
+        libgsf-1-dev \
+        libjpeg-turbo8-dev \
+        libtiff5-dev \
+        pkg-config && \
+    rm -rf /var/lib/apt/lists/* && \
+    wget https://github.com/libvips/libvips/releases/download/v8.11.2/vips-8.11.2.tar.gz -O - | tar xz && \
+    cd vips-8.11.2 && \
+    ./configure && \
+    make && make install && make clean && \
+    ldconfig
+
 # Install newer version of rsync
 WORKDIR /tmp
 
