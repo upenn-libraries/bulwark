@@ -3,12 +3,13 @@ class ApplicationController < ActionController::Base
   include Blacklight::Controller
   include Hydra::Controller::ControllerBehavior
   include Blacklight::Base
+  include HeaderAlert
 
   # base application layout is copied from Blacklight, with Matomo tracking added
   # https://github.com/projectblacklight/blacklight/blob/v5.13.0/app/views/layouts/blacklight.html.erb
   layout 'application'
 
-  before_filter :_set_current_user
+  before_action :_set_current_user
 
   rescue_from ActiveRecord::RecordNotFound, :with => :rescue_not_found
 

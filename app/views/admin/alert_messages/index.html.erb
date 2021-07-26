@@ -1,0 +1,14 @@
+<ol class="breadcrumb">
+  <li>Admin</li>
+  <li><a href="/admin/alert_messages">Alert Messages</a></li>
+</ol>
+
+<h2>Alert Messages</h2>
+
+<h3>Site Header Alert</h3>
+<%= render 'form', alert_message: @header_alert %>
+
+<hr>
+
+<h3>Homepage Alert</h3>
+<%= render 'form', alert_message: @home_alert %>

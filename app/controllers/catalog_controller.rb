@@ -5,6 +5,8 @@ class CatalogController < ApplicationController
 
   include Hydra::Catalog
 
+  before_action :home_alert, only: :index
+
   def default_url_options
     { :protocol => ENV['CATALOG_CONTROLLER_PROTOCOL'] }
   end
@@ -265,5 +267,9 @@ class CatalogController < ApplicationController
       thumbnail_link = arks_to_thumbnail_links[ark]
       doc._source['thumbnail_url'] = thumbnail_link if thumbnail_link
     end
+  end
+
+  def home_alert
+    @home_alert = AlertMessage.home
   end
 end

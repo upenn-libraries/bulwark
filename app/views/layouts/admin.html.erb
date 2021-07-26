@@ -12,8 +12,11 @@
     <%= javascript_include_tag 'admin' %>
   </head>
   <body>
+    <%= render partial: 'shared/header_alert' %>
+
     <nav class="navbar navbar-default">
       <div class="container-fluid">
+
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -34,8 +37,11 @@
             <li class="<%= request.path.starts_with?('/admin/bulk_imports') ? 'active' : nil %>">
               <%= link_to 'Bulk Imports', admin_bulk_imports_path %>
             </li>
+            <li class="<%= request.path.starts_with?('/admin/alert_messages') ? 'active' : nil %>">
+              <%= link_to 'Alert Messages', admin_alert_messages_path %>
+            </li>
           </ul>
-          <p class="navbar-text navbar-right"><%= current_user.email%></p>
+          <p class="navbar-text navbar-right"><%= current_user.email %></p>
         </div>
       </div>
     </nav>
