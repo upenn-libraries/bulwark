@@ -22,9 +22,7 @@ RUN apt-get update && apt-get install -qq -y --no-install-recommends \
         nodejs \
         openssh-server \
         sudo \
-        vim \
-        xsltproc
-
+        vim
 # Remove default generated SSH keys to prevent use in production
 # SSH login fix. Otherwise user is kicked off after login
 RUN rm /etc/ssh/ssh_host_* && \
@@ -73,6 +71,7 @@ RUN chown -R app:app /fs
 # Compile newer version of libvips
 WORKDIR /tmp
 
+# Compiling libvips because the application require libvips 8.6+. Eventually we might be able to use a packed version.
 RUN apt-get update && apt-get install -qq -y --no-install-recommends \
         build-essential \
         glib2.0-dev \

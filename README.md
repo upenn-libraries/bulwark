@@ -6,9 +6,11 @@ Bulwark is a Hydra head providing administrative digital asset and metadata gene
 
 * [Git](https://git-scm.com/) - The application supports robust versioning of content and metadata through the use of git for version control.
 * [Git-annex](git-annex.branchable.com) - A git library that allows large binaries to be safely and robustly managed by git without being checked into the git repository.
-* [xsltproc](http://xmlsoft.org/XSLT/xsltproc.html) - Command-line XSLT processor for transforming base XML into other formats for ingest/review.
 * [ImageMagick](http://www.imagemagick.org/script/index.php) - Software suite for creating and editing binary images, relied upon by the [minimagick](https://github.com/minimagick/minimagick) gem, used to create image derivatives.
+* [libvips](https://libvips.github.io/libvips/) - Image processing library, will eventually replace imagemagick. 
+  Version 8.6+ required.
 * [NPM](https://www.npmjs.com/)
+
 
 ## Setting up local development and test environment
 We are using [lando](https://docs.lando.dev/basics/) to set up our local development and test environments. We have some custom rake tasks that wrap lando commands and run other necessary tasks.
@@ -19,6 +21,7 @@ We are using [lando](https://docs.lando.dev/basics/) to set up our local develop
 ```
 brew install git-annex
 brew install imagemagick
+brew install vips
 brew cask install lando
 ```
 
