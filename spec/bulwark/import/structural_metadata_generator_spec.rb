@@ -112,31 +112,108 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
     end
   end
 
-  describe '#csv' do
-    context 'when generating csv with bibnumber' do
+  describe '#extract_metadata' do
+    context 'when extracting data with bibnumber' do
       let(:generator) { described_class.new(bibnumber: '1234567890') }
 
       it 'calls from_bibnumber' do
         expect(generator).to receive(:from_bibnumber).with('1234567890')
-        generator.csv
+        generator.extract_metadata
       end
     end
 
-    context 'when generating csv with file' do
+    context 'when extracting data from file' do
       let(:generator) { described_class.new(drive: 'test', path: 'to/file.csv') }
 
       it 'calls from_file' do
         expect(generator).to receive(:from_file).with(File.join(Bulwark::Import::MountedDrives.path_to('test'), 'to/file.csv'))
-        generator.csv
+        generator.extract_metadata
       end
     end
 
-    context 'when generating csv with filenames' do
-      let(:generator) { described_class.new(filenames: 'something') }
+    context 'when extracting data from filenames' do
+      let(:generator) { described_class.new(filenames: 'something.tif', viewing_direction: 'right-to-left') }
 
       it 'calls from_ordered_filenames' do
-        expect(generator).to receive(:from_ordered_filenames).with('something', nil, nil)
-        generator.csv
+        expect(generator).to receive(:from_ordered_filenames).with('something.tif', nil, 'right-to-left')
+        generator.extract_metadata
+      end
+    end
+
+    context 'when extracting data from sequence' do
+      let(:generator) { described_class.new(sequence: sequence) }
+
+      let(:sequence) do
+        [
+          { filename: 'first.tif', label: 'First', table_of_contents: ['First Illuminated Image', 'Second Illuminated Image'] },
+          { filename: 'second.tif', label: 'Second' },
+          { filename: 'third.tif', label: 'Third' }
+        ]
+      end
+
+      it 'calls from_sequence' do
+        expect(generator).to receive(:from_sequence).with(sequence, nil, nil)
+        generator.extract_metadata
+      end
+    end
+  end
+
+  describe '#csv' do
+    context 'when generating csv with filenames' do
+      let(:filenames) { 'first.tif; second.tif; thrid.tif' }
+      let(:generator) { described_class.new(filenames: filenames, viewing_direction: 'right-to-left') }
+      let(:expected_csv) do
+        <<~CSV
+          filename,sequence,viewing_direction
+          first.tif,1,right-to-left
+          second.tif,2,right-to-left
+          thrid.tif,3,right-to-left
+        CSV
+      end
+
+      it 'generates expected csv' do
+        expect(generator.csv).to eql expected_csv
+      end
+    end
+
+    context 'when generating csv with sequence' do
+      let(:generator) { described_class.new(sequence: sequence) }
+
+      let(:sequence) do
+        [
+          { filename: 'first.tif', label: 'First', table_of_contents: ['First Illuminated Image', 'Second Illuminated Image'] },
+          { filename: 'second.tif', label: 'Second' },
+          { filename: 'third.tif', label: 'Third' }
+        ]
+      end
+      let(:expected_csv) do
+        <<~CSV
+          filename,label,sequence,table_of_contents[1],table_of_contents[2]
+          first.tif,First,1,First Illuminated Image,Second Illuminated Image
+          second.tif,Second,2,,
+          third.tif,Third,3,,
+        CSV
+      end
+
+      it 'generates expected csv' do
+        expect(generator.csv).to eql expected_csv
+      end
+    end
+  end
+
+  describe '#all_filenames' do
+    context 'when providing sequence' do
+      let(:generator) { described_class.new(sequence: [{ filename: 'other.tif' }, { filename: 'this.tif' }]) }
+      it 'returns all filenames' do
+        expect(generator.all_filenames).to eql ['other.tif', 'this.tif']
+      end
+    end
+
+    context 'when providing list of filenames' do
+      let(:generator) { described_class.new(filenames: 'first.tif;second.tif;third.tif') }
+
+      it 'returns all filenames' do
+        expect(generator.all_filenames).to eql ['first.tif', 'second.tif', 'third.tif']
       end
     end
   end
@@ -180,25 +257,24 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
         end
 
         let(:expected_data) do
-          <<~CSV
-            display,filename,label,sequence,table_of_contents[1],table_of_contents[2],viewing_direction
-            paged,ljs501_wk1_front0001.tif,Front cover,1,,,left-to-right
-            paged,ljs501_wk1_front0002.tif,Inside front cover,2,"Seller's description, Inside front cover",,left-to-right
-            paged,ljs501_wk1_front0003.tif,[Flyleaf 1 recto],3,"Seller's note, Flyleaf 1 recto",,left-to-right
-            paged,ljs501_wk1_front0004.tif,[Flyleaf 1 verso],4,,,left-to-right
-            paged,ljs501_wk1_body0001.tif,1r,5,"Historiated initial, Initial I, Woman and monk holding armillary sphere, f. 1r","Puzzle initial, Initial C, f. 1r",left-to-right
-            paged,ljs501_wk1_body0002.tif,1v,6,"Decorated initial, Initial C, f. 1v",,left-to-right
-            paged,ljs501_wk1_body0003.tif,2r,7,,,left-to-right
-            paged,ljs501_wk1_body0004.tif,2v,8,,,left-to-right
-            paged,ljs501_wk1_back0001.tif,[Flyleaf 1 recto],9,,,left-to-right
-            paged,ljs501_wk1_back0002.tif,[Flyleaf 1 verso],10,,,left-to-right
-            paged,ljs501_wk1_back0003.tif,Inside back cover,11,,,left-to-right
-            paged,ljs501_wk1_back0004.tif,Back cover,12,,,left-to-right
-            paged,ljs501_wk1_back0005.tif,Spine,13,,,left-to-right
-          CSV
+          [
+            { display: 'paged', filename: 'ljs501_wk1_front0001.tif', label: 'Front cover', sequence: 1, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'paged', filename: 'ljs501_wk1_front0002.tif', label: 'Inside front cover', sequence: 2, table_of_contents: ["Seller's description, Inside front cover"], viewing_direction: 'left-to-right' },
+            { display: 'paged', filename: 'ljs501_wk1_front0003.tif', label: '[Flyleaf 1 recto]', sequence: 3, table_of_contents: ["Seller's note, Flyleaf 1 recto"], viewing_direction: 'left-to-right' },
+            { display: 'paged', filename: 'ljs501_wk1_front0004.tif', label: '[Flyleaf 1 verso]', sequence: 4, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'paged', filename: 'ljs501_wk1_body0001.tif', label: '1r', sequence: 5, table_of_contents: ["Historiated initial, Initial I, Woman and monk holding armillary sphere, f. 1r", "Puzzle initial, Initial C, f. 1r"], viewing_direction: 'left-to-right' },
+            { display: 'paged', filename: 'ljs501_wk1_body0002.tif', label: '1v', sequence: 6, table_of_contents: ["Decorated initial, Initial C, f. 1v"], viewing_direction: 'left-to-right' },
+            { display: 'paged', filename: 'ljs501_wk1_body0003.tif', label: '2r', sequence: 7, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'paged', filename: 'ljs501_wk1_body0004.tif', label: '2v', sequence: 8, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'paged', filename: 'ljs501_wk1_back0001.tif', label: '[Flyleaf 1 recto]', sequence: 9, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'paged', filename: 'ljs501_wk1_back0002.tif', label: '[Flyleaf 1 verso]', sequence: 10, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'paged', filename: 'ljs501_wk1_back0003.tif', label: 'Inside back cover', sequence: 11, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'paged', filename: 'ljs501_wk1_back0004.tif', label: 'Back cover', sequence: 12, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'paged', filename: 'ljs501_wk1_back0005.tif', label: 'Spine', sequence: 13, table_of_contents: [], viewing_direction: 'left-to-right' }
+          ]
         end
 
-        it 'generates expected csv data' do
+        it 'generates expected data' do
           expect(generator.send(:from_bibnumber, bibnumber)).to eql expected_data
         end
       end
@@ -217,25 +293,24 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
         end
 
         let(:expected_data) do
-          <<~CSV
-            display,filename,label,sequence,table_of_contents[1],table_of_contents[2],viewing_direction
-            paged,ljs501_wk1_front0001.tif,Front cover,1,,,right-to-left
-            paged,ljs501_wk1_front0002.tif,Inside front cover,2,"Seller's description, Inside front cover",,right-to-left
-            paged,ljs501_wk1_front0003.tif,[Flyleaf 1 recto],3,"Seller's note, Flyleaf 1 recto",,right-to-left
-            paged,ljs501_wk1_front0004.tif,[Flyleaf 1 verso],4,,,right-to-left
-            paged,ljs501_wk1_body0001.tif,1r,5,"Historiated initial, Initial I, Woman and monk holding armillary sphere, f. 1r","Puzzle initial, Initial C, f. 1r",right-to-left
-            paged,ljs501_wk1_body0002.tif,1v,6,"Decorated initial, Initial C, f. 1v",,right-to-left
-            paged,ljs501_wk1_body0003.tif,2r,7,,,right-to-left
-            paged,ljs501_wk1_body0004.tif,2v,8,,,right-to-left
-            paged,ljs501_wk1_back0001.tif,[Flyleaf 1 recto],9,,,right-to-left
-            paged,ljs501_wk1_back0002.tif,[Flyleaf 1 verso],10,,,right-to-left
-            paged,ljs501_wk1_back0003.tif,Inside back cover,11,,,right-to-left
-            paged,ljs501_wk1_back0004.tif,Back cover,12,,,right-to-left
-            paged,ljs501_wk1_back0005.tif,Spine,13,,,right-to-left
-          CSV
+          [
+            { display: 'paged', filename: 'ljs501_wk1_front0001.tif', label: 'Front cover', sequence: 1, table_of_contents: [], viewing_direction: 'right-to-left' },
+            { display: 'paged', filename: 'ljs501_wk1_front0002.tif', label: 'Inside front cover', sequence: 2, table_of_contents: ["Seller's description, Inside front cover"], viewing_direction: 'right-to-left' },
+            { display: 'paged', filename: 'ljs501_wk1_front0003.tif', label: '[Flyleaf 1 recto]', sequence: 3, table_of_contents: ["Seller's note, Flyleaf 1 recto"], viewing_direction: 'right-to-left' },
+            { display: 'paged', filename: 'ljs501_wk1_front0004.tif', label: '[Flyleaf 1 verso]', sequence: 4, table_of_contents: [], viewing_direction: 'right-to-left' },
+            { display: 'paged', filename: 'ljs501_wk1_body0001.tif', label: '1r', sequence: 5, table_of_contents: ["Historiated initial, Initial I, Woman and monk holding armillary sphere, f. 1r", "Puzzle initial, Initial C, f. 1r"], viewing_direction: 'right-to-left' },
+            { display: 'paged', filename: 'ljs501_wk1_body0002.tif', label: '1v', sequence: 6, table_of_contents: ["Decorated initial, Initial C, f. 1v"], viewing_direction: 'right-to-left' },
+            { display: 'paged', filename: 'ljs501_wk1_body0003.tif', label: '2r', sequence: 7, table_of_contents: [], viewing_direction: 'right-to-left' },
+            { display: 'paged', filename: 'ljs501_wk1_body0004.tif', label: '2v', sequence: 8, table_of_contents: [], viewing_direction: 'right-to-left' },
+            { display: 'paged', filename: 'ljs501_wk1_back0001.tif', label: '[Flyleaf 1 recto]', sequence: 9, table_of_contents: [], viewing_direction: 'right-to-left' },
+            { display: 'paged', filename: 'ljs501_wk1_back0002.tif', label: '[Flyleaf 1 verso]', sequence: 10, table_of_contents: [], viewing_direction: 'right-to-left' },
+            { display: 'paged', filename: 'ljs501_wk1_back0003.tif', label: 'Inside back cover', sequence: 11, table_of_contents: [], viewing_direction: 'right-to-left' },
+            { display: 'paged', filename: 'ljs501_wk1_back0004.tif', label: 'Back cover', sequence: 12, table_of_contents: [], viewing_direction: 'right-to-left' },
+            { display: 'paged', filename: 'ljs501_wk1_back0005.tif', label: 'Spine', sequence: 13, table_of_contents: [], viewing_direction: 'right-to-left' }
+          ]
         end
 
-        it 'generates expected csv data' do
+        it 'generates expected data' do
           expect(generator.send(:from_bibnumber, bibnumber)).to eql expected_data
         end
       end
@@ -254,25 +329,24 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
         end
 
         let(:expected_data) do
-          <<~CSV
-            display,filename,label,sequence,table_of_contents[1],table_of_contents[2],viewing_direction
-            individuals,ljs501_wk1_front0001.tif,Front cover,1,,,left-to-right
-            individuals,ljs501_wk1_front0002.tif,Inside front cover,2,"Seller's description, Inside front cover",,left-to-right
-            individuals,ljs501_wk1_front0003.tif,[Flyleaf 1 recto],3,"Seller's note, Flyleaf 1 recto",,left-to-right
-            individuals,ljs501_wk1_front0004.tif,[Flyleaf 1 verso],4,,,left-to-right
-            individuals,ljs501_wk1_body0001.tif,1r,5,"Historiated initial, Initial I, Woman and monk holding armillary sphere, f. 1r","Puzzle initial, Initial C, f. 1r",left-to-right
-            individuals,ljs501_wk1_body0002.tif,1v,6,"Decorated initial, Initial C, f. 1v",,left-to-right
-            individuals,ljs501_wk1_body0003.tif,2r,7,,,left-to-right
-            individuals,ljs501_wk1_body0004.tif,2v,8,,,left-to-right
-            individuals,ljs501_wk1_back0001.tif,[Flyleaf 1 recto],9,,,left-to-right
-            individuals,ljs501_wk1_back0002.tif,[Flyleaf 1 verso],10,,,left-to-right
-            individuals,ljs501_wk1_back0003.tif,Inside back cover,11,,,left-to-right
-            individuals,ljs501_wk1_back0004.tif,Back cover,12,,,left-to-right
-            individuals,ljs501_wk1_back0005.tif,Spine,13,,,left-to-right
-          CSV
+          [
+            { display: 'individuals', filename: 'ljs501_wk1_front0001.tif', label: 'Front cover', sequence: 1, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'individuals', filename: 'ljs501_wk1_front0002.tif', label: 'Inside front cover', sequence: 2, table_of_contents: ["Seller's description, Inside front cover"], viewing_direction: 'left-to-right' },
+            { display: 'individuals', filename: 'ljs501_wk1_front0003.tif', label: '[Flyleaf 1 recto]', sequence: 3, table_of_contents: ["Seller's note, Flyleaf 1 recto"], viewing_direction: 'left-to-right' },
+            { display: 'individuals', filename: 'ljs501_wk1_front0004.tif', label: '[Flyleaf 1 verso]', sequence: 4, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'individuals', filename: 'ljs501_wk1_body0001.tif', label: '1r', sequence: 5, table_of_contents: ["Historiated initial, Initial I, Woman and monk holding armillary sphere, f. 1r", "Puzzle initial, Initial C, f. 1r"], viewing_direction: 'left-to-right' },
+            { display: 'individuals', filename: 'ljs501_wk1_body0002.tif', label: '1v', sequence: 6, table_of_contents: ["Decorated initial, Initial C, f. 1v"], viewing_direction: 'left-to-right' },
+            { display: 'individuals', filename: 'ljs501_wk1_body0003.tif', label: '2r', sequence: 7, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'individuals', filename: 'ljs501_wk1_body0004.tif', label: '2v', sequence: 8, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'individuals', filename: 'ljs501_wk1_back0001.tif', label: '[Flyleaf 1 recto]', sequence: 9, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'individuals', filename: 'ljs501_wk1_back0002.tif', label: '[Flyleaf 1 verso]', sequence: 10, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'individuals', filename: 'ljs501_wk1_back0003.tif', label: 'Inside back cover', sequence: 11, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'individuals', filename: 'ljs501_wk1_back0004.tif', label: 'Back cover', sequence: 12, table_of_contents: [], viewing_direction: 'left-to-right' },
+            { display: 'individuals', filename: 'ljs501_wk1_back0005.tif', label: 'Spine', sequence: 13, table_of_contents: [], viewing_direction: 'left-to-right' }
+          ]
         end
 
-        it 'generates expected csv data' do
+        it 'generates expected data' do
           expect(generator.send(:from_bibnumber, bibnumber)).to eql expected_data
         end
       end
@@ -284,27 +358,25 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
 
     context 'when only providing filenames' do
       let(:expected_csv) do
-        <<~CSV
-          filename,sequence
-          first.tif,1
-          second.tif,2
-          thrid.tif,3
-        CSV
+        [
+          { filename: 'first.tif', sequence: 1 },
+          { filename: 'second.tif', sequence: 2 },
+          { filename: 'third.tif', sequence: 3 }
+        ]
       end
 
       it 'generates expected csv data' do
-        expect(generator.send(:from_ordered_filenames, 'first.tif; second.tif; thrid.tif')).to eql expected_csv
+        expect(generator.send(:from_ordered_filenames, 'first.tif; second.tif; third.tif')).to eql expected_csv
       end
     end
 
     context 'when providing filenames and display' do
       let(:expected_csv) do
-        <<~CSV
-          filename,sequence,display
-          first.tif,1,paged
-          second.tif,2,paged
-          thrid.tif,3,paged
-        CSV
+        [
+          { filename: 'first.tif', sequence: 1, display: 'paged' },
+          { filename: 'second.tif', sequence: 2, display: 'paged' },
+          { filename: 'thrid.tif', sequence: 3, display: 'paged' }
+        ]
       end
 
       it 'generates expected csv data' do
@@ -313,32 +385,30 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
     end
 
     context 'when providing filenames and viewing_direction' do
-      let(:expected_csv) do
-        <<~CSV
-          filename,sequence,viewing_direction
-          first.tif,1,top-to-bottom
-          second.tif,2,top-to-bottom
-          thrid.tif,3,top-to-bottom
-        CSV
+      let(:expected_data) do
+        [
+          { filename: 'first.tif', sequence: 1, viewing_direction: 'top-to-bottom' },
+          { filename: 'second.tif', sequence: 2, viewing_direction: 'top-to-bottom' },
+          { filename: 'thrid.tif', sequence: 3, viewing_direction: 'top-to-bottom' }
+        ]
       end
 
-      it 'generates expected csv data' do
-        expect(generator.send(:from_ordered_filenames, 'first.tif; second.tif; thrid.tif', nil, 'top-to-bottom')).to eql expected_csv
+      it 'generates expected data' do
+        expect(generator.send(:from_ordered_filenames, 'first.tif; second.tif; thrid.tif', nil, 'top-to-bottom')).to eql expected_data
       end
     end
 
     context 'when providing filenames, display and viewing_direction' do
-      let(:expected_csv) do
-        <<~CSV
-          filename,sequence,display,viewing_direction
-          first.tif,1,paged,top-to-bottom
-          second.tif,2,paged,top-to-bottom
-          thrid.tif,3,paged,top-to-bottom
-        CSV
+      let(:expected_data) do
+        [
+          { filename: 'first.tif', sequence: 1, display: 'paged', viewing_direction: 'top-to-bottom' },
+          { filename: 'second.tif', sequence: 2, display: 'paged', viewing_direction: 'top-to-bottom' },
+          { filename: 'thrid.tif', sequence: 3, display: 'paged', viewing_direction: 'top-to-bottom' }
+        ]
       end
 
-      it 'generates expected csv data' do
-        expect(generator.send(:from_ordered_filenames, 'first.tif; second.tif; thrid.tif', 'paged', 'top-to-bottom')).to eql expected_csv
+      it 'generates expected data' do
+        expect(generator.send(:from_ordered_filenames, 'first.tif; second.tif; thrid.tif', 'paged', 'top-to-bottom')).to eql expected_data
       end
     end
   end
@@ -354,17 +424,16 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
           { filename: 'thrid.tif', label: 'Thrid' }
         ]
       end
-      let(:expected_csv) do
-        <<~CSV
-          filename,label,sequence,table_of_contents[1],table_of_contents[2]
-          first.tif,First,1,First Illuminated Image,Second Illuminated Image
-          second.tif,Second,2,,
-          thrid.tif,Thrid,3,,
-        CSV
+      let(:expected_data) do
+        [
+          { filename: 'first.tif', label: 'First', sequence: 1, table_of_contents: ['First Illuminated Image', 'Second Illuminated Image'] },
+          { filename: 'second.tif', label: 'Second', sequence: 2 },
+          { filename: 'thrid.tif', label: 'Thrid', sequence: 3 }
+        ]
       end
 
-      it 'generates expected csv data' do
-        expect(generator.send(:from_sequence, sequence)).to eql expected_csv
+      it 'generates expected data' do
+        expect(generator.send(:from_sequence, sequence)).to eql expected_data
       end
     end
 
@@ -376,17 +445,16 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
           { filename: 'thrid.tif', label: 'Thrid' }
         ]
       end
-      let(:expected_csv) do
-        <<~CSV
-          filename,label,sequence,table_of_contents[1],table_of_contents[2],viewing_direction
-          first.tif,First,1,First Illuminated Image,Second Illuminated Image,left-to-right
-          second.tif,Second,2,,,left-to-right
-          thrid.tif,Thrid,3,,,left-to-right
-        CSV
+      let(:expected_data) do
+        [
+          { filename: 'first.tif', label: 'First', sequence: 1, table_of_contents: ['First Illuminated Image', 'Second Illuminated Image'], viewing_direction: 'left-to-right' },
+          { filename: 'second.tif', label: 'Second', sequence: 2, viewing_direction: 'left-to-right' },
+          { filename: 'thrid.tif', label: 'Thrid', sequence: 3, viewing_direction: 'left-to-right' }
+        ]
       end
 
-      it 'generates expected csv data' do
-        expect(generator.send(:from_sequence, sequence, nil, 'left-to-right')).to eql expected_csv
+      it 'generates expected data' do
+        expect(generator.send(:from_sequence, sequence, nil, 'left-to-right')).to eql expected_data
       end
     end
 
@@ -398,17 +466,16 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
           { filename: 'thrid.tif', label: 'Thrid' }
         ]
       end
-      let(:expected_csv) do
-        <<~CSV
-          display,filename,label,sequence,table_of_contents[1],table_of_contents[2],viewing_direction
-          paged,first.tif,First,1,First Illuminated Image,Second Illuminated Image,left-to-right
-          paged,second.tif,Second,2,,,left-to-right
-          paged,thrid.tif,Thrid,3,,,left-to-right
-        CSV
+      let(:expected_data) do
+        [
+          { display: 'paged', filename: 'first.tif', label: 'First', sequence: 1, table_of_contents: ['First Illuminated Image', 'Second Illuminated Image'], viewing_direction: 'left-to-right' },
+          { display: 'paged', filename: 'second.tif', label: 'Second', sequence: 2, viewing_direction: 'left-to-right' },
+          { display: 'paged', filename: 'thrid.tif', label: 'Thrid', sequence: 3, viewing_direction: 'left-to-right' }
+        ]
       end
 
-      it 'generates expected csv data' do
-        expect(generator.send(:from_sequence, sequence, 'paged', 'left-to-right')).to eql expected_csv
+      it 'generates expected data' do
+        expect(generator.send(:from_sequence, sequence, 'paged', 'left-to-right')).to eql expected_data
       end
     end
   end
