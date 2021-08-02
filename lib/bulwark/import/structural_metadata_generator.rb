@@ -4,6 +4,13 @@ module Bulwark
     class StructuralMetadataGenerator
       attr_reader :filenames, :bibnumber, :drive, :path, :viewing_direction, :display, :sequence, :errors
 
+      # Reads in structural metadata based on the options given.
+      #
+      # @param [Hash] options options used to generate structural metadata csv
+      # @option options [Array<String>] :filenames list of ordered filenames
+      # @option options [String] :drive to be used in conjunction with :path to retrieve file
+      # @option options [String] :path to be used in conjunction with :drive to retrieve file
+      # @option options [String] :bibnumber id used to retrieve structural metadata from Marmite (external service)
       def initialize(options = {})
         options = options.deep_symbolize_keys
 
@@ -39,14 +46,18 @@ module Bulwark
         errors.empty?
       end
 
-      # Generates structural metadata csv based on the options given.
+      # Returns extracted metadata.
       #
-      # @param [Hash] options options used to generate structural metadata csv
-      # @option options [Array<String>] :filenames list of ordered filenames
-      # @option options [String] :drive to be used in conjunction with :path to retrieve file
-      # @option options [String] :path to be used in conjunction with :drive to retrieve file
-      # @option options [String] :bibnumber id used to retrieve structural metadata from Marmite (external service)
-      def csv
+      # @return [Array<Hash>]
+      def metadata
+        @metadata ||= extract_metadata
+      end
+
+      # Reads in the metadata into a Hash. There are different strategies on how to read in the data based on the
+      # format.
+      #
+      # @return [Array<Hash>]
+      def extract_metadata
         raise ArgumentError, 'options not valid' unless valid?
 
         if filenames
@@ -61,21 +72,31 @@ module Bulwark
         end
       end
 
+      # Returns all filenames
+      #
+      # @return [Array<String>] list of filenames
+      def all_filenames
+        metadata.map { |i| i[:filename] }
+      end
+
+      # Returns structural metadata in csv format
+      #
+      # @return [String]
+      def csv
+        StructuredCSV.generate(metadata)
+      end
+
       private
 
         # Generating structural metadata csv from ordered filenames.
         #
         # @param [Array<String>] filenames in order
         def from_ordered_filenames(filenames, display = nil, viewing_direction = nil)
-          CSV.generate do |csv|
-            headers = ['filename', 'sequence']
-            headers << 'display' if display
-            headers << 'viewing_direction' if viewing_direction
-
-            csv << headers
-            filenames.split(';').map(&:strip).each_with_index do |f, i|
-              csv << [f, i + 1, display, viewing_direction].compact
-            end
+          filenames.split(';').map(&:strip).map.with_index do |f, i| # TODO: remove nils?
+            row = { filename: f, sequence: i.to_i + 1 }
+            row[:display] = display if display
+            row[:viewing_direction] = viewing_direction if viewing_direction
+            row
           end
         end
 
@@ -84,12 +105,12 @@ module Bulwark
         # @param [Array<Hash>] ordered file information
         def from_sequence(sequence, display = nil, viewing_direction = nil)
           sequence.each_with_index do |f, i|
-            f[:sequence] = i + 1
+            f[:sequence] = i.to_i + 1
             f[:viewing_direction] = viewing_direction if viewing_direction
             f[:display] = display if display
           end
 
-          Bulwark::StructuredCSV.generate(sequence)
+          sequence
         end
 
         # Reading in structural metadata csv from filesystem.
@@ -97,7 +118,8 @@ module Bulwark
         # @param [String] path to metadata
         def from_file(filepath)
           raise 'structural metadata path must lead to a file.' unless File.file?(filepath)
-          File.read(filepath)
+
+          Bulwark::StructuredCSV.parse(File.read(filepath)).map(&:deep_symbolize_keys)
         end
 
         # Generates structural metadata csv from structural and descriptive metadata found in Marmite.
@@ -116,18 +138,16 @@ module Bulwark
           display = marc_996_a == 'unbound' ? MetadataSource::INDIVIDUALS : MetadataSource::PAGED
 
           # Retrieving metadata from Marmite via bibnumber.
-          structural_data = Nokogiri::XML(MarmiteClient.structural(bibnumber)).xpath('//record/pages/page').map do |page|
+          Nokogiri::XML(MarmiteClient.structural(bibnumber)).xpath('//record/pages/page').map do |page|
             {
-              'label' => page['visiblepage'],
-              'sequence' => page['seq'],
-              'filename' => "#{page['image']}.tif",
-              'viewing_direction' => viewing_direction,
-              'display' => display,
-              'table_of_contents' => page.xpath('tocentry').map(&:text)
+              label: page['visiblepage'],
+              sequence: page['seq'].to_i,
+              filename: "#{page['image']}.tif",
+              viewing_direction: viewing_direction,
+              display: display,
+              table_of_contents: page.xpath('tocentry').map(&:text)
             }
           end
-
-          StructuredCSV.generate(structural_data)
         end
 
         # Converts value in MARC 996 field to viewing_direction

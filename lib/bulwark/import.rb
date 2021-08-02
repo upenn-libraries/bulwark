@@ -91,6 +91,19 @@ module Bulwark
 
       if structural_metadata
         @errors << "structural path invalid" if structural_metadata.drive && structural_metadata.path && !MountedDrives.valid_path?(structural_metadata.drive, structural_metadata.path)
+
+        # If action is create, validate all filenames listed in structural metadata.
+        if action == CREATE && assets_path
+
+          files_available = if File.directory?(assets_path)
+                              Dir.glob(File.join(assets_path, '*')).map { |f| File.basename(f) }
+                            else
+                              [File.basename(assets_path)]
+                            end
+          files_not_present = structural_metadata.all_filenames - files_available
+
+          @errors << "Structural metadata contains the following invalid filenames: #{files_not_present.join(', ')}" unless files_not_present.blank?
+        end
       end
 
       return error_result(@errors) unless @errors.empty?
@@ -107,7 +120,6 @@ module Bulwark
 
       # Add assets to repository.
       unless assets.empty?
-        assets_path = File.join(MountedDrives.path_to(assets[:drive]), assets[:path])
         repo.add_assets(assets_path)
       end
 
@@ -158,6 +170,11 @@ module Bulwark
     end
 
     private
+
+      def assets_path
+        return unless assets[:drive] || assets[:path]
+        File.join(MountedDrives.path_to(assets[:drive]), assets[:path])
+      end
 
       # @param [Array] errors
       # @param [Repo, nil] repository

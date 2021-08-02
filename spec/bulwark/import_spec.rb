@@ -578,6 +578,7 @@ RSpec.describe Bulwark::Import do
       let(:result) { import.process }
 
       it 'import was successful' do
+        expect(result.errors).to be_blank
         expect(result.status).to be DigitalObjectImport::SUCCESSFUL
       end
 
@@ -800,6 +801,7 @@ RSpec.describe Bulwark::Import do
       let(:result) { import.process }
 
       it 'import was not successful' do
+        expect(result.repo).to be nil
         expect(result.errors).to contain_exactly('Structural metadata contains the following invalid filenames: front_1.tif, back_2.tif')
       end
     end
