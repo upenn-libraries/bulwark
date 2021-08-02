@@ -224,8 +224,7 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
 
     context 'when invalid bibnumber' do
       before do
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=marc21").to_return(status: 404)
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=marc21")
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/api/v2/records/#{bibnumber}/marc21?update=always")
           .to_return(status: 404, body: "Record #{bibnumber} in marc21 format not found", headers: {})
       end
 
@@ -242,8 +241,7 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
           .to_return(status: 200, body: fixture_to_str('marmite', 'structural', "with_table_of_contents.xml"), headers: {})
 
         # Mock descriptive metadata request to Marmite
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=marc21").to_return(status: 302)
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=marc21")
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/api/v2/records/#{bibnumber}/marc21?update=always")
           .to_return(status: 200, body: descriptive_metadata, headers: {})
       end
 
