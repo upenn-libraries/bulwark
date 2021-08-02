@@ -9,9 +9,8 @@ module MarmiteClient
   # @param [String] bibnumber
   # @return [String] contain MARC XML for the given bibnumber
   def self.marc21(bibnumber)
-    Faraday.get(url("records/#{bibnumber}/create?format=marc21")) # Create MARC Record.
-
-    response = Faraday.get(url("records/#{bibnumber}/show?format=marc21"))
+    # Get updated MARC record
+    response = Faraday.get(url("/api/v2/records/#{bibnumber}/marc21?update=always"))
 
     raise Error, "Could not retrieve MARC for #{bibnumber}. Error: #{response.body}" unless response.success?
 
