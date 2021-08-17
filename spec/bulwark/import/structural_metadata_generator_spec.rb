@@ -219,12 +219,12 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
   end
 
   describe '#from_bibnumber' do
-    let(:bibnumber) { '9960927563503681' }
+    let(:bibnumber) { '6092756' }
     let(:generator) { described_class.new }
 
     context 'when invalid bibnumber' do
       before do
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/api/v2/records/#{bibnumber}/marc21?update=always")
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/api/v2/records/99#{bibnumber}3503681/marc21?update=always")
           .to_return(status: 404, body: "Record #{bibnumber} in marc21 format not found", headers: {})
       end
 
@@ -241,7 +241,7 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
           .to_return(status: 200, body: fixture_to_str('marmite', 'structural', "with_table_of_contents.xml"), headers: {})
 
         # Mock descriptive metadata request to Marmite
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/api/v2/records/#{bibnumber}/marc21?update=always")
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/api/v2/records/99#{bibnumber}3503681/marc21?update=always")
           .to_return(status: 200, body: descriptive_metadata, headers: {})
       end
 
