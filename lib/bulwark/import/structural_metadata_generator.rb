@@ -128,7 +128,7 @@ module Bulwark
         # have a need for this ability.
         def from_bibnumber(bibnumber)
           # Retrieve descriptive metadata from Marmite in order to retrieve viewing direction. Need to use full bibnumber to query Alma.
-          alma_bibnumber = (bibnumber.length > 7) ? bibnumber : "99#{bibnumber}3503681"
+          alma_bibnumber = bibnumber.length > 7 ? bibnumber : "99#{bibnumber}3503681"
           marc_996_a = Nokogiri::XML(MarmiteClient.marc21(alma_bibnumber))
                                .xpath('/marc:records/marc:record/marc:datafield[@tag="996"]/marc:subfield[@code="a"]')
                                .map(&:text).first
