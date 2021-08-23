@@ -259,11 +259,6 @@ services:
       - 'scanstore_rescue:${SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
       - 'kaplan_rescue:${KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
       - 'colenda_workspace:${REMOTE_WORKSPACE}'
-  rabbitmq:
-    image: 'rabbitmq:3-management'
-    hostname: 'rabbitmq'
-    ports:
-      - '15672:15672'
 
 volumes:
   colenda_workspace:

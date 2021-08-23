@@ -14,7 +14,6 @@ class FileChecksJob < ActiveJobStatus::TrackableJob
   private
 
   def relay_message
-    MessengerClient.client.publish(I18n.t('rabbitmq.publish.messages.file_checks'))
     NotificationMailer.process_completed_email(I18n.t('colenda.mailers.notification.file_checks.subject'), @user_email, I18n.t('colenda.mailers.notification.file_checks.body', :uuid => @metadata_builder.repo.unique_identifier, :root_url => @root_url, :link_fragment => @metadata_builder.repo.id)).deliver_now
   end
 end
