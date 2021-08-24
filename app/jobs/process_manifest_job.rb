@@ -14,7 +14,6 @@ class ProcessManifestJob < ActiveJobStatus::TrackableJob
   private
 
   def relay_message
-    MessengerClient.client.publish(I18n.t('rabbitmq.publish.messages.process_manifest'))
     NotificationMailer.process_completed_email(I18n.t('colenda.mailers.notification.process_manifest.subject'), @user_email, I18n.t('colenda.mailers.notification.process_manifest.body', :name => @manifest.name, :root_url => @root_url, :link_fragment => @manifest.id)).deliver_now
   end
 end

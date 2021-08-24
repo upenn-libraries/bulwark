@@ -24,7 +24,6 @@ class MailerJob < ActiveJobStatus::TrackableJob
   private
 
   def relay_message
-    MessengerClient.client.publish(I18n.t('rabbitmq.publish.messages.mailer'))
     NotificationMailer.process_completed_email(@subject, @email, @message).deliver_now
   end
 
