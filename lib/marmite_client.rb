@@ -24,7 +24,7 @@ module MarmiteClient
   def self.iiif_presentation(formatted_ark, payload)
     # Create IIIF Presentation 2.0 manifest
     response = Faraday.post(url("/api/v2/records/#{formatted_ark}/iiif_presentation"), payload) do |request|
-      request.options.timeout = 600 # Wait for up to 10 minutes for response to come back.
+      request.options.timeout = 1200 # Wait for up to 20 minutes for response to come back.
     end
 
     raise Error, "Could not create IIIF Presentation Manifest for #{formatted_ark}. Error: #{response.body}" unless response.success?
