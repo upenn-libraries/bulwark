@@ -36,7 +36,7 @@ module Utils
         destination = options[:destination].present? ? options[:destination] : @working_repo_path
         fsck = options[:fsck].nil? ? true : options[:fsck]
         begin
-          ExtendedGit.clone(@remote_repo_path, destination)
+          ExtendedGit.clone("file://#{@remote_repo_path}", destination) # By prepending with file:// we are forcing the --no-local option
           init_clone(destination, fsck)
         rescue => exception
           raise Utils::Error::VersionControl.new(error_message(exception.message))
