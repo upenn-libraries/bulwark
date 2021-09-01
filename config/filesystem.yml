@@ -18,7 +18,6 @@ development:
     type: directory
     name: local
     directory: <%= Rails.root.join('tmp', 'development_storage', 'special_remote') %>
-    top_level_pid_lock: false
   manifest_location: /Users/cgalarza/colenda_storage/manifest.txt
   remote_repo_permissions: =rx,ug+rwx
   workspace: <%= Rails.root.join('tmp', 'development_storage', 'scratch') %>
@@ -34,7 +33,6 @@ test:
     type: directory
     name: local
     directory: <%= Rails.root.join('tmp', 'test_storage', 'special_remote') %>
-    top_level_pid_lock: false
   manifest_location: /path/to/manifest.txt
   remote_repo_permissions: =rx,ug+rwx
   metadata_path_label: metadata_label_in_manifest
@@ -48,7 +46,6 @@ production:
   special_remote:
     type: <%= ENV['STORAGE_TYPE'] %>
     name: <%= ENV['SPECIAL_REMOTE_NAME'] %>
-    top_level_pid_lock: true
   manifest_location: /home/app/webapp/docker/manifest.txt
   mets_xml_derivative: mets.xml
   object_admin_path: .repoadmin

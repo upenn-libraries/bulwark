@@ -102,7 +102,6 @@ module Utils
       #
       def remove_working_directory(dir)
         git = ExtendedGit.open(dir)
-        git.config('annex.pidlock', 'true')
         git.annex.drop(all: true, force: true) # Not sure we have to be so forceful here.
 
         parent_dir = dir.gsub(repo.names.git, "")
@@ -189,7 +188,6 @@ module Utils
         end
 
         git.config('remote.origin.annex-ignore', 'true') # Does not store binary files in origin remote
-        git.config('annex.pidlock', 'true') if special_remote[:top_level_pid_lock]
         git.config('annex.largefiles', 'not (include=.repoadmin/bin/*.sh)')
         git.annex.fsck(from: special_remote[:name], fast: true) if fsck
       end
