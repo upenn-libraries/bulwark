@@ -118,7 +118,6 @@ module Utils
         content = options[:content].present? ? options[:content] : '.'
         git = ExtendedGit.open(dir)
         git.annex.drop(content)
-        change_perms(File.basename(dir)) if ENV['IMAGING_USER'].present? # This might be in preperation for deleting the file. Should probably be moved.
       end
 
       def unlock(options, dir)
