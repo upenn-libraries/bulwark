@@ -91,7 +91,7 @@ RUN apt-get update && apt-get install -qq -y --no-install-recommends \
 # Install newer version of rsync
 WORKDIR /tmp
 
-RUN wget http://rsync.samba.org/ftp/rsync/src/rsync-3.2.3.tar.gz -O - | tar xz && \
+RUN wget https://download.samba.org/pub/rsync/rsync-3.2.3.tar.gz -O - | tar xz && \
     cd rsync-3.2.3 && \
     ./configure --disable-xxhash --disable-zstd --disable-lz4 --disable-md2man && \
     make && make install && make clean && \
