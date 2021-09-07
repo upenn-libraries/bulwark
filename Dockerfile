@@ -66,7 +66,7 @@ RUN chmod 0700 \
     /etc/my_init.d/imaging.sh \
     /etc/my_init.d/ssh_service.sh
 
-RUN chown -R app:app /fs
+RUN chown -R app:app /fs /home/app/webapp
 
 # Compile newer version of libvips
 WORKDIR /tmp
