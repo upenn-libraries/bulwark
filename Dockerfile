@@ -107,7 +107,7 @@ COPY string_exts /home/app/webapp/string_exts
 
 RUN bundle install
 
-COPY . /home/app/webapp/
+COPY --chown=app:app . /home/app/webapp/
 
 RUN RAILS_ENV=production SECRET_KEY_BASE=x bundle exec rake assets:precompile --trace
 
