@@ -175,7 +175,7 @@ services:
       - '${LOCAL_FEATURED}:/home/app/webapp/public/assets/featured'
   sidekiq:
     image: 'gitlab.library.upenn.edu/digital-repository/bulwark:${BULWARK_IMAGE_TAG}'
-    command: bash -c "/etc/my_init.d/gitannex.sh && /etc/my_init.d/imaging.sh && /sbin/my_init --skip-startup-files --skip-runit -- bundle exec sidekiq -C config/sidekiq.yml"
+    command: bash -c "/etc/my_init.d/gitannex.sh && /etc/my_init.d/imaging.sh && /sbin/my_init --skip-startup-files --skip-runit -- su app -c 'bundle exec sidekiq -C config/sidekiq.yml'"
     deploy:
       replicas: 3
       update_config:
