@@ -102,7 +102,6 @@ module Utils
       #
       def remove_working_directory(dir)
         git = ExtendedGit.open(dir)
-        git.config('annex.pidlock', 'true')
         git.annex.drop(all: true, force: true) # Not sure we have to be so forceful here.
 
         parent_dir = dir.gsub(repo.names.git, "")
@@ -119,7 +118,6 @@ module Utils
         content = options[:content].present? ? options[:content] : '.'
         git = ExtendedGit.open(dir)
         git.annex.drop(content)
-        change_perms(File.basename(dir)) if ENV['IMAGING_USER'].present? # This might be in preperation for deleting the file. Should probably be moved.
       end
 
       def unlock(options, dir)
@@ -189,7 +187,6 @@ module Utils
         end
 
         git.config('remote.origin.annex-ignore', 'true') # Does not store binary files in origin remote
-        git.config('annex.pidlock', 'true') if special_remote[:top_level_pid_lock]
         git.config('annex.largefiles', 'not (include=.repoadmin/bin/*.sh)')
         git.annex.fsck(from: special_remote[:name], fast: true) if fsck
       end

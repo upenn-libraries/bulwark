@@ -66,8 +66,6 @@ RUN chmod 0700 \
     /etc/my_init.d/imaging.sh \
     /etc/my_init.d/ssh_service.sh
 
-RUN chown -R app:app /fs
-
 # Compile newer version of libvips
 WORKDIR /tmp
 
@@ -91,7 +89,7 @@ RUN apt-get update && apt-get install -qq -y --no-install-recommends \
 # Install newer version of rsync
 WORKDIR /tmp
 
-RUN wget http://rsync.samba.org/ftp/rsync/src/rsync-3.2.3.tar.gz -O - | tar xz && \
+RUN wget https://download.samba.org/pub/rsync/rsync-3.2.3.tar.gz -O - | tar xz && \
     cd rsync-3.2.3 && \
     ./configure --disable-xxhash --disable-zstd --disable-lz4 --disable-md2man && \
     make && make install && make clean && \
@@ -107,12 +105,13 @@ COPY string_exts /home/app/webapp/string_exts
 
 RUN bundle install
 
-COPY . /home/app/webapp/
+COPY --chown=app:app . /home/app/webapp/
 
 RUN RAILS_ENV=production SECRET_KEY_BASE=x bundle exec rake assets:precompile --trace
 
 RUN rm -f /etc/service/nginx/down && \
-    rm /etc/nginx/sites-enabled/default
+    rm /etc/nginx/sites-enabled/default && \
+    chown -R app:app /fs /home/app/webapp
 
 USER app
 

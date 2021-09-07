@@ -161,6 +161,7 @@ services:
         target: /run/secrets/secret_key_base
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
+      - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
       - 'mastersrbm:${MASTERSRBM_HARVESTING_ENDPOINT_REMOTE}'
       - 'managedmasters:${MANAGEDMASTERS_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed:${SCETI_COMPLETED_HARVESTING_ENDPOINT_REMOTE}'
@@ -171,11 +172,10 @@ services:
       - 'sceti:${SCETI_HARVESTING_ENDPOINT_REMOTE}'
       - 'keffer:${KEFFER_HARVESTING_ENDPOINT_REMOTE}'
       - 'kaplan_rescue:${KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
-      - 'colenda_workspace:${REMOTE_WORKSPACE}'
       - '${LOCAL_FEATURED}:/home/app/webapp/public/assets/featured'
   sidekiq:
     image: 'gitlab.library.upenn.edu/digital-repository/bulwark:${BULWARK_IMAGE_TAG}'
-    command: bash -c "/etc/my_init.d/gitannex.sh && /etc/my_init.d/imaging.sh && /sbin/my_init --skip-startup-files --skip-runit -- bundle exec sidekiq -C config/sidekiq.yml"
+    command: bash -c "/etc/my_init.d/gitannex.sh && /etc/my_init.d/imaging.sh && /sbin/my_init --skip-startup-files --skip-runit -- su app -c 'bundle exec sidekiq -C config/sidekiq.yml'"
     deploy:
       replicas: 3
       update_config:
@@ -248,6 +248,7 @@ services:
         target: /run/secrets/secret_key_base
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
+      - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
       - 'mastersrbm:${MASTERSRBM_HARVESTING_ENDPOINT_REMOTE}'
       - 'managedmasters:${MANAGEDMASTERS_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed:${SCETI_COMPLETED_HARVESTING_ENDPOINT_REMOTE}'
@@ -258,11 +259,8 @@ services:
       - 'keffer:${KEFFER_HARVESTING_ENDPOINT_REMOTE}'
       - 'scanstore_rescue:${SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
       - 'kaplan_rescue:${KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
-      - 'colenda_workspace:${REMOTE_WORKSPACE}'
 
 volumes:
-  colenda_workspace:
-    external: true
   mastersrbm:
     external: true
   managedmasters:
