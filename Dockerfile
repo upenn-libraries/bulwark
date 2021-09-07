@@ -66,8 +66,6 @@ RUN chmod 0700 \
     /etc/my_init.d/imaging.sh \
     /etc/my_init.d/ssh_service.sh
 
-RUN chown -R app:app /fs /home/app/webapp
-
 # Compile newer version of libvips
 WORKDIR /tmp
 
@@ -112,7 +110,8 @@ COPY --chown=app:app . /home/app/webapp/
 RUN RAILS_ENV=production SECRET_KEY_BASE=x bundle exec rake assets:precompile --trace
 
 RUN rm -f /etc/service/nginx/down && \
-    rm /etc/nginx/sites-enabled/default
+    rm /etc/nginx/sites-enabled/default && \
+    chown -R app:app /fs /home/app/webapp
 
 USER app
 
