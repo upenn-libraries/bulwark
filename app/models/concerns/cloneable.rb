@@ -11,6 +11,11 @@ module Cloneable
     @clone_location ||= version_control_agent.clone
   end
 
+  # Returns true if there is a cloned repo
+  def cloned?
+    @clone_location.present?
+  end
+
   # Retrieving assets from the given path, adding them
   # to the git repo and characterizing assets.
   def add_assets(path)

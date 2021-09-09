@@ -161,6 +161,7 @@ module Bulwark
       Bulwark::Import::Result.new(status: DigitalObjectImport::SUCCESSFUL, repo: repo)
     rescue => e
       Honeybadger.notify(e) # Sending full error to Honeybadger.
+      repo.delete_clone if repo&.cloned? # Delete cloned repo if there is one present
       Bulwark::Import::Result.new(status: DigitalObjectImport::FAILED,
                                   errors: [truncated_error_message(e.message)], repo: repo)
     end
