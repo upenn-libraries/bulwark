@@ -18,14 +18,6 @@ GIT
       sass-rails (>= 4.0, < 6)
 
 GIT
-  remote: https://github.com/lts-andrewnk/jhove-service
-  revision: 8cfd875653153f8e605faf0cabc605d9ec08b109
-  branch: mem_increase
-  specs:
-    jhove-service (1.1.5)
-      nokogiri (>= 1.4.3.1)
-
-GIT
   remote: https://github.com/projecthydra/hydra.git
   revision: 645c21080cb80e16d8aa24b6c52c4bca703ea5dd
   branch: pcdm
@@ -46,6 +38,14 @@ GIT
       rails (~> 4.1)
       rsolr (~> 1.0.10)
       solrizer (~> 3.3.0)
+
+GIT
+  remote: https://gitlab.library.upenn.edu/digital-repository/jhove-service
+  revision: 0d6929ba1a094680a43d00a434d268dce8375ffc
+  branch: master
+  specs:
+    jhove-service (1.4.1)
+      nokogiri (>= 1.4.3.1)
 
 PATH
   remote: rails_admin_colenda
