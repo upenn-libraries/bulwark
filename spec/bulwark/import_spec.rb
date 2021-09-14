@@ -404,6 +404,7 @@ RSpec.describe Bulwark::Import do
         let(:updated_whereis_result) { updated_git.annex.whereis }
 
         it 'update is successful' do
+          expect(updated_result.errors).to be_blank
           expect(updated_result.status).to be DigitalObjectImport::SUCCESSFUL
         end
 

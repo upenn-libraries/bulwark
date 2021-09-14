@@ -11,6 +11,11 @@ module Cloneable
     @clone_location ||= version_control_agent.clone
   end
 
+  # Returns true if there is a cloned repo
+  def cloned?
+    @clone_location.present?
+  end
+
   # Retrieving assets from the given path, adding them
   # to the git repo and characterizing assets.
   def add_assets(path)
@@ -86,7 +91,6 @@ module Cloneable
   end
 
   def generate_derivatives
-    version_control_agent.get({ location: assets_subdirectory }, clone_location)
     get_and_unlock(derivatives_subdirectory)
 
     # Create 'thumbnails' and 'access' directories if they arent present already.
@@ -100,8 +104,10 @@ module Cloneable
     # Create derivatives for jpeg and tiff files.
     assets.each do |asset|
       next unless asset.mime_type == 'image/jpeg' || asset.mime_type == 'image/tiff'
-      file_path = File.join(clone_location, assets_subdirectory, asset.filename)
-      version_control_agent.unlock({ content: file_path }, clone_location)
+      relative_file_path = File.join(assets_subdirectory, asset.filename)
+      get_and_unlock(relative_file_path)
+
+      file_path = File.join(clone_location, relative_file_path)
 
       access_filepath = Bulwark::Derivatives::Image.access_copy(file_path, access_dir_path)
       access_relative_path = Pathname.new(access_filepath).relative_path_from(Pathname.new(clone_location)).to_s
@@ -115,7 +121,8 @@ module Cloneable
 
       asset.save!
 
-      version_control_agent.lock(file_path, clone_location)
+      version_control_agent.lock(relative_file_path, clone_location)
+      version_control_agent.drop({ content: relative_file_path }, clone_location)
     end
 
     metadata_builder.update!(last_file_checks: DateTime.current)
@@ -155,8 +162,23 @@ module Cloneable
     )
   end
 
+  # Dropping annex'ed content and removing clone.
+  #
+  # TODO: Using `FileUtils.rm_rf` does not raise StandardErrors. We might want to
+  # at least log those errors, if we don't want them raised.
+  #
+  # TODO: We might want to `git annex uninit` before we delete a cloned repository
+  # because that way, the repository is removed from the list of repositories
+  # when doing a `git annex info` and the `.git/annex` directory
+  # and its contents are completely deleted.
   def delete_clone
-    version_control_agent.delete_clone(clone_location)
+    # Forcefully dropping content because if an error occurred we might not
+    # be able to drop all the files without forcing.
+    ExtendedGit.open(clone_location).annex.drop(all: true, force: true)
+
+    parent_dir = Pathname.new(clone_location).parent
+    FileUtils.rm_rf(parent_dir, secure: true) if File.directory?(parent_dir)
+
     @clone_location = nil
   end
 
@@ -214,6 +236,7 @@ module Cloneable
   private
 
     def copy_assets(path)
+      get_and_unlock(assets_subdirectory)
       assets_directory = File.join(clone_location, assets_subdirectory)
 
       Bulwark::FileUtilities.copy_files(path, assets_directory, file_extensions)
