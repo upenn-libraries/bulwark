@@ -699,6 +699,7 @@ DEPENDENCIES
   kaminari-bootstrap (~> 3.0.1)
   launchy
   letter_opener
+  mime-types
   mini_magick
   mysql2 (~> 0.4.0)
   nokogiri
