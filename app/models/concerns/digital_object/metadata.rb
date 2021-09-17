@@ -3,6 +3,10 @@ module DigitalObject
   module Metadata
     extend ActiveSupport::Concern
 
+    DESCRIPTIVE_METADATA_FILENAME = 'descriptive_metadata.csv'
+    STRUCTURAL_METADATA_FILENAME = 'structural_metadata.csv'
+    METS_FILENAME = 'mets.xml'
+
     def merge_descriptive_metadata(metadata)
       if (metadata_source = metadata_builder.metadata_source.find_by(source_type: 'descriptive'))
         desc_metadata_file = metadata_source.path

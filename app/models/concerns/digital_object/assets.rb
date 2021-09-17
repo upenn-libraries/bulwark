@@ -5,9 +5,6 @@ module DigitalObject
   module Assets
     extend ActiveSupport::Concern
 
-    DESCRIPTIVE_METADATA_FILENAME = 'descriptive_metadata.csv'
-    STRUCTURAL_METADATA_FILENAME = 'structural_metadata.csv'
-    METS_FILENAME = 'mets.xml'
     JHOVE_OUTPUT_FILENAME = 'jhove_output.xml'
 
     # Retrieving assets from the given path, adding them

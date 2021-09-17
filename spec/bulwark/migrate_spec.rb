@@ -602,7 +602,7 @@ RSpec.describe Bulwark::Migrate do
       end
     end
 
-    context 'when audio files were loaded', focus: true do
+    context 'when audio files were loaded' do
       let(:repo) do
         Repo.create(
           human_readable_name: 'Test Audio File Migration',
