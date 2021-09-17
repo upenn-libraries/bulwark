@@ -601,5 +601,86 @@ RSpec.describe Bulwark::Migrate do
         end
       end
     end
+
+    context 'when audio files were loaded', focus: true do
+      let(:repo) do
+        Repo.create(
+          human_readable_name: 'Test Audio File Migration',
+          metadata_subdirectory: 'metadata',
+          assets_subdirectory: 'assets',
+          file_extensions: Bulwark::Config.digital_object[:file_extensions],
+          metadata_source_extensions: ['csv'],
+          preservation_filename: 'preservation.xml',
+          owner: migrated_by
+        )
+      end
+
+      before do
+        ['bell.wav', 'bell.mp3'].each do |filename|
+          FileUtils.cp(
+            fixture('example_bulk_imports', 'object_four', filename),
+            File.join(repo.clone_location, repo.assets_subdirectory)
+          )
+          File.write(
+            File.join(repo.clone_location, repo.assets_subdirectory, "#{filename}.md5"),
+            'Sample MD5 Checksum File'
+          )
+        end
+
+        git = repo.clone
+        git.annex.add('.')
+        git.commit("Adding audio files")
+        git.push('origin', 'master')
+        git.push('origin', 'git-annex')
+        git.annex.sync(content: true)
+
+        repo.delete_clone
+      end
+
+      let(:migration_result) do
+        described_class.new(
+          action: 'migrate',
+          audio: 'true',
+          unique_identifier: repo.unique_identifier,
+          structural: { filenames: 'bell.wav' },
+          metadata: { title: ['A new audio item'] },
+          migrated_by: User.find_by(email: migrated_by)
+        ).process
+      end
+
+      let(:working_dir) { migration_result.repo.clone_location }
+      let(:git) { ExtendedGit.open(working_dir) }
+
+      it 'expect migration to be successful' do
+        expect(migration_result.errors).to be_empty
+        expect(migration_result.status).to be DigitalObjectImport::SUCCESSFUL
+      end
+
+      it 'contains expected asset db records' do
+        file = migration_result.repo.assets.find_by(filename: 'bell.wav')
+
+        expect(file).not_to be_nil
+        expect(file.size).to be 30_804
+        expect(file.mime_type).to eql 'audio/vnd.wave'
+        expect(file.original_file_location).to eql git.annex.lookupkey('data/assets/bell.wav')
+        expect(file.access_file_location).to eql git.annex.lookupkey('.derivs/access/bell.mp3')
+        expect(file.thumbnail_file_location).to be_nil
+      end
+
+      it 'contains expected assets' do
+        whereis_result = git.annex.whereis(repo.assets_subdirectory)
+        expect(whereis_result.map(&:filepath)).to match_array ['data/assets/bell.wav']
+        expect(whereis_result['data/assets/bell.wav'].locations.map(&:description)).to include '[local]'
+      end
+
+      it 'contains expected mp3 derivatives' do
+        whereis_result = git.annex.whereis(repo.derivatives_subdirectory)
+        derivatives = ['.derivs/access/bell.mp3']
+        expect(whereis_result.map(&:filepath)).to match_array derivatives
+        derivatives.each do |filepath|
+          expect(whereis_result[filepath].locations.map(&:description)).to include '[local]'
+        end
+      end
+    end
   end
 end
