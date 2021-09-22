@@ -15,9 +15,8 @@ module Bulwark
 
       flags = extensions.map { |ext| "--include=*.#{ext}" } + ['--exclude="*"']
       # Not preserving owner or group because it causes errors if the group/user
-      # is not present in the drive we are transfering the files to. The owner/group
-      # of the files is changed later anyways.
-      Rsync.run(source, destination, "-av --no-owner --no-group #{flags.join(' ')}") do |result|
+      # is not present in the drive we are transferring the files to.
+      Rsync.run(source, destination, "-av --no-owner --no-group --no-perms --chmod=og+rw #{flags.join(' ')}") do |result|
         if result.success?
           result.changes.each do |change|
             Rails.logger.info "#{change.filename} (#{change.summary})"
