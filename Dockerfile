@@ -13,6 +13,7 @@ RUN add-apt-repository ppa:jtgeibel/ppa
 
 RUN apt-get update && apt-get install -qq -y --no-install-recommends \
         build-essential \
+        ca-certificates \
         default-jdk \
         git-annex \
         git-core \
