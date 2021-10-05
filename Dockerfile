@@ -18,12 +18,10 @@ RUN rm /usr/share/ca-certificates/mozilla/DST_Root_CA_X3.crt && \
     sed -i 's~^mozilla/DST_Root_CA_X3.crt$~!mozilla/DST_Root_CA_X3.crt~g' /etc/ca-certificates.conf && \
     update-ca-certificates --fresh
 
-
 RUN add-apt-repository ppa:jtgeibel/ppa
 
 RUN apt-get update && apt-get install -qq -y --no-install-recommends \
         build-essential \
-        ca-certificates \
         default-jdk \
         git-annex \
         git-core \
