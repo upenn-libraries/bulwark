@@ -9,11 +9,19 @@ EXPOSE 22
 # For SMTP
 EXPOSE 25
 
+# Replace Let's Encrypt's expired DST Root CA X3 cert, which expired on 2021.09.30, with the newer ISRG Root X1 cert
+# https://letsencrypt.org/docs/certificate-compatibility/
+ADD https://letsencrypt.org/certs/isrgrootx1.pem /tmp/isrgrootx1.pem
+RUN rm /usr/share/ca-certificates/mozilla/DST_Root_CA_X3.crt && \
+    mkdir /usr/local/share/ca-certificates/letsencrypt.com && \
+    mv /tmp/isrgrootx1.pem /usr/local/share/ca-certificates/letsencrypt.com/isrgrootx1.crt && \
+    sed -i 's~^mozilla/DST_Root_CA_X3.crt$~!mozilla/DST_Root_CA_X3.crt~g' /etc/ca-certificates.conf && \
+    update-ca-certificates --fresh
+
 RUN add-apt-repository ppa:jtgeibel/ppa
 
 RUN apt-get update && apt-get install -qq -y --no-install-recommends \
         build-essential \
-        ca-certificates \
         default-jdk \
         git-annex \
         git-core \
