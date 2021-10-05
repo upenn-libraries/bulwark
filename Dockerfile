@@ -15,6 +15,7 @@ ADD https://letsencrypt.org/certs/isrgrootx1.pem /tmp/isrgrootx1.pem
 RUN rm /usr/share/ca-certificates/mozilla/DST_Root_CA_X3.crt && \
     mkdir /usr/local/share/ca-certificates/letsencrypt.com && \
     mv /tmp/isrgrootx1.pem /usr/local/share/ca-certificates/letsencrypt.com/isrgrootx1.crt && \
+    sed -i 's~^mozilla/DST_Root_CA_X3.crt$~!mozilla/DST_Root_CA_X3.crt~g' /etc/ca-certificates.conf && \
     update-ca-certificates --fresh
 
 
