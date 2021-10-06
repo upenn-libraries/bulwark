@@ -64,7 +64,8 @@ module DigitalObject
         when 'S3'
           ceph_config = Utils::Storage::Ceph.config
           git_clone.annex.enableremote(
-            special_remote[:name], aws_secret_access_key: ceph_config.aws_secret_access_key,
+            special_remote[:name],
+            aws_secret_access_key: ceph_config.aws_secret_access_key,
             aws_access_key_id: ceph_config.aws_access_key_id
           )
         when 'directory'
@@ -88,4 +89,3 @@ module DigitalObject
       end
   end
 end
-
