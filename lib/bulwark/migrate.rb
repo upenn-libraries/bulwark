@@ -163,15 +163,10 @@ module Bulwark
       Honeybadger.notify(e) # Sending full error to Honeybadger.
       repo.delete_clone if repo&.cloned? # Delete cloned repo if there is one present
       Bulwark::Import::Result.new(status: DigitalObjectImport::FAILED,
-                                  errors: [truncated_error_message(e.message)], repo: repo)
+                                  errors: [e.message], repo: repo)
     end
 
     private
-
-      # truncate error message to avoid MySQL TEXT field byte limit
-      def truncated_error_message(message)
-        message.truncate 60_000
-      end
 
       def repo
         @repo ||= Repo.find_by(unique_identifier: unique_identifier, new_format: false)
