@@ -41,7 +41,7 @@ GIT
 
 GIT
   remote: https://gitlab.library.upenn.edu/digital-repository/jhove-service
-  revision: 0d6929ba1a094680a43d00a434d268dce8375ffc
+  revision: 20c792e75dcb467cc6b469f33c5d52275c157699
   branch: master
   specs:
     jhove-service (1.4.1)
