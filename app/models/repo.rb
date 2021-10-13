@@ -575,14 +575,16 @@ class Repo < ActiveRecord::Base
     }
 
     if structural
-      hash['structural'] = {
-        'sequence' => structural_metadata.user_defined_mappings['sequence'].map { |h| h.delete('sequence'); h }
-      }
+      sequence = structural_metadata.user_defined_mappings['sequence'].map do |h|
+        h.delete('sequence')
+        h
+      end
+
+      hash['structural'] = { 'sequence' => sequence }
     end
 
     hash
   end
-
 
   private
 
