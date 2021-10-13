@@ -46,7 +46,7 @@
         <%= f.text_field :filename, append: '.csv', placeholder: 'custom-filename', hide_label: true %>
       </div>
       <div class="col-sm-2">
-        <%= f.check_box :structural, label: 'include structural' %>
+        <%= f.check_box :structural, label: 'include structural', checked: false %>
       </div>
       <div class="col-sm-1">
         <%= f.submit 'Export', class: 'btn btn-primary btn-sm' %>

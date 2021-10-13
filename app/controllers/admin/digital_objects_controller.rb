@@ -71,7 +71,7 @@ module Admin
     def csv
       unique_identifiers = params[:ids]
       filename = params[:filename].empty? ? "export-#{Time.current.to_s(:iso8601)}.csv" : params[:filename] + '.csv'
-      structural = params.fetch(:structural, false)
+      structural = params.fetch(:structural, '0').to_i.positive?
 
       digital_objects = Repo.where(unique_identifier: unique_identifiers)
       csv = Bulwark::StructuredCSV.generate(digital_objects.map { |d| d.to_hash(structural: structural) })
