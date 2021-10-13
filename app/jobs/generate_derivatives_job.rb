@@ -10,6 +10,8 @@ class GenerateDerivativesJob < ActiveJob::Base
   end
 
   def perform(repo)
+    repo.characterize_assets
+    repo.create_or_update_assets
     repo.generate_derivatives
     repo.create_iiif_manifest
   end
