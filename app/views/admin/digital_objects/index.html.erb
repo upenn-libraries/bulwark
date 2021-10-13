@@ -8,29 +8,52 @@
 
 <%= render 'filters' %>
 
-<div class="table-responsive">
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Unique Identifier</th>
-        <th>Created By</th>
-        <th>Published?</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      <% @digital_objects.each do |digital_object| %>
+<%= bootstrap_form_tag(url: csv_admin_digital_objects_path, method: :post, layout: :inline) do |f| %>
+<%#= form_tag 'digital_objects/csv', class: "form-inline" do %>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
         <tr>
-          <td><%= link_to(digital_object.human_readable_name, admin_digital_object_path(digital_object.id)) %></td>
-          <td><%= digital_object.unique_identifier %></td>
-          <td><%= digital_object.created_by&.email %></td>
-          <td><%= digital_object.published ? 'Yes' : 'No' %></td>
+          <th><%= check_box_tag :all, 'all', false, id: 'select-all' %></th>
+          <th>Name</th>
+          <th>Unique Identifier</th>
+          <th>Created By</th>
+          <th>Published?</th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+      </thead>
+
+      <tbody>
+        <% @digital_objects.each do |digital_object| %>
+          <tr>
+            <td><%= check_box_tag 'ids[]', digital_object.unique_identifier, false, class: 'digital-object-checkbox' %></td>
+            <td><%= link_to(digital_object.human_readable_name, admin_digital_object_path(digital_object.id)) %></td>
+            <td><%= digital_object.unique_identifier %></td>
+            <td><%= digital_object.created_by&.email %></td>
+            <td><%= digital_object.published ? 'Yes' : 'No' %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <%# Export form %>
+  <div class="well well-sm">
+    <div class="row form-group-sm">
+      <div class="col-sm-3">
+        <p><strong>Export selected digital object(s):</strong></p>
+      </div>
+      <div class="col-sm-3">
+        <%= f.text_field :filename, append: '.csv', placeholder: 'custom-filename', hide_label: true %>
+      </div>
+      <div class="col-sm-2">
+        <%= f.check_box :structural, label: 'include structural' %>
+      </div>
+      <div class="col-sm-1">
+        <%= f.submit 'Export', class: 'btn btn-primary btn-sm' %>
+      </div>
+    </div>
+  </div>
+<% end %>
 
 <div class="row">
   <div class="col-sm-9">

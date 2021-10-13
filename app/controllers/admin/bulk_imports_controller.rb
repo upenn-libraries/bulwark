@@ -38,7 +38,7 @@ module Admin
       @digital_object_imports = @digital_object_imports.where(status: @status) if @status
     end
 
-    # Download original download csv.
+    # Download original csv.
     def csv
       @bulk_import = BulkImport.find(params[:id])
 

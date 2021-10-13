@@ -558,6 +558,32 @@ class Repo < ActiveRecord::Base
     false
   end
 
+  def to_hash(structural: false)
+    hash = {
+      'id' => id,
+      'unique_identifier' => unique_identifier,
+      'directive_name' => human_readable_name,
+      'created_at' => created_at&.to_s(:display),
+      'created_by' => created_by&.email,
+      'updated_at' => created_at&.to_s(:display),
+      'updated_by' => updated_by&.email,
+      'published' => published,
+      'first_published_at' => first_published_at&.to_s(:display),
+      'last_published_at' => last_published_at&.to_s(:display),
+      'number_of_assets' => assets.count,
+      'metadata' => descriptive_metadata.user_defined_mappings
+    }
+
+    if structural
+      hash['structural'] = {
+        'sequence' => structural_metadata.user_defined_mappings['sequence'].map { |h| h.delete('sequence'); h }
+      }
+    end
+
+    hash
+  end
+
+
   private
 
   def _build_and_populate_directories(working_path)
