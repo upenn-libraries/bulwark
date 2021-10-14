@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require 'jhove_service'
+
 module Cloneable
   extend ActiveSupport::Concern
 
