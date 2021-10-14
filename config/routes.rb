@@ -60,6 +60,10 @@ Rails.application.routes.draw do
     end
 
     resources :digital_objects, only: [:index, :show] do
+      collection do
+        post :csv
+      end
+
       member do
         post :publish
         post :unpublish

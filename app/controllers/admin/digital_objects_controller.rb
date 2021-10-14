@@ -65,5 +65,18 @@ module Admin
       flash[:success] = "Job to regenerate IIIF manifest queued."
       redirect_to action: :show
     end
+
+    # POST csv
+    # Export CSV of listed digital objects
+    def csv
+      unique_identifiers = params[:ids]
+      filename = params[:filename].empty? ? "export-#{Time.current.to_s(:iso8601)}.csv" : params[:filename] + '.csv'
+      structural = params.fetch(:structural, '0').to_i.positive?
+
+      digital_objects = Repo.where(unique_identifier: unique_identifiers)
+      csv = Bulwark::StructuredCSV.generate(digital_objects.map { |d| d.to_hash(structural: structural) })
+
+      send_data csv, type: 'text/csv', filename: filename, disposition: :download
+    end
   end
 end

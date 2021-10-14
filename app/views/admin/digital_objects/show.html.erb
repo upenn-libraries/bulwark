@@ -7,12 +7,36 @@
 
 <h2><%= @digital_object.human_readable_name %></h2>
 
-<ul class="list-unstyled">
-  <li><strong>Unique Identifier:</strong> <%= @digital_object.unique_identifier %></li>
-  <li><strong>Description:</strong> <%= @digital_object.description %></li>
-  <li><strong>Created By:</strong> <%= @digital_object.created_by&.email %></li>
-  <li><strong>Updated By:</strong> <%= @digital_object.updated_by&.email %></li>
-</ul>
+<div class="row">
+  <div class="col-xs-6">
+    <dl class="dl-horizontal">
+      <dt>Unique Identifier</dt>
+      <dd><%= @digital_object.unique_identifier %></dd>
+
+      <dt>Description</dt>
+      <dd><%= @digital_object.description %></dd>
+
+      <dt>Number of Assets</dt>
+      <dd><%= @digital_object.assets.count %></dd>
+    </dl>
+  </div>
+  <div class="col-xs-6">
+    <dl class="dl-horizontal">
+      <dt>Created By</dt>
+      <dd><%= @digital_object.created_by&.email %></dd>
+
+      <dt>Created At</dt>
+      <dd><%= @digital_object.created_at&.to_s(:display) %></dd>
+
+      <dt>Updated By</dt>
+      <dd><%= @digital_object.updated_by&.email %></dd>
+
+      <dt>Updated At</dt>
+      <dd><%= @digital_object.updated_at&.to_s(:display) %></dd>
+    </dl>
+  </div>
+</div>
+
 <%# repo directory? %>
 
 <ul class="nav nav-tabs" role="tablist">
@@ -42,13 +66,21 @@
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="descriptive-metadata">
     <% if @digital_object.descriptive_metadata %>
-      <h4>Metadata Provided</h4>
-      <%= link_to 'descriptive_metadata.csv',
-                  download_link(*@digital_object.descriptive_metadata.remote_location.split('/', 2), filename: 'descriptive_metadata', disposition: :inline),
-                  target: '_blank' %>
-      <hr>
-      <h4>Extracted Metadata</h4>
+      <h3>
+        Descriptive Metadata
+        <small>
+          <%= link_to '(download raw metadata)',
+                      download_link(*@digital_object.descriptive_metadata.remote_location.split('/', 2), filename: 'descriptive_metadata', disposition: :inline),
+                      target: '_blank' %>
+        </small>
+      </h3>
       <table class="table">
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Value(s)</th>
+          </tr>
+        </thead>
         <tbody>
           <% @digital_object.descriptive_metadata.user_defined_mappings.each do |field, values| %>
             <tr>
@@ -64,12 +96,14 @@
   </div>
   <div role="tabpanel" class="tab-pane" id="structural-metadata">
     <% if @digital_object.structural_metadata %>
-      <h4>Metadata Provided</h4>
-      <%= link_to 'structural_metadata.csv',
-                  download_link(*@digital_object.structural_metadata.remote_location.split('/', 2), filename: 'structural_metadata', disposition: :inline),
-                  target: '_blank'%>
-      <hr>
-      <h4>Extracted Metadata</h4>
+      <h3>
+        Structural Metadata
+        <small>
+          <%= link_to '(download raw metadata)',
+                      download_link(*@digital_object.structural_metadata.remote_location.split('/', 2), filename: 'structural_metadata', disposition: :inline),
+                      target: '_blank'%>
+        </small>
+      </h3>
       <table class="table table-striped">
         <thead>
           <tr>
@@ -96,6 +130,7 @@
     <%= render 'assets' %>
   </div>
   <div role="tabpanel" class="tab-pane" id="generated-xml">
+    <h3>Generated XML</h3>
     <table class="table">
       <% (@digital_object.metadata_builder.generated_metadata_files || {}).each do |filepath, remote_location| %>
         <tr>
@@ -108,8 +143,7 @@
     </table>
   </div>
   <div role="tabpanel" class="tab-pane" id="publish">
-
-    <h4>Publish</h4>
+    <h3>Publish</h3>
     <p><strong>First published at:</strong> <%= @digital_object.first_published_at&.to_s(:display) || '[None]' %></p>
     <p><strong>Last published at:</strong> <%= @digital_object.last_published_at&.to_s(:display) || '[None]' %></p>
 

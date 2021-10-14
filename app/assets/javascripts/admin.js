@@ -12,3 +12,4 @@
 //
 //= require jquery
 //= require bootstrap-sprockets
+//= require admin/digital_objects
