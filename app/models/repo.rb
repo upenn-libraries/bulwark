@@ -565,7 +565,7 @@ class Repo < ActiveRecord::Base
       'directive_name' => human_readable_name,
       'created_at' => created_at&.to_s(:display),
       'created_by' => created_by&.email,
-      'updated_at' => created_at&.to_s(:display),
+      'updated_at' => updated_at&.to_s(:display),
       'updated_by' => updated_by&.email,
       'published' => published,
       'first_published_at' => first_published_at&.to_s(:display),
