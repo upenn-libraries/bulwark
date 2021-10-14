@@ -571,7 +571,7 @@ class Repo < ActiveRecord::Base
       'first_published_at' => first_published_at&.to_s(:display),
       'last_published_at' => last_published_at&.to_s(:display),
       'number_of_assets' => assets.count,
-      'metadata' => descriptive_metadata.user_defined_mappings
+      'metadata' => descriptive_metadata.original_mappings
     }
 
     if structural
