@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require 'jhove_service'
 
 module Bulwark
   class Import
