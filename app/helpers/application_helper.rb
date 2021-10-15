@@ -49,20 +49,22 @@ module ApplicationHelper
     partials = ''
     return '' unless repo.present?
     repo.file_display_attributes.each do |key, value|
-       partials += render :partial => 'av_display/audio', :locals => {:streaming_id => key, :streaming_url => value[:streaming_url]} if value[:content_type] == 'mp3'
-       partials += render :partial => 'av_display/video', :locals => {:streaming_id => key, :streaming_url => value[:streaming_url]} if value[:content_type] == 'mp4'
+       partials += render :partial => 'other_display/audio', :locals => {:streaming_id => key, :streaming_url => value[:streaming_url]} if value[:content_type] == 'mp3'
+       partials += render :partial => 'other_display/video', :locals => {:streaming_id => key, :streaming_url => value[:streaming_url]} if value[:content_type] == 'mp4'
     end
     return partials.html_safe
   end
 
-  def render_warc
-    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
-    partials = ''
-    return '' unless repo.present?
-    repo.file_display_attributes.each do |key, value|
-      partials += render :partial => 'other_display/warc', :locals => {:download_url => value[:download_url].gsub("#{Utils::Storage::Ceph.config.protocol}#{Utils::Storage::Ceph.config.host}",''), :filename => value[:filename]} if value[:content_type] == 'gz'
-    end
-    return partials.html_safe
+  def render_audio_player
+    repo = Repo.find_by(unique_identifier: @document.id.reverse_fedorafy, new_format: true)
+    return '' if repo.nil?
+
+    assets = repo.assets.where(mime_type: ['audio/vnd.wave'])
+    return '' if assets.blank?
+
+    assets.map do |asset|
+      render partial: 'other_display/audio', locals: { streaming_id: asset.filename, streaming_url: asset.access_file_link }
+    end.join('').html_safe
   end
 
   # Rendering files that don't have a specific viewer that should be used. These files just get a download link.

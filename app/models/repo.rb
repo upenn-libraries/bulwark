@@ -2,7 +2,10 @@ require "net/http"
 require 'sanitize'
 
 class Repo < ActiveRecord::Base
-  include Cloneable
+  include DigitalObject::Gitannexable
+  include DigitalObject::Derivatives
+  include DigitalObject::Metadata
+  include DigitalObject::Assets
 
   scope :new_format, -> { where(new_format: true) }
   scope :old_format, -> { where(new_format: false) }

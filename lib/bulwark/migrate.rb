@@ -5,7 +5,7 @@ module Bulwark
   class Migrate
     ACTION = 'migrate'
 
-    attr_reader :unique_identifier, :action, :migrated_by, :descriptive_metadata,
+    attr_reader :unique_identifier, :action, :migrated_by, :audio, :descriptive_metadata,
                 :structural_metadata, :errors
 
     # Initializes object to migrate digital objects.
@@ -14,6 +14,7 @@ module Bulwark
     # @options opts [String] :action
     # @options opts [User] :migrated_by
     # @options opts [String] :unique_identifier
+    # @options opts [Boolean] :audio # flag for items with audio files
     # @options opts [Hash] :metadata  # gets mapped to descriptive_metadata
     # @options opts [Hash] :structural  # gets mapped to structural_metadata
     def initialize(args)
@@ -22,6 +23,7 @@ module Bulwark
       @action               = args[:action]&.downcase
       @unique_identifier    = args[:unique_identifier]
       @migrated_by          = args[:migrated_by]
+      @audio                = args.fetch(:audio, 'false').casecmp('true').zero?
       @descriptive_metadata = args.fetch(:metadata, {})
       @structural_metadata  = args[:structural].blank? ? nil : Import::StructuralMetadataGenerator.new(args[:structural])
       @errors               = []
@@ -82,19 +84,22 @@ module Bulwark
       return Bulwark::Import::Result.new(status: DigitalObjectImport::FAILED, errors: errors) unless @errors.empty?
 
       # -- Additional validations that require the git repo to be present. --
+      # -- Not running these checks for repos with audio files because they would all fail. --
 
       # Get all filenames in assets directory.
       glob_path = File.join(repo.clone_location, repo.assets_subdirectory, "*")
       asset_filenames = Dir.glob(glob_path).map { |f| File.basename(f) } # Filenames only.
 
-      # Check that all files have valid extensions
-      extensions = asset_filenames.map { |f| File.extname(f).gsub(/^\./, '') }.uniq
-      invalid_extensions = extensions - valid_file_extensions
-      @errors << "Assets in git repo contain invalid file extensions: #{invalid_extensions.join(', ')}" unless invalid_extensions.blank?
+      unless audio
+        # Check that all files have valid extensions
+        extensions = asset_filenames.map { |f| File.extname(f).gsub(/^\./, '') }.uniq
+        invalid_extensions = extensions - valid_file_extensions
+        @errors << "Assets in git repo contain invalid file extensions: #{invalid_extensions.join(', ')}" unless invalid_extensions.blank?
 
-      # Check that there aren't files with the same name but different extension
-      without_extension = asset_filenames.map { |f| File.basename(f, '.*') }
-      @errors << "There are assets that share the same name but different extension" if without_extension.any? { |f| without_extension.count(f) > 1 }
+        # Check that there aren't files with the same name but different extension
+        without_extension = asset_filenames.map { |f| File.basename(f, '.*') }
+        @errors << "There are assets that share the same name but different extension" if without_extension.any? { |f| without_extension.count(f) > 1 }
+      end
 
       return Bulwark::Import::Result.new(status: DigitalObjectImport::FAILED, errors: errors) if @errors.any?
 
@@ -116,6 +121,25 @@ module Bulwark
       )
 
       # -- Migration --
+
+      # For audio files move .mp3s to .derivs/access and delete MD5 files.
+      if audio
+        access_derivs_dir = File.join(repo.derivatives_subdirectory, 'access')
+        FileUtils.mkdir(File.join(repo.clone_location, access_derivs_dir))
+
+        asset_filenames.select { |f| File.extname(f) == '.mp3' }.each do |filename|
+          repo.clone.lib.mv(File.join(repo.assets_subdirectory, filename), File.join(access_derivs_dir, filename))
+        end
+
+        asset_filenames.select { |f| File.extname(f) == '.md5' }.each do |filename|
+          repo.clone.remove(File.join(repo.assets_subdirectory, filename))
+        end
+
+        repo.clone.commit('Move MP3 files to derivatives directory and removing md5 checksum files.')
+        repo.clone.push('origin', 'master')
+        repo.clone.push('origin', 'git-annex')
+        repo.clone.annex.sync(content: true)
+      end
 
       # Characterize Files
       repo.characterize_assets

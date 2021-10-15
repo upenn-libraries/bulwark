@@ -241,6 +241,7 @@ RSpec.describe Bulwark::Import do
       let(:expected_descriptive) { fixture_to_str('example_objects', 'object_one', 'descriptive_metadata.csv') }
 
       it 'expect result to be successful' do
+        expect(result.errors).to be_blank
         expect(result.status).to be DigitalObjectImport::SUCCESSFUL
       end
 
