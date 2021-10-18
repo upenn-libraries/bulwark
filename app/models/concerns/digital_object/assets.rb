@@ -76,7 +76,7 @@ module DigitalObject
 
         version_control_agent.add({}, clone_location)
         version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.automated.added_assets'), clone_location)
-        version_control_agent.push({}, clone_location)
+        version_control_agent.push({ content: assets_subdirectory }, clone_location)
       end
   end
 end
