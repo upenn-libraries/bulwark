@@ -67,7 +67,7 @@ module Bulwark
       end
 
       if assets
-        @errors << "assets drive invalid" if assets[:drive] && !MountedDrives.valid?(assets[:drive])
+        @errors << "assets drive invalid: '#{assets[:drive]}'" if assets[:drive] && !MountedDrives.valid?(assets[:drive])
         # @errors << "asset path invalid" if assets[:drive] && assets[:path] && !MountedDrives.valid_path?(assets[:drive], assets[:path])
       end
 
