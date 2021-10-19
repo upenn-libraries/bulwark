@@ -109,7 +109,7 @@ RSpec.describe Bulwark::Import do
 
       it 'adds error' do
         expect(import.validate).to be false
-        expect(import.errors).to include 'assets drive invalid'
+        expect(import.errors).to include "assets drive invalid: 'invalid'"
       end
     end
 
