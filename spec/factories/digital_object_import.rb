@@ -5,7 +5,7 @@ FactoryBot.define do
     process_errors { [] }
     import_data do
       {
-        type: 'type',
+        action: 'create',
         assets: {
           drive: 'drive', path: 'path'
         },

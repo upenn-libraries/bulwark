@@ -57,4 +57,23 @@ RSpec.describe DigitalObjectImport, type: :model do
       end
     end
   end
+
+  context 'callbacks' do
+    context 'when an update import is created' do
+      include_context 'stub successful EZID requests'
+
+      let(:repo) { FactoryBot.create(:repo) }
+      let(:digital_object_import) do
+        FactoryBot.create(
+          :digital_object_import,
+          bulk_import: bulk_import,
+          import_data: { action: 'update', unique_identifier: repo.unique_identifier }
+        )
+      end
+
+      it 'sets repo' do
+        expect(digital_object_import.repo).to eql repo
+      end
+    end
+  end
 end

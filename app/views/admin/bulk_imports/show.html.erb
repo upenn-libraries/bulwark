@@ -64,7 +64,8 @@
     <tr>
       <th>ID</th>
       <th>Status</th>
-      <th>Digital Object Changed</th>
+      <th>Directive Name</th>
+      <th>Unique Identifier</th>
       <th></th>
     </tr>
     </thead>
@@ -73,9 +74,10 @@
       <tr>
         <td><%= digital_object_import.id %></td>
         <td><%= digital_object_import.status.titlecase %></td>
+        <td><%= digital_object_import.digital_object_human_readable_name %></td>
         <td>
-          <% if digital_object_import.repo %>
-            <%= link_to(digital_object_import.repo.unique_identifier, admin_digital_object_path(digital_object_import.repo.id)) %>
+          <% if unique_identifier =  digital_object_import.digital_object_unique_identifier %>
+            <%= link_to(unique_identifier, admin_digital_object_path(unique_identifier)) %>
           <% end %>
         </td>
         <td>
