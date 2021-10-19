@@ -1,6 +1,0 @@
-<% @document = Finder.fedora_find(@object.unique_identifier.fedorafy) %>
-
-<% if @document.present? %>
-  <%= render :partial => "repos/review_status_form" %>
-<% end %>
-

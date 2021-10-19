@@ -5,8 +5,6 @@ gem 'rails', '4.2.5'
 
 # Internal gems
 gem 'jhove-service', git: 'https://gitlab.library.upenn.edu/digital-repository/jhove-service', branch: 'master'
-gem 'rails_admin', git: 'https://github.com/kelynch/rails_admin.git', branch: 'js_loading_in_custom_theme'
-gem 'rails_admin_colenda', :path => 'rails_admin_colenda'
 gem 'string_exts', :path => 'string_exts'
 
 # Hydra/Samvera Ecosystem gems
