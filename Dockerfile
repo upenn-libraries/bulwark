@@ -61,7 +61,6 @@ RUN mkdir -p /home/app/webapp/log && \
     mkdir -p /fs/pub/data && \
     mkdir -p /fs/priv/workspace && \
     mkdir -p /home/app/webapp/string_exts && \
-    mkdir -p /home/app/webapp/rails_admin_colenda && \
     mkdir -p /etc/my_init.d
 
 COPY docker/gitannex.sh /etc/my_init.d/gitannex.sh
@@ -107,8 +106,6 @@ RUN wget https://download.samba.org/pub/rsync/rsync-3.2.3.tar.gz -O - | tar xz &
 WORKDIR /home/app/webapp
 
 COPY Gemfile Gemfile.lock /home/app/webapp/
-
-COPY rails_admin_colenda /home/app/webapp/rails_admin_colenda
 
 COPY string_exts /home/app/webapp/string_exts
 
