@@ -1,4 +1,3 @@
-require 'roo'
 require 'pathname'
 
 module Utils

@@ -1,5 +1,3 @@
-require 'fastimage'
-
 class MetadataBuilder < ActiveRecord::Base
   belongs_to :repo, :foreign_key => 'repo_id'
   has_many :metadata_source, dependent: :destroy
@@ -10,7 +8,7 @@ class MetadataBuilder < ActiveRecord::Base
 
   serialize :preserve, Set
   serialize :generated_metadata_files, JSON
-  
+
   def parent_repo=(parent_repo)
     self[:parent_repo] = parent_repo
     @repo = Repo.find(parent_repo)

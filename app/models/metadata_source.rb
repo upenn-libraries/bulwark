@@ -1,5 +1,4 @@
 require 'open-uri'
-require 'csv_xlsx_converter'
 
 class MetadataSource < ActiveRecord::Base
   include DescriptiveMetadataSources
