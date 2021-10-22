@@ -649,7 +649,6 @@ DEPENDENCIES
   launchy
   letter_opener
   mime-types
-  mini_magick
   mysql2 (~> 0.4.0)
   nokogiri
   pry-byebug

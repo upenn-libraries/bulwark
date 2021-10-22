@@ -3,7 +3,6 @@ namespace :bulwark do
   task start: :environment do
     # First, check git-annex, imagemagick and vips are installed.
     raise 'git-annex not found. Please install git-annex.' unless ExtendedGit.git_annex_installed?
-    raise 'imagemagick not found. Please install imagemagick' unless MiniMagick.imagemagick? || MiniMagick.imagemagick7?
     raise 'libvips not found. Please install vips 8.6+' unless Vips.at_least_libvips?(8, 6)
 
     # Start lando
