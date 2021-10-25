@@ -77,7 +77,7 @@
         <td><%= digital_object_import.digital_object_human_readable_name %></td>
         <td>
           <% if unique_identifier =  digital_object_import.digital_object_unique_identifier %>
-            <%= link_to(unique_identifier, admin_digital_object_path(unique_identifier)) %>
+            <%= link_to(unique_identifier, admin_digital_object_path(digital_object_import.repo.id)) %>
           <% end %>
         </td>
         <td>
