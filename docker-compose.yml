@@ -85,13 +85,10 @@ services:
       update_config:
         parallelism: 1
     environment:
-      BATCH_OPS_EMAIL:
       CACHE_URL:
       CATALOG_CONTROLLER_PROTOCOL:
-      COMBINED_HTTP_LOOKUP:
       DATABASE_NAME:
       DATABASE_USERNAME:
-      ERC_DEFAULT_WHO:
       EZID_DEFAULT_SHOULDER:
       EZID_USER:
       GIT_USER:
@@ -100,8 +97,6 @@ services:
       KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE:
       MASTERSRBM_HARVESTING_ENDPOINT_REMOTE:
       MARMITE_URL:
-      PAP_HTTP_LOOKUP:
-      PAP_STRUCTURAL_HTTP_LOOKUP:
       PHALT_ENDPOINT:
       FEDORA_URL:
       FEDORA_USER:
@@ -133,8 +128,6 @@ services:
       STORAGE_READ_PROTOCOL:
       STORAGE_TYPE:
       UV_URL:
-      VOYAGER_HTTP_LOOKUP:
-      VOYAGER_STRUCTURAL_HTTP_LOOKUP:
     networks:
       default:
         aliases:
@@ -185,12 +178,10 @@ services:
       update_config:
         parallelism: 1
     environment:
-      BATCH_OPS_EMAIL:
       CACHE_URL:
       CATALOG_CONTROLLER_PROTOCOL:
       DATABASE_NAME:
       DATABASE_USERNAME:
-      ERC_DEFAULT_WHO:
       EZID_DEFAULT_SHOULDER:
       EZID_USER:
       GIT_USER:
@@ -199,8 +190,6 @@ services:
       KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE:
       MASTERSRBM_HARVESTING_ENDPOINT_REMOTE:
       MARMITE_URL:
-      PAP_HTTP_LOOKUP:
-      PAP_STRUCTURAL_HTTP_LOOKUP:
       PHALT_ENDPOINT:
       FEDORA_URL:
       FEDORA_USER:
@@ -231,8 +220,6 @@ services:
       STORAGE_READ_HOST:
       STORAGE_READ_PROTOCOL:
       STORAGE_TYPE:
-      VOYAGER_HTTP_LOOKUP:
-      VOYAGER_STRUCTURAL_HTTP_LOOKUP:
     secrets:
       - source: bulwark_aws_access_key_id
         target: /run/secrets/aws_access_key_id
