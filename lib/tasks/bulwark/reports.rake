@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :bulwark do
   namespace :reports do
     desc 'Report listing all records with MMS IDs'
