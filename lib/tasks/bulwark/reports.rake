@@ -1,5 +1,20 @@
 namespace :bulwark do
   namespace :reports do
+    desc 'Report listing all records with MMS IDs'
+    task arks_to_bibs: :environment do
+      data = []
+
+      Repo.all.find_each do |repo|
+        bibnumber = repo&.descriptive_metadata&.original_mappings&.dig('bibnumber', 0)
+        data << { mms_id: bibnumber, unique_identifier: repo.unique_identifier } if bibnumber
+      end
+
+      filename = File.join(Utils.config[:workspace], "arks-to-bibs-#{Time.current.to_s(:number)}.csv")
+      File.write(filename, Bulwark::StructuredCSV.generate(data))
+
+      puts Rainbow("CSV written to #{filename}").green
+    end
+
     desc 'Reports whether or not items with MMS IDs have a Colenda link in the Alma record'
     task check_for_alma_links: :environment do
       # Generate a CSV with the following columns:
