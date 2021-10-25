@@ -13,7 +13,6 @@ class Repo < ActiveRecord::Base
   scope :id_search, ->(query) { where_like(:unique_identifier, query) }
 
   include ModelNamingExtensions::Naming
-  include Utils::Artifacts::ProblemsLog
 
   has_one :metadata_builder, dependent: :destroy, :validate => false
   has_one :version_control_agent, dependent: :destroy, :validate => false
@@ -163,200 +162,9 @@ class Repo < ActiveRecord::Base
     self.update_last_action(action_description[:git_remote_initialized])
   end
 
-  def set_metadata_from_ark
-    # TODO: may need to extend here eventually to account for combined_ark format data
-    url = URI.parse("#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}")
-    req = Net::HTTP.new(url.host, url.port)
-    res = req.request_head(url.path)
-    data = Nokogiri::XML(open(url.to_s))
-    data.remove_namespaces!
-    source_type = data.xpath('//record/bib_id').children.present? ? 'pqc_desc' : 'pqc_combined_desc'
-
-    if res.code == '200'
-      # TODO: may need to extend here eventually to account for combined_ark format data
-      desc = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}", :source_type => 'pqc_combined_desc').first_or_create
-      desc.update_attributes( view_type: 'horizontal',
-                              num_objects: 1,
-                              x_start: 1,
-                              y_start: 2,
-                              x_stop: 34,
-                              y_stop: 2,
-                              root_element: 'record',
-                              source_type: source_type,
-                              original_mappings: {'bibid' => data.xpath('//record/bib_id').children.first.text},
-                              z: 1 )
-
-      _set_combined_metadata_ark(desc)
-      desc.original_mappings = desc.user_defined_mappings
-
-      # TODO: may need to extend here eventually to account for combined_ark format data
-      struct = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}", :source_type => 'pqc_combined_struct').first_or_create
-      struct.update_attributes( view_type: 'horizontal',
-                                num_objects: 1,
-                                x_start: 1,
-                                y_start: 1,
-                                x_stop: 1,
-                                y_stop: 1,
-                                root_element: 'pages',
-                                parent_element: 'page',
-                                source_type: 'pqc_combined_struct',
-                                file_field: 'file_name',
-                                z: 1 )
-
-      _set_combined_metadata_ark(struct)
-
-      struct.original_mappings = struct.user_defined_mappings
-
-      desc.children << struct
-      struct.save!
-      desc.save!
-      desc.metadata_builder.repo.update_steps(:metadata_source_type_specified)
-    else
-      structural_mappings, bib_id = _set_structural_metadata_ark(self.unique_identifier)
-      desc = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:pap][:http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:http_lookup_suffix]}").first_or_create
-      desc.update_attributes( view_type: 'horizontal',
-                              num_objects: 1,
-                              x_start: 1,
-                              y_start: 2,
-                              x_stop: 34,
-                              y_stop: 2,
-                              root_element: 'record',
-                              source_type: 'pqc_desc',
-                              z: 1 )
-
-      _set_descriptive_metadata_ark(bib_id, desc)
-
-      struct = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}").first_or_create
-      struct.update_attributes( view_type: 'horizontal',
-                                num_objects: 1,
-                                x_start: 1,
-                                y_start: 1,
-                                x_stop: 1,
-                                y_stop: 1,
-                                root_element: 'pages',
-                                parent_element: 'page',
-                                source_type: 'pqc_ark',
-                                file_field: 'file_name',
-                                z: 1 )
-      struct.original_mappings = structural_mappings
-      struct.user_defined_mappings = structural_mappings
-      desc.children << struct
-      struct.save!
-      desc.save!
-      self.metadata_builder.metadata_source << desc
-    end
-    self.metadata_builder.save!
-  end
-
-  def update_ark_struct_metadata
-    structural_mappings, bib_id = _set_structural_metadata_ark(self.unique_identifier)
-    struct = MetadataSource.where(:metadata_builder => self.metadata_builder, :path => "#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{self.unique_identifier.tr(":/","+=")}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}").first_or_create
-    struct.update_attributes( view_type: 'horizontal',
-                              num_objects: 1,
-                              x_start: 1,
-                              y_start: 1,
-                              x_stop: 1,
-                              y_stop: 1,
-                              root_element: 'pages',
-                              parent_element: 'page',
-                              source_type: 'pqc_ark',
-                              file_field: 'file_name',
-                              z: 1 )
-
-    struct.original_mappings = structural_mappings
-    struct.user_defined_mappings = structural_mappings
-    struct.save!
-    self.metadata_builder.save!
-  end
-
-  def ingest(file, working_path)
-    begin
-      @status = Utils::Process.import(file, self, working_path)
-      self.thumbnail = default_thumbnail
-      self.save!
-      if self.thumbnail.present?
-        thumbnail_path = "#{self.assets_subdirectory}/#{self.thumbnail}"
-        self.version_control_agent.get({:location => "#{working_path}/#{thumbnail_path}"}, working_path)
-        self.version_control_agent.unlock({:content => "#{working_path}/#{thumbnail_path}"}, working_path)
-        self.version_control_agent.add({:content => "#{working_path}/#{thumbnail_path}"}, working_path) # Why is this necessary if the file is already present?
-        self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_previews'), working_path) # Why is this necessary?
-        Utils::Process.generate_thumbnail(self, working_path)
-      end
-      self.version_control_agent.lock(thumbnail_path, working_path)
-      self.package_metadata_info(working_path)
-      self.generate_logs(working_path)
-      self.version_control_agent.add({:content => "#{working_path}/#{self.admin_subdirectory}"}, working_path)
-      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.ingest_complete'), working_path)
-      self.version_control_agent.lock(self.admin_subdirectory, working_path)
-      self.version_control_agent.push({:content => "#{working_path}/#{self.admin_subdirectory}"}, working_path)
-      self.metadata_builder.last_file_checks = DateTime.now
-      self.metadata_builder.save!
-    rescue => e
-       self.save!
-       raise # Raises last error
-    end
-  end
-
-  def package_metadata_info(working_path)
-    self.version_control_agent.get({:location => self.admin_subdirectory}, working_path)
-    self.version_control_agent.unlock({:content => self.admin_subdirectory}, working_path)
-    File.open("#{working_path}/#{self.admin_subdirectory}/#{self.names.directory}", 'w+') do |f|
-      self.metadata_builder.metadata_source.each do |source|
-        f.puts I18n.t('colenda.version_control_agents.packaging_info', :source_path => source.path, :source_id => source.id, :source_type => source.source_type, :source_view_type => source.view_type, :source_num_objects => source.num_objects, :source_x_start => source.x_start, :source_x_stop => source.x_stop, :source_y_start => source.y_start, :source_y_stop => source.y_stop, :source_children => source.children)
-      end
-    end
-  end
-
-  def generate_logs(destination_path)
-    begin
-      temp_location = self.problems_log
-      destination = "#{destination_path}/#{Utils.config[:object_admin_path]}/#{Utils.config[:problem_log]}"
-      FileUtils.mv(temp_location, destination)
-    rescue => exception
-      return unless self.problem_files.present?
-      raise Utils::Error::Artifacts.new(exception.message)
-    end
-
-  end
-
   def update_last_action(update_string)
     self.last_action_performed = { :description => update_string }
     self.save!
-  end
-
-  # Not used
-  def push_artifacts(working_path)
-    begin
-      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.post_ingest_artifacts'), working_path)
-      self.version_control_agent.push(working_path)
-    rescue
-      self.version_control_agent.push(working_path)
-    end
-  end
-
-  #TODO: Eventually offload to metadata source subclasses
-  def default_thumbnail
-    structural_types = %w[structural_bibid custom kaplan_structural pap_structural pqc_ark pqc_combined_struct pqc_structural]
-    single_structural_source = MetadataSource.where('metadata_builder_id = ? AND source_type IN (?)', self.metadata_builder, structural_types).pluck(:id)
-    single_structural_source.length == 1 ? MetadataSource.find(single_structural_source.first).thumbnail : nil
-  end
-
-  def load_file_extensions
-    FileExtensions.asset_file_extensions
-  end
-
-  def load_metadata_source_extensions
-    FileExtensions.metadata_source_file_extensions
-  end
-
-  # Not Called.
-  def preserve_exists?
-    _check_if_preserve_exists
-  end
-
-  def directory_link
-    url = "#{Rails.application.routes.url_helpers.rails_admin_url(:only_path => true)}/repo/#{self.id}/git_actions"
-    "<a href=\"#{url}\">#{self.names.directory}</a>"
   end
 
   def update_steps(task)
@@ -364,18 +172,8 @@ class Repo < ActiveRecord::Base
     self.save!
   end
 
-  def log_problem_file(file, problem)
-    self.problem_files[file] = problem
-    self.save!
-  end
-
   def mint_ezid
     mint_initial_ark
-  end
-
-  #TODO: Add a field that indicates repo ownership candidacy
-  def self.repo_owners
-    User.where(guest: false).pluck(:email, :email)
   end
 
   # Could be put into a concern for other models to be searched
@@ -396,23 +194,6 @@ class Repo < ActiveRecord::Base
       formatted_types = extensions_array.first.manifest_singular
     end
     formatted_types
-  end
-
-  # Not used.
-  def set_image_data
-    self.images_to_render["iiif"]["images"] = {}
-    working_directory = self.version_control_agent.clone
-    ms = self.metadata_builder.metadata_source.find_all { |ms| ms.source_type == 'structural_bibid' }.first
-    ms.user_defined_mappings.each do |mapping|
-      sha_key = self.file_display_attributes.select{|k, v| v[:file_name].end_with?("#{mapping[1]["file_name"]}.jpeg")}.first[0]
-      self.images_to_render["iiif"]["images"]["#{self.names.bucket}%2F#{sha_key}"] = {
-          "page_number" => "#{mapping[1]["page_number"]}#{%w[recto verso].include?(mapping[1]["side"]) ? mapping[1]["side"][0] : nil}",
-          "file_name" => mapping[1]["file_name"],
-          "description" => mapping[1]["description"].present? ? mapping[1]["description"] : nil,
-          "tocentry_data" => mapping[1]['tocentry']
-      }
-    end
-    self.save!
   end
 
   # Returning MetadataSource that contains structural metadata.
@@ -640,19 +421,6 @@ class Repo < ActiveRecord::Base
 
   end
 
-  def _initialize_steps
-    self.steps = {
-        :git_remote_initialized => false,
-        :metadata_sources_selected => false,
-        :metadata_source_type_specified => false,
-        :metadata_source_additional_info_set => false,
-        :metadata_extracted => false,
-        :metadata_mappings_generated => false,
-        :preservation_xml_generated => false,
-        :published_preview => false
-    }
-  end
-
   def _set_version_control_agent
     self.version_control_agent = VersionControlAgent.new(:vc_type => 'GitAnnex')
     self.version_control_agent.save!
@@ -662,59 +430,6 @@ class Repo < ActiveRecord::Base
     self.metadata_builder = MetadataBuilder.new(:parent_repo => self.id)
     self.metadata_builder.save!
     self.save!
-  end
-
-  # Not called.
-  def _check_if_preserve_exists
-    working_path = self.version_control_agent.clone
-    fname = "#{working_path}/#{self.preservation_filename}"
-    self.version_control_agent.get({:location => fname}, working_path)
-    exist_status = File.exists?(fname)
-    self.version_control_agent.drop(working_path)
-    self.version_control_agent.delete_clone(working_path)
-    exist_status
-  end
-
-  def _set_combined_metadata_ark(metadata_source)
-    metadata_source.set_metadata_mappings
-  end
-
-  def _set_descriptive_metadata_ark(bib_id, metadata_source)
-    url = "#{MetadataSchema.config[:pap][:http_lookup]}/#{bib_id}/#{MetadataSchema.config[:pap][:http_lookup_suffix]}"
-    begin
-      data = Nokogiri::XML(open(url))
-    rescue Exception => e
-      return {}, '' if e.message.include?('404')
-    end
-    metadata_source.original_mappings['bibid'] = bib_id
-    metadata_source.set_metadata_mappings
-  end
-
-  def _set_structural_metadata_ark(ark_id)
-    mapped_values = {}
-    url = "#{MetadataSchema.config[:pqc_ark][:structural_http_lookup]}/#{ark_id.tr(':/','+=')}/#{MetadataSchema.config[:pqc_ark][:structural_lookup_suffix]}"
-    begin
-      data = Nokogiri::XML(open(url))
-    rescue Exception => e
-      return {}, '' if e.message.include?('404')
-    end
-
-    reading_direction = data.xpath('//record/pages/page').first['side'] == 'verso' ? 'right-to-left' : 'left-to-right'
-    data.xpath('//record/pages/page').each_with_index do |page, index|
-      mapped_values[index+1] = {
-          'page_number' => page['number'],
-          'sequence' => page['seq'],
-          'reading_direction' => reading_direction,
-          'side' => page['side'],
-          'tocentry' => page['tocentry'],
-          'identifier' => "#{ark_id.tr(':/','+=')}_#{page[:image]}",
-          'file_name' => "#{page['image']}.tif",
-          'description' => page['visiblepage']
-
-      }
-    end
-    bib_id = data.at_xpath('//record/bib_id').children.first.text
-    return mapped_values, bib_id
   end
 
   def action_description

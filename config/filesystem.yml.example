@@ -1,7 +1,6 @@
 # Config file for working with the filesystem
 
 development:
-  manifest_location: /abs/path/to/manifest.txt
   mets_xml_derivative: mets.xml
   object_admin_path: .repoadmin
   object_derivatives_path: .derivs
@@ -20,12 +19,10 @@ development:
   input_source_prefix: input_source
   problem_log: problems_log
 test:
-  manifest_location: /path/to/manifest.txt
   metadata_path_label: metadata_label_in_manifest
   file_path_label: file_path_label_in_manifest
   repository_prefix: prefix
 production:
-  manifest_location: /abs/path/to/manifest.txt
   mets_xml_derivative: mets.xml
   object_admin_path: .repoadmin
   object_derivatives_path: .derivs

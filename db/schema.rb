@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210708151014) do
+ActiveRecord::Schema.define(version: 20211019175746) do
 
   create_table "alert_messages", force: :cascade do |t|
     t.boolean "active",               default: false
@@ -33,17 +33,6 @@ ActiveRecord::Schema.define(version: 20210708151014) do
   end
 
   add_index "assets", ["filename", "repo_id"], name: "index_assets_on_filename_and_repo_id", unique: true, using: :btree
-
-  create_table "batches", force: :cascade do |t|
-    t.text     "queue_list",      limit: 4294967295
-    t.text     "directive_names", limit: 4294967295
-    t.string   "email",           limit: 255
-    t.datetime "start"
-    t.datetime "end"
-    t.string   "status",          limit: 255
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
-  end
 
   create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       limit: 4,   null: false
@@ -91,17 +80,6 @@ ActiveRecord::Schema.define(version: 20210708151014) do
   end
 
   add_index "endpoints", ["repo_id"], name: "index_endpoints_on_repo_id", using: :btree
-
-  create_table "manifests", force: :cascade do |t|
-    t.string   "name",                  limit: 255
-    t.text     "content",               limit: 4294967295
-    t.text     "validation_problems",   limit: 4294967295
-    t.string   "owner",                 limit: 255
-    t.string   "steps",                 limit: 255
-    t.string   "last_action_performed", limit: 255
-    t.datetime "created_at",                               null: false
-    t.datetime "updated_at",                               null: false
-  end
 
   create_table "metadata_builders", force: :cascade do |t|
     t.string   "parent_repo",              limit: 255

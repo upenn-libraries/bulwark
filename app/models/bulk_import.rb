@@ -55,11 +55,7 @@ class BulkImport < ActiveRecord::Base
     rows = Bulwark::StructuredCSV.parse(csv)
     rows.each_with_index do |row, index|
       row = row.symbolize_keys
-      import = if row[:action]&.downcase == Bulwark::Migrate::ACTION
-                 Bulwark::Migrate.new(migrated_by: created_by, **row)
-               else
-                 Bulwark::Import.new(created_by: created_by, **row)
-               end
+      import = Bulwark::Import.new(created_by: created_by, **row)
 
       unless import.validate
         validation_errors["row #{index + 2}"] = import.errors

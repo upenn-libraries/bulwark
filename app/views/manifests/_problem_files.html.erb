@@ -1,9 +1,0 @@
-<% unless problems.empty? %>
-  <h3><%= link_to(ark, rails_admin.file_checks_path(:model_name => Repo, :id => id)) %></h3>
-  <ul>
-    <% problems.each do |source, issue| %>
-        <li><%= "#{issue}: #{source}" %></li>
-    <% end %>
-  </ul>
-<% end %>
-

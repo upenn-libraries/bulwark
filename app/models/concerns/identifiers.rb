@@ -4,9 +4,9 @@ module Identifiers
   #TODO: Define target
   def erc_information
     {
-        erc_who: self.creator.present? ? self.creator.join('; ') : MetadataSchema.config[:erc][:default_who],
-        erc_what: self.title.present? ? self.title.join('; ') : '',
-        erc_when: self.date.present? ? self.date.join('; ') : ''
+      erc_who: self.creator.present? ? self.creator.join('; ') : '',
+      erc_what: self.title.present? ? self.title.join('; ') : '',
+      erc_when: self.date.present? ? self.date.join('; ') : ''
     }
   end
 

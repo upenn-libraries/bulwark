@@ -1,6 +1,0 @@
-<div class="fetch-metadata-by-ark">
-  <h2>Fetch metadata from marmite</h2>
-  <%= form_for @object.metadata_builder, :validate => true, :method => :post, :html => { :class => "fetch-metadata-form" }, :url => "/repos/#{@object.id}/fetch_by_ark" do |f| %>
-    <%= f.submit "Fetch metadata now", :id => "fetch_metadata_from_ark_submit" %>
-  <% end -%>
-</div>
