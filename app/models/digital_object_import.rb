@@ -17,6 +17,7 @@ class DigitalObjectImport < ActiveRecord::Base
   serialize :import_data, JSON
 
   before_validation :set_default_status, on: :create
+  before_save       :set_repo,           on: :create # set repo if it can be found
 
   validates :status, inclusion: { in: STATUSES }
 
@@ -45,9 +46,27 @@ class DigitalObjectImport < ActiveRecord::Base
     )
   end
 
+  def digital_object_unique_identifier
+    repo&.unique_identifier
+  end
+
+  def digital_object_human_readable_name
+    if repo
+      repo.human_readable_name
+    elsif import_data['action'].casecmp('create')
+      import_data['directive_name']
+    end
+  end
+
   private
 
     def set_default_status
       self.status = QUEUED unless status
+    end
+
+    # Set repo, if this is an update and the unique_identifier is present.
+    def set_repo
+      return if !import_data['action'].casecmp('update') || import_data['unique_identifier'].blank?
+      self.repo = Repo.find_by(unique_identifier: import_data['unique_identifier'])
     end
 end
