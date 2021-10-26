@@ -7,11 +7,11 @@ services:
       - mkdir -p /opt/solr/server/solr/lib/contrib/
       - cp -r /opt/solr/contrib/analysis-extras/ /opt/solr/server/solr/lib/contrib/
       - solr delete -c lando # Deleting lando created core because it raises errors.
-      - mkdir /opt/solr/bulwark-config # Copying solr config from docker container
-      - curl -o /opt/solr/bulwark-config/schema.xml https://gitlab.library.upenn.edu/digital-repository/solr5_dev/-/raw/master/schema.xml
-      - curl -o /opt/solr/bulwark-config/solrconfig.xml https://gitlab.library.upenn.edu/digital-repository/solr5_dev/-/raw/master/solrconfig.xml
-      - solr create_core -c bulwark-development -d /opt/solr/bulwark-config
-      - solr create_core -c bulwark-test -d /opt/solr/bulwark-config
+      - mkdir -p /opt/solr/server/solr/configsets/bulwark_config/conf # Copying solr config from docker container
+      - curl -o /opt/solr/server/solr/configsets/bulwark_config/conf/schema.xml https://gitlab.library.upenn.edu/digital-repository/solr5_dev/-/raw/master/conf/schema.xml
+      - curl -o /opt/solr/server/solr/configsets/bulwark_config/conf/solrconfig.xml https://gitlab.library.upenn.edu/digital-repository/solr5_dev/-/raw/master/conf/solrconfig.xml
+      - curl "http://localhost:8983/solr/admin/cores?action=CREATE&name=bulwark-development&instanceDir=bulwark-development&configSet=bulwark_config"
+      - curl "http://localhost:8983/solr/admin/cores?action=CREATE&name=bulwark-test&instanceDir=bulwark-test&configSet=bulwark_config"
   mysql:
     type: mysql:5.7.31
     portforward: 3307
