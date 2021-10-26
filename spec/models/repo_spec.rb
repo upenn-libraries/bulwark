@@ -287,7 +287,7 @@ RSpec.describe Repo, type: :model do
 
       it 'adds document to solr' do
         repo.publish
-        solr = RSolr.connect(url: Bulwark::Config.solr[:url])
+        solr = RSolr.connect(url: Settings.solr.url)
         response = solr.get('select', params: { id: repo.names.fedora })
         expect(response['response']['numFound']).to be 1
       end
@@ -360,7 +360,7 @@ RSpec.describe Repo, type: :model do
       context 'when solr is available' do
         it 'removes document from solr' do
           unpublished = repo.unpublish
-          solr = RSolr.connect(url: Bulwark::Config.solr[:url])
+          solr = RSolr.connect(url: Settings.solr.url)
           response = solr.get('select', params: { id: repo.names.fedora })
           expect(response['response']['numFound']).to be 0
           expect(unpublished).to be true
@@ -392,7 +392,7 @@ RSpec.describe Repo, type: :model do
   describe '#create_iiif_manifest' do
     context 'when images are present' do
       before do
-        allow(Bulwark::Config).to receive(:iiif).and_return(image_server: 'https://images.library.upenn/iiif/2')
+        allow(Settings).to receive(:iiif).and_return(image_server: 'https://images.library.upenn/iiif/2')
       end
 
       let(:repo) do

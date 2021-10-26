@@ -1,0 +1,16 @@
+# Settings for test environment.
+
+mounted_drives:
+  test: <%= Rails.root.join('spec', 'fixtures', 'example_bulk_imports') %>
+marmite:
+  url: https://marmite.library.upenn.edu:9292
+bulk_import:
+  create_iiif_manifest: false
+digital_object:
+  git_annex:
+    special_remote:
+      type: directory
+      name: local
+      directory: <%= Rails.root.join('tmp', 'test_storage', 'special_remote') %>
+phalt:
+iiif:

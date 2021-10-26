@@ -253,7 +253,7 @@ class Repo < ActiveRecord::Base
       title: descriptive_metadata.user_defined_mappings['title'].join('; '),
       viewing_direction: structural_metadata.viewing_direction,
       viewing_hint: structural_metadata.viewing_hint,
-      image_server: Bulwark::Config.iiif[:image_server],
+      image_server: Settings.iiif.image_server,
       sequence: sequence
     }.to_json
 
@@ -315,7 +315,7 @@ class Repo < ActiveRecord::Base
       self.published = true
       save!
       # Add Solr Document to Solr Core -- raise error if cannot be added to Solr Core
-      solr = RSolr.connect(url: Bulwark::Config.solr[:url])
+      solr = RSolr.connect(url: Settings.solr.url)
       solr.add(self.solr_document)
       solr.commit
     end
@@ -332,7 +332,7 @@ class Repo < ActiveRecord::Base
     self.transaction do
       self.published = false
       save!
-      solr = RSolr.connect(url: Bulwark::Config.solr[:url])
+      solr = RSolr.connect(url: Settings.solr.url)
       solr.delete_by_query "id:#{names.fedora}"
       solr.commit
     end
