@@ -152,7 +152,7 @@ module Bulwark
       repo.delete_clone
 
       # Create Marmite IIIF Manifest
-      repo.create_iiif_manifest if Bulwark::Config.bulk_import[:create_iiif_manifest]
+      repo.create_iiif_manifest if Settings.bulk_import.create_iiif_manifest
 
       # Publish if publish flag is set to true.
       if @publish
@@ -187,7 +187,7 @@ module Bulwark
           human_readable_name: directive_name,
           metadata_subdirectory: 'metadata',
           assets_subdirectory: 'assets',
-          file_extensions: Bulwark::Config.digital_object[:file_extensions],
+          file_extensions: Settings.digital_object.file_extensions,
           metadata_source_extensions: ['csv'],
           preservation_filename: 'preservation.xml',
           new_format: true, # Setting to differentiate from previously created repos

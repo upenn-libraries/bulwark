@@ -50,7 +50,7 @@ module Utils
         git.push('origin', 'git-annex')
 
         if options[:content].present?
-          git.annex.copy(options[:content], to: Bulwark::Config.special_remote[:name])
+          git.annex.copy(options[:content], to: Settings.digital_object.git_annex.special_remote.name)
         else
           git.annex.sync(content: true)
         end
@@ -155,7 +155,7 @@ module Utils
             aws_access_key_id: ceph_config.aws_access_key_id
           )
         when 'directory'
-          special_remote = Bulwark::Config.special_remote
+          special_remote = Settings.digital_object.git_annex.special_remote
           raise 'Missing config for Directory special remote' unless special_remote[:name] && special_remote[:directory]
 
           special_remote_directory = File.join(special_remote[:directory], remote_name.bucketize)

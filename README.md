@@ -10,7 +10,6 @@ Bulwark is a Hydra head providing administrative digital asset and metadata gene
   Version 8.6+ required.
 * [NPM](https://www.npmjs.com/)
 
-
 ## Setting up local development and test environment
 We are using [lando](https://docs.lando.dev/basics/) to set up our local development and test environments. We have some custom rake tasks that wrap lando commands and run other necessary tasks.
 
@@ -19,7 +18,6 @@ We are using [lando](https://docs.lando.dev/basics/) to set up our local develop
 #### Mac (installing via homebrew)  
 ```
 brew install git-annex
-brew install imagemagick
 brew install vips
 brew cask install lando
 ```
@@ -62,6 +60,25 @@ sudo apt-get install imagemagick git-annex
   ```
 
 ## Configuration Files
+Most of the application-wide configuration is located in `config/settings` and is organized by environment. Global 
+configuration settings (ie, settings that are the same for all environments) are located in `config/settings.yml`.
+
+Some gems require custom configuration files to be provided in `config`, so in some cases you might see gem-specific 
+config files there, for example:
+- `config/solr.yml`
+- `config/blacklight.yml`
+
+We provide access to the application-wide configuration via the [config](https://github.com/rubyconfig/config) gem. All 
+configuration can be access via the `Settings` object. For example, to retrieve the configured mounted drives:
+```ruby
+Settings.mounted_drives
+```
+
+Additionally, the `Settings` object also provides access to the configuration in `solr.yml`. The Solr url can be 
+retrieves by calling:
+```ruby
+Settings.solr.url
+```
 
 #### filesystem.yml
 This configuration file specifies semantic information about the filesystem and filesystem behaviors that the application will use for asset lookup.

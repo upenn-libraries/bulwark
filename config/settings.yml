@@ -1,0 +1,11 @@
+# Global settings.
+  
+digital_object:
+  file_extensions:
+    - 'tif'
+    - 'TIF'
+    - 'tiff'
+    - 'jpeg'
+    - 'jpg'
+    - 'pdf'
+    - 'gz'
