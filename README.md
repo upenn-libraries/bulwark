@@ -91,7 +91,6 @@ An environment block for successfully deploying the application should look like
 ```yaml
 development:
   assets_path: /absolute/path/on/fs
-  assets_display_path: /absolute/path/on/fs
   file_path_label: FILE_PATH
   metadata_path_label: METADATA_PATH
   object_data_path: directory_name
@@ -105,7 +104,6 @@ development:
 
 Edit the config file to reflect your local settings for the fields as follows:  
 * `assets_path` - The location on the filesystem where the application will maintain preservation-worthy files.
-* `assets_display_path` - The location on the filesystem where the application will handle serving display-worthy derivatives.
 * `file_path_label` - A value used by the application to populate the semantic manifest.  This can be customized, or left FILE_PATH by default.
 * `metadata_path_label` - A value used by the application to populate the semantic manifest.  This can be customized, or left METADATA_PATH by default.
 * `object_data_path` - The directory within the git repository for each object where the user will be directed to interact on their local filesystem.

@@ -9,8 +9,8 @@ RSpec.describe Bulwark::Storage do
   describe '#url_for' do
     context 'when using S3 special remote' do
       before do
-        allow(Bulwark::Config).to receive(:special_remote).and_return(type: 'S3')
-        allow(Bulwark::Config).to receive(:phalt).and_return(url: phalt)
+        allow(Settings.digital_object.git_annex.special_remote).to receive(:type).and_return('S3')
+        allow(Settings.phalt).to receive(:url).and_return(phalt)
       end
 
       it 'return correct link when no filename or disposition are provided' do
@@ -34,7 +34,7 @@ RSpec.describe Bulwark::Storage do
 
     context 'when using directory special remote' do
       before do
-        allow(Bulwark::Config).to receive(:special_remote).and_return(type: 'directory')
+        allow(Settings.digital_object.git_annex.special_remote).to receive(:type).and_return('directory')
       end
 
       it 'return correct link when no filename or disposition are provided' do

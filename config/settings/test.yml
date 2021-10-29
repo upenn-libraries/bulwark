@@ -13,4 +13,6 @@ digital_object:
       name: local
       directory: <%= Rails.root.join('tmp', 'test_storage', 'special_remote') %>
 phalt:
+  url: https://phalt.colenda.library.upenn.edu/
 iiif:
+  image_server: https://iiif.colenda.library.upenn.edu/iiif/2

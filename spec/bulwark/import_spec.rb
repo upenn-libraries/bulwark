@@ -353,7 +353,7 @@ RSpec.describe Bulwark::Import do
 
       context 'when creating a iiif presentation manifest' do
         before do
-          allow(Bulwark::Config).to receive(:bulk_import).and_return(create_iiif_manifest: true)
+          allow(Settings.bulk_import).to receive(:create_iiif_manifest).and_return(true)
         end
 
         it 'makes requests to generate iiif manifest' do
@@ -809,7 +809,7 @@ RSpec.describe Bulwark::Import do
 
     context 'when creating a new digital object with PDFs' do
       before do
-        allow(Bulwark::Config).to receive(:bulk_import).and_return(create_iiif_manifest: true)
+        allow(Settings.bulk_import).to receive(:create_iiif_manifest).and_return(true)
       end
 
       let(:descriptive_metadata) do
