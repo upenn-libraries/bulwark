@@ -5,11 +5,15 @@
 </ol>
 
 <h2>New Bulk Import</h2>
-<%= bootstrap_form_for [:admin, @bulk_import] do |f| %>
+<%= bootstrap_form_for [:admin, @bulk_import], layout: :horizontal do |f| %>
   <%= f.static_control :created_by_email, label: 'Created By' %>
   <%= f.file_field :bulk_import_csv, label: 'Bulk Import CSV', required: true %>
   <%= f.select :job_priority,
                options_for_select(Bulwark::Queues::PRIORITY_QUEUES, Bulwark::Queues::DEFAULT_PRIORITY),
-               label: 'Priority' %>
-  <%= f.submit 'Create' %>
+               label: 'Priority',
+               control_col: "col-sm-2" %>
+  <%= f.text_area :note, label: 'Note (optional)', control_col: "col-sm-5" %>
+  <%= f.form_group do %>
+    <%= f.submit 'Create' %>
+  <% end %>
 <% end %>
