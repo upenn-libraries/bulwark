@@ -191,7 +191,7 @@ module ExtendedGit
         # Potentially might have to revisit this to not raise errors when status
         # code is 1 and there is no output. See `Git::Lib#command` implementation.
         if exitstatus != 0
-          raise ExtendedGit::Error.new(git_cmd + ':' + output)
+          raise ExtendedGit::Error.new("#{git_cmd}:#{output}".gsub(env_vars, '').strip) # Removing env variables from error message.
         end
 
         output.chomp

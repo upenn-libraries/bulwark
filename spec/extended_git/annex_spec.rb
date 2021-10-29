@@ -160,25 +160,42 @@ RSpec.describe ExtendedGit::Annex, type: :model do
 
   describe '#initremote' do
     include_context 'add readme to repository'
-    let(:special_remote_name) { 'new_directory' }
-    let(:special_remote_dir) { Rails.root.join('tmp', 'test_special_remote', repo_name).to_s }
 
-    before do
-      FileUtils.mkdir_p(special_remote_dir)
-      git.annex.init
+    before { git.annex.init }
+
+    context 'when creating directory special remote' do
+      let(:special_remote_name) { 'new_directory' }
+      let(:special_remote_dir) { Rails.root.join('tmp', 'test_special_remote', repo_name).to_s }
+
+      before { FileUtils.mkdir_p(special_remote_dir) }
+
+      after do
+        FileUtils.chmod_R(0755, special_remote_dir)
+        FileUtils.rm_r(special_remote_dir)
+      end
+
+      it 'adds new special remote' do
+        expect {
+          git.annex.initremote(special_remote_name, type: 'directory', directory: special_remote_dir, encryption: 'none')
+        }.not_to raise_error
+        expect(git.annex.info.remote?(special_remote_name)).to be true
+        expect(git.annex.info.remote(special_remote_name).directory).to eql special_remote_dir
+      end
     end
 
-    after do
-      FileUtils.chmod_R(0755, special_remote_dir)
-      FileUtils.rm_r(special_remote_dir)
-    end
+    context 'when creating s3 special remote' do
+      let(:special_remote_name) { 'test_s3' }
 
-    it 'adds new special remote' do
-      expect {
-        git.annex.initremote(special_remote_name, type: 'directory', directory: special_remote_dir, encryption: 'none')
-      }.not_to raise_error
-      expect(git.annex.info.remote?(special_remote_name)).to be true
-      expect(git.annex.info.remote(special_remote_name).directory).to eql special_remote_dir
+      context 'with incorrect url and credentials' do
+        it 'raises error without env variables' do
+          expect {
+            git.annex.initremote(special_remote_name, type: 'S3', aws_secret_access_key: 'somethingverysecret')
+          }.to raise_error { |error|
+            expect(error).to be_a ExtendedGit::Error
+            expect(error.message).not_to include('somethingverysecret')
+          }
+        end
+      end
     end
   end
 
