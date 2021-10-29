@@ -22,7 +22,7 @@ module Utils
         git = ExtendedGit.bare(@remote_repo_path)
         git.annex.init('origin')
         git.config('annex.largefiles', 'not (include=.repoadmin/bin/*.sh)')
-        init_special_remote(@remote_repo_path, Bulwark::Config.special_remote[:type], @repo.unique_identifier)
+        init_special_remote(@remote_repo_path, Settings.digital_object.git_annex.special_remote.type, @repo.unique_identifier)
       end
 
       def set_remote_permissions
@@ -172,7 +172,7 @@ module Utils
         ignore_system_generated_files(dir)
         git.annex.init(version: Utils.config[:supported_vca_version])
 
-        special_remote = Bulwark::Config.special_remote
+        special_remote = Settings.digital_object.git_annex.special_remote
         case special_remote[:type]
         when 'S3'
           ceph_config = Utils::Storage::Ceph.config

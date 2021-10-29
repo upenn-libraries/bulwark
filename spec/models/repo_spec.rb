@@ -61,7 +61,7 @@ RSpec.describe Repo, type: :model do
 
       context 'when cloning git repo' do
         let!(:working_repo) { ExtendedGit.clone(origin_location, repo.names.directory, path: Rails.root.join('tmp')) }
-        let(:special_remote_name) { Bulwark::Config.special_remote[:name] }
+        let(:special_remote_name) { Settings.digital_object.git_annex.special_remote.name }
 
         after { FileUtils.remove_dir(working_repo.dir.path) }
 
@@ -82,7 +82,7 @@ RSpec.describe Repo, type: :model do
 
         context 'when setting up special remote' do
           let(:special_remote_directory) do
-            File.join(Bulwark::Config.special_remote[:directory], repo.unique_identifier.bucketize)
+            File.join(Settings.digital_object.git_annex.special_remote.directory, repo.unique_identifier.bucketize)
           end
           let(:readme_path) { File.join(working_repo.dir.path, 'README.md') }
 
@@ -305,7 +305,7 @@ RSpec.describe Repo, type: :model do
 
     context 'when solr is unavailable' do
       before do
-        allow(Bulwark::Config).to receive(:solr).and_return({})
+        allow(Settings).to receive(:solr).and_return({})
       end
 
       it 'does not save first_published_at or last_published_at' do
@@ -370,7 +370,7 @@ RSpec.describe Repo, type: :model do
 
       context 'when solr is unavailable' do
         before do
-          allow(Bulwark::Config).to receive(:solr).and_return({})
+          allow(Settings).to receive(:solr).and_return({})
         end
 
         it 'does not alter published, first_published_at or last_published_at' do
@@ -392,7 +392,7 @@ RSpec.describe Repo, type: :model do
   describe '#create_iiif_manifest' do
     context 'when images are present' do
       before do
-        allow(Settings).to receive(:iiif).and_return(image_server: 'https://images.library.upenn/iiif/2')
+        allow(Settings.iiif).to receive(:image_server).and_return('https://images.library.upenn/iiif/2')
       end
 
       let(:repo) do

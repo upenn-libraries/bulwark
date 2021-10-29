@@ -59,7 +59,7 @@ module DigitalObject
         ignore_system_generated_files(working_repo_path)
         git_clone.annex.init(version: Utils.config[:supported_vca_version])
 
-        special_remote = Bulwark::Config.special_remote
+        special_remote = Settings.digital_object.git_annex.special_remote
         case special_remote[:type]
         when 'S3'
           ceph_config = Utils::Storage::Ceph.config
