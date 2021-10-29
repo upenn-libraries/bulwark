@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20211019175746) do
+ActiveRecord::Schema.define(version: 20211029134548) do
 
   create_table "alert_messages", force: :cascade do |t|
     t.boolean "active",               default: false
@@ -51,6 +51,7 @@ ActiveRecord::Schema.define(version: 20211019175746) do
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
     t.text     "original_filename", limit: 65535
+    t.text     "note",              limit: 65535
   end
 
   create_table "digital_object_imports", force: :cascade do |t|

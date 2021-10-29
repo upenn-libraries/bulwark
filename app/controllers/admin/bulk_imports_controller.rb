@@ -12,7 +12,7 @@ module Admin
     end
 
     def create
-      @bulk_import = BulkImport.new(created_by: current_user)
+      @bulk_import = BulkImport.new(created_by: current_user, note: params[:bulk_import][:note])
       uploaded_file = params[:bulk_import][:bulk_import_csv]
       uploaded_file.tempfile.set_encoding('UTF-8') # CSVs ingested are UTF-8
       csv = uploaded_file.read
