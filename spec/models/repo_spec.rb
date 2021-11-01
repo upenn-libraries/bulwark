@@ -191,8 +191,8 @@ RSpec.describe Repo, type: :model do
 
     before do
       repo.update!(thumbnail_location: "/#{repo.names.bucket}/file_one.jpeg")
-      ceph_config = double('ceph_config', read_protocol: 'https://', read_host: 'storage.library.upenn.edu')
-      allow(Utils::Storage::Ceph).to receive(:config).and_return(ceph_config)
+      ceph_config = double('special_remote', protocol: 'https://', host: 'storage.library.upenn.edu')
+      allow(Settings.digital_object).to receive(:special_remote).and_return(ceph_config)
     end
 
     it 'return expected thumbnail_link' do

@@ -62,11 +62,10 @@ module DigitalObject
         special_remote = Settings.digital_object.special_remote
         case special_remote[:type]
         when 'S3'
-          ceph_config = Utils::Storage::Ceph.config
           git_clone.annex.enableremote(
             special_remote[:name],
-            aws_secret_access_key: ceph_config.aws_secret_access_key,
-            aws_access_key_id: ceph_config.aws_access_key_id
+            aws_secret_access_key: special_remote[:aws_secret_access_key],
+            aws_access_key_id: special_remote[:aws_access_key_id]
           )
         when 'directory'
           git_clone.annex.enableremote(special_remote[:name], directory: File.join(special_remote[:directory], unique_identifier.bucketize))

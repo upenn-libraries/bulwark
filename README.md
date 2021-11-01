@@ -96,6 +96,14 @@ digital_object:
   special_remote:
     type: S3
     name: preservation_storage
+    port: 443
+    host: ceph.library.upenn.edu
+    protocol: https://
+    encryption: none
+    request_style: path
+    public: yes
+    aws_access_key_id: accesskey
+    aws_secret_access_key_id: verysecretkey
   workspace_path: /fs/workspace
   remotes_path: /fs/data
   default_paths:
@@ -120,6 +128,15 @@ The fields are defined as follows:
   * `special_remote` - Information needed to create git-annex special remote.
     * `type` - Type of special remote to be used; options are `directory` or `S3`
     * `name` - Name given to special remote.
+    * `directory` - Only used for directory special remote. Path where all directories should be stored.
+    * `port` - Port of s3 service.
+    * `host` - Host of s3 service.
+    * `protocol` - Protocol to use for s3 service.
+    * `encryption`
+    * `request_style`
+    * `public`
+    * `aws_access_key_id` - Credentials for s3 service.
+    * `aws_secret_access_key_id` - Credentials for s3 service.
   * `workspace_path` - Absolute path on the file system where the application will clone git repositories and perform 
     operations on the content.
   * `remotes_path` - The location on the filesystem where the application will maintain git remotes.

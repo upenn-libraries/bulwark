@@ -265,8 +265,8 @@ class Repo < ActiveRecord::Base
 
     Addressable::URI.new(
       path: thumbnail_location,
-      host: Utils::Storage::Ceph.config.read_host,
-      scheme: Utils::Storage::Ceph.config.read_protocol.gsub('://', '')
+      host: Settings.digital_object.special_remote.host,
+      scheme: Settings.digital_object.special_remote.protocol.gsub('://', '')
     ).to_s
   end
 

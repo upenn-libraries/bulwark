@@ -22,7 +22,7 @@ module Utils
         git = ExtendedGit.bare(@remote_repo_path)
         git.annex.init('origin')
         git.config('annex.largefiles', 'not (include=.repoadmin/bin/*.sh)')
-        init_special_remote(@remote_repo_path, Settings.digital_object.special_remote.type, @repo.unique_identifier)
+        init_special_remote(@remote_repo_path, @repo.unique_identifier)
       end
 
       def set_remote_permissions
@@ -139,23 +139,22 @@ module Utils
         git.annex.lookupkey(path)
       end
 
-      def init_special_remote(dir, remote_type, remote_name)
+      def init_special_remote(dir, remote_name)
         git = ExtendedGit.bare(@remote_repo_path)
-        case remote_type
+        special_remote = Settings.digital_object.special_remote
+        case special_remote.type
         when 'S3'
-          raise 'Missing S3 special remote environment variables' unless Utils::Storage::Ceph.required_configs?
+          raise 'Missing S3 special remote configuration' unless required_s3_config(special_remote)
           # `git annex initremote` reads AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY from environment. If
           # these aren't available in the environment they will need to be temporarily set and then cleared.
-          ceph_config = Utils::Storage::Ceph.config
           git.annex.initremote(
-            ceph_config.special_remote_name, type: ceph_config.storage_type,
-            encryption: ceph_config.encryption, requeststyle: ceph_config.request_style,
-            host: ceph_config.host, port: ceph_config.port, public: ceph_config.public,
-            bucket: remote_name.bucketize, aws_secret_access_key: ceph_config.aws_secret_access_key,
-            aws_access_key_id: ceph_config.aws_access_key_id
+            special_remote[:name], type: special_remote[:type],
+            encryption: special_remote[:encryption], requeststyle: special_remote[:request_style],
+            host: special_remote[:host], port: special_remote[:port], public: special_remote[:public],
+            bucket: remote_name.bucketize, aws_secret_access_key: special_remote[:aws_secret_access_key],
+            aws_access_key_id: special_remote[:aws_access_key_id]
           )
         when 'directory'
-          special_remote = Settings.digital_object.special_remote
           raise 'Missing config for Directory special remote' unless special_remote[:name] && special_remote[:directory]
 
           special_remote_directory = File.join(special_remote[:directory], remote_name.bucketize)
@@ -175,10 +174,9 @@ module Utils
         special_remote = Settings.digital_object.special_remote
         case special_remote[:type]
         when 'S3'
-          ceph_config = Utils::Storage::Ceph.config
           git.annex.enableremote(
-            special_remote[:name], aws_secret_access_key: ceph_config.aws_secret_access_key,
-            aws_access_key_id: ceph_config.aws_access_key_id
+            special_remote[:name], aws_secret_access_key: special_remote[:aws_secret_access_key],
+            aws_access_key_id: special_remote[:aws_access_key_id]
           )
         when 'directory'
           git.annex.enableremote(special_remote[:name], directory: File.join(special_remote[:directory], @repo.unique_identifier.bucketize))
@@ -192,6 +190,21 @@ module Utils
       end
 
       private
+
+      def required_s3_config(config)
+        [
+          :name,
+          :type,
+          :aws_access_key_id,
+          :aws_secret_access_key,
+          :encryption,
+          :request_style,
+          :host,
+          :port,
+          :protocol,
+          :public
+        ].all? { |a| config.send(a).present? }
+      end
 
       # Ignore .nfs* files automatically generated and needed by the nfs store.
       # By using `.git/info/exclude` we can exclude the files in the

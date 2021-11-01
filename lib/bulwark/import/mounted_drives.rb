@@ -22,7 +22,7 @@ module Bulwark
 
       # Returns all configured drives.
       def self.all
-        Rails.application.config_for(:bulwark)['mounted_drives']
+        Settings.mounted_drives.to_h.with_indifferent_access
       end
     end
   end
