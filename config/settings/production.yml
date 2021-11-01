@@ -26,9 +26,9 @@ digital_object:
     protocol: <%= ENV["STORAGE_PROTOCOL"] %>
     encryption: <%= ENV["STORAGE_ENCRYPTION"] %>
     request_style: <%= ENV["REQUEST_STYLE"] %>
-    public: <%= ENV["STORAGE_PUBLIC"] %>
+    public: '<%= ENV["STORAGE_PUBLIC"] %>'
     aws_access_key_id: <%= File.exist?('/run/secrets/aws_access_key_id') ? File.read('/run/secrets/aws_access_key_id').strip : nil %>
-    aws_secret_key_id: <%= File.exist?('/run/secrets/aws_secret_access_key') ? File.read('/run/secrets/aws_secret_access_key').strip : nil %>
+    aws_secret_access_key: <%= File.exist?('/run/secrets/aws_secret_access_key') ? File.read('/run/secrets/aws_secret_access_key').strip : nil %>
   workspace_path: /fs/priv/workspace
   remotes_path: /fs/pub/data
   default_paths:
