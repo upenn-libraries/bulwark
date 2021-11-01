@@ -21,7 +21,7 @@ class VersionControlAgent < ActiveRecord::Base
   end
 
   def set_vca_attributes
-    remote_repo_path = "#{Utils.config[:assets_path]}/#{self.repo.names.git}"
+    remote_repo_path = "#{Settings.digital_object.remotes_path}/#{self.repo.names.git}"
     self.remote_path = remote_repo_path
     self.save!
   end

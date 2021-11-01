@@ -16,10 +16,18 @@ marmite:
 bulk_import:
   create_iiif_manifest: true
 digital_object:
-  git_annex:
-    special_remote:
-      type: <%= ENV['STORAGE_TYPE'] %>
-      name: <%= ENV['SPECIAL_REMOTE_NAME'] %>
+  git_annex_version: 6
+  repository_prefix: UPENNLIB
+  special_remote:
+    type: <%= ENV['STORAGE_TYPE'] %>
+    name: <%= ENV['SPECIAL_REMOTE_NAME'] %>
+  workspace_path: /fs/priv/workspace
+  remotes_path: /fs/pub/data
+  default_paths:
+    admin_directory: .repoadmin
+    derivatives_directory: .derivs
+    data_directory: data
+    semantics_filename: fs_semantics
 phalt:
   url: <%= ENV['PHALT_ENDPOINT'] %>
 iiif:

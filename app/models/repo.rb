@@ -64,17 +64,17 @@ class Repo < ActiveRecord::Base
   def set_defaults
     self[:unique_identifier] = mint_ezid unless self[:unique_identifier].present?
     self[:unique_identifier].strip!
-    self[:derivatives_subdirectory] = "#{Utils.config[:object_derivatives_path]}"
-    self[:admin_subdirectory] = "#{Utils.config[:object_admin_path]}"
+    self[:derivatives_subdirectory] = Settings.digital_object.default_paths.derivatives_directory
+    self[:admin_subdirectory] = Settings.digital_object.default_paths.admin_directory
     self[:ingested] = false
   end
 
   def metadata_subdirectory=(metadata_subdirectory)
-    self[:metadata_subdirectory] = "#{Utils.config[:object_data_path]}/#{metadata_subdirectory}"
+    self[:metadata_subdirectory] = File.join(Settings.digital_object.default_paths.data_directory, metadata_subdirectory)
   end
 
   def assets_subdirectory=(assets_subdirectory)
-    self[:assets_subdirectory] = "#{Utils.config[:object_data_path]}/#{assets_subdirectory}"
+    self[:assets_subdirectory] = File.join(Settings.digital_object.default_paths.data_directory, assets_subdirectory)
   end
 
   def file_extensions=(file_extensions)
@@ -149,7 +149,7 @@ class Repo < ActiveRecord::Base
   def create_remote
     # Function weirdness forcing update_steps to the top
     self.update_steps(:git_remote_initialized)
-    unless Dir.exists?("#{Utils.config[:assets_path]}/#{self.names.directory}")
+    unless Dir.exists?("#{Settings.digital_object.remotes_path}/#{self.names.directory}")
       self.version_control_agent.init_bare
       working_path = self.version_control_agent.clone
       directory_sets = _build_and_populate_directories(working_path)
@@ -373,8 +373,8 @@ class Repo < ActiveRecord::Base
   private
 
   def _build_and_populate_directories(working_path)
-    admin_directory = File.join(working_path, Utils.config[:object_admin_path])
-    data_directory = File.join(working_path, Utils.config[:object_data_path])
+    admin_directory = File.join(working_path, Settings.digital_object.default_paths.admin_directory)
+    data_directory = File.join(working_path, Settings.digital_object.default_paths.data_directory)
     metadata_subdirectory = File.join(working_path, self.metadata_subdirectory)
     assets_subdirectory = File.join(working_path, self.assets_subdirectory)
     derivatives_subdirectory = File.join(working_path, self.derivatives_subdirectory)
@@ -396,8 +396,8 @@ class Repo < ActiveRecord::Base
 
   def _add_init_scripts(directory)
     FileUtils.mkdir_p("#{directory}/bin")
-    FileUtils.cp(Utils.config[:init_script_path], "#{directory}/bin/init.sh")
-    FileUtils.chmod(Utils.config[:init_script_permissions], "#{directory}/bin/init.sh")
+    FileUtils.cp(Rails.root.join('docker', 'init.sh'), "#{directory}/bin/init.sh")
+    FileUtils.chmod('a+x', "#{directory}/bin/init.sh")
     "#{directory}/bin/init.sh"
   end
 
@@ -410,11 +410,11 @@ class Repo < ActiveRecord::Base
   end
 
   def _populate_admin_manifest(admin_path)
-    filesystem_semantics_path = "#{admin_path}/#{Utils.config[:object_semantics_location]}"
+    filesystem_semantics_path = "#{admin_path}/#{Settings.digital_object.default_paths.semantics_filename}"
     file_types = format_types(self.file_extensions)
     metadata_source_types = format_types(self.metadata_source_extensions)
-    metadata_line = "#{Utils.config[:metadata_path_label]}: #{self.metadata_subdirectory}/#{metadata_source_types}"
-    assets_line = "#{Utils.config[:file_path_label]}: #{self.assets_subdirectory}/#{file_types}"
+    metadata_line = "METADATA_PATH: #{self.metadata_subdirectory}/#{metadata_source_types}"
+    assets_line = "ASSETS_PATH: #{self.assets_subdirectory}/#{file_types}"
     File.open(filesystem_semantics_path, "w+") do |file|
       file.puts("#{metadata_line}\n#{assets_line}")
     end

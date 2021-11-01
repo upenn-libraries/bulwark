@@ -11,7 +11,7 @@ namespace :bulwark do
         data << { mms_id: bibnumber, unique_identifier: repo.unique_identifier } if bibnumber
       end
 
-      filename = File.join(Utils.config[:workspace], "arks-to-bibs-#{Time.current.to_s(:number)}.csv")
+      filename = File.join(Settings.digital_object.workspace_path, "arks-to-bibs-#{Time.current.to_s(:number)}.csv")
       File.write(filename, Bulwark::StructuredCSV.generate(data))
 
       puts Rainbow("CSV written to #{filename}").green
@@ -67,7 +67,7 @@ namespace :bulwark do
       end
 
       # Write to file
-      filename = File.join(Utils.config[:workspace], "colenda-links-in-alma-#{Time.current.to_s(:number)}.csv")
+      filename = File.join(Settings.digital_object.workspace_path, "colenda-links-in-alma-#{Time.current.to_s(:number)}.csv")
       File.write(filename, Bulwark::StructuredCSV.generate(data))
 
       puts Rainbow("CSV written to #{filename}").green

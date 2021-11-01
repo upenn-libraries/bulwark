@@ -22,7 +22,7 @@ class ApplicationController < ActionController::Base
   # This action mimics the file download that would be available if the special remote
   # for development and test environments were S3.
   def special_remote_download
-    special_remote = Settings.digital_object.git_annex.special_remote
+    special_remote = Settings.digital_object.special_remote
     return unless special_remote.type == 'directory'
 
     glob_path = File.join(special_remote.directory, params[:bucket], '**', '**', params[:key], params[:key])

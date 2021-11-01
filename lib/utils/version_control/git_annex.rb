@@ -9,7 +9,7 @@ module Utils
 
       def initialize(repo)
         @repo = repo
-        @remote_repo_path = "#{Utils.config[:assets_path]}/#{@repo.names.git}"
+        @remote_repo_path = "#{Settings.digital_object.remotes_path}/#{@repo.names.git}"
         @working_repo_path = ''
       end
 
@@ -22,11 +22,11 @@ module Utils
         git = ExtendedGit.bare(@remote_repo_path)
         git.annex.init('origin')
         git.config('annex.largefiles', 'not (include=.repoadmin/bin/*.sh)')
-        init_special_remote(@remote_repo_path, Settings.digital_object.git_annex.special_remote.type, @repo.unique_identifier)
+        init_special_remote(@remote_repo_path, Settings.digital_object.special_remote.type, @repo.unique_identifier)
       end
 
       def set_remote_permissions
-        FileUtils.chmod_R(Utils.config[:remote_repo_permissions], @remote_repo_path)
+        FileUtils.chmod_R('=rx,ug+rwx', @remote_repo_path)
       end
 
       def clone(options = {})
@@ -50,7 +50,7 @@ module Utils
         git.push('origin', 'git-annex')
 
         if options[:content].present?
-          git.annex.copy(options[:content], to: Settings.digital_object.git_annex.special_remote.name)
+          git.annex.copy(options[:content], to: Settings.digital_object.special_remote.name)
         else
           git.annex.sync(content: true)
         end
@@ -155,7 +155,7 @@ module Utils
             aws_access_key_id: ceph_config.aws_access_key_id
           )
         when 'directory'
-          special_remote = Settings.digital_object.git_annex.special_remote
+          special_remote = Settings.digital_object.special_remote
           raise 'Missing config for Directory special remote' unless special_remote[:name] && special_remote[:directory]
 
           special_remote_directory = File.join(special_remote[:directory], remote_name.bucketize)
@@ -170,9 +170,9 @@ module Utils
       def init_clone(dir, fsck = true)
         git = ExtendedGit.open(dir)
         ignore_system_generated_files(dir)
-        git.annex.init(version: Utils.config[:supported_vca_version])
+        git.annex.init(version: Settings.digital_object.git_annex_version)
 
-        special_remote = Settings.digital_object.git_annex.special_remote
+        special_remote = Settings.digital_object.special_remote
         case special_remote[:type]
         when 'S3'
           ceph_config = Utils::Storage::Ceph.config
@@ -220,11 +220,11 @@ module Utils
       end
 
       def path_namespace
-        "#{Utils.config[:workspace]}/#{path_seed}"
+        File.join(Settings.digital_object.workspace_path, path_seed)
       end
 
       def change_perms(repo)
-        FileUtils.chown_R(ENV['IMAGING_USER'], ENV['IMAGING_USER'], "#{Utils.config['assets_path']}/#{repo}")
+        FileUtils.chown_R(ENV['IMAGING_USER'], ENV['IMAGING_USER'], "#{Settings.digital_object.remotes_path}/#{repo}")
       end
     end
   end

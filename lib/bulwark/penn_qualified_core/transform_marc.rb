@@ -65,7 +65,7 @@ module Bulwark
 
         # Adding bibnumber and call number
         bibnumber = data.at_xpath('//records/record/controlfield[@tag=001]').text
-        mapped_values['identifier'] ||= ["#{Utils.config[:repository_prefix]}_#{bibnumber}"]
+        mapped_values['identifier'] ||= ["#{Settings.digital_object.repository_prefix}_#{bibnumber}"]
         mapped_values['call_number'] = data.xpath('//records/record/holdings/holding/call_number')
                                            .map(&:text)
                                            .compact

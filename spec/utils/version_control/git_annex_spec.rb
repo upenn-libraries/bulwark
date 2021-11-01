@@ -12,7 +12,7 @@ RSpec.describe Utils::VersionControl::GitAnnex do
     end
 
     it 'generates remote_repo_path' do
-      expect(git_annex.remote_repo_path).to eql File.join(Utils.config[:assets_path], repo.names.git)
+      expect(git_annex.remote_repo_path).to eql File.join(Settings.digital_object.remotes_path, repo.names.git)
     end
   end
 

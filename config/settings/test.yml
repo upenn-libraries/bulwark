@@ -7,11 +7,19 @@ marmite:
 bulk_import:
   create_iiif_manifest: false
 digital_object:
-  git_annex:
-    special_remote:
-      type: directory
-      name: local
-      directory: <%= Rails.root.join('tmp', 'test_storage', 'special_remote') %>
+  git_annex_version: 6
+  repository_prefix: TEST
+  special_remote:
+    type: directory
+    name: local
+    directory: <%= Rails.root.join('tmp', 'test_storage', 'special_remote') %>
+  workspace_path: <%= Rails.root.join('tmp', 'test_storage', 'scratch') %>
+  remotes_path: <%= Rails.root.join('tmp', 'test_storage', 'data') %>
+  default_paths:
+    admin_directory: .repoadmin
+    derivatives_directory: .derivs
+    data_directory: data
+    semantics_filename: fs_semantics
 phalt:
   url: https://phalt.colenda.library.upenn.edu/
 iiif:

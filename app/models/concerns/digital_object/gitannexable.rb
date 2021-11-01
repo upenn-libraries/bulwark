@@ -36,7 +36,7 @@ module DigitalObject
     end
 
     def remote_path
-      File.join(Utils.config[:assets_path], names.git)
+      File.join(Settings.digital_object.remotes_path, names.git)
     end
 
     # Helper methods for frequently used git-annex tasks
@@ -50,16 +50,16 @@ module DigitalObject
     private
 
       def create_clone
-        working_path_namespace = "#{Utils.config[:workspace]}/#{Digest::SHA256.hexdigest("#{names.git}#{SecureRandom.uuid}")}"
+        working_path_namespace = "#{Settings.digital_object.workspace_path}/#{Digest::SHA256.hexdigest("#{names.git}#{SecureRandom.uuid}")}"
         FileUtils.mkdir_p(working_path_namespace)
         working_repo_path = "#{working_path_namespace}/#{names.git}"
 
         git_clone = ExtendedGit.clone(remote_path, working_repo_path)
 
         ignore_system_generated_files(working_repo_path)
-        git_clone.annex.init(version: Utils.config[:supported_vca_version])
+        git_clone.annex.init(version: Settings.digital_object.git_annex_version)
 
-        special_remote = Settings.digital_object.git_annex.special_remote
+        special_remote = Settings.digital_object.special_remote
         case special_remote[:type]
         when 'S3'
           ceph_config = Utils::Storage::Ceph.config

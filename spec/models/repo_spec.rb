@@ -40,7 +40,7 @@ RSpec.describe Repo, type: :model do
 
     context 'when a directory is already present at remote location' do
       let(:repo) { FactoryBot.build(:repo, unique_identifier: 'ark:/99999fk4/d80p529') }
-      let(:origin_location) { File.join(Utils.config[:assets_path], repo.names.git) }
+      let(:origin_location) { File.join(Settings.digital_object.remotes_path, repo.names.git) }
 
       it 'should not create a remote in that location' do
         pending('ticked in: repo/bulwark#5')
@@ -52,7 +52,7 @@ RSpec.describe Repo, type: :model do
     end
 
     context 'when creating git repository' do
-      let(:origin_location) { File.join(Utils.config[:assets_path], repo.names.git) }
+      let(:origin_location) { File.join(Settings.digital_object.remotes_path, repo.names.git) }
 
       it 'creates remote in correct location' do
         expect(File.directory?(origin_location)).to be true
@@ -61,7 +61,7 @@ RSpec.describe Repo, type: :model do
 
       context 'when cloning git repo' do
         let!(:working_repo) { ExtendedGit.clone(origin_location, repo.names.directory, path: Rails.root.join('tmp')) }
-        let(:special_remote_name) { Settings.digital_object.git_annex.special_remote.name }
+        let(:special_remote_name) { Settings.digital_object.special_remote.name }
 
         after { FileUtils.remove_dir(working_repo.dir.path) }
 
@@ -82,7 +82,7 @@ RSpec.describe Repo, type: :model do
 
         context 'when setting up special remote' do
           let(:special_remote_directory) do
-            File.join(Settings.digital_object.git_annex.special_remote.directory, repo.unique_identifier.bucketize)
+            File.join(Settings.digital_object.special_remote.directory, repo.unique_identifier.bucketize)
           end
           let(:readme_path) { File.join(working_repo.dir.path, 'README.md') }
 
