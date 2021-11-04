@@ -1,0 +1,23 @@
+<ol class="breadcrumb">
+  <li>Admin</li>
+  <li class="active"><a href="/admin/file_listing_tool">File Listing Tool</a></li>
+</ol>
+
+<script>
+
+</script>
+
+<h2>File Listing Tool</h2>
+
+<p>
+  List the filenames of all the files in the given directory.
+  The filenames will be listing in alphabetical order.
+</p>
+
+<%= bootstrap_form_tag url: admin_file_listing_tool_file_list_url, layout: :horizontal, remote: true do |f| %>
+  <%= f.select :drive, Bulwark::Import::MountedDrives.all.keys %>
+  <%= f.text_field :path %>
+  <%= f.form_group do %>
+    <%= f.submit 'List Filenames', class: 'btn btn-primary' %>
+  <% end %>
+<% end %>
