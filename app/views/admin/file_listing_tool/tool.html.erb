@@ -23,7 +23,7 @@
   The filenames will be listing in alphabetical order.
 </p>
 
-<%= bootstrap_form_tag url: admin_file_listing_tool_file_list_url, layout: :horizontal, remote: true, html: { id: 'new-file-listing' } do |f| %>
+<%= bootstrap_form_tag url: admin_file_listing_tool_file_list_url(protocol: :https), layout: :horizontal, remote: true, html: { id: 'new-file-listing' } do |f| %>
   <%= f.select :drive, Bulwark::Import::MountedDrives.all.keys %>
   <%= f.text_field :path %>
   <%= f.form_group do %>
