@@ -4,7 +4,16 @@
 </ol>
 
 <script>
-
+    $(document).ready(function(){
+        $("#new-file-listing").on("ajax:success", function(e, data, status, xhr) {
+            var json =  JSON.parse(xhr.responseText);
+            $("#file-listing").html(
+                "<h3>" + json.drive + ", " + json.path + "</h3><p>Filenames: " + json.filenames + "</p>"
+            );
+        }).on("ajax:error", function(e, xhr, status, error) {
+            $("#file-listing").text(JSON.parse(xhr.responseText).error);
+        });
+    });
 </script>
 
 <h2>File Listing Tool</h2>
@@ -14,10 +23,14 @@
   The filenames will be listing in alphabetical order.
 </p>
 
-<%= bootstrap_form_tag url: admin_file_listing_tool_file_list_url, layout: :horizontal, remote: true do |f| %>
+<%= bootstrap_form_tag url: admin_file_listing_tool_file_list_url, layout: :horizontal, remote: true, html: { id: 'new-file-listing' } do |f| %>
   <%= f.select :drive, Bulwark::Import::MountedDrives.all.keys %>
   <%= f.text_field :path %>
   <%= f.form_group do %>
     <%= f.submit 'List Filenames', class: 'btn btn-primary' %>
   <% end %>
 <% end %>
+
+<hr />
+
+<p id="file-listing"></p>
