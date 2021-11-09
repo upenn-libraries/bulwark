@@ -34,7 +34,7 @@ module Admin
       end
 
       def filenames(path)
-        Dir.entries(path).select { |f| !f.start_with?('.') }.join(';')
+        Dir.entries(path).select { |f| !f.start_with?('.') }.sort.join('; ')
       end
   end
 end
