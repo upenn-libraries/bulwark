@@ -149,7 +149,7 @@ class Repo < ActiveRecord::Base
   def create_remote
     # Function weirdness forcing update_steps to the top
     self.update_steps(:git_remote_initialized)
-    unless Dir.exists?("#{Settings.digital_object.remotes_path}/#{self.names.directory}")
+    unless Dir.exists?(File.join(Settings.digital_object.remotes_path, self.names.directory))
       self.version_control_agent.init_bare
       working_path = self.version_control_agent.clone
       directory_sets = _build_and_populate_directories(working_path)

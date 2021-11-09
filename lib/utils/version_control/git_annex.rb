@@ -237,7 +237,7 @@ module Utils
       end
 
       def change_perms(repo)
-        FileUtils.chown_R(ENV['IMAGING_USER'], ENV['IMAGING_USER'], "#{Settings.digital_object.remotes_path}/#{repo}")
+        FileUtils.chown_R(ENV['IMAGING_USER'], ENV['IMAGING_USER'], File.join(Settings.digital_object.remotes_path}, repo))
       end
     end
   end
