@@ -10,7 +10,6 @@ Bulwark is a Hydra head providing administrative digital asset and metadata gene
   Version 8.6+ required.
 * [NPM](https://www.npmjs.com/)
 
-
 ## Setting up local development and test environment
 We are using [lando](https://docs.lando.dev/basics/) to set up our local development and test environments. We have some custom rake tasks that wrap lando commands and run other necessary tasks.
 
@@ -19,7 +18,6 @@ We are using [lando](https://docs.lando.dev/basics/) to set up our local develop
 #### Mac (installing via homebrew)  
 ```
 brew install git-annex
-brew install imagemagick
 brew install vips
 brew cask install lando
 ```
@@ -62,42 +60,96 @@ sudo apt-get install imagemagick git-annex
   ```
 
 ## Configuration Files
+Most of the application-wide configuration is located in `config/settings` and is organized by environment. Global 
+configuration settings (ie, settings that are the same for all environments) are located in `config/settings.yml`.
 
-#### filesystem.yml
-This configuration file specifies semantic information about the filesystem and filesystem behaviors that the application will use for asset lookup.
+Some gems require custom configuration files to be provided in `config`, so in some cases you might see gem-specific 
+config files there, for example:
+- `config/solr.yml`
+- `config/blacklight.yml`
 
-Run the following command from within your application's root directory:
-```bash
-cp config/file_extensions.yml.example config/file_extensions.yml
+We provide access to the application-wide configuration via the [config](https://github.com/rubyconfig/config) gem. All 
+configuration defined in `config/settings` can be access via the `Settings` object. For example, to retrieve the 
+configured mounted drives:
+```ruby
+Settings.mounted_drives
 ```
-An environment block for successfully deploying the application should look like the following:
-```yaml
-development:
-  assets_path: /absolute/path/on/fs
-  assets_display_path: /absolute/path/on/fs
-  file_path_label: FILE_PATH
-  metadata_path_label: METADATA_PATH
-  object_data_path: directory_name
-  object_admin_path: directory_name
-  object_derivatives_path: directory_name
-  object_semantics_location: filename_no_extension
+
+Additionally, the `Settings` object also provides access to the configuration in `solr.yml`. The Solr url can be 
+retrieves by calling:
+```ruby
+Settings.solr.url
+```
+
+### Sample settings file
+```yml
+# config/settings/environment.yml
+mounted_drives:
+  test: /fs/test_drive
+marmite:
+  url: https://marmite.library.upenn.edu
+bulk_import:
+  create_iiif_manifest: true
+digital_object:
+  git_annex_version: 6
   repository_prefix: PREFIX
-  working_dir: /absolute/path/on/fs
-  transformed_dir: /absolute/path/on/fs
+  special_remote:
+    type: S3
+    name: preservation_storage
+    port: 443
+    host: ceph.library.upenn.edu
+    protocol: https://
+    encryption: none
+    request_style: path
+    public: yes
+    aws_access_key_id: accesskey
+    aws_secret_access_key_id: verysecretkey
+  workspace_path: /fs/workspace
+  remotes_path: /fs/data
+  default_paths:
+    admin_directory: .repoadmin
+    derivatives_directory: .derivs
+    data_directory: data
+    semantics_filename: fs_semantics
+phalt:
+  url: https://phalt.library.upenn.edu
+iiif:
+  image_server: https://iiif.library.upenn.edu/iiif/2
 ```
-
-Edit the config file to reflect your local settings for the fields as follows:  
-* `assets_path` - The location on the filesystem where the application will maintain preservation-worthy files.
-* `assets_display_path` - The location on the filesystem where the application will handle serving display-worthy derivatives.
-* `file_path_label` - A value used by the application to populate the semantic manifest.  This can be customized, or left FILE_PATH by default.
-* `metadata_path_label` - A value used by the application to populate the semantic manifest.  This can be customized, or left METADATA_PATH by default.
-* `object_data_path` - The directory within the git repository for each object where the user will be directed to interact on their local filesystem.
-* `object_admin_path` - The directory within the git repository for each object where the application will be directed to interact.
-* `object_derivatives_path` - The directory within the git repository for each object where the application will be directed to store binary derivatives.
-* `object_semantics_location` - The filename (no extension) within the git repository for each object where the application will store and be directed to find semantic information about the structure of the git repository.
-* `repository_prefix` - String prefix used to form identifiers in Fedora (possibly to be deprecated).
-* `working_dir` - Absolute path on the file system where the application will clone git repositories for objects and perform operations on the content.
-* `transformed_dir` - Absolute path on the file system where the application will look for transformed XML files.  NOTE: This should be different from the `working_dir` location.
+The fields are defined as follows:
+* `mounted_drives` - key/value map of drive name and path on the filesystem
+* `marmite`
+  * `url` - Url to Marmite
+* `bulk_import`
+  * `create_iiif_manifest` - Whether or not a IIIF manifest should be created as part of the bulk import process.
+* `digital_object`
+  * `git_annex_version` - Supported git-annex version.
+  * `repository_prefix` - Prefix to be prepended to each git repository name
+  * `special_remote` - Information needed to create git-annex special remote.
+    * `type` - Type of special remote to be used; options are `directory` or `S3`
+    * `name` - Name given to special remote.
+    * `directory` - Only used for directory special remote. Path where all directories should be stored.
+    * `port` - Port of s3 service.
+    * `host` - Host of s3 service.
+    * `protocol` - Protocol to use for s3 service.
+    * `encryption`
+    * `request_style`
+    * `public`
+    * `aws_access_key_id` - Credentials for s3 service.
+    * `aws_secret_access_key_id` - Credentials for s3 service.
+  * `workspace_path` - Absolute path on the file system where the application will clone git repositories and perform 
+    operations on the content.
+  * `remotes_path` - The location on the filesystem where the application will maintain git remotes.
+  * `default_paths` - Defaults path to be used in a digital objects git repository.
+    * `admin_directory`
+    * `derivatives_directory` - The directory within the git repository in which the binary derivatives will be stored.
+    * `data_directory` - The directory within the git repository in which the preservation assets and metadata will 
+      be stored.
+    * `semantics_filename` - The filename (no extension) within the git repository for each object where the application will store and be directed to find semantic information about the structure of the git repository.
+* `phalt`
+  * `url` - Url to Phalt.
+* `iiif`
+  * `image_server` - Url to image server.
 
 ## Rubocop
 To recreate .rubocop_todo.yml use the following command:

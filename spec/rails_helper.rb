@@ -62,7 +62,7 @@ RSpec.configure do |config|
 
   # Before each tests clean out Solr core.
   config.before(:each) do
-    solr = RSolr.connect(url: Bulwark::Config.solr[:url])
+    solr = RSolr.connect(url: Settings.solr.url)
     solr.delete_by_query('*:*')
     solr.commit
   end

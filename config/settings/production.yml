@@ -1,0 +1,44 @@
+# Settings for all deployed environment.
+
+mounted_drives:
+  kaplan-rescue: <%= ENV['KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
+  scanstore-rescue: <%= ENV['SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
+  sceti-completed: <%= ENV['SCETI_COMPLETED_HARVESTING_ENDPOINT_REMOTE'] %>
+  sceti-completed-2: <%= ENV['SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE'] %>
+  sceti-completed-3: <%= ENV['SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE'] %>
+  sceti-completed-4: <%= ENV['SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE'] %>
+  sceti-completed-5: <%= ENV['SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE'] %>
+  sceti: <%= ENV['SCETI_HARVESTING_ENDPOINT_REMOTE'] %>
+  keffer: <%= ENV['KEFFER_HARVESTING_ENDPOINT_REMOTE'] %>
+  fairmanrogers: <%= ENV['FAIRMANROGERS_HARVESTING_ENDPOINT_REMOTE'] %>
+  mastersrbm:  <%= ENV['MASTERSRBM_HARVESTING_ENDPOINT_REMOTE'] %>
+  managedmasters: <%= ENV['MANAGEDMASTERS_HARVESTING_ENDPOINT_REMOTE'] %>
+marmite:
+  url: <%= ENV['MARMITE_URL'] %>
+bulk_import:
+  create_iiif_manifest: true
+digital_object:
+  git_annex_version: 6
+  repository_prefix: UPENNLIB
+  special_remote:
+    type: <%= ENV['STORAGE_TYPE'] %>
+    name: <%= ENV['SPECIAL_REMOTE_NAME'] %>
+    port: <%= ENV["STORAGE_PORT"] %>
+    host: <%= ENV["STORAGE_HOST"] %>
+    protocol: <%= ENV["STORAGE_PROTOCOL"] %>
+    encryption: <%= ENV["STORAGE_ENCRYPTION"] %>
+    request_style: <%= ENV["REQUEST_STYLE"] %>
+    public: '<%= ENV["STORAGE_PUBLIC"] %>'
+    aws_access_key_id: <%= File.exist?('/run/secrets/aws_access_key_id') ? File.read('/run/secrets/aws_access_key_id').strip : nil %>
+    aws_secret_access_key: <%= File.exist?('/run/secrets/aws_secret_access_key') ? File.read('/run/secrets/aws_secret_access_key').strip : nil %>
+  workspace_path: /fs/priv/workspace
+  remotes_path: /fs/pub/data
+  default_paths:
+    admin_directory: .repoadmin
+    derivatives_directory: .derivs
+    data_directory: data
+    semantics_filename: fs_semantics
+phalt:
+  url: <%= ENV['PHALT_ENDPOINT'] %>
+iiif:
+  image_server: <%= ENV['IIIF_IMAGE_SERVER'] %>

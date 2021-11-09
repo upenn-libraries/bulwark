@@ -45,7 +45,7 @@ namespace :bulwark do
         human_readable_name: 'Test Audio File',
         metadata_subdirectory: 'metadata',
         assets_subdirectory: 'assets',
-        file_extensions: Bulwark::Config.digital_object[:file_extensions],
+        file_extensions: Settings.digital_object.file_extensions,
         metadata_source_extensions: ['csv'],
         preservation_filename: 'preservation.xml',
         new_format: true,

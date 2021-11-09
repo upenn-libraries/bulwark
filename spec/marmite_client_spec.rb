@@ -99,7 +99,7 @@ RSpec.describe MarmiteClient do
 
     context 'when missing url' do
       before do
-        allow(Rails.application).to receive(:config_for).with(:bulwark).and_return('marmite' => {})
+        allow(Settings).to receive(:marmite).and_return(class_double('marmite_config', url: nil))
       end
 
       it 'raises error' do

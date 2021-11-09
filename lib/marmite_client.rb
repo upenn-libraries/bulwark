@@ -47,9 +47,9 @@ module MarmiteClient
   end
 
   def self.config
-    config = Rails.application.config_for(:bulwark)['marmite']
-    raise MissingConfiguration, 'Missing Marmite URL' unless config['url']
-    config
+    url = Settings&.marmite&.url
+    raise MissingConfiguration, 'Missing Marmite URL' unless url
+    { 'url' => url }
   end
 
   # Combines host and path to create a a full URL.

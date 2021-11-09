@@ -7,9 +7,9 @@ module Bulwark
     # special remote (CEPH) downloads file from Phalt. When using directory special remote
     # uses internal download endpoint.
     def self.url_for(bucket, file, **args)
-      special_remote_config = Bulwark::Config.special_remote
+      special_remote_config = Settings.digital_object.special_remote
 
-      case special_remote_config[:type]
+      case special_remote_config.type
       when 'directory'
         Storage::Local.url_for(bucket, file, args)
       when 'S3'

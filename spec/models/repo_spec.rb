@@ -40,7 +40,7 @@ RSpec.describe Repo, type: :model do
 
     context 'when a directory is already present at remote location' do
       let(:repo) { FactoryBot.build(:repo, unique_identifier: 'ark:/99999fk4/d80p529') }
-      let(:origin_location) { File.join(Utils.config[:assets_path], repo.names.git) }
+      let(:origin_location) { File.join(Settings.digital_object.remotes_path, repo.names.git) }
 
       it 'should not create a remote in that location' do
         pending('ticked in: repo/bulwark#5')
@@ -52,7 +52,7 @@ RSpec.describe Repo, type: :model do
     end
 
     context 'when creating git repository' do
-      let(:origin_location) { File.join(Utils.config[:assets_path], repo.names.git) }
+      let(:origin_location) { File.join(Settings.digital_object.remotes_path, repo.names.git) }
 
       it 'creates remote in correct location' do
         expect(File.directory?(origin_location)).to be true
@@ -61,7 +61,7 @@ RSpec.describe Repo, type: :model do
 
       context 'when cloning git repo' do
         let!(:working_repo) { ExtendedGit.clone(origin_location, repo.names.directory, path: Rails.root.join('tmp')) }
-        let(:special_remote_name) { Bulwark::Config.special_remote[:name] }
+        let(:special_remote_name) { Settings.digital_object.special_remote.name }
 
         after { FileUtils.remove_dir(working_repo.dir.path) }
 
@@ -82,7 +82,7 @@ RSpec.describe Repo, type: :model do
 
         context 'when setting up special remote' do
           let(:special_remote_directory) do
-            File.join(Bulwark::Config.special_remote[:directory], repo.unique_identifier.bucketize)
+            File.join(Settings.digital_object.special_remote.directory, repo.unique_identifier.bucketize)
           end
           let(:readme_path) { File.join(working_repo.dir.path, 'README.md') }
 
@@ -191,8 +191,8 @@ RSpec.describe Repo, type: :model do
 
     before do
       repo.update!(thumbnail_location: "/#{repo.names.bucket}/file_one.jpeg")
-      ceph_config = double('ceph_config', read_protocol: 'https://', read_host: 'storage.library.upenn.edu')
-      allow(Utils::Storage::Ceph).to receive(:config).and_return(ceph_config)
+      ceph_config = double('special_remote', protocol: 'https://', host: 'storage.library.upenn.edu')
+      allow(Settings.digital_object).to receive(:special_remote).and_return(ceph_config)
     end
 
     it 'return expected thumbnail_link' do
@@ -287,7 +287,7 @@ RSpec.describe Repo, type: :model do
 
       it 'adds document to solr' do
         repo.publish
-        solr = RSolr.connect(url: Bulwark::Config.solr[:url])
+        solr = RSolr.connect(url: Settings.solr.url)
         response = solr.get('select', params: { id: repo.names.fedora })
         expect(response['response']['numFound']).to be 1
       end
@@ -305,7 +305,7 @@ RSpec.describe Repo, type: :model do
 
     context 'when solr is unavailable' do
       before do
-        allow(Bulwark::Config).to receive(:solr).and_return({})
+        allow(Settings).to receive(:solr).and_return({})
       end
 
       it 'does not save first_published_at or last_published_at' do
@@ -360,7 +360,7 @@ RSpec.describe Repo, type: :model do
       context 'when solr is available' do
         it 'removes document from solr' do
           unpublished = repo.unpublish
-          solr = RSolr.connect(url: Bulwark::Config.solr[:url])
+          solr = RSolr.connect(url: Settings.solr.url)
           response = solr.get('select', params: { id: repo.names.fedora })
           expect(response['response']['numFound']).to be 0
           expect(unpublished).to be true
@@ -370,7 +370,7 @@ RSpec.describe Repo, type: :model do
 
       context 'when solr is unavailable' do
         before do
-          allow(Bulwark::Config).to receive(:solr).and_return({})
+          allow(Settings).to receive(:solr).and_return({})
         end
 
         it 'does not alter published, first_published_at or last_published_at' do
@@ -392,7 +392,7 @@ RSpec.describe Repo, type: :model do
   describe '#create_iiif_manifest' do
     context 'when images are present' do
       before do
-        allow(Bulwark::Config).to receive(:iiif).and_return(image_server: 'https://images.library.upenn/iiif/2')
+        allow(Settings.iiif).to receive(:image_server).and_return('https://images.library.upenn/iiif/2')
       end
 
       let(:repo) do

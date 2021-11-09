@@ -6,7 +6,7 @@ module ModelNamingExtensions
 
     def initialize(object)
       @human = object.human_readable_name
-      @directory = object.human_readable_name.end_with?(object.unique_identifier) ? "#{Utils.config[:repository_prefix]}_#{object.human_readable_name}".directorify : "#{Utils.config[:repository_prefix]}_#{object.human_readable_name}_#{object.unique_identifier}".directorify
+      @directory = object.human_readable_name.end_with?(object.unique_identifier) ? "#{Settings.digital_object.repository_prefix}_#{object.human_readable_name}".directorify : "#{Settings.digital_object.repository_prefix}_#{object.human_readable_name}_#{object.unique_identifier}".directorify
       @git = @directory.gitify
       @fedora = object.unique_identifier.fedorafy
       @filename = @directory.filename_sanitize

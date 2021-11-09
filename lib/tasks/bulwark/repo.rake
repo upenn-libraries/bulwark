@@ -38,11 +38,11 @@ namespace :bulwark do
         end
 
         # Remove Ceph (S3) bucket.
-        ceph_config = Utils::Storage::Ceph.config
+        ceph_config = Settings.digital_object.special_remote
         ceph = Aws::S3::Resource.new(
           access_key_id: ceph_config.aws_access_key_id,
           secret_access_key: ceph_config.aws_secret_access_key,
-          endpoint: ENV["STORAGE_PROTOCOL"] + ENV["STORAGE_HOST"],
+          endpoint: ceph_config.protocol + ceph_config.host,
           force_path_style: true,
           region: 'us-east-1' # Default
         )
