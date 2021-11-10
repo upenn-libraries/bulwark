@@ -16,22 +16,14 @@
   <meta http-equiv="cleartype" content="on">
   <![endif]-->
 
-  <!-- Matomo -->
-  <script type="text/javascript">
-    var _paq = window._paq || [];
-    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-    _paq.push(['trackPageView']);
-    _paq.push(['enableLinkTracking']);
-    (function() {
-      var u="//matomo.library.upenn.edu/";
-      _paq.push(['setTrackerUrl', u+'matomo.php']);
-      _paq.push(['setSiteId', '3']);
-      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-      g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-    })();
-  </script>
-  <noscript><p><img src="//matomo.library.upenn.edu/matomo.php?idsite=3&amp;rec=1" style="border:0;" alt="" /></p></noscript>
-  <!-- End Matomo Code -->
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-MWX8XJQ');</script>
+  <!-- End Google Tag Manager -->
+
 
   <title><%= render_page_title %></title>
   <%= opensearch_description_tag application_name, opensearch_catalog_url(:format => 'xml') %>
@@ -47,20 +39,25 @@
 
 </head>
 <body class="<%= render_body_class %>">
-<%= render :partial => 'shared/header_navbar' %>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MWX8XJQ"
+                    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
 
-<%= render partial: 'shared/ajax_modal' %>
+  <%= render :partial => 'shared/header_navbar' %>
 
-<div id="main-container" class="container">
-  <%= content_tag :h1, application_name, class: 'sr-only application-heading' %>
+  <%= render partial: 'shared/ajax_modal' %>
 
-  <%= render :partial => '/flash_msg', layout: 'shared/flash_messages' %>
+  <div id="main-container" class="container">
+    <%= content_tag :h1, application_name, class: 'sr-only application-heading' %>
 
-  <div class="row">
-    <%= yield %>
+    <%= render :partial => '/flash_msg', layout: 'shared/flash_messages' %>
+
+    <div class="row">
+      <%= yield %>
+    </div>
   </div>
-</div>
 
-<%= render :partial => 'shared/footer' %>
+  <%= render :partial => 'shared/footer' %>
 </body>
 </html>
