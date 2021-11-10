@@ -10,7 +10,7 @@ module Admin
           format.csv { send_data csv, type: 'text/csv', filename: 'structural_metadata.csv', disposition: :download }
           format.json { render json: { filenames: filenames.join('; '), drive: params[:drive], path: params[:path] }, status: :ok }
         else
-          format.csv { }
+          format.csv {}
           format.json { render json: { error: 'Path invalid!' }, status: :unprocessable_entity }
         end
       end
