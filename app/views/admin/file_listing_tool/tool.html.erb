@@ -5,13 +5,28 @@
 
 <script>
     $(document).ready(function(){
+        $('#file-listing').hide();
+        $('#error').hide();
+
         $("#new-file-listing").on("ajax:success", function(e, data, status, xhr) {
+            $('#error').hide()
+
             var json =  JSON.parse(xhr.responseText);
-            $("#file-listing").html(
-                "<h3>" + json.drive + ", " + json.path + "</h3><p>Filenames: " + json.filenames + "</p>"
-            );
+
+            $("#file-listing #drive").attr("value", json.drive)
+            $("#file-listing #path").attr("value", json.path)
+            $("#file-listing #filenames").html(json.filenames)
+
+            $("#copy-button").on("click", function() {
+                var copyText = $("#filenames").text();
+                navigator.clipboard.writeText(copyText);
+            });
+
+            $('#file-listing').show();
         }).on("ajax:error", function(e, xhr, status, error) {
-            $("#file-listing").text(JSON.parse(xhr.responseText).error);
+            $('#file-listing').hide();
+            $("#error").text(JSON.parse(xhr.responseText).error);
+            $('#error').show();
         });
     });
 </script>
@@ -20,12 +35,12 @@
 
 <p>
   List the filenames of all the files in the given directory.
-  The filenames will be listing in alphabetical order.
+  The filenames will be listed in alphabetical order.
 </p>
 
-<%= bootstrap_form_tag url: admin_file_listing_tool_file_list_url(protocol: :https), layout: :horizontal, remote: true, html: { id: 'new-file-listing' } do |f| %>
-  <%= f.select :drive, Bulwark::Import::MountedDrives.all.keys %>
-  <%= f.text_field :path %>
+<%= bootstrap_form_tag url: admin_file_listing_tool_file_list_path(format: :json), layout: :horizontal, remote: true, html: { id: 'new-file-listing' } do |f| %>
+  <%= f.select :drive, Bulwark::Import::MountedDrives.all.keys, control_col: 'col-sm-4' %>
+  <%= f.text_field :path, control_col: 'col-sm-4' %>
   <%= f.form_group do %>
     <%= f.submit 'List Filenames', class: 'btn btn-primary' %>
   <% end %>
@@ -33,4 +48,19 @@
 
 <hr />
 
-<p id="file-listing"></p>
+<div id="error"></div>
+
+<div id="file-listing">
+  <h4>Extracted Filenames</h4>
+  <%= bootstrap_form_tag url: admin_file_listing_tool_file_list_path(format: :csv), layout: :horizontal do |f| %>
+    <%= f.text_field :drive, readonly: true, control_col: 'col-sm-4' %>
+    <%= f.text_field :path, readonly: true, control_col: 'col-sm-4' %>
+    <%= f.static_control label: "Filenames" do %>
+      <span id="filenames"></span>
+    <% end %>
+    <%= f.form_group do %>
+      <button type="button" class="btn btn-primary" id="copy-button">Copy Filenames</button>
+      <%= f.submit 'Export Structural Metadata CSV', class: 'btn btn-info' %>
+    <% end %>
+  <% end %>
+</div>
