@@ -36,7 +36,9 @@ module Admin
       end
 
       def filenames
-        Dir.entries(absolute_path).select { |f| !f.start_with?('.') }.sort
+        Dir.entries(absolute_path)
+           .select { |f| !f.start_with?('.') && Settings.digital_object.file_extensions.include?(File.extname(f)[1..-1]) }
+           .sort
       end
   end
 end
