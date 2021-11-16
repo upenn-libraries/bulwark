@@ -25,6 +25,9 @@ Rails.application.routes.draw do
         post :generate_iiif_manifest
       end
     end
+
+    post 'file_listing_tool/file_list', to: 'file_listing_tool#file_list'
+    get 'file_listing_tool', to: 'file_listing_tool#tool'
   end
 
   get '/admin', to: redirect('/admin/digital_objects')
