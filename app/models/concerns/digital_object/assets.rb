@@ -7,10 +7,10 @@ module DigitalObject
 
     JHOVE_OUTPUT_FILENAME = 'jhove_output.xml'
 
-    # Retrieving assets from the given path, adding them
+    # Retrieving assets from the given paths, adding them
     # to the git repo and characterizing assets.
-    def add_assets(path)
-      copy_assets(path)
+    def add_assets(paths)
+      copy_assets(paths)
       characterize_assets
       create_or_update_assets
     end
@@ -68,11 +68,13 @@ module DigitalObject
 
     private
 
-      def copy_assets(path)
+      def copy_assets(paths)
         get_and_unlock(assets_subdirectory)
         assets_directory = File.join(clone_location, assets_subdirectory)
 
-        Bulwark::FileUtilities.copy_files(path, assets_directory, file_extensions)
+        paths.each do |path|
+          Bulwark::FileUtilities.copy_files(path, assets_directory, file_extensions)
+        end
 
         version_control_agent.add({}, clone_location)
         version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.automated.added_assets'), clone_location)

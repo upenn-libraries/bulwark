@@ -20,7 +20,7 @@ module Bulwark
     # @options opts [Hash] :assets
     # @options opts [TrueClass, FalseClass] :publish
     # @options opts [Hash] :metadata  # gets mapped to descriptive_metadata
-    # @options opts [Hash] :structural  # gets mapped to structural_metadata
+    # @options opts [StructuralMetadataGenerator] :structural  # gets mapped to structural_metadata
     def initialize(args)
       args = args.deep_symbolize_keys
 
@@ -31,7 +31,7 @@ module Bulwark
       @publish              = args.fetch(:publish, 'false').casecmp('true').zero?
       @descriptive_metadata = args.fetch(:metadata, {})
       @structural_metadata  = args[:structural].blank? ? nil : StructuralMetadataGenerator.new(args[:structural])
-      @assets               = args.fetch(:assets, {})
+      @assets               = args[:assets].blank? ? nil : AssetsLocation.new(args[:assets])
       @errors               = []
     end
 
@@ -48,7 +48,7 @@ module Bulwark
       if action == CREATE
         @errors << "\"directive_name\" must be provided to create an object" unless directive_name
         @errors << "structural must be provided to create an object" unless structural_metadata
-        @errors << "\"assets.path\" and \"assets.drive\" must be provided to create an object" if assets && (!assets[:drive] || !assets[:path])
+        @errors << "assets must be provided to create an object" unless assets
         @errors << "metadata must be provided to create an object" if descriptive_metadata.blank?
         if unique_identifier
           @errors << "\"#{unique_identifier}\" already belongs to an object. Cannot create new object with given unique identifier." if Repo.find_by(unique_identifier: unique_identifier)
@@ -66,14 +66,11 @@ module Bulwark
         end
       end
 
-      if assets
-        @errors << "assets drive invalid: '#{assets[:drive]}'" if assets[:drive] && !MountedDrives.valid?(assets[:drive])
-        # @errors << "asset path invalid" if assets[:drive] && assets[:path] && !MountedDrives.valid_path?(assets[:drive], assets[:path])
-      end
+      @errors.concat(assets.errors) if assets && !assets.valid?
 
       if structural_metadata && !structural_metadata.valid?
         @errors.concat structural_metadata.errors
-        # # @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
+        # @errors << "structural path invalid" if structural_metadata[:drive] && structural_metadata[:path] && !MountedDrives.valid_path?(structural_metadata[:drive], structural_metadata[:path])
       end
 
       @errors << "created_by must always be provided" unless created_by
@@ -84,22 +81,14 @@ module Bulwark
       validate # Validate before processing data.
 
       # Running filepath validations here, until we can configure our web containers to be able to do these checks.
-      if assets
-        @errors << "asset path invalid" if assets[:drive] && assets[:path] && !MountedDrives.valid_path?(assets[:drive], assets[:path])
-      end
+      @errors << "asset path invalid" if assets && !assets.valid_paths?
 
       if structural_metadata
         @errors << "structural path invalid" if structural_metadata.drive && structural_metadata.path && !MountedDrives.valid_path?(structural_metadata.drive, structural_metadata.path)
 
         # If action is create, validate all filenames listed in structural metadata.
-        if action == CREATE && assets_path
-
-          files_available = if File.directory?(assets_path)
-                              Dir.glob(File.join(assets_path, '*')).map { |f| File.basename(f) }
-                            else
-                              [File.basename(assets_path)]
-                            end
-          files_not_present = structural_metadata.all_filenames - files_available
+        if action == CREATE && assets.valid_paths?
+          files_not_present = structural_metadata.all_filenames - assets.files_available
 
           @errors << "Structural metadata contains the following invalid filenames: #{files_not_present.join(', ')}" unless files_not_present.blank?
         end
@@ -118,9 +107,7 @@ module Bulwark
       update_digital_object(repo)
 
       # Add assets to repository.
-      unless assets.empty?
-        repo.add_assets(assets_path)
-      end
+      repo.add_assets(assets.absolute_paths) if assets
 
       # Add descriptive metadata
       unless descriptive_metadata.empty?
@@ -139,7 +126,7 @@ module Bulwark
       end
 
       # Derivative generation (only if an asset location has been provided)
-      repo.generate_derivatives unless assets.empty?
+      repo.generate_derivatives if assets
 
       # Create Thumbnail
       thumbnail = repo.structural_metadata.user_defined_mappings['sequence'].sort_by { |file| file['sequence'] }.first['filename']
@@ -170,11 +157,6 @@ module Bulwark
     end
 
     private
-
-      def assets_path
-        return unless assets[:drive] || assets[:path]
-        File.join(MountedDrives.path_to(assets[:drive]), assets[:path])
-      end
 
       # @param [Array] errors
       # @param [Repo, nil] repository

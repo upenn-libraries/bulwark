@@ -35,7 +35,7 @@ RSpec.describe Bulwark::Import do
         expect(import.validate).to be false
         expect(import.errors).to include('structural must be provided to create an object')
         expect(import.errors).to include('metadata must be provided to create an object')
-        expect(import.errors).to include('"assets.path" and "assets.drive" must be provided to create an object')
+        expect(import.errors).to include('assets must be provided to create an object')
         expect(import.errors).to include('"directive_name" must be provided to create an object')
       end
     end
@@ -113,13 +113,12 @@ RSpec.describe Bulwark::Import do
       end
     end
 
-    context 'when asset path is invalid' do
-      subject(:import) { described_class.new('assets' => { 'drive' => 'test', 'path' => 'invalid/something' }) }
+    context 'when asset path is empty' do
+      subject(:import) { described_class.new('assets' => { 'drive' => 'test', 'path' => nil }) }
 
       it 'adds error' do
-        pending('path validity is being checked in .process')
         expect(import.validate).to be false
-        expect(import.errors).to include 'asset path invalid'
+        expect(import.errors).to include 'assets must contain at least one path'
       end
     end
 
@@ -485,6 +484,38 @@ RSpec.describe Bulwark::Import do
       end
     end
 
+    context 'when creating a new digital object with assets in two different directories' do
+      let(:import) do
+        described_class.new(
+          action: Bulwark::Import::CREATE,
+          directive_name: 'object_one',
+          assets: { 'drive' => 'test', 'path' => ['object_one', 'object_one_update'] },
+          metadata: { title: ['Object One'] },
+          structural: { 'filenames' => 'front.tif; back.tif; new.tif' },
+          publish: 'true',
+          created_by: created_by
+        )
+      end
+      let(:repo) { result.repo }
+      let(:working_dir) { repo.version_control_agent.clone }
+      let(:git) { ExtendedGit.open(working_dir) }
+      let(:whereis_result) { git.annex.whereis }
+
+      let(:result) { import.process }
+
+      it 'expect result to be successful' do
+        expect(result.errors).to be_blank
+        expect(result.status).to be DigitalObjectImport::SUCCESSFUL
+      end
+
+      it 'contains assets files' do
+        expect(whereis_result.map(&:filepath)).to include('data/assets/back.tif', 'data/assets/front.tif', 'data/assets/new.tif')
+        expect(whereis_result['data/assets/back.tif'].locations.map(&:description)).to include '[local]'
+        expect(whereis_result['data/assets/front.tif'].locations.map(&:description)).to include '[local]'
+        expect(whereis_result['data/assets/new.tif'].locations.map(&:description)).to include '[local]'
+      end
+    end
+
     context 'when creating a new digital object with one asset and not publishing' do
       let(:descriptive_metadata) do
         { 'title' => ['Trade card; J. Rosenblatt & Co.; Baltimore, Maryland, United States; undated;'] }
@@ -780,14 +811,6 @@ RSpec.describe Bulwark::Import do
     end
 
     context 'when creating a new digital object with incorrect structural metadata' do
-      let(:structural_metadata) do
-        {
-          'sequence' => [
-            { 'sequence' => '1', 'filename' => 'front_1.tif' },
-            { 'sequence' => '2', 'filename' => 'back_2.tif' }
-          ]
-        }
-      end
       let(:import) do
         described_class.new(
           action: Bulwark::Import::CREATE,
@@ -873,6 +896,26 @@ RSpec.describe Bulwark::Import do
         expect(dummy.original_file_location).to eql git.annex.lookupkey('data/assets/dummy.pdf')
         expect(dummy.access_file_location).to be_nil
         expect(dummy.thumbnail_file_location).to be_nil
+      end
+    end
+
+    context 'when creating a new digital object with incorrect asset paths' do
+      let(:import) do
+        described_class.new(
+          action: Bulwark::Import::CREATE,
+          directive_name: 'object_one',
+          assets: { drive: 'test', path: ['object_one', 'invalid_path'] },
+          metadata: { title: ['Object One'] },
+          structural: { filenames: 'front_1.tif; back_2.tif' },
+          created_by: created_by
+        )
+      end
+
+      let(:result) { import.process }
+
+      it 'import was not successful' do
+        expect(result.repo).to be nil
+        expect(result.errors).to contain_exactly('asset path invalid')
       end
     end
   end
