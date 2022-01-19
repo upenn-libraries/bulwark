@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Bulwark
   class Import
     class AssetsLocation # TODO: need a better name, files to be ingested, ingested files location
@@ -49,14 +50,14 @@ module Bulwark
 
       private
 
-      # Returns a list of files available at the given path
-      def files_at(path)
-        if File.directory?(path)
-          Dir.glob(File.join(path, '*')).map { |f| File.basename(f) }
-        else
-          [File.basename(path)]
+        # Returns a list of files available at the given path
+        def files_at(path)
+          if File.directory?(path)
+            Dir.glob(File.join(path, '*')).map { |f| File.basename(f) }
+          else
+            [File.basename(path)]
+          end
         end
-      end
     end
   end
 end
