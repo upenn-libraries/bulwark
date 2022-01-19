@@ -17,7 +17,7 @@ module Bulwark
     # @options opts [User] :created_by
     # @options opts [String] :directive_name
     # @options opts [String] :unique_identifier
-    # @options opts [Hash] :assets
+    # @options opts [AssetsLocation] :assets
     # @options opts [TrueClass, FalseClass] :publish
     # @options opts [Hash] :metadata  # gets mapped to descriptive_metadata
     # @options opts [StructuralMetadataGenerator] :structural  # gets mapped to structural_metadata

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module Bulwark
   class Import
-    class AssetsLocation # TODO: need a better name, files to be ingested, ingested files location
+    class AssetsLocation
       attr_reader :drive, :relative_paths, :errors
 
       def initialize(options = {})
