@@ -3,19 +3,24 @@
     <h4><%= asset.filename %> <small>(<%= number_to_human_size(asset.size) %>, <%= asset.mime_type %>)</small></h4>
   </div>
   <% if asset.thumbnail_file_location %>
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       <img src="<%= asset.thumbnail_file_link %>"></img>
     </div>
   <% end %>
 
-  <div class="col-sm-4">
+  <div class="col-sm-3">
     <p><strong>Label:</strong> <%= metadata.fetch('label', '[None]') %></p>
     <p><strong>Viewing Direction:</strong> <%= metadata.fetch('viewing_direction', '[None]') %></p>
     <p><strong>Display:</strong> <%= metadata.fetch('display', '[None]') %></p>
     <p><strong>Table of Contents:</strong> <%= metadata.fetch('table_of_contents', ['[None]'])&.join(', ') %></p>
   </div>
 
-  <div class="col-sm-4">
+  <div class="col-sm-3">
+    <p><strong>Fulltext:</strong></p>
+    <p style="white-space: pre;"><%= metadata.fetch('fulltext', '[None]') %></p>
+  </div>
+
+  <div class="col-sm-2">
     <a
       class="btn btn-link"
       href="<%= asset.original_file_link %>">

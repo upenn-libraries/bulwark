@@ -116,7 +116,7 @@
           <% @digital_object.structural_metadata.user_defined_mappings.fetch('sequence', []).each do |values| %>
             <tr>
               <% MetadataSource::VALID_STRUCTURAL_METADATA_FIELDS.each do |field| %>
-                <td><%= Array.wrap(values[field]).join('<br>').html_safe %></td>
+                <td style="white-space: pre;"><%= Array.wrap(values[field]).join('<br>').html_safe %></td>
               <% end %>
             </tr>
           <% end %>

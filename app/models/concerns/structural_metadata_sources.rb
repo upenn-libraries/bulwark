@@ -3,7 +3,9 @@
 module StructuralMetadataSources
   extend ActiveSupport::Concern
 
-  VALID_STRUCTURAL_METADATA_FIELDS = ['sequence', 'filename', 'label', 'viewing_direction', 'table_of_contents', 'display'].freeze
+  VALID_STRUCTURAL_METADATA_FIELDS = [
+    'sequence', 'filename', 'label', 'viewing_direction', 'table_of_contents', 'display', 'fulltext'
+  ].freeze
 
   PAGED = 'paged'
   INDIVIDUALS = 'individuals'
