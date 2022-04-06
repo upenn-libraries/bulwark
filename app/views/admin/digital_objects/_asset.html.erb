@@ -37,14 +37,14 @@
         <p>
           <strong>Fulltext:</strong>
           <% if fulltext %>
-            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFulltext" aria-expanded="false" aria-controls="collapseFulltext">
+            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFulltext-<%= File.basename(asset.filename, '.*') %>" aria-expanded="false" aria-controls="collapseFulltext">
               <span class="glyphicon glyphicon-file" aria-hidden="true"></span> View Fulltext
             </button>
           <% else %>
             [None]
           <% end %>
         </p>
-        <div class="collapse" id="collapseFulltext">
+        <div class="collapse" id="collapseFulltext-<%= File.basename(asset.filename, '.*') %>">
           <div class="card card-body">
             <p style="white-space: pre;"><%= fulltext %></p>
           </div>
