@@ -560,7 +560,7 @@ RSpec.describe Bulwark::Import do
       let(:structural_metadata) do
         {
           'sequence' => [
-            { 'sequence' => '1', 'filename' => 'front.tif', 'label' => 'p. 1', 'viewing_direction' => 'top-to-bottom', 'table_of_contents' => ['a very important illustration', 'an additional illustration'] },
+            { 'sequence' => '1', 'filename' => 'front.tif', 'fulltext' => "Importers\n32 S. Howard Street,\nBaltimore, MD.", 'label' => 'p. 1', 'viewing_direction' => 'top-to-bottom', 'table_of_contents' => ['a very important illustration', 'an additional illustration'] },
             { 'sequence' => '2', 'filename' => 'back.tif', 'label' => 'p. 2', 'viewing_direction' => 'top-to-bottom' }
           ]
         }
@@ -576,6 +576,9 @@ RSpec.describe Bulwark::Import do
               <pages>
                 <page>
                   <filename>front.tif</filename>
+                  <fulltext>Importers
+                         32 S. Howard Street,
+                         Baltimore, MD.</fulltext>
                   <label>p. 1</label>
                   <sequence>1</sequence>
                   <table_of_contents>a very important illustration</table_of_contents>

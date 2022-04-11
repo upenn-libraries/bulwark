@@ -104,24 +104,26 @@
                       target: '_blank'%>
         </small>
       </h3>
-      <table class="table table-striped">
-        <thead>
+      <div class="table-responsive">
+        <table class="table table-striped table-responsive">
+          <thead>
           <tr>
             <% MetadataSource::VALID_STRUCTURAL_METADATA_FIELDS.each do |field| %>
               <th><%= field.gsub('_', ' ').titlecase %></th>
             <% end %>
           </tr>
-        </thead>
-        <tbody>
+          </thead>
+          <tbody>
           <% @digital_object.structural_metadata.user_defined_mappings.fetch('sequence', []).each do |values| %>
             <tr>
               <% MetadataSource::VALID_STRUCTURAL_METADATA_FIELDS.each do |field| %>
-                <td><%= Array.wrap(values[field]).join('<br>').html_safe %></td>
+                <td style="white-space: pre;"><%= Array.wrap(values[field]).join('<br>').html_safe %></td>
               <% end %>
             </tr>
           <% end %>
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     <% else %>
       <p>Structural metadata not available</p>
     <% end %>

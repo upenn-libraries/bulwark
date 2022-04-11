@@ -1,3 +1,5 @@
-filename,label,sequence,table_of_contents[1],table_of_contents[2],viewing_direction
-front.tif,p. 1,1,a very important illustration,an additional illustration,top-to-bottom
-back.tif,p. 2,2,,,top-to-bottom
+filename,fulltext,label,sequence,table_of_contents[1],table_of_contents[2],viewing_direction
+front.tif,"Importers
+32 S. Howard Street,
+Baltimore, MD.",p. 1,1,a very important illustration,an additional illustration,top-to-bottom
+back.tif,,p. 2,2,,,top-to-bottom

@@ -2,29 +2,54 @@
   <div class="col-sm-12">
     <h4><%= asset.filename %> <small>(<%= number_to_human_size(asset.size) %>, <%= asset.mime_type %>)</small></h4>
   </div>
+</div>
+<div class="row">
   <% if asset.thumbnail_file_location %>
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       <img src="<%= asset.thumbnail_file_link %>"></img>
     </div>
   <% end %>
 
-  <div class="col-sm-4">
-    <p><strong>Label:</strong> <%= metadata.fetch('label', '[None]') %></p>
-    <p><strong>Viewing Direction:</strong> <%= metadata.fetch('viewing_direction', '[None]') %></p>
-    <p><strong>Display:</strong> <%= metadata.fetch('display', '[None]') %></p>
-    <p><strong>Table of Contents:</strong> <%= metadata.fetch('table_of_contents', ['[None]'])&.join(', ') %></p>
-  </div>
-
-  <div class="col-sm-4">
-    <a
-      class="btn btn-link"
-      href="<%= asset.original_file_link %>">
-      <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Original
-    </a>
-    <% if asset.access_file_location %>
-      <a class="btn btn-link" href="<%= asset.access_file_link %>" target="_blank">
-         <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Access Copy
-      </a>
-    <% end %>
+  <div class="col-sm-9">
+    <div class="row">
+      <div class="col-sm-9">
+        <p><strong>Label:</strong> <%= metadata.fetch('label', '[None]') %></p>
+        <p><strong>Viewing Direction:</strong> <%= metadata.fetch('viewing_direction', '[None]') %></p>
+        <p><strong>Display:</strong> <%= metadata.fetch('display', '[None]') %></p>
+        <p><strong>Table of Contents:</strong> <%= metadata.fetch('table_of_contents', ['[None]'])&.join(', ') %></p>
+      </div>
+      <div class="col-sm-3">
+        <a
+          class="btn btn-link"
+          href="<%= asset.original_file_link %>">
+          <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Original
+        </a>
+        <% if asset.access_file_location %>
+          <a class="btn btn-link" href="<%= asset.access_file_link %>" target="_blank">
+            <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Access Copy
+          </a>
+        <% end %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
+        <% fulltext = metadata.fetch('fulltext', nil) %>
+        <p>
+          <strong>Fulltext:</strong>
+          <% if fulltext %>
+            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFulltext-<%= File.basename(asset.filename, '.*') %>" aria-expanded="false" aria-controls="collapseFulltext">
+              <span class="glyphicon glyphicon-file" aria-hidden="true"></span> View Fulltext
+            </button>
+          <% else %>
+            [None]
+          <% end %>
+        </p>
+        <div class="collapse" id="collapseFulltext-<%= File.basename(asset.filename, '.*') %>">
+          <div class="card card-body">
+            <p style="white-space: pre;"><%= fulltext %></p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
