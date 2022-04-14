@@ -92,18 +92,6 @@ RSpec.describe Bulwark::Import do
       end
     end
 
-    context 'when updating an object that has not been migrated' do
-      include_context 'stub successful EZID requests'
-
-      subject(:import) { described_class.new(action: Bulwark::Import::UPDATE, unique_identifier: repo.unique_identifier) }
-      let(:repo) { FactoryBot.create(:repo, new_format: false) }
-
-      it 'adds error' do
-        expect(import.validate).to be false
-        expect(import.errors).to include "Object has not been migrated"
-      end
-    end
-
     context 'when asset drive is invalid' do
       subject(:import) { described_class.new(assets: { 'drive' => 'invalid' }) }
 
@@ -185,12 +173,21 @@ RSpec.describe Bulwark::Import do
         expect(import.errors).to include 'structural path invalid'
       end
     end
+
+
   end
 
   describe '.process' do
     include_context 'stub successful EZID requests'
 
     let(:created_by) { User.create(email: 'test@example.com') }
+
+    let(:repo) { result.repo }
+    let(:working_dir) { repo.version_control_agent.clone }
+    let(:git) { ExtendedGit.open(working_dir) }
+    let(:whereis_result) { git.annex.whereis }
+
+    let(:result) { import.process }
 
     context 'when creating a new digital object' do
       let(:descriptive_metadata) do
@@ -227,12 +224,6 @@ RSpec.describe Bulwark::Import do
           created_by: created_by
         )
       end
-      let(:repo) { result.repo }
-      let(:working_dir) { repo.version_control_agent.clone }
-      let(:git) { ExtendedGit.open(working_dir) }
-      let(:whereis_result) { git.annex.whereis }
-
-      let(:result) { import.process }
 
       let(:expected_mets) { fixture_to_xml('example_objects', 'object_one', 'mets.xml') }
       let(:expected_preservation) { fixture_to_xml('example_objects', 'object_one', 'preservation.xml') }
@@ -496,12 +487,6 @@ RSpec.describe Bulwark::Import do
           created_by: created_by
         )
       end
-      let(:repo) { result.repo }
-      let(:working_dir) { repo.version_control_agent.clone }
-      let(:git) { ExtendedGit.open(working_dir) }
-      let(:whereis_result) { git.annex.whereis }
-
-      let(:result) { import.process }
 
       it 'expect result to be successful' do
         expect(result.errors).to be_blank
@@ -531,12 +516,6 @@ RSpec.describe Bulwark::Import do
           publish: 'false'
         )
       end
-      let(:repo) { result.repo }
-      let(:working_dir) { repo.version_control_agent.clone }
-      let(:git) { ExtendedGit.open(working_dir) }
-      let(:whereis_result) { git.annex.whereis }
-
-      let(:result) { import.process }
 
       it 'does not have first_published_at set' do
         expect(repo.first_published_at).to be_nil
@@ -606,12 +585,6 @@ RSpec.describe Bulwark::Import do
           created_by: created_by
         )
       end
-      let(:repo) { result.repo }
-      let(:working_dir) { repo.version_control_agent.clone }
-      let(:git) { ExtendedGit.open(working_dir) }
-      let(:whereis_result) { git.annex.whereis }
-
-      let(:result) { import.process }
 
       it 'import was successful' do
         expect(result.errors).to be_blank
@@ -666,12 +639,6 @@ RSpec.describe Bulwark::Import do
           created_by: created_by
         )
       end
-      let(:repo) { result.repo }
-      let(:working_dir) { repo.version_control_agent.clone }
-      let(:git) { ExtendedGit.open(working_dir) }
-      let(:whereis_result) { git.annex.whereis }
-
-      let(:result) { import.process }
 
       it 'import was successful' do
         expect(result.errors).to be_empty
@@ -825,8 +792,6 @@ RSpec.describe Bulwark::Import do
         )
       end
 
-      let(:result) { import.process }
-
       it 'import was not successful' do
         expect(result.repo).to be nil
         expect(result.errors).to contain_exactly('Structural metadata contains the following invalid filenames: front_1.tif, back_2.tif')
@@ -860,12 +825,6 @@ RSpec.describe Bulwark::Import do
           created_by: created_by
         )
       end
-      let(:repo) { result.repo }
-      let(:working_dir) { repo.version_control_agent.clone }
-      let(:git) { ExtendedGit.open(working_dir) }
-      let(:whereis_result) { git.annex.whereis }
-
-      let(:result) { import.process }
 
       it 'result is successful' do
         expect(result.status).to be DigitalObjectImport::SUCCESSFUL
@@ -914,11 +873,109 @@ RSpec.describe Bulwark::Import do
         )
       end
 
-      let(:result) { import.process }
-
       it 'import was not successful' do
         expect(result.repo).to be nil
         expect(result.errors).to contain_exactly('asset path invalid')
+      end
+    end
+
+    context 'when creating a new digital object with invalid derivative paths' do
+      let(:import) do
+        described_class.new(
+          action: Bulwark::Import::CREATE,
+          directive_name: 'object_four',
+          assets: { drive: 'test', path: ['object_four/bell.wav'] },
+          derivatives: { access: { drive: 'test', path: ['object_four/something.mp3'] } },
+          metadata: { title: ['Object Four'] },
+          structural: { filenames: 'bell.wav' },
+          created_by: created_by
+        )
+      end
+
+      it 'import was not successful' do
+        expect(result.repo).to be nil
+        expect(result.errors).to contain_exactly('derivatives access path invalid')
+      end
+    end
+
+    context 'when creating a new digital object with non-matching derivatives' do
+      let(:import) do
+        described_class.new(
+          action: Bulwark::Import::CREATE,
+          directive_name: 'object_four',
+          assets: { drive: 'test', path: ['object_four/bell.wav'] },
+          derivatives: { access: { drive: 'test', path: ['object_four/other_bell.mp3'] } },
+          metadata: { title: ['Object Four'] },
+          structural: { filenames: 'bell.wav' },
+          created_by: created_by
+        )
+      end
+
+      it 'import was not successful' do
+        expect(result.repo).to be nil
+        expect(result.errors).to contain_exactly('Invalid derivatives: other_bell')
+      end
+    end
+
+    context 'when creating a new digital object with invalid derivative extensions' do
+      let(:import) do
+        described_class.new(
+          action: Bulwark::Import::CREATE,
+          directive_name: 'object_four',
+          assets: { drive: 'test', path: ['object_four/bell.wav'] },
+          derivatives: { access: { drive: 'test', path: ['object_four/bell.wav'] } },
+          metadata: { title: ['Object Four'] },
+          structural: { filenames: 'bell.wav' },
+          created_by: created_by
+        )
+      end
+
+      it 'import was not successful' do
+        expect(result.repo).to be nil
+        expect(result.errors).to contain_exactly('Derivatives with invalid file extensions: wav')
+      end
+    end
+
+    context 'when creating a new digital objects with external derivatives' do
+      let(:import) do
+        described_class.new(
+          action: Bulwark::Import::CREATE,
+          directive_name: 'object_four',
+          assets: { drive: 'test', path: ['object_four/bell.wav'] },
+          derivatives: { access: { drive: 'test', path: ['object_four/bell.mp3'] } },
+          metadata: { title: ['Object Four'] },
+          structural: { filenames: 'bell.wav' },
+          created_by: created_by
+        )
+      end
+
+      it 'expect result to be successful' do
+        expect(result.errors).to be_blank
+        expect(result.status).to be DigitalObjectImport::SUCCESSFUL
+      end
+
+      it 'contains assets files' do
+        expect(whereis_result.map(&:filepath)).to include('data/assets/bell.wav')
+        expect(whereis_result['data/assets/bell.wav'].locations.map(&:description)).to include '[local]'
+      end
+
+      it 'contains derivatives' do
+        derivatives = ['.derivs/access/bell.mp3']
+        expect(whereis_result.map(&:filepath)).to include(*derivatives)
+        derivatives.each do |filepath|
+          expect(whereis_result[filepath].locations.map(&:description)).to include '[local]'
+        end
+      end
+
+      it 'creates expected asset records' do
+        bell = repo.assets.find_by(filename: 'bell.wav')
+
+        expect(bell).not_to be_nil
+        expect(bell.size).to be 30_804
+        expect(bell.mime_type).to eql 'audio/vnd.wave'
+        expect(bell.original_file_location).to eql git.annex.lookupkey('data/assets/bell.wav')
+        expect(bell.access_file_location).to eql git.annex.lookupkey('.derivs/access/bell.mp3')
+        expect(bell.thumbnail_file_location).to be_nil
       end
     end
   end

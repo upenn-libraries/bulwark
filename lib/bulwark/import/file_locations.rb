@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module Bulwark
   class Import
-    class AssetsLocation
+    class FileLocations
       attr_reader :drive, :relative_paths, :errors
 
       def initialize(options = {})
@@ -16,8 +16,8 @@ module Bulwark
       # Check that the configuration contains all the necessary
       # information. This does not check the validity of the paths
       def valid?
-        @errors << "assets drive invalid: '#{drive}'" if drive && !MountedDrives.valid?(drive)
-        @errors << "assets must contain at least one path" if relative_paths.empty?
+        @errors << "drive invalid: '#{drive}'" if drive && !MountedDrives.valid?(drive)
+        @errors << "must contain at least one path" if relative_paths.empty?
 
         errors.empty?
       end

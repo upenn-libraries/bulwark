@@ -9,3 +9,4 @@ digital_object:
     - 'jpg'
     - 'pdf'
     - 'gz'
+    - 'wav'

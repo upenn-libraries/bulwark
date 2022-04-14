@@ -7,7 +7,7 @@ module Bulwark
     IMPORT_ACTIONS = [CREATE, UPDATE].freeze
 
     attr_reader :unique_identifier, :action, :directive_name, :created_by, :assets,
-                :descriptive_metadata, :structural_metadata,
+                :descriptive_metadata, :structural_metadata, :derivatives,
                 :repo, :errors
 
     # Initializes object to import digital objects.
@@ -17,7 +17,8 @@ module Bulwark
     # @options opts [User] :created_by
     # @options opts [String] :directive_name
     # @options opts [String] :unique_identifier
-    # @options opts [AssetsLocation] :assets
+    # @options opts [FileLocations] :assets
+    # @options opts [Hash<String,FileLocations>] :derivatives
     # @options opts [TrueClass, FalseClass] :publish
     # @options opts [Hash] :metadata  # gets mapped to descriptive_metadata
     # @options opts [StructuralMetadataGenerator] :structural  # gets mapped to structural_metadata
@@ -31,7 +32,8 @@ module Bulwark
       @publish              = args.fetch(:publish, 'false').casecmp('true').zero?
       @descriptive_metadata = args.fetch(:metadata, {})
       @structural_metadata  = args[:structural].blank? ? nil : StructuralMetadataGenerator.new(args[:structural])
-      @assets               = args[:assets].blank? ? nil : AssetsLocation.new(args[:assets])
+      @assets               = args[:assets].blank? ? nil : FileLocations.new(args[:assets])
+      @derivatives          = derivatives_options(args[:derivatives])
       @errors               = []
     end
 
@@ -58,15 +60,15 @@ module Bulwark
 
       if action == UPDATE
         if unique_identifier
-          repo = Repo.find_by(unique_identifier: unique_identifier)
+          @repo = Repo.find_by(unique_identifier: unique_identifier, new_format: true)
           @errors << "\"unique_identifier\" does not belong to an object. Cannot update object." unless repo
-          @errors << "Object has not been migrated" if repo && !repo.new_format
         else
           @errors << "\"unique_identifier\" must be provided when updating an object"
         end
       end
 
-      @errors.concat(assets.errors) if assets && !assets.valid?
+      @errors.concat(assets.errors.map { |e| "assets #{e}" }) if assets && !assets.valid?
+      @errors.concat(derivatives[:access].errors.map { |e| "derivative.access #{e}" }) if derivatives && derivatives[:access].valid?
 
       if structural_metadata && !structural_metadata.valid?
         @errors.concat structural_metadata.errors
@@ -84,25 +86,47 @@ module Bulwark
       @errors << "asset path invalid" if assets && !assets.valid_paths?
 
       if structural_metadata
+        # If structural metadata provided by CSV, check that file is present.
         @errors << "structural path invalid" if structural_metadata.drive && structural_metadata.path && !MountedDrives.valid_path?(structural_metadata.drive, structural_metadata.path)
 
-        # If action is create, validate all filenames listed in structural metadata.
-        if action == CREATE && assets.valid_paths?
-          files_not_present = structural_metadata.all_filenames - assets.files_available
+        # Check that files in structural metadata are valid
+        assets_present = []
+        assets_present.concat assets.files_available if assets
+        assets_present.concat repo.assets.map(&:filename) if repo
 
-          @errors << "Structural metadata contains the following invalid filenames: #{files_not_present.join(', ')}" unless files_not_present.blank?
+        files_not_present = structural_metadata.all_filenames - assets_present
+        @errors << "Structural metadata contains the following invalid filenames: #{files_not_present.join(', ')}" unless files_not_present.blank?
+      end
+
+      if derivatives && derivatives[:access]
+        if !derivatives[:access].valid_paths? # Ensure derivative filepaths are valid.
+          @errors << "derivatives access path invalid"
+        else # If derivative filepaths are valid do other checks
+          # Ensure derivatives have original/preservation files
+          derivative_basenames = derivatives[:access].files_available.map { |f| File.basename(f, '.*') }
+
+          assets_present = []
+          assets_present.concat assets.files_available if assets
+          assets_present.concat repo.assets.map(&:filename) if repo
+
+          assets_basenames = assets_present.map { |f| File.basename(f, '.*') }
+
+          invalid_derivatives = derivative_basenames - assets_basenames
+
+          @errors << "Invalid derivatives: #{invalid_derivatives.join(', ') }" unless invalid_derivatives.blank?
+
+          # TODO: Ensure derivatives have valid extension
+          derivative_extensions = derivatives[:access].files_available.map { |f| File.extname(f)[1..-1] }.uniq
+          invalid_extensions = derivative_extensions - DigitalObject::Derivatives::DERIVATIVE_EXTENSIONS.values
+
+          @errors << "Derivatives with invalid file extensions: #{invalid_extensions.join(', ')}" unless invalid_extensions.blank?
         end
       end
 
       return error_result(@errors) unless @errors.empty?
 
-      # Retrieve or create repo.
-      @repo = case action.downcase
-              when CREATE
-                create_digital_object
-              when UPDATE
-                Repo.find_by(unique_identifier: unique_identifier, new_format: true)
-              end
+      # Create repo if action is create
+      @repo = create_digital_object if action == CREATE
 
       update_digital_object(repo)
 
@@ -124,6 +148,9 @@ module Bulwark
         # Check that all filenames referenced in the structural metadata are valid.
         repo.validate_structural_metadata!
       end
+
+      # Copy and link derivatives if they are provided externally.
+      repo.copy_and_link_derivatives('access', derivatives[:access].absolute_paths) if derivatives&.dig(:access)
 
       # Derivative generation (only if an asset location has been provided)
       repo.generate_derivatives if assets
@@ -151,12 +178,18 @@ module Bulwark
 
       Result.new(status: DigitalObjectImport::SUCCESSFUL, repo: repo)
     rescue => e
+      raise e
       Honeybadger.notify(e) # Sending full error to Honeybadger.
       repo.delete_clone if repo&.cloned? # Delete cloned repo if there is one present
       error_result [e.message], repo
     end
 
     private
+
+      def derivatives_options(derivatives)
+        return if derivatives.blank? || derivatives[:access].blank?
+        { access: FileLocations.new(derivatives[:access]) }
+      end
 
       # @param [Array] errors
       # @param [Repo, nil] repository
