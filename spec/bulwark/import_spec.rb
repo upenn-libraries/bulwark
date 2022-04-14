@@ -875,7 +875,7 @@ RSpec.describe Bulwark::Import do
 
       it 'import was not successful' do
         expect(result.repo).to be nil
-        expect(result.errors).to contain_exactly('asset path invalid')
+        expect(result.errors).to contain_exactly('asset path invalid', 'Structural metadata contains the following invalid filenames: front_1.tif, back_2.tif')
       end
     end
 
