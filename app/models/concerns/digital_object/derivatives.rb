@@ -5,10 +5,10 @@ module DigitalObject
     DERIVATIVE_EXTENSIONS = {
       'mov' => 'mp4',
       'audio/vnd.wave' => 'mp3'
-    }
+    }.freeze
     ACCESS = 'access'
     THUMBNAILS = 'thumbnails'
-    TYPES = [ACCESS, THUMBNAILS]
+    TYPES = [ACCESS, THUMBNAILS].freeze
 
     extend ActiveSupport::Concern
 
@@ -24,7 +24,7 @@ module DigitalObject
         Bulwark::FileUtilities.copy_files(path, access_dir_path, DERIVATIVE_EXTENSIONS.values)
       end
 
-      version_control_agent.add({ content: access_dir_path, include_dotfiles: true  }, clone_location)
+      version_control_agent.add({ content: access_dir_path, include_dotfiles: true }, clone_location)
       version_control_agent.commit('Access derivatives added via bulk import', clone_location)
       version_control_agent.push({ content: access_dir_path }, clone_location)
 
@@ -61,27 +61,27 @@ module DigitalObject
 
       # Create derivatives for jpeg and tiff files. For any audio files, link any assets, that are found.
       assets.each do |asset|
-        if asset.mime_type == 'image/jpeg' || asset.mime_type == 'image/tiff'
-          relative_file_path = File.join(assets_subdirectory, asset.filename)
-          get_and_unlock(relative_file_path)
+        next unless asset.mime_type == 'image/jpeg' || asset.mime_type == 'image/tiff'
 
-          file_path = File.join(clone_location, relative_file_path)
+        relative_file_path = File.join(assets_subdirectory, asset.filename)
+        get_and_unlock(relative_file_path)
 
-          access_filepath = Bulwark::Derivatives::Image.access_copy(file_path, access_dir_path)
-          access_relative_path = Pathname.new(access_filepath).relative_path_from(Pathname.new(clone_location)).to_s
-          version_control_agent.add({ content: access_relative_path, include_dotfiles: true }, clone_location)
-          asset.access_file_location = version_control_agent.look_up_key(access_relative_path, clone_location)
+        file_path = File.join(clone_location, relative_file_path)
 
-          thumbnail_filepath = Bulwark::Derivatives::Image.thumbnail(file_path, thumbnail_dir_path)
-          thumbnail_relative_path = Pathname.new(thumbnail_filepath).relative_path_from(Pathname.new(clone_location)).to_s
-          version_control_agent.add({ content: thumbnail_relative_path, include_dotfiles: true }, clone_location)
-          asset.thumbnail_file_location = version_control_agent.look_up_key(thumbnail_relative_path, clone_location)
+        access_filepath = Bulwark::Derivatives::Image.access_copy(file_path, access_dir_path)
+        access_relative_path = Pathname.new(access_filepath).relative_path_from(Pathname.new(clone_location)).to_s
+        version_control_agent.add({ content: access_relative_path, include_dotfiles: true }, clone_location)
+        asset.access_file_location = version_control_agent.look_up_key(access_relative_path, clone_location)
 
-          asset.save!
+        thumbnail_filepath = Bulwark::Derivatives::Image.thumbnail(file_path, thumbnail_dir_path)
+        thumbnail_relative_path = Pathname.new(thumbnail_filepath).relative_path_from(Pathname.new(clone_location)).to_s
+        version_control_agent.add({ content: thumbnail_relative_path, include_dotfiles: true }, clone_location)
+        asset.thumbnail_file_location = version_control_agent.look_up_key(thumbnail_relative_path, clone_location)
 
-          version_control_agent.lock(relative_file_path, clone_location)
-          version_control_agent.drop({ content: relative_file_path }, clone_location)
-        end
+        asset.save!
+
+        version_control_agent.lock(relative_file_path, clone_location)
+        version_control_agent.drop({ content: relative_file_path }, clone_location)
       end
 
       metadata_builder.update!(last_file_checks: DateTime.current)
@@ -93,13 +93,13 @@ module DigitalObject
 
     private
 
-    def create_derivative_subdirectories
-      get_and_unlock(derivatives_subdirectory)
+      def create_derivative_subdirectories
+        get_and_unlock(derivatives_subdirectory)
 
-      # Create 'thumbnails' and 'access' directories if they aren't present already.
-      [access_dir_path, thumbnail_dir_path].each do |dir|
-        FileUtils.mkdir(dir) unless File.exist?(dir)
+        # Create 'thumbnails' and 'access' directories if they aren't present already.
+        [access_dir_path, thumbnail_dir_path].each do |dir|
+          FileUtils.mkdir(dir) unless File.exist?(dir)
+        end
       end
-    end
   end
 end

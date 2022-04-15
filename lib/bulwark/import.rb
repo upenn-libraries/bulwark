@@ -113,7 +113,7 @@ module Bulwark
 
           invalid_derivatives = derivative_basenames - assets_basenames
 
-          @errors << "Invalid derivatives: #{invalid_derivatives.join(', ') }" unless invalid_derivatives.blank?
+          @errors << "Invalid derivatives: #{invalid_derivatives.join(', ')}" unless invalid_derivatives.blank?
 
           # TODO: Ensure derivatives have valid extension
           derivative_extensions = derivatives[:access].files_available.map { |f| File.extname(f)[1..-1] }.uniq
@@ -178,7 +178,6 @@ module Bulwark
 
       Result.new(status: DigitalObjectImport::SUCCESSFUL, repo: repo)
     rescue => e
-      raise e
       Honeybadger.notify(e) # Sending full error to Honeybadger.
       repo.delete_clone if repo&.cloned? # Delete cloned repo if there is one present
       error_result [e.message], repo

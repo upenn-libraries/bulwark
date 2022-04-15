@@ -173,8 +173,6 @@ RSpec.describe Bulwark::Import do
         expect(import.errors).to include 'structural path invalid'
       end
     end
-
-
   end
 
   describe '.process' do
