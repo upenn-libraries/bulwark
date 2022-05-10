@@ -98,7 +98,7 @@ RUN apt-get update && apt-get install -qq -y --no-install-recommends \
 WORKDIR /tmp
 
 RUN wget https://download.samba.org/pub/rsync/rsync-3.2.4.tar.gz -O - | tar xz && \
-    cd rsync-3.2.3 && \
+    cd rsync-3.2.4 && \
     ./configure --disable-xxhash --disable-zstd --disable-lz4 --disable-md2man && \
     make && make install && make clean && \
     rsync --version
