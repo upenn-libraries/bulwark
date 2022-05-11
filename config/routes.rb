@@ -32,6 +32,10 @@ Rails.application.routes.draw do
 
   get '/admin', to: redirect('/admin/digital_objects')
 
+  namespace :pages do
+    get 'about'
+  end
+
   if Rails.env.development? || Rails.env.test?
     get 'special_remote_download/:bucket/:key',
         action: :special_remote_download,
