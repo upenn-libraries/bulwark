@@ -771,8 +771,7 @@ RSpec.describe Bulwark::Import do
       before do
         stub_request(:get, "https://marmite.library.upenn.edu:9292/api/v2/records/#{bibnumber}/marc21?update=always")
           .to_return(status: 200, body: fixture_to_str('marmite', 'marc_xml', "#{bibnumber}.xml"), headers: {})
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=structural").to_return(status: 302)
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=structural")
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/api/v2/records/#{bibnumber}/structural")
           .to_return(status: 200, body: structural_xml, headers: {})
       end
 

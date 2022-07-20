@@ -225,7 +225,7 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
     context 'when invalid bibnumber' do
       before do
         stub_request(:get, "https://marmite.library.upenn.edu:9292/api/v2/records/99#{bibnumber}3503681/marc21?update=always")
-          .to_return(status: 404, body: "Record #{bibnumber} in marc21 format not found", headers: {})
+          .to_return(status: 404, body: "{\"errors\":[\"Bib not found in Alma for #{bibnumber}\"]}", headers: {})
       end
 
       it 'raises error' do
@@ -236,8 +236,7 @@ RSpec.describe Bulwark::Import::StructuralMetadataGenerator do
     context 'when valid bibnumber' do
       before do
         # Mock structural metadata request to Marmite
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=structural").to_return(status: 302)
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=structural")
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/api/v2/records/#{bibnumber}/structural")
           .to_return(status: 200, body: fixture_to_str('marmite', 'structural', "with_table_of_contents.xml"), headers: {})
 
         # Mock descriptive metadata request to Marmite
