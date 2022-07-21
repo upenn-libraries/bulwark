@@ -5,83 +5,54 @@ module Bulwark
     module MarcMappings
       MULTIVALUED_FIELDS = %w[
         abstract contributor coverage creator date description identifier
-        includes includesComponent language publisher relation rights source
+        includes language publisher relation rights source
         subject title type collection personal_name corporate_name
         geographic_subject provenance
       ].freeze
 
-      TAGS = {
-        '026' => { 'e' => 'identifier' },
-        '035' => { 'a' => 'identifier' },
-        '099' => { 'a' => 'call_number' },
-        '100' => { 'a' => 'creator' },
-        '110' => { 'a' => 'corporate_name' },
+      # Mapping of MARC fields.
+      # Note: As of right now, there is one mapping per field. In future more mappings could be added per
+      #       field by converting the hashes to an array of hashes and making the appropriate code changes.
+      MARC_FIELDS = {
+        '026' => { subfields: 'e', field: 'identifier' },
+        '035' => { subfields: 'a', field: 'identifier' },
+        '099' => { subfields: 'a', field: 'call_number' },
+        '100' => { subfields: 'a', field: 'creator' },
+        '110' => { subfields: 'a', field: 'corporate_name' },
         '245' => {
-          'a' => 'title',
-          'b' => 'title',
-          'c' => 'title',
-          'f' => 'title',
-          'g' => 'title',
-          'h' => 'title',
-          'k' => 'title',
-          'n' => 'title',
-          'p' => 'title',
-          's' => 'title'
+          subfields: ['a', 'b', 'c', 'f', 'g', 'h', 'k', 'n', 'p', 's'],
+          field: 'title'
         },
-        '246' => { 'a' => 'title' },
-        '260' => {
-          'a' => 'publisher',
-          'b' => 'publisher',
-          'c' => 'publisher',
-          'e' => 'publisher',
-          'f' => 'publisher',
-          'g' => 'publisher'
-        },
-        '300' => { '*' => 'format' },
-        '590' => { '*' => 'description' },
-        '500' => { '*' => 'bibliographic_note' }, # TODO: Should this be `note`?
-        '510' => { 'a' => 'citation_note' },
-        '520' => { '*' => 'abstract' },
-        '522' => { '*' => 'coverage' },
-        '524' => { '*' => 'preferred_citation_note' },
-        '530' => { '*' => 'additional_physical_form_note' },
-        '546' => { '*' => 'language' },
-        '561' => { 'a' => 'provenance' },
-        '581' => { '*' => 'publications_note' },
-        '600' => { 'a' => 'personal_name' },
-        '650' => { '*' => 'subject' },
-        '651' => {
-          'a' => 'coverage',
-          'y' => 'date',
-          'z' => 'coverage'
-        },
+        '246' => { subfields: 'a', field: 'title' },
+        '260' => { subfields: ['a', 'b', 'c', 'e', 'f', 'g'], field: 'publisher', join: ' ' },
+        '300' => { subfields: '*', field: 'format' },
+        '590' => { subfields: '*', field: 'description' },
+        '500' => { subfields: '*', field: 'bibliographic_note' }, # TODO: Should this be `note`?
+        '510' => { subfields: 'a', field: 'citation_note' },
+        '520' => { subfields: '*', field: 'abstract' },
+        '522' => { subfields: '*', field: 'coverage' },
+        '524' => { subfields: '*', field: 'preferred_citation_note' },
+        '530' => { subfields: '*', field: 'additional_physical_form_note' },
+        '546' => { subfields: '*', field: 'language' },
+        '561' => { subfields: 'a', field: 'provenance' },
+        '581' => { subfields: '*', field: 'publications_note' },
+        '600' => { subfields: 'a', field: 'personal_name' },
+        '650' => { subfields: '*', field: 'subject', join: ' -- ' },
+        '651' => [
+          { subfields: ['a', 'z'], field: 'coverage' },
+          { subfields: ['y'], field: 'date' }
+        ],
         '655' => {
-          'a' => 'subject',
-          'b' => 'subject',
-          'c' => 'subject',
-          'v' => 'subject',
-          'x' => 'subject',
-          'y' => 'subject',
-          'z' => 'subject',
-          '0' => 'subject',
-          '3' => 'subject',
-          '5' => 'subject',
-          '6' => 'subject',
-          '8' => 'subject'
+          subfields: ['a', 'b', 'c', 'v', 'x', 'y', 'z', '0', '3', '5', '6', '8'],
+          field: 'subject'
         },
-        '700' => { 'a' => 'personal_name' },
-        '773' => { 't' => 'collection' },
-        '730' => { '*' => 'relation' },
-        '740' => { '*' => 'relation' },
-        '752' => { '*' => 'geographic_subject' },
-        '856' => { 'u' => 'relation' }
-      }.freeze
-
-      ROLLUP_FIELDS = {
-        '260' => { 'separator' => ' ' },
-        '650' => { 'separator' => ' -- ' },
-        '752' => { 'separator' => ' -- ' }
-      }.freeze
+        '700' => { subfields: 'a', field: 'personal_name' },
+        '773' => { subfields: 't', field: 'collection' },
+        '730' => { subfields: '*', field: 'relation' },
+        '740' => { subfields: '*', field: 'relation' },
+        '752' => { subfields: '*', field: 'geographic_subject', join: ' -- ' },
+        '856' => { subfields: 'u', field: 'relation' }
+      }
     end
   end
 end
