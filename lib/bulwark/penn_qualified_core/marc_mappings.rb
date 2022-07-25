@@ -14,7 +14,7 @@ module Bulwark
       CONTROL_FIELDS = {
         '001' => { field: 'identifier' },
         '008' => { field: 'date', chars: (7..10).to_a }
-      }
+      }.freeze
 
       # Mapping of MARC fields.
       MARC_FIELDS = {
@@ -52,7 +52,7 @@ module Bulwark
         '752' => { subfields: ('a'..'h').to_a, field: 'geographic_subject', join: ' -- ' },
         '773' => { subfields: 't', field: 'collection' },
         '856' => { subfields: 'u', field: 'relation' }
-      }
+      }.freeze
     end
   end
 end

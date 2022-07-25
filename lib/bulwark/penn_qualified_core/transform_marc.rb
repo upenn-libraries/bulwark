@@ -43,14 +43,10 @@ module Bulwark
             mapped_values[field] ||= []
 
             values = element.xpath('subfield')
-
-            if selected_subfields.first != '*'
-              values = values.select { |s| selected_subfields.include?(s.attributes['code'].value) }
-            end
-
+            values = values.select { |s| selected_subfields.include?(s.attributes['code'].value) } if selected_subfields.first != '*'
             values = values.map { |v| v&.text&.strip }.delete_if(&:blank?)
 
-            if delimeter = config[:join]
+            if (delimeter = config[:join])
               mapped_values[field].push values.join(delimeter)
             else
               mapped_values[field].concat values
@@ -71,7 +67,7 @@ module Bulwark
                                            .compact
         # Cleanup
         mapped_values.transform_values! { |values| values.map(&:strip).reject(&:blank?) }
-                     .delete_if { |_,v| v.blank? }
+                     .delete_if { |_, v| v.blank? }
 
         # Join fields if they aren't multivalued.
         mapped_values.each do |k, v|
