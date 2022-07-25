@@ -12,9 +12,10 @@ module MarmiteClient
     # Get updated MARC record
     response = Faraday.get(url("/api/v2/records/#{bibnumber}/marc21?update=always"))
 
-    raise Error, "Could not retrieve MARC for #{bibnumber}. Error: #{response.body}" unless response.success?
+    return response.body if response.success?
 
-    response.body
+    error = JSON.parse(response.body)['errors'].join(' ')
+    raise Error, "Could not retrieve MARC for #{bibnumber}. Error: #{error}"
   end
 
   # Generating IIIF Presentation Manifest.
@@ -27,9 +28,10 @@ module MarmiteClient
       request.options.timeout = 1200 # Wait for up to 20 minutes for response to come back.
     end
 
-    raise Error, "Could not create IIIF Presentation Manifest for #{formatted_ark}. Error: #{response.body}" unless response.success?
+    return response.body if response.success?
 
-    response.body
+    error = JSON.parse(response.body)['errors'].join(' ')
+    raise Error, "Could not create IIIF Presentation Manifest for #{formatted_ark}. Error: #{error}"
   end
 
   # Fetches structural metadata from Marmite.
@@ -37,13 +39,12 @@ module MarmiteClient
   # @param [String] bibnumber
   # @return [String] XML containing structural metadata
   def self.structural(bibnumber)
-    Faraday.get(url("records/#{bibnumber}/create?format=structural")) # Create structural record.
+    response = Faraday.get(url("api/v2/records/#{bibnumber}/structural")) # Get structural record.
 
-    response = Faraday.get(url("records/#{bibnumber}/show?format=structural"))
+    return response.body if response.success?
 
-    raise Error, "Could not retrieve Structural for #{bibnumber}. Error: #{response.body}" unless response.success?
-
-    response.body
+    error = JSON.parse(response.body)['errors'].join(' ')
+    raise Error, "Could not retrieve Structural for #{bibnumber}. Error: #{error}"
   end
 
   def self.config

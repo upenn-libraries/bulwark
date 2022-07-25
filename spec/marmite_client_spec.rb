@@ -18,13 +18,13 @@ RSpec.describe MarmiteClient do
     context 'when request is unsuccessful' do
       before do
         stub_request(:get, "https://marmite.library.upenn.edu:9292/api/v2/records/#{bibnumber}/marc21?update=always")
-          .to_return(status: 404, body: "Record #{bibnumber} in marc21 format not found", headers: {})
+          .to_return(status: 404, body: "{\"errors\":[\"Bib not found in Alma for #{bibnumber}\"]}", headers: {})
       end
 
       it 'raises exception' do
         expect {
           described_class.marc21(bibnumber)
-        }.to raise_error(MarmiteClient::Error, "Could not retrieve MARC for #{bibnumber}. Error: Record #{bibnumber} in marc21 format not found")
+        }.to raise_error(MarmiteClient::Error, "Could not retrieve MARC for #{bibnumber}. Error: Bib not found in Alma for #{bibnumber}")
       end
     end
   end
@@ -48,13 +48,13 @@ RSpec.describe MarmiteClient do
     context 'when request is unsuccessful' do
       before do
         stub_request(:post, "https://marmite.library.upenn.edu:9292/api/v2/records/#{repo.names.fedora}/iiif_presentation")
-          .with(body: "{}").to_return(status: 404, body: "Record #{repo.names.fedora} in iiif_presentation format not found")
+          .with(body: "{}").to_return(status: 404, body: "{\"errors\": [\"Unexpected error generating IIIF manifest.\"]}")
       end
 
       it 'raises exception' do
         expect {
           described_class.iiif_presentation(repo.names.fedora, "{}")
-        }.to raise_error(MarmiteClient::Error, "Could not create IIIF Presentation Manifest for #{repo.names.fedora}. Error: Record #{repo.names.fedora} in iiif_presentation format not found")
+        }.to raise_error(MarmiteClient::Error, "Could not create IIIF Presentation Manifest for #{repo.names.fedora}. Error: Unexpected error generating IIIF manifest.")
       end
     end
   end
@@ -65,9 +65,8 @@ RSpec.describe MarmiteClient do
     context 'when request is successful' do
       let(:xml) { fixture_to_str('marmite', 'structural', "with_table_of_contents.xml") }
       before do
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=structural").to_return(status: 302)
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=structural")
-          .to_return(status: 200, body: xml, headers: {})
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/api/v2/records/#{bibnumber}/structural")
+          .to_return(status: 201, body: xml, headers: {})
       end
 
       it 'returns expected XML' do
@@ -77,15 +76,14 @@ RSpec.describe MarmiteClient do
 
     context 'when request is unsuccessful' do
       before do
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/create?format=structural").to_return(status: 404)
-        stub_request(:get, "https://marmite.library.upenn.edu:9292/records/#{bibnumber}/show?format=structural")
-          .to_return(status: 404, body: "Record #{bibnumber} in structural format not found", headers: {})
+        stub_request(:get, "https://marmite.library.upenn.edu:9292/api/v2/records/#{bibnumber}/structural")
+          .to_return(status: 404, body: "{\"errors\":[\"Record not found.\"]}", headers: {})
       end
 
       it 'raises exception' do
         expect {
           described_class.structural(bibnumber)
-        }.to raise_error(MarmiteClient::Error, "Could not retrieve Structural for #{bibnumber}. Error: Record #{bibnumber} in structural format not found")
+        }.to raise_error(MarmiteClient::Error, "Could not retrieve Structural for #{bibnumber}. Error: Record not found.")
       end
     end
   end
