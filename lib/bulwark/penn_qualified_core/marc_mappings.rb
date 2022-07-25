@@ -10,21 +10,26 @@ module Bulwark
         geographic_subject provenance
       ].freeze
 
+      # Mapping of Control fields
+      CONTROL_FIELDS = {
+        '001' => { field: 'identifier' },
+        '008' => { field: 'date', chars: (7..10).to_a }
+      }
+
       # Mapping of MARC fields.
-      # Note: As of right now, there is one mapping per field. In future more mappings could be added per
-      #       field by converting the hashes to an array of hashes and making the appropriate code changes.
       MARC_FIELDS = {
         '026' => { subfields: 'e', field: 'identifier' },
         '035' => { subfields: 'a', field: 'identifier' },
         '099' => { subfields: 'a', field: 'call_number' },
-        '100' => { subfields: 'a', field: 'creator' },
-        '110' => { subfields: 'a', field: 'corporate_name' },
+        '100' => { subfields: ('a'..'z').to_a, field: 'creator', join: ' ' },
+        '110' => { subfields: ('a'..'z').to_a, field: 'corporate_name', join: ' ' },
         '245' => {
           subfields: ['a', 'b', 'c', 'f', 'g', 'h', 'k', 'n', 'p', 's'],
           field: 'title'
         },
         '246' => { subfields: 'a', field: 'title' },
         '260' => { subfields: ['a', 'b', 'c', 'e', 'f', 'g'], field: 'publisher', join: ' ' },
+        '264' => { subfields: ['a', 'b', 'c'], field: 'publisher', join: ' ' },
         '300' => { subfields: '*', field: 'format' },
         '590' => { subfields: '*', field: 'description' },
         '500' => { subfields: '*', field: 'bibliographic_note' }, # TODO: Should this be `note`?
@@ -37,20 +42,15 @@ module Bulwark
         '561' => { subfields: 'a', field: 'provenance' },
         '581' => { subfields: '*', field: 'publications_note' },
         '600' => { subfields: 'a', field: 'personal_name' },
-        '650' => { subfields: '*', field: 'subject', join: ' -- ' },
-        '651' => [
-          { subfields: ['a', 'z'], field: 'coverage' },
-          { subfields: ['y'], field: 'date' }
-        ],
-        '655' => {
-          subfields: ['a', 'b', 'c', 'v', 'x', 'y', 'z', '0', '3', '5', '6', '8'],
-          field: 'subject'
-        },
-        '700' => { subfields: 'a', field: 'personal_name' },
+        '650' => { subfields: ('a'..'z').to_a, field: 'subject', join: ' -- ' },
+        '651' => { subfields: ['a', 'y', 'z'], field: 'coverage', join: ' -- ' },
+        '655' => { subfields: ('a'..'z').to_a, field: 'subject', join: ' -- ' },
+        '700' => { subfields: ('a'..'x').to_a, field: 'personal_name', join: ' ' },
+        '710' => { subfields: ('a'..'x').to_a, field: 'corporate_name', join: ' ' },
+        '730' => { subfields: ('a'..'x').to_a, field: 'relation' },
+        '740' => { subfields: ('a'..'x').to_a, field: 'relation' },
+        '752' => { subfields: ('a'..'h').to_a, field: 'geographic_subject', join: ' -- ' },
         '773' => { subfields: 't', field: 'collection' },
-        '730' => { subfields: '*', field: 'relation' },
-        '740' => { subfields: '*', field: 'relation' },
-        '752' => { subfields: '*', field: 'geographic_subject', join: ' -- ' },
         '856' => { subfields: 'u', field: 'relation' }
       }
     end

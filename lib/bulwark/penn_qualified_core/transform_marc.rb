@@ -10,6 +10,26 @@ module Bulwark
 
         mapped_values = {}
 
+        # Map control fields
+        data.xpath('//records/record/controlfield').each do |element|
+          tag = element.attributes['tag'].value
+          mapping_config = MarcMappings::CONTROL_FIELDS[tag]
+
+          next unless mapping_config.present?
+
+          Array.wrap(mapping_config).each do |config|
+            field = config[:field]
+
+            mapped_values[field] ||= []
+
+            text = element.text
+            text = config[:chars].map { |i| text.slice(i) }.join if config[:chars]
+
+            mapped_values[field].push(text)
+          end
+        end
+
+        # Map MARC fields
         data.xpath('//records/record/datafield').each do |element|
           tag = element.attributes['tag'].value
           mapping_config = MarcMappings::MARC_FIELDS[tag]
@@ -45,9 +65,7 @@ module Bulwark
           mapped_values['item_type'] = ['Books']
         end
 
-        # Adding bibnumber and call number
-        bibnumber = data.at_xpath('//records/record/controlfield[@tag=001]').text
-        mapped_values['identifier'] ||= ["#{Settings.digital_object.repository_prefix}_#{bibnumber}"]
+        # Adding call number
         mapped_values['call_number'] = data.xpath('//records/record/holdings/holding/call_number')
                                            .map(&:text)
                                            .compact
