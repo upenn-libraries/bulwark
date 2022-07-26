@@ -712,9 +712,9 @@ RSpec.describe Bulwark::Import do
         {
           'bibnumber' => [bibnumber],
           'identifier' => [
-            'sts- n.r* n.n. di12 (3) 1598 (A)', '(OCoLC)ocm16660686', '(OCoLC)16660686', '2347850', '(PU)2347850-penndb-Voyager'
+            '9923478503503681', 'sts- n.r* n.n. di12 (3) 1598 (A)', '(OCoLC)ocm16660686', '(OCoLC)16660686', '2347850', '(PU)2347850-penndb-Voyager'
           ],
-          'creator' => ['Ercker, Lazarus,'],
+          'creator' => ['Ercker, Lazarus, d. 1594.'],
           'title' => [
             "Beschreibung aller fürnemisten Mineralischen Ertzt vnnd Berckwercksarten :",
             "wie dieselbigen vnd eine jede in Sonderheit jrer Natur vnd Eygenschafft nach, auff alle Metalla probirt, vnd im kleinen Fewr sollen versucht werden, mit Erklärung etlicher fürnemer nützlicher Schmeltzwerck im grossen Feuwer, auch Scheidung Goldts, Silbers, vnd anderer Metalln, sampt einem Bericht des Kupffer Saigerns, Messing brennens, vnd Salpeter Siedens, auch aller saltzigen Minerischen proben, vnd was denen allen anhengig : in fünff Bücher verfast, dessgleichen zuvorn niemals in Druck kommen ... : auffs newe an vielen Orten mit besserer Aussführung, vnd mehreren Figurn erklärt /",
@@ -727,14 +727,16 @@ RSpec.describe Bulwark::Import do
           ],
           'provenance' => ["Smith, Edgar Fahs, 1854-1928 (autograph, 1917)", "Wright, H. (autograph, 1870)"],
           'description' => ["Penn Libraries copy has Edgar Fahs Smith's autograph on front free endpaper; autograph of H. Wright on front free endpaper; effaced ms. inscription (autograph?) on title leaf."],
-          'subject' => ['Metallurgy -- Early works to 1800.', 'Assaying -- Early works to 1800.', 'PU', 'PU', 'PU'],
+          'subject' => ['Metallurgy -- Early works to 1800.', 'Assaying -- Early works to 1800.'],
           'date' => ['1598'],
-          'personal_name' => ['Feyerabend, Johann,'],
+          'personal_name' => ['Feyerabend, Johann, 1550-1599, printer.'],
           'geographic_subject' => ['Germany -- Frankfurt am Main.'],
           'collection' => ['Edgar Fahs Smith Memorial Collection (University of Pennsylvania)'],
           'call_number' => ['Folio TN664 .E7 1598'],
           'relation' => ['https://colenda.library.upenn.edu/catalog/81431-p3df6k90j'],
-          'item_type' => ['Manuscript']
+          'item_type' => ['Manuscript'],
+          'corporate_name' => ["Edgar Fahs Smith Memorial Collection (University of Pennsylvania)"],
+          'coverage' => ["1598"]
         }
       end
       let(:structural_metadata) do

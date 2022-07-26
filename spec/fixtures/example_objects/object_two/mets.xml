@@ -19,15 +19,14 @@
           </mods:originInfo>
           <mods:language/>
           <mods:name type='personal'>
-            <mods:namePart>Feyerabend, Johann,</mods:namePart>
+            <mods:namePart>Feyerabend, Johann, 1550-1599, printer.</mods:namePart>
           </mods:name>
-          <mods:name type='corporate'/>
+          <mods:name type='corporate'>
+            <mods:namePart>Edgar Fahs Smith Memorial Collection (University of Pennsylvania)</mods:namePart>
+          </mods:name>
           <mods:subject>
             <mods:topic>Metallurgy -- Early works to 1800.</mods:topic>
             <mods:topic>Assaying -- Early works to 1800.</mods:topic>
-            <mods:topic>PU</mods:topic>
-            <mods:topic>PU</mods:topic>
-            <mods:topic>PU</mods:topic>
           </mods:subject>
           <mods:subject>
             <mods:geographic>Germany -- Frankfurt am Main.</mods:geographic>

@@ -2,12 +2,14 @@
 <root>
   <record>
     <uuid>ark:/81431/p3df6k90j</uuid>
+    <identifier>9923478503503681</identifier>
     <identifier>sts- n.r* n.n. di12 (3) 1598 (A)</identifier>
     <identifier>(OCoLC)ocm16660686</identifier>
     <identifier>(OCoLC)16660686</identifier>
     <identifier>2347850</identifier>
     <identifier>(PU)2347850-penndb-Voyager</identifier>
-    <creator>Ercker, Lazarus,</creator>
+    <date>1598</date>
+    <creator>Ercker, Lazarus, d. 1594.</creator>
     <title>Beschreibung aller fürnemisten Mineralischen Ertzt vnnd Berckwercksarten :</title>
     <title>wie dieselbigen vnd eine jede in Sonderheit jrer Natur vnd Eygenschafft nach, auff alle Metalla probirt, vnd im kleinen Fewr sollen versucht werden, mit Erklärung etlicher fürnemer nützlicher Schmeltzwerck im grossen Feuwer, auch Scheidung Goldts, Silbers, vnd anderer Metalln, sampt einem Bericht des Kupffer Saigerns, Messing brennens, vnd Salpeter Siedens, auch aller saltzigen Minerischen proben, vnd was denen allen anhengig : in fünff Bücher verfast, dessgleichen zuvorn niemals in Druck kommen ... : auffs newe an vielen Orten mit besserer Aussführung, vnd mehreren Figurn erklärt /</title>
     <title>durch den weitberühmten Lazarum Erckern, der Röm. Kay. May. Obersten Bergkmeister vnd Buchhalter in Königreich Böhem  ...</title>
@@ -19,17 +21,15 @@
     <description>Penn Libraries copy has Edgar Fahs Smith's autograph on front free endpaper; autograph of H. Wright on front free endpaper; effaced ms. inscription (autograph?) on title leaf.</description>
     <subject>Metallurgy -- Early works to 1800.</subject>
     <subject>Assaying -- Early works to 1800.</subject>
-    <subject>PU</subject>
-    <subject>PU</subject>
-    <subject>PU</subject>
-    <date>1598</date>
-    <personal_name>Feyerabend, Johann,</personal_name>
+    <coverage>1598</coverage>
+    <personal_name>Feyerabend, Johann, 1550-1599, printer.</personal_name>
+    <corporate_name>Edgar Fahs Smith Memorial Collection (University of Pennsylvania)</corporate_name>
     <geographic_subject>Germany -- Frankfurt am Main.</geographic_subject>
     <collection>Edgar Fahs Smith Memorial Collection (University of Pennsylvania)</collection>
     <relation>https://colenda.library.upenn.edu/catalog/81431-p3df6k90j</relation>
+    <item_type>Manuscript</item_type>
     <call_number>Folio TN664 .E7 1598</call_number>
     <bibnumber>9923478503503681</bibnumber>
-    <item_type>Manuscript</item_type>
     <pages>
       <page>
         <display>paged</display>
