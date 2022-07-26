@@ -44,6 +44,18 @@ module DigitalObject
       source.save!
     end
 
+    # Update metadata retrieved from catalog.
+    def update_catalog_metadata
+      source = metadata_builder.metadata_source.find_by(source_type: 'descriptive')
+      raise 'Descriptive metadata source not available' unless source
+
+      bibnumber = source.original_mappings['bibnumber']&.first
+      raise 'Descriptive metadata does not contain bibnumber' if bibnumber.blank?
+
+      source.set_metadata_mappings(clone_location)
+      source.save!
+    end
+
     def add_structural_metadata(metadata)
       if (metadata_source = metadata_builder.metadata_source.find_by(source_type: 'structural'))
         struct_metadata_file = metadata_source.path
