@@ -7,7 +7,7 @@ module Bulwark
         abstract contributor coverage creator date description identifier
         includes language publisher relation rights source
         subject title type collection personal_name corporate_name
-        geographic_subject provenance
+        geographic_subject provenance notes
       ].freeze
 
       # Mapping of Control fields
@@ -25,14 +25,15 @@ module Bulwark
         '110' => { subfields: ('a'..'z').to_a, field: 'corporate_name', join: ' ' },
         '245' => {
           subfields: ['a', 'b', 'c', 'f', 'g', 'h', 'k', 'n', 'p', 's'],
-          field: 'title'
+          field: 'title',
+          join: ' '
         },
         '246' => { subfields: 'a', field: 'title' },
         '260' => { subfields: ['a', 'b', 'c', 'e', 'f', 'g'], field: 'publisher', join: ' ' },
         '264' => { subfields: ['a', 'b', 'c'], field: 'publisher', join: ' ' },
         '300' => { subfields: '*', field: 'format' },
         '590' => { subfields: '*', field: 'description' },
-        '500' => { subfields: '*', field: 'bibliographic_note' }, # TODO: Should this be `note`?
+        '500' => { subfields: 'a', field: 'notes' },
         '510' => { subfields: 'a', field: 'citation_note' },
         '520' => { subfields: '*', field: 'abstract' },
         '522' => { subfields: '*', field: 'coverage' },

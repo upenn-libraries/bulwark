@@ -716,15 +716,11 @@ RSpec.describe Bulwark::Import do
           ],
           'creator' => ['Ercker, Lazarus, d. 1594.'],
           'title' => [
-            "Beschreibung aller fürnemisten Mineralischen Ertzt vnnd Berckwercksarten :",
-            "wie dieselbigen vnd eine jede in Sonderheit jrer Natur vnd Eygenschafft nach, auff alle Metalla probirt, vnd im kleinen Fewr sollen versucht werden, mit Erklärung etlicher fürnemer nützlicher Schmeltzwerck im grossen Feuwer, auch Scheidung Goldts, Silbers, vnd anderer Metalln, sampt einem Bericht des Kupffer Saigerns, Messing brennens, vnd Salpeter Siedens, auch aller saltzigen Minerischen proben, vnd was denen allen anhengig : in fünff Bücher verfast, dessgleichen zuvorn niemals in Druck kommen ... : auffs newe an vielen Orten mit besserer Aussführung, vnd mehreren Figurn erklärt /",
-            "durch den weitberühmten Lazarum Erckern, der Röm. Kay. May. Obersten Bergkmeister vnd Buchhalter in Königreich Böhem  ..."
+            "Beschreibung aller fürnemisten Mineralischen Ertzt vnnd Berckwercksarten : wie dieselbigen vnd eine jede in Sonderheit jrer Natur vnd Eygenschafft nach, auff alle Metalla probirt, vnd im kleinen Fewr sollen versucht werden, mit Erklärung etlicher fürnemer nützlicher Schmeltzwerck im grossen Feuwer, auch Scheidung Goldts, Silbers, vnd anderer Metalln, sampt einem Bericht des Kupffer Saigerns, Messing brennens, vnd Salpeter Siedens, auch aller saltzigen Minerischen proben, vnd was denen allen anhengig : in fünff Bücher verfast, dessgleichen zuvorn niemals in Druck kommen ... : auffs newe an vielen Orten mit besserer Aussführung, vnd mehreren Figurn erklärt / durch den weitberühmten Lazarum Erckern, der Röm. Kay. May. Obersten Bergkmeister vnd Buchhalter in Königreich Böhem  ..."
           ],
           'publisher' => ["Gedruckt zu Franckfurt am Mayn : Durch Johan Feyerabendt, 1598."],
           'format' => ['[4], 134, [4] leaves : ill. ; 31 cm. (fol.)'],
-          'bibliographic_note' => [
-            'Leaves printed on both sides. Signatures: )(⁴ A-Z⁴ a-k⁴ l⁶. The last leaf is blank. Woodcut illustrations, initials and tail-pieces. Title page printed in black and red. Printed marginalia. "Erratum" on verso of last printed leaf. Online version available via Colenda https://colenda.library.upenn.edu/catalog/81431-p3df6k90j'
-          ],
+          "notes" => ['Leaves printed on both sides.', 'Signatures: )(⁴ A-Z⁴ a-k⁴ l⁶.', 'The last leaf is blank.', 'Woodcut illustrations, initials and tail-pieces.', 'Title page printed in black and red.', 'Printed marginalia.', '"Erratum" on verso of last printed leaf.', 'Online version available via Colenda'],
           'provenance' => ["Smith, Edgar Fahs, 1854-1928 (autograph, 1917)", "Wright, H. (autograph, 1870)"],
           'description' => ["Penn Libraries copy has Edgar Fahs Smith's autograph on front free endpaper; autograph of H. Wright on front free endpaper; effaced ms. inscription (autograph?) on title leaf."],
           'subject' => ['Metallurgy -- Early works to 1800.', 'Assaying -- Early works to 1800.'],
