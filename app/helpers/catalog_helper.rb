@@ -17,11 +17,6 @@ module CatalogHelper
     current_user != nil
   end
 
-  def multivalue_no_separator(options={})
-    options[:separator] = ' '
-    html_entity(options)
-  end
-
   def html_entity(options={})
     separator = options[:separator].nil? ? '; ' : "#{options[:separator]}"
     option_vals = []
