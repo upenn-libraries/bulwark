@@ -31,6 +31,16 @@
           Regenerate IIIF manifest only.
         </td>
       </tr>
+      <tr>
+        <td>
+          <%= bootstrap_form_tag(url: refresh_catalog_metadata_admin_digital_object_path(@digital_object), method: :post) do |f| %>
+            <%= f.submit 'Refresh Catalog Metadata', class: 'btn btn-primary', disabled: @digital_object.bibid.blank? %>
+          <% end %>
+        </td>
+        <td>
+          If a bibnumber is included in the descriptive metadata, refreshes metadata from catalog.
+        </td>
+      </tr>
     </tbody>
   </table>
 </div>
