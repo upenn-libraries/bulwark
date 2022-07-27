@@ -81,5 +81,17 @@ namespace :bulwark do
         puts "  Database Record: #{success ? 'Removed' : "Error deleting id=#{repo.id}"}\n"
       end
     end
+
+    desc 'Refresh catalog metadata for all records that include it'
+    task refresh_catalog_metadata: :environment do
+      Repo.includes(:metadata_builder).find_in_batches do |repos|
+        repos.each do |repo|
+          bibnumber = repo.bibid
+          next unless bibnumber
+
+          RefreshCatalogMetadataJob.perform_later(repo)
+        end
+      end
+    end
   end
 end
