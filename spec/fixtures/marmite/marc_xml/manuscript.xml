@@ -1,9 +1,10 @@
-<?xml version="1.0"?>
+
+<?xml version="1.0" encoding="UTF-8"?>
 <marc:records xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
   <marc:record>
-    <marc:leader>02615ctm a2200457Ia 4500</marc:leader>
+    <marc:leader>03013ctm a2200529Ia 4500</marc:leader>
     <marc:controlfield tag="001">9961263533503681</marc:controlfield>
-    <marc:controlfield tag="005">20171208142802.0</marc:controlfield>
+    <marc:controlfield tag="005">20220803105837.0</marc:controlfield>
     <marc:controlfield tag="008">140318q14751499pau           000 0 lat d</marc:controlfield>
     <marc:datafield ind1=" " ind2=" " tag="035">
       <marc:subfield code="a">(OCoLC)ocn873818335</marc:subfield>
@@ -17,8 +18,8 @@
     <marc:datafield ind1=" " ind2=" " tag="040">
       <marc:subfield code="a">PAULM</marc:subfield>
       <marc:subfield code="b">eng</marc:subfield>
-      <marc:subfield code="c">PAULM</marc:subfield>
       <marc:subfield code="e">amremm</marc:subfield>
+      <marc:subfield code="c">PAULM</marc:subfield>
       <marc:subfield code="d">PAULM</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2=" " tag="049">
@@ -34,10 +35,10 @@
       <marc:subfield code="a">Sigebert,</marc:subfield>
       <marc:subfield code="c">of Gembloux,</marc:subfield>
       <marc:subfield code="d">approximately 1030-1112.</marc:subfield>
+      <marc:subfield code="0">http://id.loc.gov/authorities/names/n87881954</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1="1" ind2="0" tag="245">
-      <marc:subfield code="a">[Partial copy of Chronicon]</marc:subfield>
-      <marc:subfield code="h">[manuscript].</marc:subfield>
+      <marc:subfield code="a">[Partial copy of Chronicon].</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1="3" ind2="8" tag="246">
       <marc:subfield code="a">Initium Chronici Siceberti.</marc:subfield>
@@ -49,19 +50,37 @@
     <marc:datafield ind1=" " ind2=" " tag="300">
       <marc:subfield code="a">10 leaves :</marc:subfield>
       <marc:subfield code="b">paper ;</marc:subfield>
-      <marc:subfield code="c">263 x 190 mm. bound to 218 x 155 mm.</marc:subfield>
+      <marc:subfield code="c">263 x 190 mm bound to 218 x 155 mm</marc:subfield>
     </marc:datafield>
-    <marc:datafield ind1=" " ind2=" " tag="500">
-      <marc:subfield code="a">Ms. gathering.</marc:subfield>
+    <marc:datafield ind1=" " ind2=" " tag="336">
+      <marc:subfield code="a">text</marc:subfield>
+      <marc:subfield code="b">txt</marc:subfield>
+      <marc:subfield code="2">rdacontent</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="337">
+      <marc:subfield code="a">unmediated</marc:subfield>
+      <marc:subfield code="b">n</marc:subfield>
+      <marc:subfield code="2">rdamedia</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="338">
+      <marc:subfield code="a">volume</marc:subfield>
+      <marc:subfield code="b">nc</marc:subfield>
+      <marc:subfield code="2">rdacarrier</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2=" " tag="500">
       <marc:subfield code="a">Title supplied by cataloger.</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2=" " tag="500">
-      <marc:subfield code="a">Collation:  Paper, 10; 1&#xB2; 2&#x2078; (f. 7-10 blank).</marc:subfield>
+      <marc:subfield code="a">Origin:  Probably written in Belgium, possibly in Gembloux (inscription on title page of printed work, Bibliotheca Gemblacensis), in the late 15th century (Zacour-Hirsch).</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2=" " tag="500">
-      <marc:subfield code="a">Layout:  Written in 47-50 long lines; frame-ruled in lead.</marc:subfield>
+      <marc:subfield code="a">Ms. gathering.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Collation:  Paper, 10; 1² 2⁸ (f. 7-10 blank).</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="500">
+      <marc:subfield code="a">Binding:  Bound with Strabo's Geographia (Paris:  Gourmont, 1512) in 18th-century calf including gilt spine title Initium Chronic[i] Sicebert[i] MS.</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2=" " tag="500">
       <marc:subfield code="a">Script:  Written in Gothic cursive script.</marc:subfield>
@@ -70,10 +89,7 @@
       <marc:subfield code="a">Decoration: 4-line initial (f. 2r) and 3-line initial (f. 1r) in red; paragraph marks in red followed by initials slashed with red on first page (f. 1r).</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2=" " tag="500">
-      <marc:subfield code="a">Binding:  Bound with Strabo's Geographia (Paris:  Gourmont, 1512) in 18th-century calf including gilt spine title Initium Chronic[i] Sicebert[i] MS.</marc:subfield>
-    </marc:datafield>
-    <marc:datafield ind1=" " ind2=" " tag="500">
-      <marc:subfield code="a">Origin:  Probably written in Belgium, possibly in Gembloux (inscription on title page of printed work, Bibliotheca Gemblacensis), in the late 15th century (Zacour-Hirsch).</marc:subfield>
+      <marc:subfield code="a">Layout:  Written in 47-50 long lines; frame-ruled in lead.</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1="4" ind2=" " tag="510">
       <marc:subfield code="a">Described in Zacour, Norman P. and Hirsch, Rudolf. Catalogue of Manuscripts in the Libraries of the University of Pennsylvania to 1800 (Philadelphia: University of Pennsylvania Press, 1965), Supplement A (1) Library Chronicle 35 (1969),</marc:subfield>
@@ -88,20 +104,30 @@
     <marc:datafield ind1="1" ind2=" " tag="561">
       <marc:subfield code="a">Sold by Bernard M. Rosenthal (New York), 1964.</marc:subfield>
     </marc:datafield>
+    <marc:datafield ind1=" " ind2="7" tag="648">
+      <marc:subfield code="a">Early works to 1800.</marc:subfield>
+      <marc:subfield code="2">fast</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="7" tag="650">
+      <marc:subfield code="a">World history.</marc:subfield>
+      <marc:subfield code="2">fast</marc:subfield>
+      <marc:subfield code="0">http://id.worldcat.org/fast/1181345</marc:subfield>
+    </marc:datafield>
     <marc:datafield ind1=" " ind2="0" tag="650">
       <marc:subfield code="a">World history</marc:subfield>
       <marc:subfield code="v">Early works to 1800.</marc:subfield>
+      <marc:subfield code="0">http://id.loc.gov/authorities/subjects/sh85148202</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2="7" tag="655">
       <marc:subfield code="a">Chronicles.</marc:subfield>
       <marc:subfield code="2">aat</marc:subfield>
-    </marc:datafield>
-    <marc:datafield ind1=" " ind2="0" tag="655">
-      <marc:subfield code="a">Manuscripts, Latin</marc:subfield>
-      <marc:subfield code="y">15th century.</marc:subfield>
+      <marc:subfield code="0">http://vocab.getty.edu/aat/300026361</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2="0" tag="655">
       <marc:subfield code="a">Manuscripts, Renaissance.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="0" tag="655">
+      <marc:subfield code="a">Manuscripts, Latin.</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1="0" ind2=" " tag="700">
       <marc:subfield code="a">Sigebert,</marc:subfield>
@@ -116,8 +142,11 @@
       <marc:subfield code="j">Folio GrC St812 Ef512g</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1="4" ind2="1" tag="856">
-      <marc:subfield code="z">Facsimile</marc:subfield>
-      <marc:subfield code="u">http://hdl.library.upenn.edu/1017/d/medren/9961263533503681</marc:subfield>
+      <marc:subfield code="z">Digital facsimile for browsing (Colenda)</marc:subfield>
+      <marc:subfield code="u">https://colenda.library.upenn.edu/catalog/81431-p3833nf29</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="902">
+      <marc:subfield code="a">MARCIVE 2022</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2=" " tag="994">
       <marc:subfield code="a">C0</marc:subfield>
