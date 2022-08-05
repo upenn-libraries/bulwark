@@ -61,6 +61,10 @@ module Bulwark
           mapped_values['item_type'] = ['Books']
         end
 
+        # Converting language codes to english name and remove duplicates
+        languages = mapped_values.fetch('language', [])
+        mapped_values['language'] = languages.map { |l| ISO_639.find_by_code(l)&.english_name }.compact.uniq
+
         # Adding call number
         mapped_values['call_number'] = data.xpath('//records/record/holdings/holding/call_number')
                                            .map(&:text)
@@ -98,7 +102,8 @@ module Bulwark
       # Returns true if the MARC data describes the item as a Book
       def self.book?(data)
         # Checking for `a` in 7th value of the leader field
-        leader = data.at_xpath("//records/record/leader").text
+        leader = data.at_xpath("//records/record/leader")&.text
+        return if leader.blank?
         leader[6] == 'a'
       end
     end

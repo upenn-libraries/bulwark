@@ -10,12 +10,14 @@
       <METS:xmlData>
         <mods:mods>
           <mods:titleInfo>
-            <mods:title>Beschreibung aller fu&#x308;rnemisten Mineralischen Ertzt vnnd Berckwercksarten : wie dieselbigen vnd eine jede in Sonderheit jrer Natur vnd Eygenschafft nach, auff alle Metalla probirt, vnd im kleinen Fewr sollen versucht werden, mit Erkla&#x308;rung etlicher fu&#x308;rnemer nu&#x308;tzlicher Schmeltzwerck im grossen Feuwer, auch Scheidung Goldts, Silbers, vnd anderer Metalln, sampt einem Bericht des Kupffer Saigerns, Messing brennens, vnd Salpeter Siedens, auch aller saltzigen Minerischen proben, vnd was denen allen anhengig : in fu&#x308;nff Bu&#x308;cher verfast, dessgleichen zuvorn niemals in Druck kommen ... : auffs newe an vielen Orten mit besserer Aussfu&#x308;hrung, vnd mehreren Figurn erkla&#x308;rt / durch den weitberu&#x308;hmten Lazarum Erckern, der Ro&#x308;m. Kay. May. Obersten Bergkmeister vnd Buchhalter in Ko&#x308;nigreich Bo&#x308;hem  ...</mods:title>
+            <mods:title>Beschreibung aller fu&#x308;rnemisten Mineralischen Ertzt vnnd Berckwercksarten : wie dieselbigen vnd eine jede in Sonderheit jrer Natur vnd Eygenschafft nach, auff alle Metalla probirt, vnd im kleinen Fewr sollen versucht werden, mit Erkla&#x308;rung etlicher fu&#x308;rnemer nu&#x308;tzlicher Schmeltzwerck im grossen Feuwer, auch Scheidung Goldts, Silbers, vnd anderer Metalln, sampt einem Bericht des Kupffer Saigerns, Messing brennens, vnd Salpeter Siedens, auch aller saltzigen Minerischen proben, vnd was denen allen anhengig : in fu&#x308;nff Bu&#x308;cher verfast, dessgleichen zuvorn niemals in Druck kommen ... : auffs newe an vielen Orten mit besserer Aussfu&#x308;hrung, vnd mehreren Figurn erkla&#x308;rt / durch den weitberu&#x308;hmten Lazarum Erckern, der Ro&#x308;m. Kay. May. Obersten Bergkmeister vnd Buchhalter in Ko&#x308;nigreich Bo&#x308;hem c. ...</mods:title>
           </mods:titleInfo>
           <mods:originInfo>
             <mods:issuance>monographic</mods:issuance>
           </mods:originInfo>
-          <mods:language/>
+          <mods:language>
+            <mods:languageTerm type="text" authority="iso639-2b" authorityURI="http://id.loc.gov/vocabulary/iso639-2.html" valueURI="http://id.loc.gov/vocabulary/iso639-2/ita">German</mods:languageTerm>
+          </mods:language>
           <mods:name type='personal'>
             <mods:namePart>Feyerabend, Johann, 1550-1599, printer.</mods:namePart>
           </mods:name>
@@ -24,7 +26,9 @@
           </mods:name>
           <mods:subject>
             <mods:topic>Metallurgy -- Early works to 1800.</mods:topic>
+            <mods:topic>Assaying.</mods:topic>
             <mods:topic>Assaying -- Early works to 1800.</mods:topic>
+            <mods:topic>Metallurgy.</mods:topic>
           </mods:subject>
           <mods:subject>
             <mods:geographic>Germany -- Frankfurt am Main.</mods:geographic>
