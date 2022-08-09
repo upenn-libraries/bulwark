@@ -286,7 +286,9 @@ class Repo < ActiveRecord::Base
       'has_model_ssim' => ['Manuscript'],
       'unique_identifier_tesim' => unique_identifier,
       'system_create_dtsi' => first_published_at.utc.iso8601,
-      'system_modified_dtsi' => last_published_at.utc.iso8601
+      'system_modified_dtsi' => last_published_at.utc.iso8601,
+      'thumbnail_location_ssi' => thumbnail_location,
+      'bibnumber_ssi' => bibid
     }
 
     MetadataSource::VALID_DESCRIPTIVE_METADATA_FIELDS.each do |field|

@@ -227,6 +227,7 @@ RSpec.describe Repo, type: :model do
     let(:document) do
       {
         "active_fedora_model_ssi" => "Manuscript",
+        "bibnumber_ssi" => nil,
         "call_number_sim" => ["Ms. Coll 200 box 180 folder 8576 item 2"],
         "call_number_ssim" => ["Ms. Coll 200 box 180 folder 8576 item 2"],
         "call_number_tesim" => ["Ms. Coll 200 box 180 folder 8576 item 2"],
@@ -264,6 +265,7 @@ RSpec.describe Repo, type: :model do
         "rights_tesim" => ["https://creativecommons.org/publicdomain/zero/1.0/"],
         "system_create_dtsi" => repo.first_published_at.utc.iso8601,
         "system_modified_dtsi" => repo.last_published_at.utc.iso8601,
+        "thumbnail_location_ssi" => nil,
         "title_sim" => ["[Concert program 1941-12-20]"],
         "title_ssim" => ["[Concert program 1941-12-20]"],
         "title_tesim" => ["[Concert program 1941-12-20]"],
