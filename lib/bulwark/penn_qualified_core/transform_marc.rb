@@ -61,14 +61,18 @@ module Bulwark
           mapped_values['item_type'] = ['Books']
         end
 
-        # Converting language codes to english name and remove duplicates
+        # Converting language codes to english name.
         languages = mapped_values.fetch('language', [])
-        mapped_values['language'] = languages.map { |l| ISO_639.find_by_code(l)&.english_name }.compact.uniq
+        mapped_values['language'] = languages.map { |l| ISO_639.find_by_code(l)&.english_name }.compact
 
         # Adding call number
         mapped_values['call_number'] = data.xpath('//records/record/holdings/holding/call_number')
                                            .map(&:text)
                                            .compact
+
+        # Removing duplicate values from selected fields.
+        %w[subject corporate_name personal_name language].each { |f| mapped_values[f]&.uniq! }
+
         # Cleanup
         mapped_values.transform_values! { |values| values.map(&:strip).reject(&:blank?) }
                      .delete_if { |_, v| v.blank? }
