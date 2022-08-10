@@ -289,7 +289,7 @@ class Repo < ActiveRecord::Base
       'system_modified_dtsi' => last_published_at.utc.iso8601,
       'thumbnail_location_ssi' => thumbnail_location,
       'bibnumber_ssi' => bibid,
-      'has_images_bsi' => has_images? ? 'T' : nil,
+      'has_images_bsi' => has_images? ? 'T' : nil
     }
 
     MetadataSource::VALID_DESCRIPTIVE_METADATA_FIELDS.each do |field|
