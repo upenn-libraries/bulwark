@@ -8,9 +8,17 @@ module CatalogHelper
   end
 
   def thumbnail(document, options)
-    repo = Repo.find_by(unique_identifier: document['unique_identifier_tesim'].first)
-    return '' if repo.nil? || repo.thumbnail_location.blank?
-    image_tag download_link(*repo.thumbnail_location.split('/', 2))
+    thumbnail_location = document.fetch('thumbnail_location_ssi', nil)
+
+    # Fetching from record if not present in Solr document.
+    if thumbnail_location.nil?
+      repo = Repo.find_by(unique_identifier: document.unique_identifier)
+      thumbnail_location = repo&.thumbnail_location
+    end
+
+    return if thumbnail_location.blank?
+
+    image_tag download_link(*thumbnail_location.split('/', 2))
   end
 
   def current_user?

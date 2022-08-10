@@ -8,11 +8,11 @@
   <div id="doc_<%= @document.id.to_s.parameterize %>">
     <%= render_document_partials @document, blacklight_config.view_config(:show).partials %>
   </div>
-  <% catalog_link = render_catalog_link label: 'View Full Catalog Record' %>
+  <% catalog_link = render_catalog_link @document, label: 'View Full Catalog Record' %>
   <% if catalog_link.present? %>
-  <div id="view-full-record-area">
-    <%= catalog_link %>
-  </div>
+    <div id="view-full-record-area">
+      <%= catalog_link %>
+    </div>
   <% end %>
 </div>
 
