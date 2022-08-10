@@ -18,7 +18,7 @@ module ApplicationHelper
   end
 
   def render_audio_player
-    repo = Repo.find_by(unique_identifier: @document.id.reverse_fedorafy, new_format: true)
+    repo = Repo.find_by(unique_identifier: @document.unique_identifier, new_format: true)
     return '' if repo.nil?
 
     assets = repo.assets.where(mime_type: ['audio/vnd.wave'])
@@ -31,7 +31,7 @@ module ApplicationHelper
 
   # Rendering files that don't have a specific viewer that should be used. These files just get a download link.
   def render_other
-    repo = Repo.find_by(unique_identifier: @document.id.reverse_fedorafy, new_format: true)
+    repo = Repo.find_by(unique_identifier: @document.unique_identifier, new_format: true)
     return '' if repo.nil?
 
     assets = repo.assets.where(mime_type: ['application/pdf', 'application/gzip'])
@@ -44,14 +44,14 @@ module ApplicationHelper
   end
 
   def render_uv
-    repo = Repo.find_by(unique_identifier: @document.id.reverse_fedorafy)
+    repo = Repo.find_by(unique_identifier: @document.unique_identifier)
     partials = ''
     partials += render :partial => 'other_display/uv'
     return partials.html_safe if repo.has_images?
   end
 
   def render_iiif_manifest_link
-    repo = Repo.where(:unique_identifier => @document.id.reverse_fedorafy).first
+    repo = Repo.find_by(unique_identifier: @document.unique_identifier)
     return repo.has_images? ? link_to("IIIF presentation manifest", "#{ENV['UV_URL']}/#{@document.id}/manifest") : ''
   end
 
@@ -60,7 +60,7 @@ module ApplicationHelper
     bibid = document.fetch('bibnumber_ssi', nil)
 
     if bibid.nil?
-      repo = Repo.find_by(unique_identifier: document.id.reverse_fedorafy)
+      repo = Repo.find_by(unique_identifier: document.unique_identifier)
       bibid = repo&.bibid
     end
 
@@ -70,7 +70,7 @@ module ApplicationHelper
   end
 
   def additional_resources
-    repo = Repo.find_by(unique_identifier: @document.id.reverse_fedorafy)
+    repo = Repo.find_by(unique_identifier: @document.unique_identifier)
     return true if repo.bibid.present? || repo.has_images?
   end
 

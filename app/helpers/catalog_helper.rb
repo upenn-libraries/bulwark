@@ -12,7 +12,7 @@ module CatalogHelper
 
     # Fetching from record if not present in Solr document.
     if thumbnail_location.nil?
-      repo = Repo.find_by(unique_identifier: document['unique_identifier_tesim'].first)
+      repo = Repo.find_by(unique_identifier: document.unique_identifier)
       thumbnail_location = repo&.thumbnail_location
     end
 
