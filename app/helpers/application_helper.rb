@@ -56,21 +56,22 @@ module ApplicationHelper
   end
 
   # @param [String] label
-  def render_catalog_link(label: "Full Catalog Record (Franklin)")
-    repo = Repo.find_by(unique_identifier: @document.id.reverse_fedorafy)
-    bibid = repo&.bibid
-    return '' unless bibid.present?
+  def render_catalog_link(document, label: "Full Catalog Record (Franklin)")
+    bibid = document.fetch('bibnumber_ssi', nil)
 
-    link_to label, "https://franklin.library.upenn.edu/catalog/FRANKLIN_#{validate_bib_id(bibid)}"
+    if bibid.nil?
+      repo = Repo.find_by(unique_identifier: document.id.reverse_fedorafy)
+      bibid = repo&.bibid
+    end
+
+    return if bibid.blank?
+
+    link_to label, "https://franklin.library.upenn.edu/catalog/FRANKLIN_#{bibid}"
   end
 
   def additional_resources
     repo = Repo.find_by(unique_identifier: @document.id.reverse_fedorafy)
     return true if repo.bibid.present? || repo.has_images?
-  end
-
-  def validate_bib_id(bib_id)
-    return bib_id.to_s.length <= 7 ? "99#{bib_id}3503681" : bib_id.to_s
   end
 
   def universal_viewer_path(identifier)
