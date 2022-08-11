@@ -69,4 +69,12 @@ module CatalogHelper
            end
     link_to('View in Colenda Admin', link)
   end
+
+  # Removing values that contain ID of this item because the are links back to this same page.
+  def remove_circular_references(options = {})
+    document = options[:document] # the original document
+    value = options[:value] || [] # the value of the field
+
+    value.delete_if {|v| v.include?(document[:id]) }
+  end
 end
