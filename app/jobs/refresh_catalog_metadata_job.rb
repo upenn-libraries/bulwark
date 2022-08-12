@@ -2,7 +2,7 @@
 class RefreshCatalogMetadataJob < ActiveJob::Base
   queue_as :high
 
-  # Need to catch error in case digital_object import no longer exists
+  # Need to catch error in case repo no longer exists
   rescue_from ActiveJob::DeserializationError do |_exception|
     # TODO: Not sure what the correct action is here. We could silently fail
     # since the repo no longer exists.
