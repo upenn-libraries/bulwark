@@ -23,6 +23,7 @@ Rails.application.routes.draw do
         post :unpublish
         post :generate_derivatives
         post :generate_iiif_manifest
+        post :refresh_catalog_metadata
       end
     end
 

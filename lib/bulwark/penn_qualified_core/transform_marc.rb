@@ -4,54 +4,52 @@ module Bulwark
   module PennQualifiedCore
     module TransformMarc
       # Converts marc xml (provided by Marmite) to PQC fields.
-      # TODO: This should be broken up in smaller methods. This mapping will
-      # probably change, so I'll save the refactoring for when I know what those
-      # changes are.
       def self.from_marc_xml(marc_xml)
         data = Nokogiri::XML(marc_xml)
         data.remove_namespaces!
 
         mapped_values = {}
 
+        # Map control fields
+        data.xpath('//records/record/controlfield').each do |element|
+          tag = element.attributes['tag'].value
+          mapping_config = MarcMappings::CONTROL_FIELDS[tag]
+
+          next unless mapping_config.present?
+
+          Array.wrap(mapping_config).each do |config|
+            field = config[:field]
+
+            mapped_values[field] ||= []
+
+            text = element.text
+            text = config[:chars].map { |i| text.slice(i) }.join if config[:chars]
+
+            mapped_values[field].push(text)
+          end
+        end
+
+        # Map MARC fields
         data.xpath('//records/record/datafield').each do |element|
           tag = element.attributes['tag'].value
-          next unless MarcMappings::TAGS[tag].present?
+          mapping_config = MarcMappings::MARC_FIELDS[tag]
 
-          if MarcMappings::TAGS[tag]['*'].present? # selecting all fields under the given tag
-            header = pqc_field(tag, '*')
-            mapped_values[header] ||= []
-            values = element.children.map(&:text).delete_if { |v| v.strip.empty? }
+          next unless mapping_config.present?
 
-            # Joining fields with a configured seperator and appending, otherwise concating values to array.
-            if MarcMappings::ROLLUP_FIELDS[tag].present?
-              seperator = MarcMappings::ROLLUP_FIELDS[tag]['separator']
-              mapped_values[header].push(values.join(seperator))
+          Array.wrap(mapping_config).each do |config|
+            field = config[:field]
+            selected_subfields = Array.wrap(config[:subfields])
+
+            mapped_values[field] ||= []
+
+            values = element.xpath('subfield')
+            values = values.select { |s| selected_subfields.include?(s.attributes['code'].value) } if selected_subfields.first != '*'
+            values = values.map { |v| v&.text&.strip }.delete_if(&:blank?)
+
+            if (delimeter = config[:join])
+              mapped_values[field].push values.join(delimeter)
             else
-              mapped_values[header].concat(values)
-            end
-          else
-            # if not selecting all
-            if MarcMappings::ROLLUP_FIELDS[tag].present?
-              rollup_values = []
-              header = ''
-              element.xpath('subfield').each do |subfield|
-                # FIXME: If the headers are different for a field that rolls up, there are going to be problems.
-                header = pqc_field(tag, subfield.attributes['code'].value)
-                if header.present?
-                  mapped_values[header] ||= []
-                  values = subfield.children.map(&:text).delete_if { |v| v.strip.empty? }
-                  rollup_values.concat(values)
-                end
-              end
-              mapped_values[header] << rollup_values.join(MarcMappings::ROLLUP_FIELDS[tag]['separator']) if rollup_values
-            else
-              element.xpath('subfield').each do |subfield|
-                header = pqc_field(tag, subfield.attributes['code'].value)
-                if header.present?
-                  mapped_values[header] ||= []
-                  mapped_values[header].concat(subfield.children.map(&:text))
-                end
-              end
+              mapped_values[field].concat values
             end
           end
         end
@@ -63,14 +61,21 @@ module Bulwark
           mapped_values['item_type'] = ['Books']
         end
 
-        # Adding bibnumber and call number
-        bibnumber = data.at_xpath('//records/record/controlfield[@tag=001]').text
-        mapped_values['identifier'] ||= ["#{Settings.digital_object.repository_prefix}_#{bibnumber}"]
+        # Converting language codes to english name.
+        languages = mapped_values.fetch('language', [])
+        mapped_values['language'] = languages.map { |l| ISO_639.find_by_code(l)&.english_name }.compact
+
+        # Adding call number
         mapped_values['call_number'] = data.xpath('//records/record/holdings/holding/call_number')
                                            .map(&:text)
                                            .compact
+
+        # Removing duplicate values from selected fields.
+        %w[subject corporate_name personal_name language].each { |f| mapped_values[f]&.uniq! }
+
         # Cleanup
-        mapped_values.transform_values! { |values| values.map(&:strip).reject(&:empty?) }
+        mapped_values.transform_values! { |values| values.map(&:strip).reject(&:blank?) }
+                     .delete_if { |_, v| v.blank? }
 
         # Join fields if they aren't multivalued.
         mapped_values.each do |k, v|
@@ -101,12 +106,9 @@ module Bulwark
       # Returns true if the MARC data describes the item as a Book
       def self.book?(data)
         # Checking for `a` in 7th value of the leader field
-        leader = data.at_xpath("//records/record/leader").text
+        leader = data.at_xpath("//records/record/leader")&.text
+        return if leader.blank?
         leader[6] == 'a'
-      end
-
-      def self.pqc_field(marc_field, code = '*')
-        MarcMappings::TAGS[marc_field][code]
       end
     end
   end

@@ -1,14 +1,16 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
 <marc:records xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
   <marc:record>
-    <marc:leader>01554ctm a2200361Mi 4500</marc:leader>
+    <marc:leader>02114ctm a2200421Mi 4500</marc:leader>
     <marc:controlfield tag="001">993181873503681</marc:controlfield>
-    <marc:controlfield tag="005">20191028143638.0</marc:controlfield>
-    <marc:controlfield tag="008">830225s1823 xx m 000 0 eng d</marc:controlfield>
+    <marc:controlfield tag="005">20220609153903.0</marc:controlfield>
+    <marc:controlfield tag="008">830225s1823    xx       m    000 0 eng d</marc:controlfield>
     <marc:datafield ind1=" " ind2=" " tag="035">
       <marc:subfield code="a">(OCoLC)13610637</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2=" " tag="035">
-      <marc:subfield code="a">(OCoLC)ocm13610637 </marc:subfield>
+      <marc:subfield code="a">(OCoLC)ocm13610637</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2=" " tag="035">
       <marc:subfield code="a">(PU)318187-penndb-Voyager</marc:subfield>
@@ -23,7 +25,7 @@
       <marc:subfield code="d">OCLCF</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1="1" ind2=" " tag="100">
-      <marc:subfield code="a">Lynch, Micajah T.</marc:subfield>
+      <marc:subfield code="a">Lynch, Micajah T.,</marc:subfield>
       <marc:subfield code="e">author.</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1="1" ind2="3" tag="245">
@@ -53,13 +55,18 @@
       <marc:subfield code="2">rdacarrier</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2=" " tag="500">
-      <marc:subfield code="a">"Passed March 22d 1823"--title page.</marc:subfield>
+      <marc:subfield code="a">Volume 16 number 4 in a collection of University of Pennsylvania medical dissertations bound together.</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2=" " tag="500">
-      <marc:subfield code="a">Volume 16 number 4 in a collection of University of Pennsylvania medical dissertations bound together.</marc:subfield>
+      <marc:subfield code="a">"Passed March 22d 1823"--title page.</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2=" " tag="502">
       <marc:subfield code="a">Dissertation (M.D.)--School of Medicine, University of Pennsylvania, 1823.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="7" tag="650">
+      <marc:subfield code="a">Fever.</marc:subfield>
+      <marc:subfield code="2">fast</marc:subfield>
+      <marc:subfield code="0">http://id.worldcat.org/fast/923528</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2="0" tag="650">
       <marc:subfield code="a">Fever</marc:subfield>
@@ -70,40 +77,60 @@
       <marc:subfield code="5">PU</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2="4" tag="650">
-      <marc:subfield code="a">Medicine</marc:subfield>
-      <marc:subfield code="x">Penn dissertations.</marc:subfield>
-    </marc:datafield>
-    <marc:datafield ind1=" " ind2="4" tag="650">
       <marc:subfield code="a">Penn dissertations</marc:subfield>
       <marc:subfield code="x">Medicine.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="4" tag="650">
+      <marc:subfield code="a">Medicine</marc:subfield>
+      <marc:subfield code="x">Penn dissertations.</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2=" " tag="651">
       <marc:subfield code="y">1823</marc:subfield>
     </marc:datafield>
-    <marc:datafield ind1=" " ind2="7" tag="655">
-      <marc:subfield code="a">Academic theses.</marc:subfield>
-      <marc:subfield code="2">lcgft</marc:subfield>
+    <marc:datafield ind1=" " ind2="7" tag="651">
+      <marc:subfield code="a">Virginia</marc:subfield>
+      <marc:subfield code="z">Botetourt County.</marc:subfield>
+      <marc:subfield code="2">fast</marc:subfield>
+      <marc:subfield code="0">http://id.worldcat.org/fast/1207230</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2="0" tag="655">
+      <marc:subfield code="a">Manuscripts, American.</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2="7" tag="655">
       <marc:subfield code="a">Academic theses.</marc:subfield>
       <marc:subfield code="2">fast</marc:subfield>
-      <marc:subfield code="0">(OCoLC)fst01726453</marc:subfield>
+      <marc:subfield code="0">http://id.worldcat.org/fast/1726453</marc:subfield>
     </marc:datafield>
-    <marc:datafield ind1=" " ind2="0" tag="655">
-      <marc:subfield code="a">Manuscripts, American</marc:subfield>
-      <marc:subfield code="y">19th century.</marc:subfield>
+    <marc:datafield ind1=" " ind2="7" tag="655">
+      <marc:subfield code="a">Academic theses.</marc:subfield>
+      <marc:subfield code="2">lcgft</marc:subfield>
+      <marc:subfield code="0">http://id.loc.gov/authorities/genreForms/gf2014026039</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="2" ind2=" " tag="710">
+      <marc:subfield code="a">University of Pennsylvania.</marc:subfield>
+      <marc:subfield code="b">School of Medicine,</marc:subfield>
+      <marc:subfield code="e">degree granting institution.</marc:subfield>
+      <marc:subfield code="0">http://id.loc.gov/authorities/names/n79066161</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1="2" ind2=" " tag="710">
       <marc:subfield code="a">University of Pennsylvania Medical Dissertation Digital Library.</marc:subfield>
       <marc:subfield code="5">PU</marc:subfield>
     </marc:datafield>
-    <marc:datafield ind1="2" ind2=" " tag="710">
-      <marc:subfield code="a">University of Pennsylvania.</marc:subfield>
-      <marc:subfield code="b">School of Medicine.</marc:subfield>
-      <marc:subfield code="e">degree granting institution.</marc:subfield>
-    </marc:datafield>
     <marc:datafield ind1="0" ind2="0" tag="773">
       <marc:subfield code="t">University of Pennsylvania Medical Dissertation Digital Library.</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="852">
+      <marc:subfield code="b">Kislak Center for Special Collections, Rare Books and Manuscripts</marc:subfield>
+      <marc:subfield code="a">University of Pennsylvania</marc:subfield>
+      <marc:subfield code="e">3420 Walnut Street, Philadelphia, Pennsylvania 19104-6206.</marc:subfield>
+      <marc:subfield code="j">378.748 POM 16.4</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1="4" ind2="1" tag="856">
+      <marc:subfield code="z">Facsimile</marc:subfield>
+      <marc:subfield code="u">https://colenda.library.upenn.edu/catalog/81431-p3m902c6b</marc:subfield>
+    </marc:datafield>
+    <marc:datafield ind1=" " ind2=" " tag="902">
+      <marc:subfield code="a">MARCIVE 2022</marc:subfield>
     </marc:datafield>
     <marc:datafield ind1=" " ind2=" " tag="950">
       <marc:subfield code="l">RBC</marc:subfield>

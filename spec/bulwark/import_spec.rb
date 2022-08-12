@@ -712,29 +712,28 @@ RSpec.describe Bulwark::Import do
         {
           'bibnumber' => [bibnumber],
           'identifier' => [
-            'sts- n.r* n.n. di12 (3) 1598 (A)', '(OCoLC)ocm16660686', '(OCoLC)16660686', '2347850', '(PU)2347850-penndb-Voyager'
+            '9923478503503681', 'sts- n.r* n.n. di12 (3) 1598 (A)', '(OCoLC)ocm16660686', '(OCoLC)16660686', '2347850', '(PU)2347850-penndb-Voyager'
           ],
-          'creator' => ['Ercker, Lazarus,'],
+          'creator' => ['Ercker, Lazarus, -1594.'],
           'title' => [
-            "Beschreibung aller fürnemisten Mineralischen Ertzt vnnd Berckwercksarten :",
-            "wie dieselbigen vnd eine jede in Sonderheit jrer Natur vnd Eygenschafft nach, auff alle Metalla probirt, vnd im kleinen Fewr sollen versucht werden, mit Erklärung etlicher fürnemer nützlicher Schmeltzwerck im grossen Feuwer, auch Scheidung Goldts, Silbers, vnd anderer Metalln, sampt einem Bericht des Kupffer Saigerns, Messing brennens, vnd Salpeter Siedens, auch aller saltzigen Minerischen proben, vnd was denen allen anhengig : in fünff Bücher verfast, dessgleichen zuvorn niemals in Druck kommen ... : auffs newe an vielen Orten mit besserer Aussführung, vnd mehreren Figurn erklärt /",
-            "durch den weitberühmten Lazarum Erckern, der Röm. Kay. May. Obersten Bergkmeister vnd Buchhalter in Königreich Böhem  ..."
+            "Beschreibung aller fürnemisten Mineralischen Ertzt vnnd Berckwercksarten : wie dieselbigen vnd eine jede in Sonderheit jrer Natur vnd Eygenschafft nach, auff alle Metalla probirt, vnd im kleinen Fewr sollen versucht werden, mit Erklärung etlicher fürnemer nützlicher Schmeltzwerck im grossen Feuwer, auch Scheidung Goldts, Silbers, vnd anderer Metalln, sampt einem Bericht des Kupffer Saigerns, Messing brennens, vnd Salpeter Siedens, auch aller saltzigen Minerischen proben, vnd was denen allen anhengig : in fünff Bücher verfast, dessgleichen zuvorn niemals in Druck kommen ... : auffs newe an vielen Orten mit besserer Aussführung, vnd mehreren Figurn erklärt / durch den weitberühmten Lazarum Erckern, der Röm. Kay. May. Obersten Bergkmeister vnd Buchhalter in Königreich Böhem c. ..."
           ],
           'publisher' => ["Gedruckt zu Franckfurt am Mayn : Durch Johan Feyerabendt, 1598."],
-          'format' => ['[4], 134, [4] leaves : ill. ; 31 cm. (fol.)'],
-          'bibliographic_note' => [
-            'Leaves printed on both sides. Signatures: )(⁴ A-Z⁴ a-k⁴ l⁶. The last leaf is blank. Woodcut illustrations, initials and tail-pieces. Title page printed in black and red. Printed marginalia. "Erratum" on verso of last printed leaf. Online version available via Colenda https://colenda.library.upenn.edu/catalog/81431-p3df6k90j'
-          ],
+          'format' => ['4 unnumbered leaves, 134 leaves, 4 unnumbered leaves : illustrations ; 31 cm (folio)'],
+          'language' => ['German'],
+          "notes" => ['Signatures: )(⁴ A-Z⁴ a-k⁴ l⁶.', 'Leaves printed on both sides.', 'The last leaf is blank.', 'Woodcut illustrations, initials and tail-pieces.', 'Title page printed in black and red.', 'Online version available via Colenda', '"Erratum" on verso of last printed leaf.', 'Printed marginalia.'],
           'provenance' => ["Smith, Edgar Fahs, 1854-1928 (autograph, 1917)", "Wright, H. (autograph, 1870)"],
           'description' => ["Penn Libraries copy has Edgar Fahs Smith's autograph on front free endpaper; autograph of H. Wright on front free endpaper; effaced ms. inscription (autograph?) on title leaf."],
-          'subject' => ['Metallurgy -- Early works to 1800.', 'Assaying -- Early works to 1800.', 'PU', 'PU', 'PU'],
+          'subject' => ['Metallurgy -- Early works to 1800.', 'Assaying.', 'Assaying -- Early works to 1800.', 'Metallurgy.'],
           'date' => ['1598'],
-          'personal_name' => ['Feyerabend, Johann,'],
+          'personal_name' => ['Feyerabend, Johann, 1550-1599, printer.'],
           'geographic_subject' => ['Germany -- Frankfurt am Main.'],
           'collection' => ['Edgar Fahs Smith Memorial Collection (University of Pennsylvania)'],
           'call_number' => ['Folio TN664 .E7 1598'],
-          'relation' => ['https://colenda.library.upenn.edu/catalog/81431-p3df6k90j'],
-          'item_type' => ['Manuscript']
+          'relation' => ['Facsimile https://colenda.library.upenn.edu/catalog/81431-p3df6k90j'],
+          'item_type' => ['Manuscript'],
+          'corporate_name' => ["Edgar Fahs Smith Memorial Collection (University of Pennsylvania)"],
+          'coverage' => ["1598"]
         }
       end
       let(:structural_metadata) do
