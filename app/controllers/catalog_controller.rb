@@ -60,22 +60,17 @@ class CatalogController < ApplicationController
     # :show may be set to false if you don't want the facet to be drawn in the
     # facet bar
 
-    # PQC
-    config.add_facet_field solr_name('subject', :facetable), :label => 'Subject', :limit => 5, :collapse => false
-    config.add_facet_field solr_name('language', :facetable), :label => 'Language', :limit => 5, :collapse => false
-    config.add_facet_field solr_name('date', :facetable), :label => 'Date', :limit => 5, :collapse => false
-    config.add_facet_field solr_name('contributor', :facetable), :label => 'Contributor', :limit => 5, :collapse => true
-    config.add_facet_field solr_name('creator', :facetable), :label => 'Creator', :limit => 5, :collapse => true
-    config.add_facet_field solr_name('publisher', :facetable), :label => 'Publisher', :limit => 5, :collapse => true
-    config.add_facet_field solr_name('coverage', :facetable), :label => 'Coverage', :limit => 5, :collapse => true
-    config.add_facet_field solr_name('item_type', :facetable), :label => 'Type', :limit => 5, :collapse => true
-    config.add_facet_field solr_name('source', :facetable), :label => 'Source', :limit => 5, :collapse => true
-    config.add_facet_field solr_name('personal_name', :facetable), :label => 'Personal Name', :limit => 5, :collapse => true, helper_method: 'html_facet'
-    config.add_facet_field solr_name('corporate_name', :facetable), :label => 'Corporate Name',:limit => 5, :collapse => true,  helper_method: 'html_facet'
-    config.add_facet_field solr_name('geographic_subject', :facetable), :label => 'Geographic Subject', :limit => 5, :collapse => true
-
-    # Catalog
-    config.add_facet_field solr_name('collection', :facetable), :label => 'Collection', :limit => 5, :collapse => true
+    # Facets
+    config.add_facet_field solr_name('collection', :facetable), label: 'Collection', limit: 5, collapse: false
+    config.add_facet_field solr_name('subject', :facetable), label: 'Subject', limit: 5, collapse: false
+    config.add_facet_field solr_name('language', :facetable), label: 'Language', limit: 5, collapse: false
+    config.add_facet_field solr_name('date', :facetable), label: 'Date', limit: 5, collapse: false
+    config.add_facet_field solr_name('creator', :facetable), label: 'Creator', limit: 5, collapse: true
+    config.add_facet_field solr_name('publisher', :facetable), label: 'Publisher', limit: 5, collapse: true
+    config.add_facet_field solr_name('item_type', :facetable), label: 'Type', limit: 5, collapse: true
+    config.add_facet_field solr_name('personal_name', :facetable), label: 'Personal Name', limit: 5, collapse: true, helper_method: 'html_facet'
+    config.add_facet_field solr_name('corporate_name', :facetable), label: 'Corporate Name', limit: 5, collapse: true,  helper_method: 'html_facet'
+    config.add_facet_field solr_name('geographic_subject', :facetable), label: 'Geographic Subject', limit: 5, collapse: true
 
     config.add_facet_fields_to_solr_request!
 
