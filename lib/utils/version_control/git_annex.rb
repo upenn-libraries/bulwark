@@ -122,7 +122,7 @@ module Utils
 
       def unlock(options, dir)
         raise ArgumentError, 'Utils::VersionControl::GitAnnex#unlock no longer supports location parameter' if options[:location]
-        raise Utils::Error::VersionControl.new(I18n.t('colenda.utils.version_control.git_annex.errors.unlock_no_options')) unless options[:content].present?
+        raise Utils::Error::VersionControl.new(I18n.t('utils.version_control.git_annex.errors.unlock_no_options')) unless options[:content].present?
 
         git = ExtendedGit.open(dir)
         git.annex.unlock(options[:content])
@@ -217,13 +217,13 @@ module Utils
       def error_message(message)
         case(message)
           when /no changes/
-            error_message = I18n.t('colenda.utils.version_control.git_annex.errors.no_changes')
+            error_message = I18n.t('utils.version_control.git_annex.errors.no_changes')
           when /does not exist/
-            error_message = I18n.t('colenda.utils.version_control.git_annex.errors.does_not_exist')
+            error_message = I18n.t('utils.version_control.git_annex.errors.does_not_exist')
           when /already exists and is not an empty directory/
-            error_message = I18n.t('colenda.utils.version_control.git_annex.errors.leftover_clone', :directory => @working_repo_path)
+            error_message = I18n.t('utils.version_control.git_annex.errors.leftover_clone', :directory => @working_repo_path)
           else
-            error_message = I18n.t('colenda.utils.version_control.git_annex.errors.generic', :error_message => message)
+            error_message = I18n.t('utils.version_control.git_annex.errors.generic', :error_message => message)
         end
         error_message
       end

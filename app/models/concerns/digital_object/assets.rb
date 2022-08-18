@@ -35,7 +35,7 @@ module DigitalObject
       version_control_agent.lock(assets_subdirectory, clone_location)
 
       version_control_agent.add({ content: File.join(metadata_subdirectory, File.basename(jhove_output)) }, clone_location)
-      version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_preservation_metadata', object_id: names.fedora), clone_location)
+      version_control_agent.commit(I18n.t('version_control_agents.commit_messages.generated_preservation_metadata', object_id: names.fedora), clone_location)
       version_control_agent.push({ content: File.join(metadata_subdirectory, File.basename(jhove_output)) }, clone_location)
     end
 
@@ -77,7 +77,7 @@ module DigitalObject
         end
 
         version_control_agent.add({}, clone_location)
-        version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.automated.added_assets'), clone_location)
+        version_control_agent.commit(I18n.t('version_control_agents.commit_messages.automated.added_assets'), clone_location)
         version_control_agent.push({ content: assets_subdirectory }, clone_location)
       end
   end
