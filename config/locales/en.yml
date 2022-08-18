@@ -1,3 +1,12 @@
 en:
   about:
     title: 'About Colenda'
+  homepage:
+    institution_link_href: 'http://www.library.upenn.edu'
+    institution_link_text: 'Penn Libraries'
+    public_domain_link_href: 'https://creativecommons.org/publicdomain/mark/1.0/'
+    public_domain_link_text: 'public domain'
+    undetermined_copyright_link_href: 'http://rightsstatements.org/page/UND/1.0/'
+    undetermined_copyright_link_text: 'undetermined copyright'
+    beta_html: '<div class="alert alert-warning"><p>This site is currently in beta and may be periodically unavailable as we make improvements to the service.</p></div>'
+    featured_title_html: '<h3>Featured Items</h3>'
