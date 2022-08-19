@@ -1,11 +1,17 @@
 en:
   homepage:
-    institution_link_href: 'http://www.library.upenn.edu'
-    institution_link_text: 'Penn Libraries'
-    public_domain_link_href: 'https://creativecommons.org/publicdomain/mark/1.0/'
-    public_domain_link_text: 'public domain'
-    undetermined_copyright_link_href: 'http://rightsstatements.org/page/UND/1.0/'
-    undetermined_copyright_link_text: 'undetermined copyright'
+    penn_libraries:
+      text: 'Penn Libraries'
+      url: 'https://www.library.upenn.edu'
+    public_domain:
+      text: 'public domain'
+      url: 'https://creativecommons.org/publicdomain/mark/1.0/'
+    undetermined_copyright:
+      text: 'undetermined copyright'
+      url: 'http://rightsstatements.org/page/UND/1.0/'
+    in_copyright:
+      text: 'in copyright'
+      url: 'http://rightsstatements.org/vocab/InC/1.0/'
     beta_html: '<div class="alert alert-warning"><p>This site is currently in beta and may be periodically unavailable as we make improvements to the service.</p></div>'
     featured_title_html: '<h3>Featured Items</h3>'
   header:
