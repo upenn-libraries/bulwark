@@ -1,10 +1,27 @@
-<%= t('colenda.static.homepage.blurb_html', :institution_link => link_to(t('colenda.static.homepage.institution_link_text'), t('colenda.static.homepage.institution_link_href')), :public_domain_link => link_to(t('colenda.static.homepage.public_domain_link_text'), t('colenda.static.homepage.public_domain_link_href')), :undetermined_copyright_link => link_to(t('colenda.static.homepage.undetermined_copyright_link_text'), t('colenda.static.homepage.undetermined_copyright_link_href'))) %>
+<p>
+  Colenda is a repository system for digitized and born-digital material of enduring value to University and global
+  scholarly communities, serving teaching and research needs. It provides direct access and long-term stewardship for
+  these important resources.
+</p>
+<p>
+  Much of Colenda’s content consists of materials owned and digitized by the
+  <%= link_to(t('homepage.penn_libraries.text'), t('homepage.penn_libraries.url')) %>, including significant collections that have been
+  donated to the library. Colenda also includes some public domain digital objects that were created from assets owned
+  by other institutions in the course of a joint project with the Penn Libraries.
+</p>
+<p>
+  Each item in Colenda states whether it is in the
+  <%= link_to(t('homepage.public_domain.text'), t('homepage.public_domain.url')) %>, of
+  <%= link_to(t('homepage.undetermined_copyright.text'), t('homepage.undetermined_copyright.url')) %>, or
+  <%= link_to(t('homepage.in_copyright.text'), t('homepage.in_copyright.url')) %> but
+  presented by permission of the copyright owner.
+</p>
 
 <% if @home_alert.active? %>
   <div class="alert alert-<%= @home_alert.level %>"><%= @home_alert.message %></div>
 <% end %>
 
-<%= t('colenda.static.homepage.featured_title_html') %>
+<%= t('homepage.featured_title_html') %>
 <ul class="bxslider">
   <%= render_featured_list %>
 </ul>

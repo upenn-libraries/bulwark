@@ -31,7 +31,7 @@ module DigitalObject
 
       # add, commit, push descriptive  metadata
       version_control_agent.add({ content: desc_metadata_file }, clone_location)
-      version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.automated.added_metadata'), clone_location)
+      version_control_agent.commit(I18n.t('version_control_agents.commit_messages.automated.added_metadata'), clone_location)
       version_control_agent.push({ content: desc_metadata_file }, clone_location)
 
       # Create or update metadata source for descriptive metadata
@@ -67,7 +67,7 @@ module DigitalObject
       end
 
       version_control_agent.add({ content: struct_metadata_file }, clone_location)
-      version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.automated.added_metadata'), clone_location)
+      version_control_agent.commit(I18n.t('version_control_agents.commit_messages.automated.added_metadata'), clone_location)
       version_control_agent.push({ content: struct_metadata_file }, clone_location)
 
       # Create or update metadata source for structural metadata
@@ -98,7 +98,7 @@ module DigitalObject
 
       # add, commit, push
       version_control_agent.add({ content: metadata_subdirectory }, clone_location)
-      version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.write_preservation_xml'), clone_location)
+      version_control_agent.commit(I18n.t('version_control_agents.commit_messages.write_preservation_xml'), clone_location)
       version_control_agent.push({ content: metadata_subdirectory }, clone_location)
 
       # Save link to xml files in metadata_builder

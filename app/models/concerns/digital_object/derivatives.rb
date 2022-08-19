@@ -53,7 +53,7 @@ module DigitalObject
       metadata_builder.update!(last_file_checks: DateTime.current)
 
       version_control_agent.lock(derivatives_subdirectory, clone_location)
-      version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.generated_all_derivatives', object_id: names.fedora), clone_location)
+      version_control_agent.commit(I18n.t('version_control_agents.commit_messages.generated_all_derivatives', object_id: names.fedora), clone_location)
       version_control_agent.push({ content: derivatives_subdirectory }, clone_location)
     end
   end

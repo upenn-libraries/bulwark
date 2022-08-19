@@ -154,7 +154,7 @@ class Repo < ActiveRecord::Base
       working_path = self.version_control_agent.clone
       directory_sets = _build_and_populate_directories(working_path)
       directory_sets.each{|dir_set| dir_set.each{|add_type,dirs| dirs.each{|dir| self.version_control_agent.add({:content => dir, :add_type => add_type}, working_path) } } }
-      self.version_control_agent.commit(I18n.t('colenda.version_control_agents.commit_messages.commit_bare'), working_path)
+      self.version_control_agent.commit(I18n.t('version_control_agents.commit_messages.commit_bare'), working_path)
       self.version_control_agent.push(working_path)
       self.version_control_agent.delete_clone(working_path)
       self.version_control_agent.set_remote_permissions
@@ -407,7 +407,7 @@ class Repo < ActiveRecord::Base
   def _generate_readme(directory)
     readme_filename = File.join(directory, 'README.md')
     File.open(readme_filename, 'w') do |file|
-      file.write(I18n.t('colenda.version_control_agents.readme_contents', unique_identifier: self.unique_identifier))
+      file.write(I18n.t('version_control_agents.readme_contents', unique_identifier: self.unique_identifier))
     end
     readme_filename
   end

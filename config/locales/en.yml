@@ -1,23 +1,44 @@
-# Files in the config/locales directory are used for internationalization
-# and are automatically loaded by Rails. If you want to use locales other
-# than English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t 'hello'
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t('hello') %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more, please read the Rails Internationalization guide
-# available at http://guides.rubyonrails.org/i18n.html.
-
 en:
-  hello: "Hello world"
+  homepage:
+    penn_libraries:
+      text: 'Penn Libraries'
+      url: 'https://www.library.upenn.edu'
+    public_domain:
+      text: 'public domain'
+      url: 'https://creativecommons.org/publicdomain/mark/1.0/'
+    undetermined_copyright:
+      text: 'undetermined copyright'
+      url: 'http://rightsstatements.org/page/UND/1.0/'
+    in_copyright:
+      text: 'in copyright'
+      url: 'http://rightsstatements.org/vocab/InC/1.0/'
+    beta_html: '<div class="alert alert-warning"><p>This site is currently in beta and may be periodically unavailable as we make improvements to the service.</p></div>'
+    featured_title_html: '<h3>Featured Items</h3>'
+  header:
+    links:
+      admin_dashboard: 'Admin Dashboard'
+  about:
+    title: 'About Colenda'
+  mailers:
+    addresses:
+      default: 'colenda@upenn.edu'
+  version_control_agents:
+    commit_messages:
+      commit_bare: 'Added subdirectories according to the configuration specified in the repo configuration'
+      catalog_derivative_spreadsheet: 'Created derivative spreadsheet of catalog metadata'
+      generated_all_derivatives: 'Generated all derivatives'
+      generated_preservation_metadata: 'Generated JHOVE XML for %{object_id}'
+      write_preservation_xml: 'Generated unified XML'
+      automated:
+        added_metadata: 'Added metadata through automated workflow'
+        added_assets: 'Added assets through automated workflow'
+    readme_contents: '## README for %{unique_identifier}\n\nFor up-to-date information regarding the structure and contents of this git repository, visit the RST Confluence page'
+  utils:
+    version_control:
+      git_annex:
+        errors:
+          leftover_clone: 'Leftover Git remote clone in working directory - %{directory}.'
+          does_not_exist: 'Git remote does not exist.  Could not clone to perform tasks.'
+          unlock_no_options: 'Unlock command cannot be used without specifying content.'
+          no_changes: 'Nothing staged for commit.'
+          generic: 'Error from Git: %{error_message}'

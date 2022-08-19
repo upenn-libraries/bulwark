@@ -6,8 +6,6 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-ENV['RAILS_ADMIN_THEME'] = 'rails_admin_colenda'
-
 module Head
   class Application < Rails::Application
 
@@ -25,6 +23,9 @@ module Head
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
+
+    # Raise errors if there are missing locales.
+    config.action_view.raise_on_missing_translations = true
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
