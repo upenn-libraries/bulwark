@@ -70,8 +70,7 @@ services:
       VIRTUAL_URL:
       DOWNLOAD_LINK:
       DOWNLOAD_PORT:
-      MARMITE_BASE:
-      MARMITE_FORMAT:
+      MARMITE_URL:
       STORAGE_HOST:
     ports:
       - '9292'
