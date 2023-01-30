@@ -226,7 +226,6 @@ RSpec.describe Repo, type: :model do
     let(:current_time) { Time.current }
     let(:document) do
       {
-        "active_fedora_model_ssi" => "Manuscript",
         "bibnumber_ssi" => nil,
         "call_number_sim" => ["Ms. Coll 200 box 180 folder 8576 item 2"],
         "call_number_ssim" => ["Ms. Coll 200 box 180 folder 8576 item 2"],

@@ -282,7 +282,6 @@ class Repo < ActiveRecord::Base
   def solr_document
     document = {
       'id' => names.fedora,
-      'active_fedora_model_ssi' => 'Manuscript', # TODO: Can remove once Blacklight doesn't depend on these fields
       'has_model_ssim' => ['Manuscript'],
       'unique_identifier_tesim' => unique_identifier,
       'system_create_dtsi' => first_published_at.utc.iso8601,
