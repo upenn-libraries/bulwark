@@ -413,8 +413,7 @@ RSpec.describe Repo, type: :model do
 
     context 'when missing title' do
       before do
-        metadata_source = repo.descriptive_metadata.user_defined_mappings
-        metadata_source.update!(user_defined_mappings: {})
+        repo.descriptive_metadata.update!(user_defined_mappings: {})
       end
 
       it 'raises expected error' do
