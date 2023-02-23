@@ -55,16 +55,16 @@ class CatalogController < ApplicationController
     # facet bar
 
     # Facets
-    # config.add_facet_field :collection_ssim, label: 'Collection', limit: 5, collapse: false
-    # config.add_facet_field :subject_ssim, label: 'Subject', limit: 5, collapse: false
-    # config.add_facet_field :language_ssim, label: 'Language', limit: 5, collapse: false
-    # config.add_facet_field :date_ssim, label: 'Date', limit: 5, collapse: false
-    # config.add_facet_field :creator_ssim, label: 'Creator', limit: 5, collapse: true
-    # config.add_facet_field :publisher_ssim, label: 'Publisher', limit: 5, collapse: true
-    # config.add_facet_field :item_type_ssim, label: 'Type', limit: 5, collapse: true
-    # config.add_facet_field :personal_name_ssim, label: 'Personal Name', limit: 5, collapse: true, helper_method: 'html_facet'
-    # config.add_facet_field :corporate_name_ssim, label: 'Corporate Name', limit: 5, collapse: true,  helper_method: 'html_facet'
-    # config.add_facet_field :geographic_subject_ssim, label: 'Geographic Subject', limit: 5, collapse: true
+    config.add_facet_field :collection_ssim, label: 'Collection', limit: 5, collapse: false
+    config.add_facet_field :subject_ssim, label: 'Subject', limit: 5, collapse: false
+    config.add_facet_field :language_ssim, label: 'Language', limit: 5, collapse: false
+    config.add_facet_field :date_ssim, label: 'Date', limit: 5, collapse: false
+    config.add_facet_field :creator_ssim, label: 'Creator', limit: 5, collapse: true
+    config.add_facet_field :publisher_ssim, label: 'Publisher', limit: 5, collapse: true
+    config.add_facet_field :item_type_ssim, label: 'Type', limit: 5, collapse: true
+    config.add_facet_field :personal_name_ssim, label: 'Personal Name', limit: 5, collapse: true, helper_method: 'html_facet'
+    config.add_facet_field :corporate_name_ssim, label: 'Corporate Name', limit: 5, collapse: true,  helper_method: 'html_facet'
+    config.add_facet_field :geographic_subject_ssim, label: 'Geographic Subject', limit: 5, collapse: true
 
     config.add_facet_fields_to_solr_request!
 
@@ -96,7 +96,7 @@ class CatalogController < ApplicationController
     config.add_index_field :format_type_ssim, :label => 'Type'
 
     # Catalog
-    config.add_index_field :collection_tsim, :label => 'Collection'
+    config.add_index_field :collection_ssim, :label => 'Collection'
     config.add_index_field :display_call_number_ssim, :label => 'Call Number' # TODO: delete when all digital objects are migrated.
     config.add_index_field :call_number_ssim, :label => 'Call Number'
 
