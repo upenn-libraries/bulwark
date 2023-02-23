@@ -55,16 +55,16 @@ class CatalogController < ApplicationController
     # facet bar
 
     # Facets
-    config.add_facet_field :collection_ssim, label: 'Collection', limit: 5, collapse: false
-    config.add_facet_field :subject_ssim, label: 'Subject', limit: 5, collapse: false
-    config.add_facet_field :language_ssim, label: 'Language', limit: 5, collapse: false
-    config.add_facet_field :date_ssim, label: 'Date', limit: 5, collapse: false
-    config.add_facet_field :creator_ssim, label: 'Creator', limit: 5, collapse: true
-    config.add_facet_field :publisher_ssim, label: 'Publisher', limit: 5, collapse: true
-    config.add_facet_field :item_type_ssim, label: 'Type', limit: 5, collapse: true
-    config.add_facet_field :personal_name_ssim, label: 'Personal Name', limit: 5, collapse: true, helper_method: 'html_facet'
-    config.add_facet_field :corporate_name_ssim, label: 'Corporate Name', limit: 5, collapse: true,  helper_method: 'html_facet'
-    config.add_facet_field :geographic_subject_ssim, label: 'Geographic Subject', limit: 5, collapse: true
+    config.add_facet_field :collection_sim, label: 'Collection', limit: 5, collapse: false
+    config.add_facet_field :subject_sim, label: 'Subject', limit: 5, collapse: false
+    config.add_facet_field :language_sim, label: 'Language', limit: 5, collapse: false
+    config.add_facet_field :date_sim, label: 'Date', limit: 5, collapse: false
+    config.add_facet_field :creator_sim, label: 'Creator', limit: 5, collapse: true
+    config.add_facet_field :publisher_sim, label: 'Publisher', limit: 5, collapse: true
+    config.add_facet_field :item_type_sim, label: 'Type', limit: 5, collapse: true
+    config.add_facet_field :personal_name_sim, label: 'Personal Name', limit: 5, collapse: true, helper_method: 'html_facet'
+    config.add_facet_field :corporate_name_sim, label: 'Corporate Name', limit: 5, collapse: true,  helper_method: 'html_facet'
+    config.add_facet_field :geographic_subject_sim, label: 'Geographic Subject', limit: 5, collapse: true
 
     config.add_facet_fields_to_solr_request!
 
