@@ -123,7 +123,7 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('language', :stored_searchable, type: :string), :label => 'Language'
     config.add_show_field solr_name('provenance', :stored_searchable, type: :string), :label => 'Provenance'
     config.add_show_field solr_name('publisher', :stored_searchable, type: :string), :label => 'Publisher'
-    config.add_show_field solr_name('relation', :stored_searchable, type: :string), :label => 'Relation', helper_method: :remove_circular_references
+    config.add_show_field :relation, label: 'Relation', accessor: :relation, unless: lambda { |_, _, d| d.relation.blank? }
     config.add_show_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
     config.add_show_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject', :link_to_search => 'subject_sim'
     config.add_show_field solr_name('item_type', :stored_searchable, type: :string), :label => 'Type'
