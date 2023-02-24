@@ -15,18 +15,6 @@ services:
   mysql:
     type: mysql:5.7.31
     portforward: 3307
-  fcrepo:
-    type: compose
-    app_mount: false
-    services:
-      image: quay.io/upennlibraries/fcrepo_dev:latest
-      command:
-        - catalina.sh
-        - run
-      ports:
-        - '8080:8080'
 proxy:
   solr:
     - bulwark.solr.lndo.site:8983
-  fcrepo:
-    - bulwark.fcrepo.lndo.site:8080

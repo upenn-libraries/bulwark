@@ -35,7 +35,7 @@ String.class_eval do
   end
 
   # Fedora names
-
+  # TODO: rename or remove these methods? it looks like they used in non-deprecated code, e.g., DigitalObjectsController#publish, Repo,
   def fedorafy
     self.gsub('ark:/', '').gsub('/','-')
   end

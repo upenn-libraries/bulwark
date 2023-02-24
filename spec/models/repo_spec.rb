@@ -226,7 +226,6 @@ RSpec.describe Repo, type: :model do
     let(:current_time) { Time.current }
     let(:document) do
       {
-        "active_fedora_model_ssi" => "Manuscript",
         "bibnumber_ssi" => nil,
         "call_number_sim" => ["Ms. Coll 200 box 180 folder 8576 item 2"],
         "call_number_ssim" => ["Ms. Coll 200 box 180 folder 8576 item 2"],
@@ -251,7 +250,6 @@ RSpec.describe Repo, type: :model do
         "geographic_subject_tesim" => ["New York City, New York, United States"],
         "id" => repo.names.fedora,
         "has_images_bsi" => "T",
-        "has_model_ssim" => ["Manuscript"],
         "item_type_sim" => ["Programs"],
         "item_type_ssim" => ["Programs"],
         "item_type_tesim" => ["Programs"],

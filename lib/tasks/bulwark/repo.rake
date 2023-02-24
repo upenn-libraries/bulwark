@@ -58,17 +58,6 @@ namespace :bulwark do
           puts "  Ceph Bucket: Does not exist"
         end
 
-        # Purposefully not deleting fedora object and solr documents because they will
-        # most likely be recreated.
-
-        # Checks for Fedora object
-        begin
-          ActiveFedora::Base.find(repo.names.fedora)
-          puts Rainbow("  Fedora Object: Found for id #{repo.names.fedora}").red
-        rescue ActiveFedora::ObjectNotFoundError
-          puts "  Fedora Object: Not found"
-        end
-
         # Checks for Solr document,
         if Blacklight.default_index.search(q: "id:#{repo.names.fedora}", fl: 'id').docs.count == 1
           puts Rainbow("  Solr Object: Found for id #{repo.names.fedora}").red
