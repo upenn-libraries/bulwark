@@ -82,7 +82,6 @@ services:
         parallelism: 1
     environment:
       CACHE_URL:
-      CATALOG_CONTROLLER_PROTOCOL:
       DATABASE_NAME:
       DATABASE_USERNAME:
       EZID_DEFAULT_SHOULDER:
@@ -170,7 +169,6 @@ services:
         parallelism: 1
     environment:
       CACHE_URL:
-      CATALOG_CONTROLLER_PROTOCOL:
       DATABASE_NAME:
       DATABASE_USERNAME:
       EZID_DEFAULT_SHOULDER:

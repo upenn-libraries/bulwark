@@ -6,10 +6,6 @@ class CatalogController < ApplicationController
 
   before_action :home_alert, only: :index
 
-  def default_url_options
-    { :protocol => ENV['CATALOG_CONTROLLER_PROTOCOL'] }
-  end
-
   # These before_filters apply the hydra access controls
   #before_filter :enforce_show_permissions, :only=>:show
   # This applies appropriate access controls to all solr queries
