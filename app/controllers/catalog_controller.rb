@@ -112,7 +112,7 @@ class CatalogController < ApplicationController
     config.add_show_field :language_ssim, label: 'Language'
     config.add_show_field :provenance_ssim, label: 'Provenance'
     config.add_show_field :publisher_ssim, label: 'Publisher'
-    config.add_show_field :relation, label: 'Relation', accessor: :relation, unless: ->(_,_,d) { d.relation.blank? }
+    config.add_show_field :relation, label: 'Relation', accessor: :relation, unless: ->(_, _, d) { d.relation.blank? }
     config.add_show_field :source_ssim, label: 'Source'
     config.add_show_field :subject_ssim, label: 'Subject', :link_to_search => 'subject_sim'
     config.add_show_field :item_type_ssim, label: 'Type'
