@@ -2,23 +2,13 @@
 #require 'blacklight/catalog'
 
 class CatalogController < ApplicationController
-
-  include Hydra::Catalog
+  include Blacklight::Catalog
 
   before_action :home_alert, only: :index
-
-  def default_url_options
-    { :protocol => ENV['CATALOG_CONTROLLER_PROTOCOL'] }
-  end
 
   # These before_filters apply the hydra access controls
   #before_filter :enforce_show_permissions, :only=>:show
   # This applies appropriate access controls to all solr queries
-
-  add_nav_action 'admin_repo/admin_menu', if: :current_user?
-
-  CatalogController.search_params_logic += [:exclude_unwanted_models]#, :exclude_unwanted_terms]
-
   configure_blacklight do |config|
     # Delete document actions that we don't support
     config.index.document_actions.delete(:bookmark)
@@ -27,7 +17,7 @@ class CatalogController < ApplicationController
     config.show.document_actions.delete(:email)
     config.show.document_actions.delete(:sms)
 
-    config.search_builder_class = Hydra::SearchBuilder
+    config.search_builder_class = SearchBuilder
     config.default_solr_params = {
       :qt => 'search',
       :rows => 10
@@ -35,7 +25,6 @@ class CatalogController < ApplicationController
 
     # solr field configuration for search results/index views
     config.index.title_field = 'title_tesim'
-    config.index.display_type_field = 'has_model_ssim'
 
     # thumbnail field
     config.index.thumbnail_method = :thumbnail
@@ -61,16 +50,16 @@ class CatalogController < ApplicationController
     # facet bar
 
     # Facets
-    config.add_facet_field solr_name('collection', :facetable), label: 'Collection', limit: 5, collapse: false
-    config.add_facet_field solr_name('subject', :facetable), label: 'Subject', limit: 5, collapse: false
-    config.add_facet_field solr_name('language', :facetable), label: 'Language', limit: 5, collapse: false
-    config.add_facet_field solr_name('date', :facetable), label: 'Date', limit: 5, collapse: false
-    config.add_facet_field solr_name('creator', :facetable), label: 'Creator', limit: 5, collapse: true
-    config.add_facet_field solr_name('publisher', :facetable), label: 'Publisher', limit: 5, collapse: true
-    config.add_facet_field solr_name('item_type', :facetable), label: 'Type', limit: 5, collapse: true
-    config.add_facet_field solr_name('personal_name', :facetable), label: 'Personal Name', limit: 5, collapse: true, helper_method: 'html_facet'
-    config.add_facet_field solr_name('corporate_name', :facetable), label: 'Corporate Name', limit: 5, collapse: true,  helper_method: 'html_facet'
-    config.add_facet_field solr_name('geographic_subject', :facetable), label: 'Geographic Subject', limit: 5, collapse: true
+    config.add_facet_field :collection_sim, label: 'Collection', limit: 5, collapse: false
+    config.add_facet_field :subject_sim, label: 'Subject', limit: 5, collapse: false
+    config.add_facet_field :language_sim, label: 'Language', limit: 5, collapse: false
+    config.add_facet_field :date_sim, label: 'Date', limit: 5, collapse: false
+    config.add_facet_field :creator_sim, label: 'Creator', limit: 5, collapse: true
+    config.add_facet_field :publisher_sim, label: 'Publisher', limit: 5, collapse: true
+    config.add_facet_field :item_type_sim, label: 'Type', limit: 5, collapse: true
+    config.add_facet_field :personal_name_sim, label: 'Personal Name', limit: 5, collapse: true, helper_method: 'html_facet'
+    config.add_facet_field :corporate_name_sim, label: 'Corporate Name', limit: 5, collapse: true,  helper_method: 'html_facet'
+    config.add_facet_field :geographic_subject_sim, label: 'Geographic Subject', limit: 5, collapse: true
 
     config.add_facet_fields_to_solr_request!
 
@@ -86,58 +75,58 @@ class CatalogController < ApplicationController
     #   The ordering of the field names is the order of the display
 
     # PQC
-    config.add_index_field solr_name('title', :stored_searchable, type: :string), :label => 'Title', helper_method: 'html_entity'
-    config.add_index_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject', helper_method: 'html_entity'
-    config.add_index_field solr_name('description', :stored_searchable, type: :string), :label => 'Description', helper_method: 'html_entity'
-    config.add_index_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name', helper_method: 'html_entity'
-    config.add_index_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name', helper_method: 'html_entity'
-    config.add_index_field solr_name('contributor', :stored_searchable, type: :string), :label => 'Contributor', helper_method: 'html_entity'
-    config.add_index_field solr_name('contributing_institution', :stored_searchable, type: :string), :label => 'Contributing Institution', helper_method: 'html_entity'
-    config.add_index_field solr_name('date', :stored_searchable, type: :string), :label => 'Date'
-    config.add_index_field solr_name('language', :stored_searchable, type: :string), :label => 'Language'
-    config.add_index_field solr_name('creator', :stored_searchable, type: :string), :label => 'Creator'
-    config.add_index_field solr_name('publisher', :stored_searchable, type: :string), :label => 'Publisher'
-    config.add_index_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
-    config.add_index_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
-    config.add_index_field solr_name('format_type', :stored_searchable, type: :string), :label => 'Type'
+    config.add_index_field :title_ssim, label: 'Title', helper_method: 'html_entity'
+    config.add_index_field :subject_ssim, label: 'Subject', helper_method: 'html_entity'
+    config.add_index_field :description_ssim, label: 'Description', helper_method: 'html_entity'
+    config.add_index_field :personal_name_ssim, label: 'Personal Name', helper_method: 'html_entity'
+    config.add_index_field :corporate_name_ssim, label: 'Corporate Name', helper_method: 'html_entity'
+    config.add_index_field :contributor_ssim, label: 'Contributor', helper_method: 'html_entity'
+    config.add_index_field :contributing_institution_ssim, label: 'Contributing Institution', helper_method: 'html_entity'
+    config.add_index_field :date_ssim, label: 'Date'
+    config.add_index_field :language_ssim, label: 'Language'
+    config.add_index_field :creator_ssim, label: 'Creator'
+    config.add_index_field :publisher_ssim, label: 'Publisher'
+    config.add_index_field :rights_ssim, label: 'Rights'
+    config.add_index_field :source_ssim, label: 'Source'
+    config.add_index_field :format_type_ssim, label: 'Type'
 
     # Catalog
-    config.add_index_field solr_name('collection', :stored_searchable), :label => 'Collection'
-    config.add_index_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number' # TODO: delete when all digital objects are migrated.
-    config.add_index_field solr_name('call_number', :stored_searchable, type: :string), :label => 'Call Number'
+    config.add_index_field :collection_ssim, label: 'Collection'
+    config.add_index_field :display_call_number_ssim, label: 'Call Number' # TODO: delete when all digital objects are migrated.
+    config.add_index_field :call_number_ssim, label: 'Call Number'
 
     # solr fields to be displayed in the show (single result) view
     #   The ordering of the field names is the order of the display
 
     # PQC
-    config.add_show_field solr_name('title', :stored_searchable, type: :string), :label => 'Title', helper_method: 'html_entity'
-    config.add_show_field solr_name('abstract', :stored_searchable, type: :string), :label => 'Abstract'
-    config.add_show_field solr_name('contributor', :stored_searchable, type: :string), :label => 'Contributor'
-    config.add_show_field solr_name('coverage', :stored_searchable, type: :string), :label => 'Coverage'
-    config.add_show_field solr_name('creator', :stored_searchable, type: :string), :label => 'Creator'
-    config.add_show_field solr_name('contributing_institution', :stored_searchable, type: :string), :label => 'Contributing Institution'
-    config.add_show_field solr_name('date', :stored_searchable, type: :string), :label => 'Date'
-    config.add_show_field solr_name('description', :stored_searchable, type: :string), :label => 'Description'
-    config.add_show_field solr_name('format', :stored_searchable, type: :string), :label => 'Format'
-    config.add_show_field solr_name('identifier', :stored_searchable, type: :string), :label => 'Identifier'
-    config.add_show_field solr_name('language', :stored_searchable, type: :string), :label => 'Language'
-    config.add_show_field solr_name('provenance', :stored_searchable, type: :string), :label => 'Provenance'
-    config.add_show_field solr_name('publisher', :stored_searchable, type: :string), :label => 'Publisher'
+    config.add_show_field :title_ssim, label: 'Title', helper_method: 'html_entity'
+    config.add_show_field :abstract_ssim, label: 'Abstract'
+    config.add_show_field :contributor_ssim, label: 'Contributor'
+    config.add_show_field :coverage_ssim, label: 'Coverage'
+    config.add_show_field :creator_ssim, label: 'Creator'
+    config.add_show_field :contributing_institution_ssim, label: 'Contributing Institution'
+    config.add_show_field :date_ssim, label: 'Date'
+    config.add_show_field :description_ssim, label: 'Description'
+    config.add_show_field :format_ssim, label: 'Format'
+    config.add_show_field :identifier_ssim, label: 'Identifier'
+    config.add_show_field :language_ssim, label: 'Language'
+    config.add_show_field :provenance_ssim, label: 'Provenance'
+    config.add_show_field :publisher_ssim, label: 'Publisher'
     config.add_show_field :relation, label: 'Relation', accessor: :relation, unless: ->(_,_,d) { d.relation.blank? }
-    config.add_show_field solr_name('source', :stored_searchable, type: :string), :label => 'Source'
-    config.add_show_field solr_name('subject', :stored_searchable, type: :string), :label => 'Subject', :link_to_search => 'subject_sim'
-    config.add_show_field solr_name('item_type', :stored_searchable, type: :string), :label => 'Type'
-    config.add_show_field solr_name('personal_name', :stored_searchable, type: :string), :label => 'Personal Name'
-    config.add_show_field solr_name('corporate_name', :stored_searchable, type: :string), :label => 'Corporate Name'
-    config.add_show_field solr_name('geographic_subject', :stored_searchable, type: :string), :label => 'Geographic Subject'
-    config.add_show_field solr_name('rights', :stored_searchable, type: :string), :label => 'Rights'
-    config.add_show_field solr_name('notes', :stored_searchable, type: :string), :label => 'Notes'
+    config.add_show_field :source_ssim, label: 'Source'
+    config.add_show_field :subject_ssim, label: 'Subject', :link_to_search => 'subject_sim'
+    config.add_show_field :item_type_ssim, label: 'Type'
+    config.add_show_field :personal_name_ssim, label: 'Personal Name'
+    config.add_show_field :corporate_name_ssim, label: 'Corporate Name'
+    config.add_show_field :geographic_subject_ssim, label: 'Geographic Subject'
+    config.add_show_field :rights_ssim, label: 'Rights'
+    config.add_show_field :notes_ssim, label: 'Notes'
 
     # Catalog
-    config.add_show_field solr_name('display_call_number', :stored_searchable, type: :string), :label => 'Call Number' # TODO: remove when all digital objects are migrated.
-    config.add_show_field solr_name('call_number', :stored_searchable, type: :string), :label => 'Call Number'
+    config.add_show_field :display_call_number_ssim, label: 'Call Number' # TODO: remove when all digital objects are migrated.
+    config.add_show_field :call_number_ssim, label: 'Call Number'
 
-    config.add_show_field solr_name('collection', :stored_searchable, type: :string), :label => 'Collection'
+    config.add_show_field :collection_ssim, label: 'Collection'
 
     # "fielded" search configuration. Used by pulldown among other places.
     # For supported keys in hash, see rdoc for Blacklight::SearchFields
@@ -157,7 +146,7 @@ class CatalogController < ApplicationController
     # solr request handler? The one set in config[:default_solr_parameters][:qt],
     # since we aren't specifying it otherwise.
 
-    config.add_search_field 'all_fields', :label => 'All Fields'
+    config.add_search_field 'all_fields', label: 'All Fields'
 
     # Now we see how to over-ride Solr request handler defaults, in this
     # case for a BL "search field", which is really a dismax aggregate
@@ -232,26 +221,6 @@ class CatalogController < ApplicationController
     # If there are more than this many search results, no spelling ("did you
     # mean") suggestion is offered.
     config.spell_max = 5
-  end
-
-  def exclude_unwanted_models(solr_parameters, user_parameters)
-    solr_parameters[:fq] ||= []
-    unwanted_models.each do |um|
-    if um.kind_of?(String)
-      model_uri = um
-    else
-      model_uri = um.to_class_uri
-      end
-    solr_parameters[:fq] << "-has_model_ssim:\"#{model_uri}\""
-    end
-  end
-
-  def exclude_unwanted_terms(solr_parameters, user_parameters)
-    solr_parameters[:fq] << "-title_tesim:\"Book of\""
-  end
-
-  def unwanted_models
-    [Collection, Image, ActiveFedora::DirectContainer, ActiveFedora::IndirectContainer, ActiveFedora::Aggregation::Proxy]
   end
 
   def render_search_results_as_json

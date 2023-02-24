@@ -226,7 +226,6 @@ RSpec.describe Repo, type: :model do
     let(:current_time) { Time.current }
     let(:document) do
       {
-        "active_fedora_model_ssi" => "Manuscript",
         "bibnumber_ssi" => nil,
         "call_number_sim" => ["Ms. Coll 200 box 180 folder 8576 item 2"],
         "call_number_ssim" => ["Ms. Coll 200 box 180 folder 8576 item 2"],
@@ -251,7 +250,6 @@ RSpec.describe Repo, type: :model do
         "geographic_subject_tesim" => ["New York City, New York, United States"],
         "id" => repo.names.fedora,
         "has_images_bsi" => "T",
-        "has_model_ssim" => ["Manuscript"],
         "item_type_sim" => ["Programs"],
         "item_type_ssim" => ["Programs"],
         "item_type_tesim" => ["Programs"],
@@ -393,15 +391,35 @@ RSpec.describe Repo, type: :model do
   end
 
   describe '#create_iiif_manifest' do
-    context 'when images are present' do
+    before do
+      allow(Settings.iiif).to receive(:image_server).and_return('https://images.library.upenn/iiif/2')
+    end
+
+    let(:repo) do
+      FactoryBot.create(:repo, :with_descriptive_metadata, :with_structural_metadata)
+    end
+
+    context 'when assets missing derivatives' do
       before do
-        allow(Settings.iiif).to receive(:image_server).and_return('https://images.library.upenn/iiif/2')
+        repo.assets.each { |a| a.update!(access_file_location: nil) }
       end
 
-      let(:repo) do
-        FactoryBot.create(:repo, :with_descriptive_metadata, :with_structural_metadata)
+      it 'raises expected error' do
+        expect { repo.create_iiif_manifest }.to raise_error /missing derivatives: #{repo.assets.map(&:filename).join(', ')}/
+      end
+    end
+
+    context 'when missing title' do
+      before do
+        repo.descriptive_metadata.update!(user_defined_mappings: {})
       end
 
+      it 'raises expected error' do
+        expect { repo.create_iiif_manifest }.to raise_error /title is blank/
+      end
+    end
+
+    context 'when images are present' do
       let(:expected_payload) do
         first_asset = repo.assets.find_by(filename: repo.structural_metadata.user_defined_mappings['sequence'][0]['filename'])
         second_asset = repo.assets.find_by(filename: repo.structural_metadata.user_defined_mappings['sequence'][1]['filename'])

@@ -20,9 +20,6 @@ secrets:
   bulwark_ezid_password:
     external: true
     name: colenda_bulwark_ezid_password_v${EZID_PASSWORD_VERSION}
-  bulwark_fedora_password:
-    external: true
-    name: colenda_bulwark_fedora_password_v${FEDORA_PASSWORD_VERSION}
   bulwark_git_user_pass:
     external: true
     name: colenda_bulwark_git_user_pass_v${GIT_USER_PASS_VERSION}
@@ -85,7 +82,6 @@ services:
         parallelism: 1
     environment:
       CACHE_URL:
-      CATALOG_CONTROLLER_PROTOCOL:
       DATABASE_NAME:
       DATABASE_USERNAME:
       EZID_DEFAULT_SHOULDER:
@@ -97,10 +93,7 @@ services:
       MASTERSRBM_HARVESTING_ENDPOINT_REMOTE:
       MARMITE_URL:
       PHALT_ENDPOINT:
-      FEDORA_URL:
-      FEDORA_USER:
       SOLR_URL:
-      PUBLIC_FEDORA_URL:
       RAILS_ENV:
       REDIS_URL:
       REQUEST_STYLE:
@@ -143,8 +136,6 @@ services:
         target: /run/secrets/database_password
       - source: bulwark_ezid_password
         target: /run/secrets/ezid_password
-      - source: bulwark_fedora_password
-        target: /run/secrets/fedora_password
       - source: bulwark_git_user_pass
         target: /run/secrets/git_user_pass
       - source: bulwark_imaging_user_pass
@@ -178,7 +169,6 @@ services:
         parallelism: 1
     environment:
       CACHE_URL:
-      CATALOG_CONTROLLER_PROTOCOL:
       DATABASE_NAME:
       DATABASE_USERNAME:
       EZID_DEFAULT_SHOULDER:
@@ -190,10 +180,7 @@ services:
       MASTERSRBM_HARVESTING_ENDPOINT_REMOTE:
       MARMITE_URL:
       PHALT_ENDPOINT:
-      FEDORA_URL:
-      FEDORA_USER:
       SOLR_URL:
-      PUBLIC_FEDORA_URL:
       RAILS_ENV:
       REDIS_URL:
       REQUEST_STYLE:
@@ -228,8 +215,6 @@ services:
         target: /run/secrets/database_password
       - source: bulwark_ezid_password
         target: /run/secrets/ezid_password
-      - source: bulwark_fedora_password
-        target: /run/secrets/fedora_password
       - source: bulwark_honeybadger_api_key
         target: /run/secrets/honeybadger_api_key
       - source: bulwark_git_user_pass

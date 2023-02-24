@@ -231,10 +231,16 @@ class Repo < ActiveRecord::Base
   def create_iiif_manifest
     return if assets.where(mime_type: ['image/jpeg', 'image/tiff']).count.zero?
 
+    raise 'Cannot generate IIIF manifest because title is blank' if descriptive_metadata.user_defined_mappings['title'].blank?
+
+    missing_derivatives = [] # Keeping track of any assets that are missing derivatives
+
     sequence = structural_metadata.user_defined_mappings['sequence'].map do |info|
       asset = assets.find_by(filename: info['filename'])
+      missing_derivatives << info['filename'] if asset&.access_file_location.blank?
+
       {
-        file: names.bucket + '%2F' + asset.access_file_location,
+        file: "#{names.bucket}%2F#{asset&.access_file_location}",
         label: info.fetch('label', nil),
         table_of_contents: info.fetch('table_of_contents', []).map { |t| { text: t } },
         additional_downloads: [
@@ -247,6 +253,8 @@ class Repo < ActiveRecord::Base
         ]
       }.delete_if { |_,v| v.blank? }
     end
+
+    raise "Cannot generate IIIF manifest because the following files are missing derivatives: #{missing_derivatives.join(', ')}" unless missing_derivatives.blank?
 
     payload = {
       id: names.fedora,
@@ -282,8 +290,6 @@ class Repo < ActiveRecord::Base
   def solr_document
     document = {
       'id' => names.fedora,
-      'active_fedora_model_ssi' => 'Manuscript', # TODO: Can remove once Blacklight doesn't depend on these fields
-      'has_model_ssim' => ['Manuscript'],
       'unique_identifier_tesim' => unique_identifier,
       'system_create_dtsi' => first_published_at.utc.iso8601,
       'system_modified_dtsi' => last_published_at.utc.iso8601,

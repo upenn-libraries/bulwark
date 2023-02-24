@@ -1,6 +1,6 @@
 # README for `bulwark`
 
-Bulwark is a Hydra head providing administrative digital asset and metadata generation, management, review, and ingest to a repository with a public facing capability.
+Bulwark is a Blacklight app providing administrative digital asset and metadata generation, management, review, and ingest to a repository with a public facing capability.
 
 ## System dependencies
 
@@ -161,17 +161,6 @@ This illustration represents the current deployment workflow for Bulwark.
 
 ![Bulwark deployment workflow](bulwark_deployment.png)
 
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at [https://github.com/upenn-libraries/bulwark](https://github.com/upenn-libraries/bulwark).
-
 ## License
 
 This code is available as open source under the terms of the [Apache 2.0 License](https://opensource.org/licenses/Apache-2.0).
-
-## Acknowledgments
-
-This software is brought to you by the Samvera community.  Learn more at the
-[Samvera website](http://samvera.org/).
-
-![Samvera Logo](https://wiki.duraspace.org/download/thumbnails/87459292/samvera-fall-font2-200w.png?version=1&modificationDate=1498550535816&api=v2)
