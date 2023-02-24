@@ -8,8 +8,6 @@ class ApplicationController < ActionController::Base
   # https://github.com/projectblacklight/blacklight/blob/v5.13.0/app/views/layouts/blacklight.html.erb
   layout 'application'
 
-  before_action :_set_current_user
-
   rescue_from ActiveRecord::RecordNotFound, :with => :rescue_not_found
 
   # Prevent CSRF attacks by raising an exception.
@@ -28,10 +26,5 @@ class ApplicationController < ActionController::Base
     path = Dir.glob(glob_path).first
     filename = params[:filename] + File.extname(params[:key]) if params[:filename].present?
     send_file(path, disposition: params[:disposition], filename: filename)
-  end
-
-  private
-  def _set_current_user
-    User.current = current_user.email if current_user
   end
 end
