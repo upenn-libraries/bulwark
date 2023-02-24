@@ -80,58 +80,58 @@ class CatalogController < ApplicationController
     #   The ordering of the field names is the order of the display
 
     # PQC
-    config.add_index_field :title_ssim, :label => 'Title', helper_method: 'html_entity'
-    config.add_index_field :subject_ssim, :label => 'Subject', helper_method: 'html_entity'
-    config.add_index_field :description_ssim, :label => 'Description', helper_method: 'html_entity'
-    config.add_index_field :personal_name_ssim, :label => 'Personal Name', helper_method: 'html_entity'
-    config.add_index_field :corporate_name_ssim, :label => 'Corporate Name', helper_method: 'html_entity'
-    config.add_index_field :contributor_ssim, :label => 'Contributor', helper_method: 'html_entity'
-    config.add_index_field :contributing_institution_ssim, :label => 'Contributing Institution', helper_method: 'html_entity'
-    config.add_index_field :date_ssim, :label => 'Date'
-    config.add_index_field :language_ssim, :label => 'Language'
-    config.add_index_field :creator_ssim, :label => 'Creator'
-    config.add_index_field :publisher_ssim, :label => 'Publisher'
-    config.add_index_field :rights_ssim, :label => 'Rights'
-    config.add_index_field :source_ssim, :label => 'Source'
-    config.add_index_field :format_type_ssim, :label => 'Type'
+    config.add_index_field :title_ssim, label: 'Title', helper_method: 'html_entity'
+    config.add_index_field :subject_ssim, label: 'Subject', helper_method: 'html_entity'
+    config.add_index_field :description_ssim, label: 'Description', helper_method: 'html_entity'
+    config.add_index_field :personal_name_ssim, label: 'Personal Name', helper_method: 'html_entity'
+    config.add_index_field :corporate_name_ssim, label: 'Corporate Name', helper_method: 'html_entity'
+    config.add_index_field :contributor_ssim, label: 'Contributor', helper_method: 'html_entity'
+    config.add_index_field :contributing_institution_ssim, label: 'Contributing Institution', helper_method: 'html_entity'
+    config.add_index_field :date_ssim, label: 'Date'
+    config.add_index_field :language_ssim, label: 'Language'
+    config.add_index_field :creator_ssim, label: 'Creator'
+    config.add_index_field :publisher_ssim, label: 'Publisher'
+    config.add_index_field :rights_ssim, label: 'Rights'
+    config.add_index_field :source_ssim, label: 'Source'
+    config.add_index_field :format_type_ssim, label: 'Type'
 
     # Catalog
-    config.add_index_field :collection_ssim, :label => 'Collection'
-    config.add_index_field :display_call_number_ssim, :label => 'Call Number' # TODO: delete when all digital objects are migrated.
-    config.add_index_field :call_number_ssim, :label => 'Call Number'
+    config.add_index_field :collection_ssim, label: 'Collection'
+    config.add_index_field :display_call_number_ssim, label: 'Call Number' # TODO: delete when all digital objects are migrated.
+    config.add_index_field :call_number_ssim, label: 'Call Number'
 
     # solr fields to be displayed in the show (single result) view
     #   The ordering of the field names is the order of the display
 
     # PQC
-    config.add_show_field :title_ssim, :label => 'Title', helper_method: 'html_entity'
-    config.add_show_field :abstract_ssim, :label => 'Abstract'
-    config.add_show_field :contributor_ssim, :label => 'Contributor'
-    config.add_show_field :coverage_ssim, :label => 'Coverage'
-    config.add_show_field :creator_ssim, :label => 'Creator'
-    config.add_show_field :contributing_institution_ssim, :label => 'Contributing Institution'
-    config.add_show_field :date_ssim, :label => 'Date'
-    config.add_show_field :description_ssim, :label => 'Description'
-    config.add_show_field :format_ssim, :label => 'Format'
-    config.add_show_field :identifier_ssim, :label => 'Identifier'
-    config.add_show_field :language_ssim, :label => 'Language'
-    config.add_show_field :provenance_ssim, :label => 'Provenance'
-    config.add_show_field :publisher_ssim, :label => 'Publisher'
-    config.add_show_field :relation_ssim, :label => 'Relation', helper_method: :remove_circular_references
-    config.add_show_field :source_ssim, :label => 'Source'
-    config.add_show_field :subject_ssim, :label => 'Subject', :link_to_search => 'subject_sim'
-    config.add_show_field :item_type_ssim, :label => 'Type'
-    config.add_show_field :personal_name_ssim, :label => 'Personal Name'
-    config.add_show_field :corporate_name_ssim, :label => 'Corporate Name'
-    config.add_show_field :geographic_subject_ssim, :label => 'Geographic Subject'
-    config.add_show_field :rights_ssim, :label => 'Rights'
-    config.add_show_field :notes_ssim, :label => 'Notes'
+    config.add_show_field :title_ssim, label: 'Title', helper_method: 'html_entity'
+    config.add_show_field :abstract_ssim, label: 'Abstract'
+    config.add_show_field :contributor_ssim, label: 'Contributor'
+    config.add_show_field :coverage_ssim, label: 'Coverage'
+    config.add_show_field :creator_ssim, label: 'Creator'
+    config.add_show_field :contributing_institution_ssim, label: 'Contributing Institution'
+    config.add_show_field :date_ssim, label: 'Date'
+    config.add_show_field :description_ssim, label: 'Description'
+    config.add_show_field :format_ssim, label: 'Format'
+    config.add_show_field :identifier_ssim, label: 'Identifier'
+    config.add_show_field :language_ssim, label: 'Language'
+    config.add_show_field :provenance_ssim, label: 'Provenance'
+    config.add_show_field :publisher_ssim, label: 'Publisher'
+    config.add_show_field :relation_ssim, label: 'Relation', helper_method: :remove_circular_references
+    config.add_show_field :source_ssim, label: 'Source'
+    config.add_show_field :subject_ssim, label: 'Subject', :link_to_search => 'subject_sim'
+    config.add_show_field :item_type_ssim, label: 'Type'
+    config.add_show_field :personal_name_ssim, label: 'Personal Name'
+    config.add_show_field :corporate_name_ssim, label: 'Corporate Name'
+    config.add_show_field :geographic_subject_ssim, label: 'Geographic Subject'
+    config.add_show_field :rights_ssim, label: 'Rights'
+    config.add_show_field :notes_ssim, label: 'Notes'
 
     # Catalog
-    config.add_show_field :display_call_number_ssim, :label => 'Call Number' # TODO: remove when all digital objects are migrated.
-    config.add_show_field :call_number_ssim, :label => 'Call Number'
+    config.add_show_field :display_call_number_ssim, label: 'Call Number' # TODO: remove when all digital objects are migrated.
+    config.add_show_field :call_number_ssim, label: 'Call Number'
 
-    config.add_show_field :collection_ssim, :label => 'Collection'
+    config.add_show_field :collection_ssim, label: 'Collection'
 
     # "fielded" search configuration. Used by pulldown among other places.
     # For supported keys in hash, see rdoc for Blacklight::SearchFields
@@ -151,7 +151,7 @@ class CatalogController < ApplicationController
     # solr request handler? The one set in config[:default_solr_parameters][:qt],
     # since we aren't specifying it otherwise.
 
-    config.add_search_field 'all_fields', :label => 'All Fields'
+    config.add_search_field 'all_fields', label: 'All Fields'
 
     # Now we see how to over-ride Solr request handler defaults, in this
     # case for a BL "search field", which is really a dismax aggregate
