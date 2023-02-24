@@ -21,4 +21,9 @@ class SolrDocument
   def unique_identifier
     fetch('unique_identifier_tesim', []).first
   end
+
+  # Removing circular references from relation field.
+  def relation
+    fetch(:relation_tesim, []).delete_if { |r| r.include?(id) }
+  end
 end
