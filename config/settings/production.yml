@@ -1,18 +1,8 @@
 # Settings for all deployed environment.
 
 mounted_drives:
-  kaplan-rescue: <%= ENV['KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
-  scanstore-rescue: <%= ENV['SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE'] %>
-  sceti-completed: <%= ENV['SCETI_COMPLETED_HARVESTING_ENDPOINT_REMOTE'] %>
-  sceti-completed-2: <%= ENV['SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE'] %>
-  sceti-completed-3: <%= ENV['SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE'] %>
   sceti-completed-4: <%= ENV['SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE'] %>
   sceti-completed-5: <%= ENV['SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE'] %>
-  sceti: <%= ENV['SCETI_HARVESTING_ENDPOINT_REMOTE'] %>
-  keffer: <%= ENV['KEFFER_HARVESTING_ENDPOINT_REMOTE'] %>
-  fairmanrogers: <%= ENV['FAIRMANROGERS_HARVESTING_ENDPOINT_REMOTE'] %>
-  mastersrbm:  <%= ENV['MASTERSRBM_HARVESTING_ENDPOINT_REMOTE'] %>
-  managedmasters: <%= ENV['MANAGEDMASTERS_HARVESTING_ENDPOINT_REMOTE'] %>
 marmite:
   url: <%= ENV['MARMITE_URL'] %>
 bulk_import:

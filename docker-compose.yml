@@ -89,24 +89,14 @@ services:
       GIT_USER:
       IIIF_IMAGE_SERVER:
       IMAGING_USER:
-      KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE:
-      MASTERSRBM_HARVESTING_ENDPOINT_REMOTE:
       MARMITE_URL:
       PHALT_ENDPOINT:
       SOLR_URL:
       RAILS_ENV:
       REDIS_URL:
       REQUEST_STYLE:
-      MANAGEDMASTERS_HARVESTING_ENDPOINT_REMOTE:
-      SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE:
-      SCETI_COMPLETED_HARVESTING_ENDPOINT_REMOTE:
-      SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE:
-      SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE:
-      SCETI_HARVESTING_ENDPOINT_REMOTE:
-      FAIRMANROGERS_HARVESTING_ENDPOINT_REMOTE:
-      KEFFER_HARVESTING_ENDPOINT_REMOTE:
       SMTP_ADDRESS:
       SMTP_DOMAIN:
       SMTP_PORT:
@@ -147,18 +137,8 @@ services:
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
-      - 'mastersrbm:${MASTERSRBM_HARVESTING_ENDPOINT_REMOTE}'
-      - 'managedmasters:${MANAGEDMASTERS_HARVESTING_ENDPOINT_REMOTE}'
-      - 'sceti_completed:${SCETI_COMPLETED_HARVESTING_ENDPOINT_REMOTE}'
-      - 'sceti_completed_2:${SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE}'
-      - 'sceti_completed_3:${SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_4:${SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_5:${SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE}'
-      - 'scanstore_rescue:${SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
-      - 'sceti:${SCETI_HARVESTING_ENDPOINT_REMOTE}'
-      - 'keffer:${KEFFER_HARVESTING_ENDPOINT_REMOTE}'
-      - 'fairmanrogers:${FAIRMANROGERS_HARVESTING_ENDPOINT_REMOTE}'
-      - 'kaplan_rescue:${KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
       - '${LOCAL_FEATURED}:/home/app/webapp/public/assets/featured'
   sidekiq:
     image: 'gitlab.library.upenn.edu/digital-repository/bulwark:${BULWARK_IMAGE_TAG}'
@@ -184,16 +164,8 @@ services:
       RAILS_ENV:
       REDIS_URL:
       REQUEST_STYLE:
-      MANAGEDMASTERS_HARVESTING_ENDPOINT_REMOTE:
-      SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE:
-      SCETI_COMPLETED_HARVESTING_ENDPOINT_REMOTE:
-      SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE:
-      SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE:
-      SCETI_HARVESTING_ENDPOINT_REMOTE:
-      FAIRMANROGERS_HARVESTING_ENDPOINT_REMOTE:
-      KEFFER_HARVESTING_ENDPOINT_REMOTE:
       SMTP_ADDRESS:
       SMTP_DOMAIN:
       SMTP_PORT:
@@ -226,43 +198,13 @@ services:
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
-      - 'mastersrbm:${MASTERSRBM_HARVESTING_ENDPOINT_REMOTE}'
-      - 'managedmasters:${MANAGEDMASTERS_HARVESTING_ENDPOINT_REMOTE}'
-      - 'sceti_completed:${SCETI_COMPLETED_HARVESTING_ENDPOINT_REMOTE}'
-      - 'sceti_completed_2:${SCETI_COMPLETED_2_HARVESTING_ENDPOINT_REMOTE}'
-      - 'sceti_completed_3:${SCETI_COMPLETED_3_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_4:${SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_5:${SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE}'
-      - 'sceti:${SCETI_HARVESTING_ENDPOINT_REMOTE}'
-      - 'keffer:${KEFFER_HARVESTING_ENDPOINT_REMOTE}'
-      - 'fairmanrogers:${FAIRMANROGERS_HARVESTING_ENDPOINT_REMOTE}'
-      - 'scanstore_rescue:${SCANSTORE_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
-      - 'kaplan_rescue:${KAPLAN_RESCUE_HARVESTING_ENDPOINT_REMOTE}'
 
 volumes:
-  mastersrbm:
-    external: true
-  managedmasters:
-    external: true
-  sceti_completed:
-    external: true
-  sceti_completed_2:
-    external: true
-  sceti_completed_3:
-    external: true
   sceti_completed_4:
     external: true
   sceti_completed_5:
-    external: true
-  sceti:
-    external: true
-  keffer:
-    external: true
-  fairmanrogers:
-    external: true
-  scanstore_rescue:
-    external: true
-  kaplan_rescue:
     external: true
   redis:
   db:
