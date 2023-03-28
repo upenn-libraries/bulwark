@@ -12,7 +12,6 @@ en:
     in_copyright:
       text: 'in copyright'
       url: 'http://rightsstatements.org/vocab/InC/1.0/'
-    beta_html: '<div class="alert alert-warning"><p>This site is currently in beta and may be periodically unavailable as we make improvements to the service.</p></div>'
     featured_title_html: '<h3>Featured Items</h3>'
   header:
     links:

@@ -67,30 +67,6 @@ span.site-name {
   }
 }
 
-#beta-announcement {
-  clear: both;
-  padding: 5px 10px;
-  background-color: $light-grey;
-  border-bottom: 1px solid $medium-grey;
-}
-
-#beta-label {
-  text-align: right;
-  font-size: 14px;
-}
-
-#beta-label .label {
-  background-color: $upenn-lighter-red;
-  width: 100px;
-  margin-right: 10px;
-  font-size: 14px;
-}
-
-#beta-label .text {
-  text-transform: uppercase;
-  color: #ffffff;
-}
-
 /*************
 *
 * Overriding Blacklight styles
