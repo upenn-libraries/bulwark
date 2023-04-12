@@ -37,6 +37,13 @@ Rails.application.routes.draw do
     get 'about'
   end
 
+  defaults format: :json do
+    scope :migration, controller: :migration do
+      get 'migration/:id/serialized', action: :serialize
+      # post 'migration/:id/migrated', action: :mark_migrated
+    end
+  end
+
   if Rails.env.development? || Rails.env.test?
     get 'special_remote_download/:bucket/:key',
         action: :special_remote_download,
