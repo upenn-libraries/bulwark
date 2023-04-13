@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 RSpec.describe 'Migration Endpoints', type: :request do
-  let(:repo) { FactoryBot.create :repo, :with_unique_identifier }
+  let(:repo) do
+    user = FactoryBot.create :user, :with_password
+    FactoryBot.create :repo, :with_unique_identifier, :with_assets, :with_descriptive_metadata,
+                      :with_structural_metadata, :published, created_by: user
+  end
 
   describe 'GET migration#serialize' do
     it 'returns OK' do
