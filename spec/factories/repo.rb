@@ -76,5 +76,9 @@ FactoryBot.define do
       first_published_at { Time.current - 1.day }
       last_published_at { Time.current }
     end
+
+    trait :with_unique_identifier do
+      unique_identifier { 'ark:/12148/btv1b8449691v' }
+    end
   end
 end

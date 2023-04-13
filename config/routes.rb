@@ -39,7 +39,7 @@ Rails.application.routes.draw do
 
   defaults format: :json do
     scope :migration, controller: :migration do
-      get 'migration/:id/serialized', action: :serialize
+      get 'migration/:id/serialized', action: :serialize, as: :serialize
       # post 'migration/:id/migrated', action: :mark_migrated
     end
   end
