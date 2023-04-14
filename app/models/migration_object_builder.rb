@@ -66,7 +66,7 @@ class MigrationObjectBuilder
         label: seq['label'],
         annotations: seq['table_of_contents'],
         transcription: seq['fulltext'], # not set by test factory...
-        checksum: '', # TODO: existing or computed? should we fixity check at migration?
+        checksum: '', # TODO: pull jhove output file from git repo? aughhhh
         path: "#{@repo.names.bucket}%2F#{asset.access_file_location}" # "path to file in the bucket, won't actually be a path just a filename"
       }
     end
