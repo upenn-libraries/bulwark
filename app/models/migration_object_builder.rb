@@ -51,27 +51,33 @@ class MigrationObjectBuilder
   # @return [Hash]
   def assets
     {
-      bucket: '',
+      bucket: @repo.names.bucket,
       arranged: arranged_assets,
       unarranged: unarranged_assets
     }
   end
 
   def arranged_assets
-    source = @structural_metadata.user_defined_mappings['sequence']
+    source = @structural_metadata.original_mappings['sequence']
     source.map do |seq|
+      asset = @assets.find { |a| a.filename == seq['filename'] }
       {
-        filename: seq['filename'], # original filename
+        filename: seq['filename'], # original filename - or is this a value from the asset?
         label: seq['label'],
         annotations: seq['table_of_contents'],
         transcription: seq['fulltext'], # not set by test factory...
         checksum: '', # TODO: existing or computed? should we fixity check at migration?
-        path: '' # "path to file in the bucket, won't actually be a path just a filename"
+        path: "#{@repo.names.bucket}%2F#{asset.access_file_location}" # "path to file in the bucket, won't actually be a path just a filename"
       }
     end
   end
 
+  # @return [Array]
   def unarranged_assets
-    [] # just an array of filenames
+    # assuming @asset entries not in sequence
+    source = Array.wrap(@structural_metadata.original_mappings['sequence'])
+    asset_filenames = Array.wrap(@assets.map(&:filename))
+    seq_filenames = source.map { |s| s['filename'] }
+    asset_filenames - seq_filenames
   end
 end
