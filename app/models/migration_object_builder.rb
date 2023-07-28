@@ -70,7 +70,7 @@ class MigrationObjectBuilder
         annotations: seq['table_of_contents'],
         transcription: seq['fulltext'],
         checksum: asset_checksum(asset),
-        path: "#{asset.original_file_location}" }
+        path: asset.original_file_location }
     end
   end
 
