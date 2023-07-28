@@ -38,17 +38,17 @@ module StructuralMetadataSources
     }
   end
 
-  def viewing_direction
+  def viewing_direction(default: LEFT_TO_RIGHT)
     return nil unless source_type == 'structural'
     direction = user_defined_mappings['sequence'].map { |asset| asset['viewing_direction'] }.uniq
     raise 'Conflicting viewing_directions. Viewing direction must be the same for all assets' if direction.length > 1
-    direction.first || LEFT_TO_RIGHT
+    direction.first || default
   end
 
-  def viewing_hint
+  def viewing_hint(default: INDIVIDUALS)
     return nil unless source_type == 'structural'
     display = user_defined_mappings['sequence'].map { |asset| asset['display'] }.uniq
     raise 'Conflicting viewing hint. Viewing hint must be the same for all assets' if display.length > 1
-    display.first || INDIVIDUALS
+    display.first || default
   end
 end
