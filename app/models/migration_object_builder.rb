@@ -26,8 +26,8 @@ class MigrationObjectBuilder
       structural_metadata: structural_metadata,
       assets: {
         bucket: @repo.names.bucket,
-        arranged_assets: arranged_assets,
-        unarranged_assets: unarranged_assets
+        arranged: arranged_assets,
+        unarranged: unarranged_assets
       }
     }
   rescue StandardError => e
@@ -67,8 +67,8 @@ class MigrationObjectBuilder
       asset = @assets.find { |a| a.filename == seq['filename'] }
       { filename: seq['filename'],
         label: seq['label'],
-        annotations: seq['table_of_contents'],
-        transcription: seq['fulltext'],
+        annotation: seq.fetch('table_of_contents', []),
+        transcription: [seq['fulltext']].compact,
         checksum: asset_checksum(asset),
         path: asset.original_file_location }
     end
