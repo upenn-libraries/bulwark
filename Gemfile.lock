@@ -1,5 +1,5 @@
 GIT
-  remote: https://gitlab.library.upenn.edu/digital-repository/jhove-service
+  remote: https://gitlab.library.upenn.edu/dld/digital-repository/jhove-service
   revision: 20c792e75dcb467cc6b469f33c5d52275c157699
   branch: master
   specs:

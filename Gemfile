@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gem 'rails', '4.2.5'
 
 # Internal gems
-gem 'jhove-service', git: 'https://gitlab.library.upenn.edu/digital-repository/jhove-service', branch: 'master'
+gem 'jhove-service', git: 'https://gitlab.library.upenn.edu/dld/digital-repository/jhove-service', branch: 'master'
 gem 'string_exts', :path => 'string_exts'
 
 # Hydra/Samvera Ecosystem gems
