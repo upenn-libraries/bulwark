@@ -26,7 +26,7 @@ RSpec.describe 'Item Endpoints', type: :request do
         {
           id: 'ark:/99999/fk4pp0qk3c',
           first_published_at: '2023-01-03T14:27:35Z',
-          last_published_at:'2024-01-03T11:22:30Z',
+          last_published_at: '2024-01-03T11:22:30Z',
           uuid: '36a224db-c416-4769-9da1-28513827d179',
           descriptive_metadata: {
             title: [{ value: 'Message from Phanias and others of the agoranomoi of Oxyrhynchus about a purchase of land.' }],
@@ -65,7 +65,7 @@ RSpec.describe 'Item Endpoints', type: :request do
         {
           id: 'ark:/99999/fk4pp0qk3c',
           first_published_at: '2023-01-03T14:27:35Z',
-          last_published_at:'2024-01-03T11:22:30Z',
+          last_published_at: '2024-01-03T11:22:30Z'
         }
       end
 
@@ -120,7 +120,7 @@ RSpec.describe 'Item Endpoints', type: :request do
           id: id,
           first_published_at: '2023-01-03T14:27:35Z',
           last_published_at: '2024-01-03T11:22:30Z',
-          uuid: '36a224db-c416-4769-9da1-28513827d179',
+          uuid: '36a224db-c416-4769-9da1-28513827d179'
         }.with_indifferent_access
       end
 

@@ -52,10 +52,10 @@ module ApplicationHelper
 
   def render_iiif_manifest_link
     link = if @document.from_apotheca?
-            @document.fetch('iiif_manifest_path_ss', nil) ? item_manifest_url(@document.unique_identifier) : nil
-          else
-            repo = Repo.find_by(unique_identifier: @document.unique_identifier)
-            repo.has_images? ? "#{ENV['UV_URL']}/#{@document.id}/manifest" : nil
+             @document.fetch('iiif_manifest_path_ss', nil) ? item_manifest_url(@document.unique_identifier) : nil
+           else
+             repo = Repo.find_by(unique_identifier: @document.unique_identifier)
+             repo.has_images? ? "#{ENV['UV_URL']}/#{@document.id}/manifest" : nil
            end
 
     link ? link_to('IIIF presentation manifest', link) : nil

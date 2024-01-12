@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Controller for an assets actions. For now, that's mostly downloading files.
 class AssetsController < ActionController::Base
   include PresignedUrls
@@ -38,8 +40,8 @@ class AssetsController < ActionController::Base
 
   private
 
-  def fetch_item
-    @item = Item.find(params[:item_id])
-    raise ItemNotFound unless @item
-  end
+    def fetch_item
+      @item = Item.find(params[:item_id])
+      raise ItemNotFound unless @item
+    end
 end

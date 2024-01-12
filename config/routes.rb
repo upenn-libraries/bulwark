@@ -54,7 +54,7 @@ Rails.application.routes.draw do
       get :manifest
     end
 
-    resources :assets, only: [], constraints: { id: /[a-zA-Z0-9\-]+/} do
+    resources :assets, only: [], constraints: { id: /[a-zA-Z0-9\-]+/ } do
       member do
         get :thumbnail
         get :access

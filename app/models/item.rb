@@ -2,7 +2,7 @@
 
 # Class to find, create and delete Items.
 class Item
-  REQUIRED_CREATE_KEYS = %w[id uuid first_published_at last_published_at]
+  REQUIRED_CREATE_KEYS = %w[id uuid first_published_at last_published_at].freeze
 
   # Find item.
   #
@@ -30,7 +30,7 @@ class Item
       iiif_manifest_path_ss: payload[:iiif_manifest_path],
       from_apotheca_bsi: 'T',
       non_iiif_asset_listing_ss: payload.fetch(:assets, []).select { |a| !a[:iiif] }.to_json, # Assets that need to be listed instead of displayed via the IIIF manifest.
-      raw_ss: payload.to_json, # Keep the whole payload
+      raw_ss: payload.to_json # Keep the whole payload
     }
 
     payload.fetch(:descriptive_metadata, []).each do |field, values|
@@ -58,6 +58,6 @@ class Item
   end
 
   def self.solr_identifier(ark)
-    ark.gsub('ark:/', '').gsub('/','-')
+    ark.tr('ark:/', '').tr('/', '-')
   end
 end

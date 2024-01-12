@@ -6,13 +6,13 @@ module PresignedUrls
 
   private
 
-  def client(**config)
-    Aws::S3::Client.new(**config)
-  end
+    def client(**config)
+      Aws::S3::Client.new(**config)
+    end
 
-  # Returns AWS S3 presigned url that expires in 5 minutes.
-  def presigned_url(client, bucket, key)
-    signer = Aws::S3::Presigner.new(client: client)
-    signer.presigned_url(:get_object, bucket: bucket, key: key, expires_in: 300)
-  end
+    # Returns AWS S3 presigned url that expires in 5 minutes.
+    def presigned_url(client, bucket, key)
+      signer = Aws::S3::Presigner.new(client: client)
+      signer.presigned_url(:get_object, bucket: bucket, key: key, expires_in: 300)
+    end
 end

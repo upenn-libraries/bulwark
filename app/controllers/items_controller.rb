@@ -16,24 +16,20 @@ class ItemsController < ActionController::Base
 
   # POST items/
   def create
-    begin
-      Item.create(params[:item])
-      render json: { status: 'success' }, status: :ok # return 200 if successfully added solr document
-    rescue ArgumentError => e
-      render json: { status: 'error', error: e.message }, status: :bad_request
-    rescue StandardError => e
-      render json: { status: 'error', error: e.message }, status: :internal_server_error
-    end
+    Item.create(params[:item])
+    render json: { status: 'success' }, status: :ok # return 200 if successfully added solr document
+  rescue ArgumentError => e
+    render json: { status: 'error', error: e.message }, status: :bad_request
+  rescue StandardError => e
+    render json: { status: 'error', error: e.message }, status: :internal_server_error
   end
 
   # DELETE items/:id
   def destroy
-    begin
-      Item.delete(@item.unique_identifier)
-      render json: { status: 'success' }, status: :no_content
-    rescue StandardError => e
-      render json: { status: 'error', error: e.message }, status: :internal_server_error
-    end
+    Item.delete(@item.unique_identifier)
+    render json: { status: 'success' }, status: :no_content
+  rescue StandardError => e
+    render json: { status: 'error', error: e.message }, status: :internal_server_error
   end
 
   # GET items/:id/manifest
@@ -51,14 +47,14 @@ class ItemsController < ActionController::Base
 
   private
 
-  def fetch_item
-    @item = Item.find(params[:id])
-    raise ItemNotFound unless @item
-  end
-
-  def token_authentication
-    authenticate_or_request_with_http_token do |token, _options|
-      ActiveSupport::SecurityUtils.secure_compare(token, Settings.publishing_endpoint.token)
+    def fetch_item
+      @item = Item.find(params[:id])
+      raise ItemNotFound unless @item
     end
-  end
+
+    def token_authentication
+      authenticate_or_request_with_http_token do |token, _options|
+        ActiveSupport::SecurityUtils.secure_compare(token, Settings.publishing_endpoint.token)
+      end
+    end
 end
