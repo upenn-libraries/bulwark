@@ -22,3 +22,22 @@ digital_object:
     semantics_filename: fs_semantics
 phalt:
 iiif:
+
+# Apotheca File Storage
+aws: &aws
+  access_key_id: placeholder
+  secret_access_key: placeholder
+  region: us-east-1
+preservation_storage:
+  <<: *aws
+  bucket: upennlib-apotheca-preservation-staging
+derivative_storage:
+  <<: *aws
+  bucket: upennlib-apotheca-derivatives-staging
+iiif_manifest_storage:
+  <<: *aws
+  bucket: upennlib-apotheca-iiif-manifests-staging
+
+# Publishing Endpoint
+publishing_endpoint:
+  token: 'sample_token'

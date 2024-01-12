@@ -16,12 +16,21 @@
   <% end %>
 </div>
 
-<%= render_audio_player %>
+<% if @document.from_apotheca? %>
+  <%= render(partial: 'other_display/uv') if @document.fetch('iiif_manifest_path_ss', false) %>
 
-<%= render_other %>
+  <% @document.non_iiif_assets.select { |a| a[:original_file][:mime_type]&.starts_with? 'audio' }.map do |a| %>
+    <%= render partial: 'other_display/audio', locals: { streaming_id: a[:filename], streaming_url: asset_access_url(@document.unique_identifier, a[:id]) } %>
+  <% end %>
+
+  <% file_download_assets = @document.non_iiif_assets.select { |a| !a[:original_file][:mime_type]&.start_with?('audio') } %>
+  <%= render partial: 'other_display/file_download', locals: { assets: file_download_assets } if file_download_assets.present? %>
+<% else %>
+  <%= render_audio_player %>
+  <%= render_other %>
+  <%= render_uv %>
+<% end %>
 
 <% if @document.respond_to?(:export_as_openurl_ctx_kev) %>
   <span class="Z3988" title="<%= @document.export_as_openurl_ctx_kev(document_partial_name(@document)) %>"></span>
 <% end %>
-
-<%= render_uv %>

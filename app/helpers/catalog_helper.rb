@@ -8,21 +8,7 @@ module CatalogHelper
   end
 
   def thumbnail(document, options)
-    thumbnail_location = document.fetch('thumbnail_location_ssi', nil)
-
-    # Fetching from record if not present in Solr document.
-    if thumbnail_location.nil?
-      repo = Repo.find_by(unique_identifier: document.unique_identifier)
-      thumbnail_location = repo&.thumbnail_location
-    end
-
-    return if thumbnail_location.blank?
-
-    image_tag download_link(*thumbnail_location.split('/', 2))
-  end
-
-  def current_user?
-    current_user != nil
+    image_tag document.thumbnail_link
   end
 
   def html_entity(options={})
@@ -63,5 +49,22 @@ module CatalogHelper
              "admin_repo/repo/#{repo.id}/ingest"
            end
     link_to('View in Colenda Admin', link)
+  end
+
+  # Additional URL helpers needed for item and asset urls because the built-in methods escape the ARK.
+  def item_manifest_url(unique_identifier)
+    "#{root_url}items/#{unique_identifier}/manifest"
+  end
+
+  def asset_thumbnail_url(unique_identifier, id)
+    "#{root_url}items/#{unique_identifier}/assets/#{id}/thumbnail"
+  end
+
+  def asset_original_url(unique_identifier, id)
+    "#{root_url}items/#{unique_identifier}/assets/#{id}/original"
+  end
+
+  def asset_access_url(unique_identifier, id)
+    "#{root_url}items/#{unique_identifier}/assets/#{id}/access"
   end
 end

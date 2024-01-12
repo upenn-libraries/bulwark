@@ -1,0 +1,143 @@
+# frozen_string_literal: true
+
+RSpec.describe 'Item Endpoints', type: :request do
+  # POST /items
+  context 'when adding a item' do
+    let(:headers) do
+      { 'Content-Type' => 'application/json',
+        'Authorization' => "Token token=#{Settings.publishing_endpoint.token}" }
+    end
+
+    before do
+      post items_path, { item: params }.to_json, headers
+    end
+
+    context 'with invalid token' do
+      let(:headers) { {} }
+      let(:params) { {} }
+
+      it 'returns 401' do
+        expect(response).to have_http_status :unauthorized
+      end
+    end
+
+    context 'with a complete payload' do
+      let(:params) do
+        {
+          id: 'ark:/99999/fk4pp0qk3c',
+          first_published_at: '2023-01-03T14:27:35Z',
+          last_published_at:'2024-01-03T11:22:30Z',
+          uuid: '36a224db-c416-4769-9da1-28513827d179',
+          descriptive_metadata: {
+            title: [{ value: 'Message from Phanias and others of the agoranomoi of Oxyrhynchus about a purchase of land.' }],
+            collection: [{ value: 'University of Pennsylvania Papyrological Collection' }]
+          },
+          thumbnail_asset_id: 'b65d33d3-8c34-4e36-acf9-dab273277583',
+          iiif_manifest_path: '36a224db-c416-4769-9da1-28513827d179/iiif_manifest',
+          assets: [
+            {
+              id: 'b65d33d3-8c34-4e36-acf9-dab273277583',
+              filename: 'e2750_wk1_body0001.tif',
+              iiif: true,
+              original_file: {
+                path: 'b65d33d3-8c34-4e36-acf9-dab273277583/df4f0a9b-e657-41fb-82b7-228cc9a0642b',
+                size: '',
+                mime_type: 'image/tiff'
+              }
+            }
+          ]
+        }
+      end
+
+      it 'returns 200' do
+        expect(response).to have_http_status 200
+      end
+
+      it 'adds document to Solr' do
+        solr = RSolr.connect(url: Settings.solr.url)
+        response = solr.get('select', params: { q: "unique_identifier_ssi:\"#{params[:id]}\"" })
+        expect(response['response']['numFound']).to be 1
+      end
+    end
+
+    context 'when missing required keys' do
+      let(:params) do
+        {
+          id: 'ark:/99999/fk4pp0qk3c',
+          first_published_at: '2023-01-03T14:27:35Z',
+          last_published_at:'2024-01-03T11:22:30Z',
+        }
+      end
+
+      it 'returns 400' do
+        expect(response).to have_http_status 400
+      end
+
+      it 'does not add document to Solr' do
+        solr = RSolr.connect(url: Settings.solr.url)
+        response = solr.get('select', params: { q: '*:*' })
+        expect(response['response']['numFound']).to be 0
+      end
+    end
+  end
+
+  # DELETE /items/:id
+  context 'when deleting an item' do
+    let(:headers) do
+      { 'Content-Type' => 'application/json',
+        'Authorization' => "Token token=#{Settings.publishing_endpoint.token}" }
+    end
+
+    context 'with invalid token' do
+      let(:headers) { {} }
+      let(:id) { 'ark:/12345/sample' }
+
+      before do
+        delete "/items/#{id}", {}, headers
+      end
+
+      it 'returns 401' do
+        expect(response).to have_http_status :unauthorized
+      end
+    end
+
+    context 'when item not present' do
+      let(:id) { 'ark:/12345/invalid' }
+
+      before do
+        delete "/items/#{id}", {}, headers
+      end
+
+      it 'return 404' do
+        expect(response).to have_http_status 404
+      end
+    end
+
+    context 'when item is present' do
+      let(:id) { 'ark:/99999/fk4pp0qk3c' }
+      let(:payload) do
+        {
+          id: id,
+          first_published_at: '2023-01-03T14:27:35Z',
+          last_published_at: '2024-01-03T11:22:30Z',
+          uuid: '36a224db-c416-4769-9da1-28513827d179',
+        }.with_indifferent_access
+      end
+
+      before do
+        Item.create(payload)
+        delete "/items/#{id}", {}, headers
+      end
+
+      it 'return 204' do
+        expect(response).to have_http_status :no_content
+      end
+
+      it 'deletes record from Solr' do
+        solr = RSolr.connect(url: Settings.solr.url)
+        response = solr.get('select', params: { q: "unique_identifier_ssi:\"#{id}\"" })
+        expect(response['response']['numFound']).to be 0
+      end
+    end
+  end
+end

@@ -32,31 +32,31 @@ sudo apt-get install imagemagick git-annex
 
 #### Starting
   ```
-  rake bulwark:start
+  bundle exec rake bulwark:start
   rails s
   ```
 
 #### Stopping
   ```
-  rake bulwark:stop
+  bundle exec rake bulwark:stop
   ```
 
 #### Starting Fresh
   ```
-  rake bulwark:clean
-  rake bulwark:start
+  bundle exec rake bulwark:clean
+  bundle exec rake bulwark:start
   ```
 
 ### Adding Data
 
 #### To add administrative user
   ```
-  rake bulwark:setup:create_admin
+  bundle exec rake bulwark:setup:create_admin
   ```
 
 #### To add digital object and administrative user
   ```
-  rake bulwark:setup:create_digital_object
+  bundle exec rake bulwark:setup:create_digital_object
   ```
 
 ## Configuration Files

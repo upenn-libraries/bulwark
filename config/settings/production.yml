@@ -32,3 +32,22 @@ phalt:
   url: <%= ENV['PHALT_ENDPOINT'] %>
 iiif:
   image_server: <%= ENV['IIIF_IMAGE_SERVER'] %>
+
+# Apotheca File Storage
+aws: &aws
+  access_key_id: <%= DockerSecrets.lookup(:aws_access_key_id) %>
+  secret_access_key: <%= DockerSecrets.lookup(:aws_secret_access_key) %>
+  region: <%= DockerSecrets.lookup(:aws_region, 'us-east-1') %>
+preservation_storage:
+  <<: *aws
+  bucket: upennlib-apotheca-preservation-staging
+derivative_storage:
+  <<: *aws
+  bucket: upennlib-apotheca-derivatives-staging
+iiif_manifest_storage:
+  <<: *aws
+  bucket: upennlib-apotheca-iiif-manifests-staging
+
+# Publishing endpoint
+publishing_endpoint:
+  token:  <%= File.exist?('/run/secrets/publishing_token') ? File.read('/run/secrets/publishing_token').strip : nil %>

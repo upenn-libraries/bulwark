@@ -37,6 +37,12 @@
 # Other stuff
 *.rdb
 /.idea
+.byebug_history
 
 # Ignore .ruby-version, for now
 .ruby-version
+
+# Ignore local ruby-config files
+config/settings.local.yml
+config/settings/*.local.yml
+config/environments/*.local.yml

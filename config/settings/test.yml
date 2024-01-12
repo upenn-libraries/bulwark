@@ -24,3 +24,5 @@ phalt:
   url: https://phalt.colenda.library.upenn.edu/
 iiif:
   image_server: https://iiif.colenda.library.upenn.edu/iiif/2
+publishing_endpoint:
+  token: 'sample_token'

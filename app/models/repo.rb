@@ -269,13 +269,10 @@ class Repo < ActiveRecord::Base
   end
 
   def thumbnail_link
-    return '' unless thumbnail_location
+    return if thumbnail.blank?
 
-    Addressable::URI.new(
-      path: thumbnail_location,
-      host: Settings.digital_object.special_remote.host,
-      scheme: Settings.digital_object.special_remote.protocol.gsub('://', '')
-    ).to_s
+    location = assets.find_by!(filename: thumbnail)&.thumbnail_file_location
+    location ? Bulwark::Storage.url_for(names.bucket, location) : nil
   end
 
   # Validates that all the filenames referenced in the structural metadata are valid.

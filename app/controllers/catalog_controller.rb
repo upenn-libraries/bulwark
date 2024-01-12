@@ -229,13 +229,8 @@ class CatalogController < ApplicationController
   end
 
   def docs_with_urls
-    # Retrieve all thumbnail_links at the same time.
-    arks = @document_list.map { |d| d['unique_identifier_tesim'].first }
-    arks_to_thumbnail_links = Repo.where(unique_identifier: arks).map { |r| [r.unique_identifier, r.thumbnail_link] }.to_h
-
     @document_list.each do |doc|
-      ark = doc['unique_identifier_tesim'].first
-      thumbnail_link = arks_to_thumbnail_links[ark]
+      thumbnail_link = doc.thumbnail_link
       doc._source['thumbnail_url'] = thumbnail_link if thumbnail_link
     end
   end
