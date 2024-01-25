@@ -299,9 +299,11 @@ class Repo < ActiveRecord::Base
       values = descriptive_metadata.user_defined_mappings.fetch(field, [])
       next if values.blank?
 
-      document["#{field}_tesim"] = values
-      document["#{field}_ssim"] = values
-      document["#{field}_sim"] = values
+      f = (field == 'item_type') ? 'physical_format' : field
+
+      document["#{f}_tesim"] = values
+      document["#{f}_ssim"] = values
+      document["#{f}_sim"] = values
     end
 
     document
