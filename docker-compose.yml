@@ -11,6 +11,15 @@ secrets:
   bulwark_aws_secret_access_key:
     external: true
     name: colenda_bulwark_aws_secret_access_key_v${AWS_SECRET_ACCESS_KEY_VERSION}
+  bulwark_s3_access_key_id:
+    external: true
+    name: colenda_bulwark_s3_access_key_id_v${S3_ACCESS_KEY_ID_VERSION}
+  bulwark_s3_secret_access_key:
+    external: true
+    name: colenda_bulwark_s3_secret_access_key_v${S3_SECRET_ACCESS_KEY_VERSION}
+  bulwark_s3_region:
+    external: true
+    name: colenda_bulwark_s3_region_v${S3_REGION}
   bulwark_database_password:
     external: true
     name: colenda_bulwark_database_password_v${DATABASE_PASSWORD_VERSION}
@@ -122,6 +131,12 @@ services:
         target: /run/secrets/aws_access_key_id
       - source: bulwark_aws_secret_access_key
         target: /run/secrets/aws_secret_access_key
+      - source: bulwark_s3_access_key_id
+        target: /run/secrets/s3_access_key_id
+      - source: bulwark_s3_secret_access_key
+        target: /run/secrets/s3_secret_access_key
+      - source: bulwark_s3_region
+        target: /run/secrets/s3_region
       - source: bulwark_database_password
         target: /run/secrets/database_password
       - source: bulwark_ezid_password
@@ -181,6 +196,12 @@ services:
         target: /run/secrets/aws_access_key_id
       - source: bulwark_aws_secret_access_key
         target: /run/secrets/aws_secret_access_key
+      - source: bulwark_s3_access_key_id
+        target: /run/secrets/s3_access_key_id
+      - source: bulwark_s3_secret_access_key
+        target: /run/secrets/s3_secret_access_key
+      - source: bulwark_s3_region
+        target: /run/secrets/s3_region
       - source: bulwark_database_password
         target: /run/secrets/database_password
       - source: bulwark_ezid_password
