@@ -82,5 +82,14 @@ namespace :bulwark do
         end
       end
     end
+
+    desc 'Republish all published records'
+    task republish: :environment do
+      Repo.includes(:metadata_builder).where(published: true).find_in_batches do |repos|
+        repos.each do |repo|
+          repo.publish
+        end
+      end
+    end
   end
 end
