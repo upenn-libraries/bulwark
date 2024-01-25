@@ -54,9 +54,11 @@ class CatalogController < ApplicationController
     config.add_facet_field :subject_sim, label: 'Subject', limit: 5, collapse: false
     config.add_facet_field :language_sim, label: 'Language', limit: 5, collapse: false
     config.add_facet_field :date_sim, label: 'Date', limit: 5, collapse: false
+    config.add_facet_field :name_sim, label: 'Creator/Contributor', limit: 5, collapse: true
     config.add_facet_field :creator_sim, label: 'Creator', limit: 5, collapse: true
     config.add_facet_field :publisher_sim, label: 'Publisher', limit: 5, collapse: true
-    config.add_facet_field :item_type_sim, label: 'Type', limit: 5, collapse: true
+    config.add_facet_field :item_type_sim, label: 'Resource Type', limit: 5, collapse: true
+    config.add_facet_field :physical_format_sim, label: 'Physical Format', limit: 5, collapse: true
     config.add_facet_field :personal_name_sim, label: 'Personal Name', limit: 5, collapse: true, helper_method: 'html_facet'
     config.add_facet_field :corporate_name_sim, label: 'Corporate Name', limit: 5, collapse: true,  helper_method: 'html_facet'
     config.add_facet_field :geographic_subject_sim, label: 'Geographic Subject', limit: 5, collapse: true
