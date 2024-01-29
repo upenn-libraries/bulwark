@@ -41,6 +41,9 @@ secrets:
   bulwark_secret_key_base:
     external: true
     name: colenda_bulwark_secret_key_base_v${SECRET_KEY_BASE_VERSION}
+  bulwark_publishing_token:
+    external: true
+    name: colenda_bulwark_secret_key_base_v${PUBLISHING_TOKEN_VERSION}
 
 services:
   redis:
@@ -149,6 +152,8 @@ services:
         target: /run/secrets/honeybadger_api_key
       - source: bulwark_secret_key_base
         target: /run/secrets/secret_key_base
+      - source: bulwark_publishing_token
+        target: /run/secrets/publishing_token
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
@@ -214,6 +219,8 @@ services:
         target: /run/secrets/imaging_user_pass
       - source: bulwark_secret_key_base
         target: /run/secrets/secret_key_base
+      - source: bulwark_publishing_token
+        target: /run/secrets/publishing_token
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
