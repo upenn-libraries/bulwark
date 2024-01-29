@@ -19,7 +19,7 @@ secrets:
     name: colenda_bulwark_s3_secret_access_key_v${S3_SECRET_ACCESS_KEY_VERSION}
   bulwark_s3_region:
     external: true
-    name: colenda_bulwark_s3_region_v${S3_REGION}
+    name: colenda_bulwark_s3_region_v${S3_REGION_VERSION}
   bulwark_database_password:
     external: true
     name: colenda_bulwark_database_password_v${DATABASE_PASSWORD_VERSION}
