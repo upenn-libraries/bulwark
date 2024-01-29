@@ -25,19 +25,21 @@ iiif:
 
 # Apotheca File Storage
 aws: &aws
-  access_key_id: placeholder
-  secret_access_key: placeholder
+  access_key_id: minioadmin
+  secret_access_key: minioadmin
+  endpoint: http://minio-dev.library.upenn.edu
   region: us-east-1
+  force_path_style: true
 preservation_storage:
   <<: *aws
-  bucket: upennlib-apotheca-preservation-staging
+  bucket: preservation-dev
 derivative_storage:
   <<: *aws
-  bucket: upennlib-apotheca-derivatives-staging
+  bucket: derivatives-dev
 iiif_manifest_storage:
   <<: *aws
-  bucket: upennlib-apotheca-iiif-manifests-staging
+  bucket: iiif-manifests-dev
 
 # Publishing Endpoint
 publishing_endpoint:
-  token: 'sample_token'
+  token: sample_token
