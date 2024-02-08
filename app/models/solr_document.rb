@@ -45,24 +45,14 @@ class SolrDocument
   #
   # @return [<Array<Hash>>]
   def non_iiif_assets
-    raw_json = fetch(:non_iiif_asset_listing_ss, nil)
+    json = fetch(:non_iiif_asset_listing_ss, nil)
 
-    return [] if raw_json.blank?
-    JSON.parse(raw_json, symbolize_names: true)
+    return [] if json.blank?
+    JSON.parse(json, symbolize_names: true)
   end
 
   # Returns true if this item was published from Apotheca.
   def from_apotheca?
     fetch('from_apotheca_bsi', false)
-  end
-
-  # Return original raw json request body from Apotheca.
-  def raw_json
-    return unless from_apotheca?
-
-    raw_json = fetch(:raw_ss, nil)
-
-    return [] if raw_json.blank?
-    JSON.parse(raw_json, symbolize_names: true)
   end
 end

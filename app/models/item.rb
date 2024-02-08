@@ -1,63 +1,129 @@
 # frozen_string_literal: true
 
 # Class to find, create and delete Items.
-class Item
-  REQUIRED_CREATE_KEYS = %w[id uuid first_published_at last_published_at].freeze
+#
+# Each item has a representation in the database (which includes the full json payload we receive) and in Solr (which
+# includes the data that is used for display).
+class Item < ActiveRecord::Base
+  REQUIRED_KEYS = %w[id uuid first_published_at last_published_at].freeze
 
-  # Find item.
-  #
-  # @return [SolrDocument] if Item is found
-  # @return [FalseClass] if Item is not found
-  def self.find(ark)
-    response = Blacklight.default_index.search(q: "unique_identifier_ssi:\"#{ark}\"", fq: ['from_apotheca_bsi:true'])
-    return if response.docs.count.zero?
-    response.docs.first
+  validates :unique_identifier, :published_json, presence: true
+  validates :unique_identifier, uniqueness: true
+  validate :required_keys_present
+
+  serialize :published_json, JSON
+
+  # Ensuring the minimum required fields are present in the published_json
+  def required_keys_present
+    return if published_json.blank?
+
+    missing_keys = REQUIRED_KEYS - published_json.keys
+
+    return if missing_keys.blank?
+
+    errors.add(:published_json, "missing the following key(s): #{missing_keys.join(', ')}")
   end
 
   # Add Item to Solr.
-  def self.create(payload)
-    missing_keys = REQUIRED_CREATE_KEYS - payload.keys
-    raise ArgumentError, "Payload is missing the following key(s): #{missing_keys.join(', ')}." if missing_keys.present?
+  def add_solr_document!
+    raise ArgumentError, 'publish_json must be present in order to add document to Solr' if published_json.blank?
 
-    document = {
-      id: solr_identifier(payload[:id]),
-      uuid_ssi: payload[:uuid],
-      unique_identifier_ssi: payload[:id],
-      system_create_dtsi: payload[:first_published_at],
-      system_modified_dtsi: payload[:last_published_at],
-      thumbnail_asset_id_ssi: payload[:thumbnail_asset_id],
-      bibnumber_ssi: payload.dig(:descriptive_metadata, :bibnumber, 0, :value),
-      iiif_manifest_path_ss: payload[:iiif_manifest_path],
-      from_apotheca_bsi: 'T',
-      non_iiif_asset_listing_ss: payload.fetch(:assets, []).select { |a| !a[:iiif] }.to_json, # Assets that need to be listed instead of displayed via the IIIF manifest.
-      raw_ss: payload.to_json # Keep the whole payload
-    }
-
-    payload.fetch(:descriptive_metadata, []).each do |field, values|
-      next if values.blank?
-
-      only_values = values.map { |v| v[:value] }
-
-      document["#{field}_tesim"] = only_values
-      document["#{field}_ssim"] = only_values
-      document["#{field}_sim"] = only_values
-      # TODO: might need to do something different for rights
-    end
-
-    # Add Solr document.
     solr = RSolr.connect(url: Settings.solr.url)
-    solr.add(document)
+    solr.add(solr_document)
     solr.commit
   end
 
   # Delete Item from Solr.
-  def self.delete(ark)
+  def remove_solr_document!
     solr = RSolr.connect(url: Settings.solr.url)
-    solr.delete_by_query "id:#{solr_identifier(ark)}"
+    solr.delete_by_query "id:#{solr_identifier}"
     solr.commit
   end
 
-  def self.solr_identifier(ark)
-    ark.tr('ark:/', '').tr('/', '-')
+  def solr_identifier
+    unique_identifier.gsub('ark:/', '').tr('/', '-')
+  end
+
+  # Returns Solr document that can be committed to Solr
+  #
+  # @return [Hash] solr_document
+  def solr_document
+    document = {
+      id: solr_identifier,
+      uuid_ssi: published_json['uuid'],
+      unique_identifier_ssi: published_json['id'],
+      system_create_dtsi: published_json['first_published_at'],
+      system_modified_dtsi: published_json['last_published_at'],
+      thumbnail_asset_id_ssi: published_json['thumbnail_asset_id'],
+      bibnumber_ssi: published_json.dig('descriptive_metadata', 'bibnumber', 0, 'value'),
+      iiif_manifest_path_ss: published_json['iiif_manifest_path'],
+      from_apotheca_bsi: 'T',
+      non_iiif_asset_listing_ss: published_json.fetch('assets', []).select { |a| !a['iiif'] }.to_json # Assets that need to be listed instead of displayed via the IIIF manifest.
+    }
+
+    descriptive_metadata = { creator: [], contributor: [], name: [], name_with_role: [] }
+
+    # Extract the values that we want to display from the descriptive metadata.
+    published_json.fetch('descriptive_metadata', []).each do |field, values|
+      next if values.blank?
+
+      case field
+      when 'date'
+        dates = values&.map { |v| v['value'] }
+
+        descriptive_metadata[field] = dates&.map do |value|
+          if value =~ /^\d\d(\d|X)X$/
+            "#{value.tr('X', '0')}s"
+          else
+            value
+          end
+        end
+
+        descriptive_metadata['year'] = dates&.sum([]) do |value|
+          if value =~ /^\d\d(\d|X)X$/ # 10XX, 100X
+            Range.new(value.tr('X', '0').to_i, value.tr('X', '9').to_i).to_a.map(&:to_s)
+          elsif value =~ /^\d\d\d\d(-\d\d(-\d\d)?)?$/ # 2002, 2002-02, 2002-02-02
+            Array.wrap(value[0..3])
+          else
+            [value]
+          end
+        end
+      when 'rights' # extracting URI for rights
+        descriptive_metadata[:rights] = values.map { |v| v['uri'] }
+      when 'name' # extracting creator, contributor names based on roles
+        values.each do |name|
+          roles = name.fetch('role', []).map { |r| r['value'] }.map(&:downcase).uniq
+          if roles.include?('creator')
+            descriptive_metadata[:creator] << name['value']
+          elsif roles.include?('contributor')
+            descriptive_metadata[:contributor] << name['value']
+          else
+            name_with_role = roles.blank? ? name['value'] : "#{name['value']} (#{roles.join(', ')})"
+            descriptive_metadata[:name] << name['value']
+            descriptive_metadata[:name_with_role] << name_with_role
+          end
+        end
+      else
+        descriptive_metadata[field] = values&.map { |v| v['value'] }
+      end
+    end
+
+    descriptive_metadata.each do |field, values|
+      document[:"#{field}_tesim"] = values
+      document[:"#{field}_ssim"] = values
+      document[:"#{field}_sim"] = values
+    end
+
+    document
+  end
+
+  # Find item in Solr.
+  #
+  # @return [SolrDocument] if Item is found
+  # @return [FalseClass] if Item is not found
+  def self.find_solr_document(ark)
+    response = Blacklight.default_index.search(q: "unique_identifier_ssi:\"#{ark}\"", fq: ['from_apotheca_bsi:true'])
+    return if response.docs.count.zero?
+    response.docs.first
   end
 end

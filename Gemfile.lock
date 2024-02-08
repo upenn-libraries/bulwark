@@ -205,7 +205,6 @@ GEM
     hashie (3.6.0)
     hike (1.2.3)
     honeybadger (4.7.2)
-    htmlentities (4.3.4)
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
     image_processing (1.12.1)
@@ -468,7 +467,6 @@ DEPENDENCIES
   git
   guard-rspec
   honeybadger
-  htmlentities
   image_processing (~> 1.0)
   iso-639
   jbuilder (~> 2.0)

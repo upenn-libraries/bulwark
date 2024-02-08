@@ -53,14 +53,14 @@ class CatalogController < ApplicationController
     config.add_facet_field :collection_sim, label: 'Collection', limit: 5, collapse: false
     config.add_facet_field :subject_sim, label: 'Subject', limit: 5, collapse: false
     config.add_facet_field :language_sim, label: 'Language', limit: 5, collapse: false
-    config.add_facet_field :date_sim, label: 'Date', limit: 5, collapse: false
-    config.add_facet_field :name_sim, label: 'Creator/Contributor', limit: 5, collapse: true
+    # config.add_facet_field :date_sim, label: 'Date', limit: 5, collapse: false # TODO: When data is cleaner, need to extract year.
     config.add_facet_field :creator_sim, label: 'Creator', limit: 5, collapse: true
-    config.add_facet_field :publisher_sim, label: 'Publisher', limit: 5, collapse: true
+    config.add_facet_field :contributor_sim, label: 'Contributor', limit: 5, collapse: true
+    config.add_facet_field :name_sim, label: 'Name', limit: 5, collapse: true
     config.add_facet_field :item_type_sim, label: 'Resource Type', limit: 5, collapse: true
-    config.add_facet_field :physical_format_sim, label: 'Physical Format', limit: 5, collapse: true
-    config.add_facet_field :personal_name_sim, label: 'Personal Name', limit: 5, collapse: true, helper_method: 'html_facet'
-    config.add_facet_field :corporate_name_sim, label: 'Corporate Name', limit: 5, collapse: true,  helper_method: 'html_facet'
+    config.add_facet_field :physical_format_sim, label: 'Form/Genre', limit: 5, collapse: true
+    config.add_facet_field :personal_name_sim, label: 'Personal Name', limit: 5, collapse: true
+    config.add_facet_field :corporate_name_sim, label: 'Corporate Name', limit: 5, collapse: true
     config.add_facet_field :geographic_subject_sim, label: 'Geographic Subject', limit: 5, collapse: true
 
     config.add_facet_fields_to_solr_request!
@@ -76,40 +76,28 @@ class CatalogController < ApplicationController
     # solr fields to be displayed in the index (search results) view
     #   The ordering of the field names is the order of the display
 
-    # PQC
-    config.add_index_field :title_ssim, label: 'Title', helper_method: 'html_entity'
-    config.add_index_field :subject_ssim, label: 'Subject', helper_method: 'html_entity'
-    config.add_index_field :description_ssim, label: 'Description', helper_method: 'html_entity'
-    config.add_index_field :personal_name_ssim, label: 'Personal Name', helper_method: 'html_entity'
-    config.add_index_field :corporate_name_ssim, label: 'Corporate Name', helper_method: 'html_entity'
-    config.add_index_field :contributor_ssim, label: 'Contributor', helper_method: 'html_entity'
-    config.add_index_field :contributing_institution_ssim, label: 'Contributing Institution', helper_method: 'html_entity'
+    config.add_index_field :creator_ssim, label: 'Creator'
+    config.add_index_field :contributor_ssim, label: 'Contributor'
+    config.add_index_field :name_with_role_ssim, label: 'Name'
+    config.add_index_field :personal_name_ssim, label: 'Personal Name'
+    config.add_index_field :corporate_name_ssim, label: 'Corporate Name'
     config.add_index_field :date_ssim, label: 'Date'
     config.add_index_field :language_ssim, label: 'Language'
-    config.add_index_field :creator_ssim, label: 'Creator'
     config.add_index_field :publisher_ssim, label: 'Publisher'
-    config.add_index_field :rights_ssim, label: 'Rights'
-    config.add_index_field :source_ssim, label: 'Source'
-    config.add_index_field :format_type_ssim, label: 'Type'
-
-    # Catalog
     config.add_index_field :collection_ssim, label: 'Collection'
-    config.add_index_field :display_call_number_ssim, label: 'Call Number' # TODO: delete when all digital objects are migrated.
-    config.add_index_field :call_number_ssim, label: 'Call Number'
+    config.add_index_field :call_number_ssim, label: 'Physical Location'
 
     # solr fields to be displayed in the show (single result) view
     #   The ordering of the field names is the order of the display
 
-    # PQC
-    config.add_show_field :title_ssim, label: 'Title', helper_method: 'html_entity'
+    config.add_show_field :alternate_title_ssim, label: 'Alternate Title'
     config.add_show_field :abstract_ssim, label: 'Abstract'
-    config.add_show_field :contributor_ssim, label: 'Contributor'
-    config.add_show_field :coverage_ssim, label: 'Coverage'
     config.add_show_field :creator_ssim, label: 'Creator'
-    config.add_show_field :contributing_institution_ssim, label: 'Contributing Institution'
+    config.add_show_field :contributor_ssim, label: 'Contributor'
+    config.add_show_field :name_with_role_ssim, label: 'Name'
+    config.add_show_field :coverage_ssim, label: 'Timespan'
     config.add_show_field :date_ssim, label: 'Date'
     config.add_show_field :description_ssim, label: 'Description'
-    config.add_show_field :format_ssim, label: 'Format'
     config.add_show_field :identifier_ssim, label: 'Identifier'
     config.add_show_field :language_ssim, label: 'Language'
     config.add_show_field :provenance_ssim, label: 'Provenance'
@@ -117,17 +105,20 @@ class CatalogController < ApplicationController
     config.add_show_field :relation, label: 'Relation', accessor: :relation, unless: ->(_, _, d) { d.relation.blank? }
     config.add_show_field :source_ssim, label: 'Source'
     config.add_show_field :subject_ssim, label: 'Subject', :link_to_search => 'subject_sim'
-    config.add_show_field :item_type_ssim, label: 'Type'
+    config.add_show_field :item_type_ssim, label: 'Resource Type'
+    config.add_show_field :physical_format_ssim, label: 'Form/Genre'
+    config.add_show_field :extent_ssim, label: 'Physical Description'
+    config.add_show_field :format_ssim, label: 'Physical Description' # old format field is getting mapped to extent
     config.add_show_field :personal_name_ssim, label: 'Personal Name'
     config.add_show_field :corporate_name_ssim, label: 'Corporate Name'
     config.add_show_field :geographic_subject_ssim, label: 'Geographic Subject'
+    config.add_show_field :location_ssim, label: 'Related Place'
     config.add_show_field :rights_ssim, label: 'Rights'
+    config.add_show_field :rights_note_ssim, label: 'Rights Note'
     config.add_show_field :notes_ssim, label: 'Notes'
-
-    # Catalog
-    config.add_show_field :display_call_number_ssim, label: 'Call Number' # TODO: remove when all digital objects are migrated.
-    config.add_show_field :call_number_ssim, label: 'Call Number'
-
+    config.add_show_field :note_ssim, label: 'Notes'
+    config.add_show_field :physical_location_ssim, label: 'Physical Location'
+    config.add_show_field :call_number_ssim, label: 'Physical Location'
     config.add_show_field :collection_ssim, label: 'Collection'
 
     # "fielded" search configuration. Used by pulldown among other places.

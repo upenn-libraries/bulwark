@@ -1,5 +1,3 @@
-require 'htmlentities'
-
 module CatalogHelper
   include Blacklight::CatalogHelperBehavior
 
@@ -11,28 +9,10 @@ module CatalogHelper
     image_tag document.thumbnail_link
   end
 
-  def html_entity(options={})
-    separator = options[:separator].nil? ? '; ' : "#{options[:separator]}"
-    option_vals = []
-    options[:value].each do |val|
-      option_vals << html_decode(display_render(val))
-    end
-    return option_vals.reject(&:blank?).join(separator)
-  end
-
-  def html_facet(facet_string)
-    return html_decode(facet_string)
-  end
-
   def display_render(string)
     transformations = { ',,' => ',', '&amp;' => '&', ':,' => ':', ' ;' => ';'}
     transformations.each_pair {|d,t| string = string.gsub(d, t)}
     string.html_safe
-  end
-
-  def html_decode(string_to_decode)
-    decoder = HTMLEntities.new
-    return decoder.decode(string_to_decode)
   end
 
   def render_admin_actions

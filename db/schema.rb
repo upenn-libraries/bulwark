@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20211029134548) do
+ActiveRecord::Schema.define(version: 20240206191029) do
 
   create_table "alert_messages", force: :cascade do |t|
     t.boolean "active",               default: false
@@ -81,6 +81,15 @@ ActiveRecord::Schema.define(version: 20211029134548) do
   end
 
   add_index "endpoints", ["repo_id"], name: "index_endpoints_on_repo_id", using: :btree
+
+  create_table "items", force: :cascade do |t|
+    t.string   "unique_identifier", limit: 255,      null: false
+    t.text     "published_json",    limit: 16777215, null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "items", ["unique_identifier"], name: "index_items_on_unique_identifier", unique: true, using: :btree
 
   create_table "metadata_builders", force: :cascade do |t|
     t.string   "parent_repo",              limit: 255

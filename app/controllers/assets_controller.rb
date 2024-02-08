@@ -5,8 +5,13 @@ class AssetsController < ActionController::Base
   include PresignedUrls
 
   class ItemNotFound < StandardError; end
+  class KeyNotFound < StandardError; end
 
   before_action :fetch_item
+
+  rescue_from 'AssetsController::ItemNotFound', 'AssetsController::KeyNotFound' do |_e|
+    head :not_found
+  end
 
   # Download original preservation file
   # use pre-signed urls with an expiry period of one minute
@@ -14,14 +19,12 @@ class AssetsController < ActionController::Base
     config = Settings.preservation_storage
     client = client(config.to_h.except(:bucket))
 
-    assets_json = @item.raw_json[:assets]
-    key = assets_json.find { |a| a[:id] == params[:id] }&.dig(:original_file, :path)
+    assets_json = @item.published_json['assets']
+    key = assets_json&.find { |a| a['id'] == params['id'] }&.dig('original_file', 'path')
 
-    if key
-      redirect_to presigned_url(client, config[:bucket], key), status: :temporary_redirect
-    else
-      render head: :not_found
-    end
+    raise KeyNotFound unless key
+
+    redirect_to presigned_url(client, config[:bucket], key), status: :temporary_redirect
   end
 
   # Download thumbnail
@@ -41,7 +44,7 @@ class AssetsController < ActionController::Base
   private
 
     def fetch_item
-      @item = Item.find(params[:item_id])
+      @item = Item.find_by(unique_identifier: params[:item_id])
       raise ItemNotFound unless @item
     end
 end

@@ -8,9 +8,7 @@ RSpec.describe 'Item Endpoints', type: :request do
         'Authorization' => "Token token=#{Settings.publishing_endpoint.token}" }
     end
 
-    before do
-      post items_path, { item: params }.to_json, headers
-    end
+    before { post items_path, { item: params }.to_json, headers }
 
     context 'with invalid token' do
       let(:headers) { {} }
@@ -21,7 +19,7 @@ RSpec.describe 'Item Endpoints', type: :request do
       end
     end
 
-    context 'with a complete payload' do
+    context 'with a payload with iiif assets' do
       let(:params) do
         {
           id: 'ark:/99999/fk4pp0qk3c',
@@ -58,6 +56,10 @@ RSpec.describe 'Item Endpoints', type: :request do
         response = solr.get('select', params: { q: "unique_identifier_ssi:\"#{params[:id]}\"" })
         expect(response['response']['numFound']).to be 1
       end
+
+      it 'adds a database record' do
+        expect(Item.find_by(unique_identifier: params[:id])).to be_present
+      end
     end
 
     context 'when missing required keys' do
@@ -71,6 +73,10 @@ RSpec.describe 'Item Endpoints', type: :request do
 
       it 'returns 400' do
         expect(response).to have_http_status 400
+      end
+
+      it 'does not create a database record' do
+        expect(Item.count).to be 0
       end
 
       it 'does not add document to Solr' do
@@ -115,17 +121,17 @@ RSpec.describe 'Item Endpoints', type: :request do
 
     context 'when item is present' do
       let(:id) { 'ark:/99999/fk4pp0qk3c' }
-      let(:payload) do
+      let(:json) do
         {
           id: id,
           first_published_at: '2023-01-03T14:27:35Z',
           last_published_at: '2024-01-03T11:22:30Z',
           uuid: '36a224db-c416-4769-9da1-28513827d179'
-        }.with_indifferent_access
+        }
       end
 
       before do
-        Item.create(payload)
+        Item.create(unique_identifier: id, published_json: json)
         delete "/items/#{id}", {}, headers
       end
 
@@ -137,6 +143,43 @@ RSpec.describe 'Item Endpoints', type: :request do
         solr = RSolr.connect(url: Settings.solr.url)
         response = solr.get('select', params: { q: "unique_identifier_ssi:\"#{id}\"" })
         expect(response['response']['numFound']).to be 0
+      end
+
+      it 'deletes record from database' do
+        expect(Item.find_by(unique_identifier: id)).to be_nil
+      end
+    end
+  end
+
+  # GET /items/:id/manifest
+  context 'when fetching iiif manifest' do
+    before do
+      item.add_solr_document! if defined?(item)
+      get "/items/#{unique_identifier}/manifest"
+    end
+    context 'when id valid and iiif manifest present' do
+      let(:item) { FactoryBot.create(:item, :with_asset) }
+      let(:unique_identifier) { item.unique_identifier }
+
+      it 'redirects to presigned URL' do
+        expect(request).to redirect_to %r{\Ahttp://minio-dev.library.upenn.edu/iiif-manifests-dev/36a224db-c416-4769-9da1-28513827d179/iiif_manifest}
+      end
+    end
+
+    context 'when id invalid' do
+      let(:unique_identifier) { 'ark:/12345/invalid' }
+
+      it 'returns 404' do
+        expect(response).to have_http_status 404
+      end
+    end
+
+    context 'when iiif manifest not present' do
+      let(:item) { FactoryBot.create(:item) }
+      let(:unique_identifier) { item.unique_identifier }
+
+      it 'returns 404' do
+        expect(response).to have_http_status 404
       end
     end
   end
