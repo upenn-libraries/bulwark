@@ -36,7 +36,7 @@ iiif:
 # Apotheca File Storage
 aws: &aws
   access_key_id: <%= File.exist?('/run/secrets/s3_access_key_id') ? File.read('/run/secrets/s3_access_key_id').strip : nil %>
-  aws_secret_access_key: <%= File.exist?('/run/secrets/s3_secret_access_key') ? File.read('/run/secrets/s3_secret_access_key').strip : nil %>
+  secret_access_key: <%= File.exist?('/run/secrets/s3_secret_access_key') ? File.read('/run/secrets/s3_secret_access_key').strip : nil %>
   region: <%= File.exist?('/run/secrets/s3_region') ? File.read('/run/secrets/s3_region').strip : 'us-east-1' %>
 preservation_storage:
   <<: *aws
