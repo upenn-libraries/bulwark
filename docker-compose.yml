@@ -43,7 +43,7 @@ secrets:
     name: colenda_bulwark_secret_key_base_v${SECRET_KEY_BASE_VERSION}
   bulwark_publishing_token:
     external: true
-    name: colenda_bulwark_secret_key_base_v${PUBLISHING_TOKEN_VERSION}
+    name: colenda_bulwark_publishing_token_v${PUBLISHING_TOKEN_VERSION}
 
 services:
   redis:
