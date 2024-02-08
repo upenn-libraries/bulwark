@@ -91,4 +91,7 @@ Rails.application.configure do
 
   # Configuring cache store to use for ActiveJob::Status.
   config.cache_store = :redis_store, ENV['CACHE_URL'], { namespace: 'sidekiq::cache', expires_in: 90.minutes }
+
+  # Default host to use for generating links outside of views
+  routes.default_url_options[:host] = ENV['APP_URL']
 end

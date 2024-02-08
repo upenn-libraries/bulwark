@@ -38,7 +38,7 @@ Rails.application.configure do
   config.active_support.deprecation = :stderr
 
   # Default host to use for generating links outside of views
-  routes.default_url_options[:host] = 'http://localhost:3000'
+  routes.default_url_options[:host] = 'localhost:3000'
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true

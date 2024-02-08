@@ -43,7 +43,7 @@ class SolrDocument
 
   # Returns assets that are not represented in the iiif manifest and have to be displayed a different way.
   #
-  # @return [<Array<Hash>>]
+  # @return [<Array<Hash>]
   def non_iiif_assets
     json = fetch(:non_iiif_asset_listing_ss, nil)
 

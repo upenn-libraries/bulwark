@@ -93,6 +93,7 @@ services:
       update_config:
         parallelism: 1
     environment:
+      APP_URL:
       CACHE_URL:
       DATABASE_NAME:
       DATABASE_USERNAME:
@@ -168,6 +169,7 @@ services:
       update_config:
         parallelism: 1
     environment:
+      APP_URL:
       CACHE_URL:
       DATABASE_NAME:
       DATABASE_USERNAME:
