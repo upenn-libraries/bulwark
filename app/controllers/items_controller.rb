@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 #
-# Controller for Item actions. Contains actions that removes items from Solr index (AKA our publishing
-# endpoint). Also contains an action to serve up our manifests.
+# Controller for Item actions. Contains actions that removes and adds records/items. Also contains an action
+# to serve up our manifests.
 class ItemsController < ActionController::Base
   include PresignedUrls
 
@@ -25,7 +25,7 @@ class ItemsController < ActionController::Base
       item.add_solr_document!
     end
 
-    render json: { status: 'success' }, status: :ok # return 200 if successfully added solr document
+    render json: { status: 'success' }, status: :ok
   rescue ActiveRecord::RecordInvalid => e
     render json: { status: 'error', error: e.message }, status: :bad_request
   rescue StandardError => e

@@ -53,7 +53,7 @@ class CatalogController < ApplicationController
     config.add_facet_field :collection_sim, label: 'Collection', limit: 5, collapse: false
     config.add_facet_field :subject_sim, label: 'Subject', limit: 5, collapse: false
     config.add_facet_field :language_sim, label: 'Language', limit: 5, collapse: false
-    # config.add_facet_field :date_sim, label: 'Date', limit: 5, collapse: false # TODO: When data is cleaner, need to extract year.
+    config.add_facet_field :year_sim, label: 'Date', limit: 5, collapse: true
     config.add_facet_field :creator_sim, label: 'Creator', limit: 5, collapse: true
     config.add_facet_field :contributor_sim, label: 'Contributor', limit: 5, collapse: true
     config.add_facet_field :name_sim, label: 'Name', limit: 5, collapse: true

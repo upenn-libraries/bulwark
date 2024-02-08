@@ -14,11 +14,11 @@ class AssetsController < ActionController::Base
   end
 
   # Download original preservation file
-  # use pre-signed urls with an expiry period of one minute
   def original
     config = Settings.preservation_storage
     client = client(config.to_h.except(:bucket))
 
+    # Fetching file location from published json.
     assets_json = @item.published_json['assets']
     key = assets_json&.find { |a| a['id'] == params['id'] }&.dig('original_file', 'path')
 
@@ -36,7 +36,7 @@ class AssetsController < ActionController::Base
 
   # Access copy download
   def access
-    config = Settings.derivative_storage # for now only displaying non-iiif access copies
+    config = Settings.derivative_storage # For now only displaying non-iiif access copies
     client = client(config.to_h.except(:bucket))
     redirect_to presigned_url(client, config[:bucket], "#{params[:id]}/access"), status: :temporary_redirect
   end
