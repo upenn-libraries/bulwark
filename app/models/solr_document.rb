@@ -27,11 +27,11 @@ class SolrDocument
   end
 
   # Return thumbnail link for Solr document
-  def thumbnail_link
+  def thumbnail_link(root_url)
     if from_apotheca?
       thumbnail_id = fetch(:thumbnail_asset_id_ssi, nil)
       # Url helpers escape unique identifier, so we have to manually create the links.
-      thumbnail_id ? "#{Rails.application.routes.url_helpers.root_url}items/#{unique_identifier}/assets/#{thumbnail_id}/thumbnail" : nil
+      thumbnail_id ? URI.join(root_url, "items/#{unique_identifier}/assets/#{thumbnail_id}/thumbnail").to_s : nil
     elsif fetch(:thumbnail_location_ssi, nil) # Fetching thumbnail location from Solr document if present.
       thumbnail_location = fetch(:thumbnail_location_ssi, nil)&.split('/', 2)
       Bulwark::Storage.url_for(*thumbnail_location)

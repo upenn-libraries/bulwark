@@ -6,7 +6,7 @@ module CatalogHelper
   end
 
   def thumbnail(document, options)
-    image_tag document.thumbnail_link
+    image_tag document.thumbnail_link(root_url)
   end
 
   def display_render(string)
