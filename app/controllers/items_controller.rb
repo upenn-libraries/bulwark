@@ -3,7 +3,6 @@
 # Controller for Item actions. Contains actions that removes and adds records/items. Also contains an action
 # to serve up our manifests.
 class ItemsController < ActionController::Base
-
   class ItemNotFound < StandardError; end
   class ManifestNotFound < StandardError; end
 
