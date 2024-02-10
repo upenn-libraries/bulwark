@@ -3,7 +3,6 @@
 # Controller for Item actions. Contains actions that removes and adds records/items. Also contains an action
 # to serve up our manifests.
 class ItemsController < ActionController::Base
-  include PresignedUrls
 
   class ItemNotFound < StandardError; end
   class ManifestNotFound < StandardError; end
@@ -52,7 +51,12 @@ class ItemsController < ActionController::Base
 
     config = Settings.iiif_manifest_storage
     client = client(config.to_h.except(:bucket))
-    redirect_to presigned_url(client, config[:bucket], manifest_path), status: :temporary_redirect
+
+    response = client.get_object(bucket: config[:bucket], key: manifest_path)
+
+    send_data response.body.read, type: 'application/json', disposition: :inline
+  rescue Aws::S3::Errors::NoSuchKey
+    raise ManifestNotFound
   end
 
   private
