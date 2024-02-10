@@ -49,8 +49,7 @@ class ItemsController < ActionController::Base
     raise ManifestNotFound unless manifest_path
 
     config = Settings.iiif_manifest_storage
-    client = client(config.to_h.except(:bucket))
-
+    client = Aws::S3::Client.new(**config.to_h.except(:bucket))
     response = client.get_object(bucket: config[:bucket], key: manifest_path)
 
     send_data response.body.read, type: 'application/json', disposition: :inline
