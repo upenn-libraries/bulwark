@@ -90,7 +90,7 @@ class CatalogController < ApplicationController
     # solr fields to be displayed in the show (single result) view
     #   The ordering of the field names is the order of the display
 
-    config.add_show_field :alternate_title_ssim, label: 'Alternate Title'
+    config.add_show_field :alt_title_ssim, label: 'Alternate Title'
     config.add_show_field :abstract_ssim, label: 'Abstract'
     config.add_show_field :creator_ssim, label: 'Creator'
     config.add_show_field :contributor_ssim, label: 'Contributor'
