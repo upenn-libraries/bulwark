@@ -86,6 +86,7 @@ class CatalogController < ApplicationController
     config.add_index_field :publisher_ssim, label: 'Publisher'
     config.add_index_field :collection_ssim, label: 'Collection'
     config.add_index_field :call_number_ssim, label: 'Physical Location'
+    config.add_index_field :physical_location_ssim, label: 'Physical Location'
 
     # solr fields to be displayed in the show (single result) view
     #   The ordering of the field names is the order of the display
