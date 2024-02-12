@@ -20,11 +20,13 @@ class AssetsController < ActionController::Base
 
     # Fetching file location from published json.
     assets_json = @item.published_json['assets']
-    key = assets_json&.find { |a| a['id'] == params['id'] }&.dig('original_file', 'path')
+    asset = assets_json&.find { |a| a['id'] == params['id'] }
+    key = asset&.dig('original_file', 'path')
 
     raise KeyNotFound unless key
 
-    redirect_to presigned_url(client, config[:bucket], key), status: :temporary_redirect
+    redirect_to presigned_url(client, config[:bucket], key, :attachment, asset['filename']),
+                status: :temporary_redirect
   end
 
   # Download thumbnail
