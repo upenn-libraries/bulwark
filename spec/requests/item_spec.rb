@@ -153,21 +153,32 @@ RSpec.describe 'Item Endpoints', type: :request do
 
   # GET /items/:id/manifest
   context 'when fetching iiif manifest' do
-    before do
-      item.add_solr_document! if defined?(item)
-      get "/items/#{unique_identifier}/manifest"
-    end
+    before { item.add_solr_document! if defined?(item) }
+
     context 'when id valid and iiif manifest present' do
       let(:item) { FactoryBot.create(:item, :with_asset) }
       let(:unique_identifier) { item.unique_identifier }
 
-      it 'redirects to presigned URL' do
-        expect(request).to redirect_to %r{\Ahttp://minio-dev.library.upenn.edu/iiif-manifests-dev/36a224db-c416-4769-9da1-28513827d179/iiif_manifest}
+      before do
+        client = instance_double('Aws::S3::Client')
+        io = instance_double('IO', read: 'sample_data')
+        response = instance_double('Aws::S3::Types::GetObjectOutput', body: io)
+        allow(Aws::S3::Client).to receive(:new).with(any_args).and_return(client)
+        allow(client).to receive(:get_object).with(bucket: 'iiif-manifests-dev', key: '36a224db-c416-4769-9da1-28513827d179/iiif_manifest')
+                                             .and_return(response)
+
+        get "/items/#{unique_identifier}/manifest"
+      end
+
+      it 'sends data' do
+        expect(response.body).to eq 'sample_data'
       end
     end
 
     context 'when id invalid' do
       let(:unique_identifier) { 'ark:/12345/invalid' }
+
+      before { get "/items/#{unique_identifier}/manifest" }
 
       it 'returns 404' do
         expect(response).to have_http_status 404
@@ -177,6 +188,8 @@ RSpec.describe 'Item Endpoints', type: :request do
     context 'when iiif manifest not present' do
       let(:item) { FactoryBot.create(:item) }
       let(:unique_identifier) { item.unique_identifier }
+
+      before { get "/items/#{unique_identifier}/manifest" }
 
       it 'returns 404' do
         expect(response).to have_http_status 404
