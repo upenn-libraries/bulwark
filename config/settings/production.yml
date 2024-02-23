@@ -43,7 +43,7 @@ preservation_storage:
   bucket: <%= ENV['S3_PRESERVATION_BUCKET'] %>
 derivative_storage:
   <<: *aws
-  bucket: <%= ENV['S3_STAGING_BUCKET'] %>
+  bucket: <%= ENV['S3_DERIVATIVES_BUCKET'] %>
 iiif_manifest_storage:
   <<: *aws
   bucket: <%= ENV['S3_IIIF_MANIFEST_BUCKET'] %>
