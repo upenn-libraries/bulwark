@@ -40,13 +40,13 @@ aws: &aws
   region: <%= File.exist?('/run/secrets/s3_region') ? File.read('/run/secrets/s3_region').strip : 'us-east-1' %>
 preservation_storage:
   <<: *aws
-  bucket: upennlib-apotheca-preservation-staging
+  bucket: <%= ENV['S3_PRESERVATION_BUCKET'] %>
 derivative_storage:
   <<: *aws
-  bucket: upennlib-apotheca-derivatives-staging
+  bucket: <%= ENV['S3_STAGING_BUCKET'] %>
 iiif_manifest_storage:
   <<: *aws
-  bucket: upennlib-apotheca-iiif-manifests-staging
+  bucket: <%= ENV['S3_IIIF_MANIFEST_BUCKET'] %>
 
 # Publishing endpoint
 publishing_endpoint:
