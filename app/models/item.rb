@@ -61,7 +61,9 @@ class Item < ActiveRecord::Base
       non_iiif_asset_listing_ss: published_json.fetch('assets', []).select { |a| !a['iiif'] }.to_json # Assets that need to be listed instead of displayed via the IIIF manifest.
     }
 
-    descriptive_metadata = { creator: [], contributor: [], name: [], name_with_role: [] }
+    descriptive_metadata = {
+      creator: [], creator_with_role: [], contributor: [], contributor_with_role: [], name: []
+    }
 
     # Extract the values that we want to display from the descriptive metadata.
     published_json.fetch('descriptive_metadata', []).each do |field, values|
@@ -93,14 +95,16 @@ class Item < ActiveRecord::Base
       when 'name' # extracting creator, contributor names based on roles
         values.each do |name|
           roles = name.fetch('role', []).map { |r| r['value'] }.map(&:downcase).uniq
-          if roles.include?('creator')
+          name_with_role = roles.blank? ? name['value'] : "#{name['value']} (#{roles.join(', ')})"
+
+          if roles.include?('creator') || roles.include?('author')
             descriptive_metadata[:creator] << name['value']
-          elsif roles.include?('contributor')
+            descriptive_metadata[:creator_with_role] << name_with_role
+          elsif roles.present?
             descriptive_metadata[:contributor] << name['value']
+            descriptive_metadata[:contributor_with_role] << name_with_role
           else
-            name_with_role = roles.blank? ? name['value'] : "#{name['value']} (#{roles.join(', ')})"
             descriptive_metadata[:name] << name['value']
-            descriptive_metadata[:name_with_role] << name_with_role
           end
         end
       else

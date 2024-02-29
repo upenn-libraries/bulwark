@@ -77,8 +77,10 @@ class CatalogController < ApplicationController
     #   The ordering of the field names is the order of the display
 
     config.add_index_field :creator_ssim, label: 'Creator'
+    config.add_index_field :creator_with_role_ssim, label: 'Creator'
     config.add_index_field :contributor_ssim, label: 'Contributor'
-    config.add_index_field :name_with_role_ssim, label: 'Name'
+    config.add_index_field :contributor_with_role_ssim, label: 'Contributor'
+    config.add_index_field :name, label: 'Name'
     config.add_index_field :personal_name_ssim, label: 'Personal Name'
     config.add_index_field :corporate_name_ssim, label: 'Corporate Name'
     config.add_index_field :date_ssim, label: 'Date'
@@ -94,8 +96,10 @@ class CatalogController < ApplicationController
     config.add_show_field :alt_title_ssim, label: 'Alternate Title'
     config.add_show_field :abstract_ssim, label: 'Abstract'
     config.add_show_field :creator_ssim, label: 'Creator'
+    config.add_show_field :creator_with_role_ssim, label: 'Creator'
     config.add_show_field :contributor_ssim, label: 'Contributor'
-    config.add_show_field :name_with_role_ssim, label: 'Name'
+    config.add_show_field :contributor_with_role_ssim, label: 'Contributor'
+    config.add_show_field :name_ssim, label: 'Name'
     config.add_show_field :coverage_ssim, label: 'Timespan'
     config.add_show_field :date_ssim, label: 'Date'
     config.add_show_field :description_ssim, label: 'Description'
