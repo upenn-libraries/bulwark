@@ -76,9 +76,9 @@ class CatalogController < ApplicationController
     # solr fields to be displayed in the index (search results) view
     #   The ordering of the field names is the order of the display
 
-    config.add_index_field :creator_ssim, label: 'Creator'
+    config.add_index_field :creator_ssim, label: 'Creator', if: ->(_, _, d) { d[:creator_with_role_ssim].blank? }
     config.add_index_field :creator_with_role_ssim, label: 'Creator'
-    config.add_index_field :contributor_ssim, label: 'Contributor'
+    config.add_index_field :contributor_ssim, label: 'Contributor', if: ->(_, _, d) { d[:contributor_with_role_ssim].blank? }
     config.add_index_field :contributor_with_role_ssim, label: 'Contributor'
     config.add_index_field :name, label: 'Name'
     config.add_index_field :personal_name_ssim, label: 'Personal Name'
@@ -95,9 +95,9 @@ class CatalogController < ApplicationController
 
     config.add_show_field :alt_title_ssim, label: 'Alternate Title'
     config.add_show_field :abstract_ssim, label: 'Abstract'
-    config.add_show_field :creator_ssim, label: 'Creator'
+    config.add_show_field :creator_ssim, label: 'Creator', if: ->(_, _, d) { d[:creator_with_role_ssim].blank? }
     config.add_show_field :creator_with_role_ssim, label: 'Creator'
-    config.add_show_field :contributor_ssim, label: 'Contributor'
+    config.add_show_field :contributor_ssim, label: 'Contributor', if: ->(_, _, d) { d[:contributor_with_role_ssim].blank? }
     config.add_show_field :contributor_with_role_ssim, label: 'Contributor'
     config.add_show_field :name_ssim, label: 'Name'
     config.add_show_field :coverage_ssim, label: 'Timespan'
