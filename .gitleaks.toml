@@ -178,7 +178,8 @@ title = "gitlab gitleaks config"
     description = "Global Allowlists"
     commits = [
         '''a8d170e645929cf2d3008e9936a81fa6be4af535''',
-        '''ee1328bbc905aa8e020edca5d7e048aaca5ad186'''
+        '''ee1328bbc905aa8e020edca5d7e048aaca5ad186''',
+        '''2bc906ef1a545547d599716352c352caa6d0194b'''
     ]
     files = [
         '''(.*?)(bin|csv|doc|gif|jpg|md|pdf)$''',
