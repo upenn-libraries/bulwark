@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Bulwark
   module Storage
     module Ceph

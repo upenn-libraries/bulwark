@@ -6,9 +6,9 @@
   <ul class="list-group">
     <% assets.each do |asset| %>
       <li class="list-group-item">
-        <span><%= asset.filename %></span>
+        <span><%= asset.is_a?(Asset) ? asset.filename : asset[:filename] %></span>
         <span class="pull-right">
-          <a href="<%= asset.original_file_link %>" target="_blank">
+          <a href="<%= asset.is_a?(Asset) ? asset.original_file_link : asset_original_url(@document.unique_identifier, asset[:id])%>" target="_blank">
             <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download
           </a>
         </span>

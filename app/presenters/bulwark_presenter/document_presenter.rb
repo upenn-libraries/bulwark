@@ -59,11 +59,5 @@ module BulwarkPresenter
       transformations.each_pair {|d,t| string = string.gsub(d, t)}
       string.html_safe
     end
-
-    def html_decode(string_to_decode)
-      decoder = HTMLEntities.new
-      return decoder.decode(string_to_decode)
-    end
-
   end
 end

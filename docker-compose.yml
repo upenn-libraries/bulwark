@@ -11,6 +11,15 @@ secrets:
   bulwark_aws_secret_access_key:
     external: true
     name: colenda_bulwark_aws_secret_access_key_v${AWS_SECRET_ACCESS_KEY_VERSION}
+  bulwark_s3_access_key_id:
+    external: true
+    name: colenda_bulwark_s3_access_key_id_v${S3_ACCESS_KEY_ID_VERSION}
+  bulwark_s3_secret_access_key:
+    external: true
+    name: colenda_bulwark_s3_secret_access_key_v${S3_SECRET_ACCESS_KEY_VERSION}
+  bulwark_s3_region:
+    external: true
+    name: colenda_bulwark_s3_region_v${S3_REGION_VERSION}
   bulwark_database_password:
     external: true
     name: colenda_bulwark_database_password_v${DATABASE_PASSWORD_VERSION}
@@ -32,6 +41,9 @@ secrets:
   bulwark_secret_key_base:
     external: true
     name: colenda_bulwark_secret_key_base_v${SECRET_KEY_BASE_VERSION}
+  bulwark_publishing_token:
+    external: true
+    name: colenda_bulwark_publishing_token_v${PUBLISHING_TOKEN_VERSION}
 
 services:
   redis:
@@ -81,6 +93,7 @@ services:
       update_config:
         parallelism: 1
     environment:
+      APP_URL:
       CACHE_URL:
       DATABASE_NAME:
       DATABASE_USERNAME:
@@ -95,6 +108,9 @@ services:
       RAILS_ENV:
       REDIS_URL:
       REQUEST_STYLE:
+      S3_PRESERVATION_BUCKET:
+      S3_DERIVATIVES_BUCKET:
+      S3_IIIF_MANIFEST_BUCKET:
       SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE:
       SMTP_ADDRESS:
@@ -122,6 +138,12 @@ services:
         target: /run/secrets/aws_access_key_id
       - source: bulwark_aws_secret_access_key
         target: /run/secrets/aws_secret_access_key
+      - source: bulwark_s3_access_key_id
+        target: /run/secrets/s3_access_key_id
+      - source: bulwark_s3_secret_access_key
+        target: /run/secrets/s3_secret_access_key
+      - source: bulwark_s3_region
+        target: /run/secrets/s3_region
       - source: bulwark_database_password
         target: /run/secrets/database_password
       - source: bulwark_ezid_password
@@ -134,6 +156,8 @@ services:
         target: /run/secrets/honeybadger_api_key
       - source: bulwark_secret_key_base
         target: /run/secrets/secret_key_base
+      - source: bulwark_publishing_token
+        target: /run/secrets/publishing_token
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
@@ -148,6 +172,7 @@ services:
       update_config:
         parallelism: 1
     environment:
+      APP_URL:
       CACHE_URL:
       DATABASE_NAME:
       DATABASE_USERNAME:
@@ -162,6 +187,9 @@ services:
       RAILS_ENV:
       REDIS_URL:
       REQUEST_STYLE:
+      S3_PRESERVATION_BUCKET:
+      S3_DERIVATIVES_BUCKET:
+      S3_IIIF_MANIFEST_BUCKET:
       SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE:
       SMTP_ADDRESS:
@@ -181,6 +209,12 @@ services:
         target: /run/secrets/aws_access_key_id
       - source: bulwark_aws_secret_access_key
         target: /run/secrets/aws_secret_access_key
+      - source: bulwark_s3_access_key_id
+        target: /run/secrets/s3_access_key_id
+      - source: bulwark_s3_secret_access_key
+        target: /run/secrets/s3_secret_access_key
+      - source: bulwark_s3_region
+        target: /run/secrets/s3_region
       - source: bulwark_database_password
         target: /run/secrets/database_password
       - source: bulwark_ezid_password
@@ -193,6 +227,8 @@ services:
         target: /run/secrets/imaging_user_pass
       - source: bulwark_secret_key_base
         target: /run/secrets/secret_key_base
+      - source: bulwark_publishing_token
+        target: /run/secrets/publishing_token
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'

@@ -187,16 +187,19 @@ RSpec.describe Repo, type: :model do
   end
 
   describe '#thumbnail_link' do
-    let(:repo) { FactoryBot.create(:repo) }
+    let(:repo) { FactoryBot.create(:repo, :with_assets) }
+    let(:thumbnail) { repo.assets.first }
 
     before do
-      repo.update!(thumbnail_location: "/#{repo.names.bucket}/file_one.jpeg")
-      ceph_config = double('special_remote', protocol: 'https://', host: 'storage.library.upenn.edu')
+      repo.update(thumbnail: thumbnail.filename)
+      ceph_config = double('special_remote', type: 'S3')
       allow(Settings.digital_object).to receive(:special_remote).and_return(ceph_config)
     end
 
     it 'return expected thumbnail_link' do
-      expect(repo.thumbnail_link).to eql "https://storage.library.upenn.edu/#{repo.names.bucket}/file_one.jpeg"
+      expect(repo.thumbnail_link).to eql(
+        "https://phalt.colenda.library.upenn.edu/download/#{repo.names.bucket}/#{thumbnail.thumbnail_file_location}"
+      )
     end
   end
 
@@ -250,9 +253,9 @@ RSpec.describe Repo, type: :model do
         "geographic_subject_tesim" => ["New York City, New York, United States"],
         "id" => repo.names.fedora,
         "has_images_bsi" => "T",
-        "item_type_sim" => ["Programs"],
-        "item_type_ssim" => ["Programs"],
-        "item_type_tesim" => ["Programs"],
+        "physical_format_sim" => ["Programs"],
+        "physical_format_ssim" => ["Programs"],
+        "physical_format_tesim" => ["Programs"],
         "language_sim" => ["English"],
         "language_ssim" => ["English"],
         "language_tesim" => ["English"],

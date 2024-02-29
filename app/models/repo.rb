@@ -269,13 +269,10 @@ class Repo < ActiveRecord::Base
   end
 
   def thumbnail_link
-    return '' unless thumbnail_location
+    return if thumbnail.blank?
 
-    Addressable::URI.new(
-      path: thumbnail_location,
-      host: Settings.digital_object.special_remote.host,
-      scheme: Settings.digital_object.special_remote.protocol.gsub('://', '')
-    ).to_s
+    location = assets.find_by!(filename: thumbnail)&.thumbnail_file_location
+    location ? Bulwark::Storage.url_for(names.bucket, location) : nil
   end
 
   # Validates that all the filenames referenced in the structural metadata are valid.
@@ -302,9 +299,11 @@ class Repo < ActiveRecord::Base
       values = descriptive_metadata.user_defined_mappings.fetch(field, [])
       next if values.blank?
 
-      document["#{field}_tesim"] = values
-      document["#{field}_ssim"] = values
-      document["#{field}_sim"] = values
+      f = field == 'item_type' ? 'physical_format' : field
+
+      document["#{f}_tesim"] = values
+      document["#{f}_ssim"] = values
+      document["#{f}_sim"] = values
     end
 
     document

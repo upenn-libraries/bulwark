@@ -32,3 +32,22 @@ phalt:
   url: <%= ENV['PHALT_ENDPOINT'] %>
 iiif:
   image_server: <%= ENV['IIIF_IMAGE_SERVER'] %>
+
+# Apotheca File Storage
+aws: &aws
+  access_key_id: <%= File.exist?('/run/secrets/s3_access_key_id') ? File.read('/run/secrets/s3_access_key_id').strip : nil %>
+  secret_access_key: <%= File.exist?('/run/secrets/s3_secret_access_key') ? File.read('/run/secrets/s3_secret_access_key').strip : nil %>
+  region: <%= File.exist?('/run/secrets/s3_region') ? File.read('/run/secrets/s3_region').strip : 'us-east-1' %>
+preservation_storage:
+  <<: *aws
+  bucket: <%= ENV['S3_PRESERVATION_BUCKET'] %>
+derivative_storage:
+  <<: *aws
+  bucket: <%= ENV['S3_DERIVATIVES_BUCKET'] %>
+iiif_manifest_storage:
+  <<: *aws
+  bucket: <%= ENV['S3_IIIF_MANIFEST_BUCKET'] %>
+
+# Publishing endpoint
+publishing_endpoint:
+  token:  <%= File.exist?('/run/secrets/publishing_token') ? File.read('/run/secrets/publishing_token').strip : nil %>

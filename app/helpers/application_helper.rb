@@ -51,8 +51,14 @@ module ApplicationHelper
   end
 
   def render_iiif_manifest_link
-    repo = Repo.find_by(unique_identifier: @document.unique_identifier)
-    return repo.has_images? ? link_to("IIIF presentation manifest", "#{ENV['UV_URL']}/#{@document.id}/manifest") : ''
+    link = if @document.from_apotheca?
+             @document.fetch('iiif_manifest_path_ss', nil) ? item_manifest_url(@document.unique_identifier) : nil
+           else
+             repo = Repo.find_by(unique_identifier: @document.unique_identifier)
+             repo.has_images? ? "#{ENV['UV_URL']}/#{@document.id}/manifest" : nil
+           end
+
+    link ? link_to('IIIF presentation manifest', link) : nil
   end
 
   # @param [String] label
@@ -70,13 +76,22 @@ module ApplicationHelper
   end
 
   def additional_resources
-    repo = Repo.find_by(unique_identifier: @document.unique_identifier)
-    return true if repo.bibid.present? || repo.has_images?
+    if @document.from_apotheca?
+      @document.fetch(:iiif_manifest_path_ss, nil) || @document.fetch(:bibnumber_ssi, nil)
+    else
+      repo = Repo.find_by(unique_identifier: @document.unique_identifier)
+      repo.bibid.present? || repo.has_images?
+    end
   end
 
-  def universal_viewer_path(identifier)
-    # Add to this for additional UV params
+  def universal_viewer_path(document)
     url_args = "cv=#{params[:cv]}"
-    "/uv/uv#?manifest=uv/uv#?manifest=#{ENV['UV_URL']}/#{identifier}/manifest&#{url_args}&config=/uv/uv-config.json"
+
+    if document.from_apotheca?
+      "/uv/uv#?manifest=uv/uv#?manifest=#{manifest_item_url(document.unique_identifier)}&#{url_args}&config=/uv/uv-config.json"
+    else
+      # Add to this for additional UV params
+      "/uv/uv#?manifest=uv/uv#?manifest=#{ENV['UV_URL']}/#{document.id}/manifest&#{url_args}&config=/uv/uv-config.json"
+    end
   end
 end

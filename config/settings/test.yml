@@ -24,3 +24,24 @@ phalt:
   url: https://phalt.colenda.library.upenn.edu/
 iiif:
   image_server: https://iiif.colenda.library.upenn.edu/iiif/2
+
+# Apotheca File Storage
+aws: &aws
+  access_key_id: minioadmin
+  secret_access_key: minioadmin
+  endpoint: http://minio-dev.library.upenn.edu
+  region: us-east-1
+  force_path_style: true
+preservation_storage:
+  <<: *aws
+  bucket: preservation-dev
+derivative_storage:
+  <<: *aws
+  bucket: derivatives-dev
+iiif_manifest_storage:
+  <<: *aws
+  bucket: iiif-manifests-dev
+
+# Publishing Endpoint
+publishing_endpoint:
+  token: 'sample_token'

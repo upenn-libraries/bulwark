@@ -44,6 +44,25 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :items, only: [], constraints: { id: /ark:\/\d{5}\/[a-z0-9]+/ } do
+    collection do
+      post :create, constraints: { format: :json }
+    end
+
+    member do
+      delete :destroy, constraints: { format: :json }
+      get :manifest
+    end
+
+    resources :assets, only: [], constraints: { id: /[a-zA-Z0-9\-]+/ } do
+      member do
+        get :thumbnail
+        get :access
+        get :original
+      end
+    end
+  end
+
   if Rails.env.development? || Rails.env.test?
     get 'special_remote_download/:bucket/:key',
         action: :special_remote_download,
