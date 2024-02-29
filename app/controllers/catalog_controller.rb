@@ -228,7 +228,7 @@ class CatalogController < ApplicationController
 
   def docs_with_urls
     @document_list.each do |doc|
-      thumbnail_link = doc.thumbnail_link(root_url: root_url)
+      thumbnail_link = doc.thumbnail_link(root_url)
       doc._source['thumbnail_url'] = thumbnail_link if thumbnail_link
     end
   end
