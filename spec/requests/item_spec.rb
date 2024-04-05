@@ -173,6 +173,10 @@ RSpec.describe 'Item Endpoints', type: :request do
       it 'sends data' do
         expect(response.body).to eq 'sample_data'
       end
+
+      it 'has correct CORS header' do
+        expect(response.headers).to include 'Access-Control-Allow-Origin' => '*'
+      end
     end
 
     context 'when id invalid' do
