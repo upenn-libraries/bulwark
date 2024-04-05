@@ -50,9 +50,13 @@ class ItemsController < ActionController::Base
 
     config = Settings.iiif_manifest_storage
     client = Aws::S3::Client.new(**config.to_h.except(:bucket))
-    response = client.get_object(bucket: config[:bucket], key: manifest_path)
+    r = client.get_object(bucket: config[:bucket], key: manifest_path)
 
-    send_data response.body.read, type: 'application/json', disposition: :inline
+    # Add CORS headers to allow external services to pull the IIIF manifest.
+    # TODO: We might need to include the rack-cors gem to include a preflight check.
+    response.headers['Access-Control-Allow-Origin'] = '*'
+
+    send_data r.body.read, type: 'application/json', disposition: :inline
   rescue Aws::S3::Errors::NoSuchKey
     raise ManifestNotFound
   end
