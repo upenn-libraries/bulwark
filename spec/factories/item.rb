@@ -30,6 +30,11 @@ FactoryBot.define do
                 path: 'b65d33d3-8c34-4e36-acf9-dab273277583/df4f0a9b-e657-41fb-82b7-228cc9a0642b',
                 size: 1234,
                 mime_type: 'image/tiff'
+              },
+              access_file: {
+                path: 'b65d33d3-8c34-4e36-acf9-dab273277583/access',
+                size: 1234,
+                mime_type: 'image/jpeg'
               }
             }
           ]

@@ -25,10 +25,11 @@ RSpec.describe 'Asset Endpoints', type: :request do
 
   # GET /items/:item_id/assets/:id/access
   context 'when fetching access file' do
-    before { get "/items/#{unique_identifier}/assets/12345/access" }
+    before { get "/items/#{unique_identifier}/assets/#{asset_id}/access" }
 
     context 'when item_id invalid' do
       let(:unique_identifier) { 'ark:/12345/invalid' }
+      let(:asset_id) { '12345' }
 
       it 'returns 404' do
         expect(response).to have_http_status 404
@@ -36,11 +37,13 @@ RSpec.describe 'Asset Endpoints', type: :request do
     end
 
     context 'when item_id is valid' do
-      let(:item) { FactoryBot.create(:item) }
+      let(:item) { FactoryBot.create(:item, :with_asset) }
       let(:unique_identifier) { item.unique_identifier }
+      let(:asset_id) { 'b65d33d3-8c34-4e36-acf9-dab273277583' }
 
-      it 'redirects to presigned URL' do
-        expect(request).to redirect_to %r{\Ahttp://minio-dev.library.upenn.edu/derivatives-dev/12345/access}
+      it 'redirects to presigned URL with correct filename' do
+        expect(request).to redirect_to %r{\Ahttp://minio-dev.library.upenn.edu/derivatives-dev/b65d33d3-8c34-4e36-acf9-dab273277583/access}
+        expect(request).to redirect_to %r{e2750_wk1_body0001.jpeg}
       end
     end
   end
