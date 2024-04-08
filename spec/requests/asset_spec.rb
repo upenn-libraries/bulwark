@@ -41,8 +41,9 @@ RSpec.describe 'Asset Endpoints', type: :request do
       let(:unique_identifier) { item.unique_identifier }
       let(:asset_id) { 'b65d33d3-8c34-4e36-acf9-dab273277583' }
 
-      it 'redirects to presigned URL' do
+      it 'redirects to presigned URL with correct filename' do
         expect(request).to redirect_to %r{\Ahttp://minio-dev.library.upenn.edu/derivatives-dev/b65d33d3-8c34-4e36-acf9-dab273277583/access}
+        expect(request).to redirect_to %r{e2750_wk1_body0001.jpeg}
       end
     end
   end

@@ -45,7 +45,7 @@ class AssetsController < ActionController::Base
 
     raise KeyNotFound unless key
 
-    access_ext = Mime::Type.lookup(@asset&.dig('access_file', 'mime_type')).symbol
+    access_ext = MIME::Types[@asset&.dig('access_file', 'mime_type')].first&.preferred_extension
     access_filename = "#{File.basename(@asset['filename'], '.*')}.#{access_ext}"
 
     redirect_to presigned_url(client, config[:bucket], key, :attachment, access_filename),
