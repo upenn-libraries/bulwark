@@ -19,13 +19,13 @@
             <% if asset[:access_file].present? %>
               <span>
                 <a href="<%= asset_access_url(@document.unique_identifier, asset[:id])%>" target="_blank">
-                  <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Access Copy <%= asset.dig(:access_file, :size) ? "(#{number_to_human_size(asset.dig(:access_file, :size, prefix: :si))})": '' %>
+                  <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Access Copy <%= asset.dig(:access_file, :size) ? "(#{number_to_human_size(asset.dig(:access_file, :size), prefix: :si)})": '' %>
                 </a>
               </span>
             <% end %>
             <span>
               <a href="<%= asset_original_url(@document.unique_identifier, asset[:id]) %>" target="_blank">
-                <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Original (<%= number_to_human_size(asset.dig(:original_file, :size, prefix: :si)) %>)
+                <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Original (<%= number_to_human_size(asset.dig(:original_file, :size), prefix: :si) %>)
               </a>
             </span>
           </span>
