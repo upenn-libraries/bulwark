@@ -162,7 +162,7 @@ services:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
       - 'sceti_completed_4:${SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE}'
-#      - 'sceti_completed_5:${SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE}'
+      - 'sceti_completed_5:${SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE}'
       - '${LOCAL_FEATURED}:/home/app/webapp/public/assets/featured'
   sidekiq:
     image: 'gitlab.library.upenn.edu/dld/digital-repository/bulwark:${BULWARK_IMAGE_TAG}'
@@ -233,7 +233,7 @@ services:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
       - 'sceti_completed_4:${SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE}'
-#      - 'sceti_completed_5:${SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE}'
+      - 'sceti_completed_5:${SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE}'
 
 volumes:
   sceti_completed_4:
