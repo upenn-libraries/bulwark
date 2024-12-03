@@ -28,17 +28,12 @@ class SolrDocument
 
   # Return thumbnail link for Solr document
   def thumbnail_link(root_url)
-    if from_apotheca?
-      thumbnail_id = fetch(:thumbnail_asset_id_ssi, nil)
-      # Url helpers escape unique identifier, so we have to manually create the links.
-      thumbnail_id ? URI.join(root_url, "items/#{unique_identifier}/assets/#{thumbnail_id}/thumbnail").to_s : nil
-    elsif fetch(:thumbnail_location_ssi, nil) # Fetching thumbnail location from Solr document if present.
-      thumbnail_location = fetch(:thumbnail_location_ssi, nil)&.split('/', 2)
-      Bulwark::Storage.url_for(*thumbnail_location)
-    else # Fetching thumbnail location from database.
-      repo = Repo.find_by(unique_identifier: unique_identifier)
-      repo.thumbnail_link
-    end
+    thumbnail_id = fetch(:thumbnail_asset_id_ssi, nil)
+
+    return unless thumbnail_id
+
+    # Url helpers escape unique identifier, so we have to manually create the links.
+    URI.join(root_url, "items/#{unique_identifier}/assets/#{thumbnail_id}/thumbnail").to_s
   end
 
   # Returns assets that are not represented in the iiif manifest and have to be displayed a different way.
@@ -51,8 +46,22 @@ class SolrDocument
     JSON.parse(json, symbolize_names: true)
   end
 
-  # Returns true if this item was published from Apotheca.
-  def from_apotheca?
-    fetch('from_apotheca_bsi', false)
+  # Returns true if item has a IIIF manifest
+  def iiif_manifest?
+    fetch('iiif_manifest_path_ss', nil).present?
+  end
+
+  # Returns true if bibnumber is present, false otherwise.
+  #
+  # @return [Boolean]
+  def bibnumber?
+    bibnumber.present?
+  end
+
+  # Returns bibnumber
+  #
+  # @return [String]
+  def bibnumber
+    fetch('bibnumber_ssi', nil)
   end
 end

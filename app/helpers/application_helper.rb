@@ -17,81 +17,27 @@ module ApplicationHelper
     return items.html_safe
   end
 
-  def render_audio_player
-    repo = Repo.find_by(unique_identifier: @document.unique_identifier, new_format: true)
-    return '' if repo.nil?
-
-    assets = repo.assets.where(mime_type: ['audio/vnd.wave'])
-    return '' if assets.blank?
-
-    assets.map do |asset|
-      render partial: 'other_display/audio', locals: { streaming_id: asset.filename, streaming_url: asset.access_file_link }
-    end.join('').html_safe
-  end
-
-  # Rendering files that don't have a specific viewer that should be used. These files just get a download link.
-  def render_other
-    repo = Repo.find_by(unique_identifier: @document.unique_identifier, new_format: true)
-    return '' if repo.nil?
-
-    assets = repo.assets.where(mime_type: ['application/pdf', 'application/gzip'])
-    return '' if assets.blank?
-
-    ordered_files = repo.structural_metadata.user_defined_mappings['sequence'].map { |i| i['filename'] }
-    assets = assets.sort_by { |a| ordered_files.index(a.filename) }
-
-    render partial: 'other_display/file_download', locals: { assets: assets }
-  end
-
-  def render_uv
-    repo = Repo.find_by(unique_identifier: @document.unique_identifier)
-    partials = ''
-    partials += render :partial => 'other_display/uv'
-    return partials.html_safe if repo.has_images?
-  end
-
   def render_iiif_manifest_link
-    link = if @document.from_apotheca?
-             @document.fetch('iiif_manifest_path_ss', nil) ? item_manifest_url(@document.unique_identifier) : nil
-           else
-             repo = Repo.find_by(unique_identifier: @document.unique_identifier)
-             repo.has_images? ? "#{ENV['UV_URL']}/#{@document.id}/manifest" : nil
-           end
+    # Check to make sure iiif manifest is present in storage.
+    return unless @document.iiif_manifest?
 
-    link ? link_to('IIIF presentation manifest', link) : nil
+    link_to 'IIIF presentation manifest', item_manifest_url(@document.unique_identifier)
   end
 
   # @param [String] label
   def render_catalog_link(document, label: "Full Catalog Record")
-    bibid = document.fetch('bibnumber_ssi', nil)
+    return unless document.bibnumber?
 
-    if bibid.nil?
-      repo = Repo.find_by(unique_identifier: document.unique_identifier)
-      bibid = repo&.bibid
-    end
-
-    return if bibid.blank?
-
-    link_to label, "https://find.library.upenn.edu/catalog/#{bibid}"
+    link_to label, "https://find.library.upenn.edu/catalog/#{document.bibnumber}"
   end
 
   def additional_resources
-    if @document.from_apotheca?
-      @document.fetch(:iiif_manifest_path_ss, nil) || @document.fetch(:bibnumber_ssi, nil)
-    else
-      repo = Repo.find_by(unique_identifier: @document.unique_identifier)
-      repo.bibid.present? || repo.has_images?
-    end
+    @document.iiif_manifest? || @document.bibnumber?
   end
 
   def universal_viewer_path(document)
     url_args = "cv=#{params[:cv]}"
 
-    if document.from_apotheca?
-      "/uv/uv#?manifest=uv/uv#?manifest=#{manifest_item_url(document.unique_identifier)}&#{url_args}&config=/uv/uv-config.json"
-    else
-      # Add to this for additional UV params
-      "/uv/uv#?manifest=uv/uv#?manifest=#{ENV['UV_URL']}/#{document.id}/manifest&#{url_args}&config=/uv/uv-config.json"
-    end
+    "/uv/uv#?manifest=uv/uv#?manifest=#{manifest_item_url(document.unique_identifier)}&#{url_args}&config=/uv/uv-config.json"
   end
 end

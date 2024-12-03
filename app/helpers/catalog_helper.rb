@@ -15,22 +15,6 @@ module CatalogHelper
     string.html_safe
   end
 
-  def render_admin_actions
-    repo = Repo.find_by(unique_identifier: @document.unique_identifier)
-    return unless repo.present?
-
-    render 'admin_actions', repo: repo
-  end
-
-  def render_admin_link(repo)
-    link = if repo.new_format
-             admin_digital_object_path(repo)
-           else
-             "admin_repo/repo/#{repo.id}/ingest"
-           end
-    link_to('View in Colenda Admin', link)
-  end
-
   # Additional URL helpers needed for item and asset urls because the built-in methods escape the ARK.
   def item_manifest_url(unique_identifier)
     "#{root_url}items/#{unique_identifier}/manifest"
