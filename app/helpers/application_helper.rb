@@ -25,7 +25,7 @@ module ApplicationHelper
   end
 
   # @param [String] label
-  def render_catalog_link(document, label: "Full Catalog Record (Franklin)")
+  def render_catalog_link(document, label: "Full Catalog Record")
     return unless document.bibnumber?
 
     link_to label, "https://find.library.upenn.edu/catalog/#{document.bibnumber}"
