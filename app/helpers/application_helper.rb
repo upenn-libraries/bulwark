@@ -62,7 +62,7 @@ module ApplicationHelper
   end
 
   # @param [String] label
-  def render_catalog_link(document, label: "Full Catalog Record (Franklin)")
+  def render_catalog_link(document, label: "Full Catalog Record")
     bibid = document.fetch('bibnumber_ssi', nil)
 
     if bibid.nil?
@@ -72,7 +72,7 @@ module ApplicationHelper
 
     return if bibid.blank?
 
-    link_to label, "https://franklin.library.upenn.edu/catalog/FRANKLIN_#{bibid}"
+    link_to label, "https://find.library.upenn.edu/catalog/#{bibid}"
   end
 
   def additional_resources
