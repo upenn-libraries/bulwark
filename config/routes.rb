@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :alert_messages, only: %w[index update]
 
-    resources :bulk_imports, except: %w[edit update destroy] do
+    resources :bulk_imports, except: %w[create edit update destroy] do
       member do
         get :csv
       end
@@ -18,13 +18,13 @@ Rails.application.routes.draw do
         post :csv
       end
 
-      member do
-        post :publish
-        post :unpublish
-        post :generate_derivatives
-        post :generate_iiif_manifest
-        post :refresh_catalog_metadata
-      end
+      # member do
+      #   post :publish
+      #   post :unpublish
+      #   post :generate_derivatives
+      #   post :generate_iiif_manifest
+      #   post :refresh_catalog_metadata
+      # end
     end
 
     post 'file_listing_tool/file_list', to: 'file_listing_tool#file_list'

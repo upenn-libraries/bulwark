@@ -13,9 +13,9 @@
     <tbody>
       <tr>
         <td>
-          <%= bootstrap_form_tag(url: generate_derivatives_admin_digital_object_path(@digital_object), method: :post) do |f| %>
-            <%= f.submit 'Regenerate Derivatives', class: 'btn btn-primary' %>
-          <% end %>
+          <%#= bootstrap_form_tag(url: generate_derivatives_admin_digital_object_path(@digital_object), method: :post) do |f| %>
+            <%#= f.submit 'Regenerate Derivatives', class: 'btn btn-primary' %>
+          <%# end %>
         </td>
         <td>
           Run file characterization, regenerate derivatives and recreate IIIF manifest.
@@ -23,9 +23,9 @@
       </tr>
       <tr>
         <td>
-          <%= bootstrap_form_tag(url: generate_iiif_manifest_admin_digital_object_path(@digital_object), method: :post) do |f| %>
-            <%= f.submit 'Regenerate IIIF Manifest', class: 'btn btn-primary' %>
-          <% end %>
+          <%# bootstrap_form_tag(url: generate_iiif_manifest_admin_digital_object_path(@digital_object), method: :post) do |f| %>
+            <%#= f.submit 'Regenerate IIIF Manifest', class: 'btn btn-primary' %>
+          <%# end %>
         </td>
         <td>
           Regenerate IIIF manifest only.
@@ -33,9 +33,9 @@
       </tr>
       <tr>
         <td>
-          <%= bootstrap_form_tag(url: refresh_catalog_metadata_admin_digital_object_path(@digital_object), method: :post) do |f| %>
-            <%= f.submit 'Refresh Catalog Metadata', class: 'btn btn-primary', disabled: @digital_object.bibid.blank? %>
-          <% end %>
+          <%#= bootstrap_form_tag(url: refresh_catalog_metadata_admin_digital_object_path(@digital_object), method: :post) do |f| %>
+            <%#= f.submit 'Refresh Catalog Metadata', class: 'btn btn-primary', disabled: @digital_object.bibid.blank? %>
+          <%# end %>
         </td>
         <td>
           If a bibnumber is included in the descriptive metadata, refreshes metadata from catalog.
