@@ -71,25 +71,9 @@ class Item < ActiveRecord::Base
 
       case field
       when 'date'
-        dates = values&.map { |v| v['value'] }
-
-        descriptive_metadata[field] = dates&.map do |value|
-          if value =~ /^\d\d(\d|X)X$/
-            "#{value.tr('X', '0')}s"
-          else
-            value
-          end
-        end
-
-        descriptive_metadata['year'] = dates&.sum([]) do |value|
-          if value =~ /^\d\d(\d|X)X$/ # 10XX, 100X
-            Range.new(value.tr('X', '0').to_i, value.tr('X', '9').to_i).to_a.map(&:to_s)
-          elsif value =~ /^\d\d\d\d(-\d\d(-\d\d)?)?$/ # 2002, 2002-02, 2002-02-02
-            Array.wrap(value[0..3])
-          else
-            [value]
-          end
-        end
+        dates = values&.map { |v| EDTFConversion.new(v['value']) }
+        descriptive_metadata[field] = dates&.map(&:humanize)
+        descriptive_metadata['year'] = dates&.map(&:years).flatten
       when 'rights' # extracting URI for rights
         descriptive_metadata[:rights] = values.map { |v| v['uri'] }
       when 'name' # extracting creator, contributor names based on roles

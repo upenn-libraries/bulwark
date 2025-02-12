@@ -1,0 +1,21 @@
+en:
+  date:
+    seasons:
+      spring: 'Spring'
+      summer: 'Summer'
+      autumn: 'Fall'
+      winter: 'Winter'
+  edtf:
+    terms:
+      open_end_interval_with_day: "%{date} to unknown date"
+      open_end_interval_with_month: "%{date} to unknown date"
+      open_end_interval_with_year: "%{date} to unknown date"
+      set_earlier_prefix_exclusive: 'unknown date before or during '
+#      set_earlier_prefix_inclusive: 'on and before '
+      set_later_prefix_exclusive: 'unknown date during or after '
+#      set_later_prefix_inclusive: 'on and after '
+      uncertain_date_prefix: "possibly "
+      uncertain_date_suffix: ""
+    formats:
+      day_precision_strftime_format: '%Y-%m-%d'
+      month_precision_strftime_format: '%Y-%m'

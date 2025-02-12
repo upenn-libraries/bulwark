@@ -1,4 +1,14 @@
 GIT
+  remote: https://github.com/cgalarza/edtf-humanize
+  revision: ffea670310eefc35ebcec4722c7f6cf19cd0168e
+  branch: ruby-2-3-support
+  specs:
+    edtf-humanize (2.3.0)
+      activesupport (>= 4)
+      edtf (>= 2.3, < 4)
+      roman (~> 0.2.0)
+
+GIT
   remote: https://gitlab.library.upenn.edu/dld/digital-repository/jhove-service
   revision: 20c792e75dcb467cc6b469f33c5d52275c157699
   branch: master
@@ -112,7 +122,7 @@ GEM
       execjs
     coffee-script-source (1.12.2)
     colorize (0.8.1)
-    concurrent-ruby (1.1.6)
+    concurrent-ruby (1.3.4)
     config (1.7.2)
       activesupport (>= 3.0)
       deep_merge (~> 1.2, >= 1.2.1)
@@ -161,6 +171,8 @@ GEM
       dry-equalizer (~> 0.2)
       dry-logic (~> 0.5, >= 0.5.0)
       dry-types (~> 0.14, >= 0.14)
+    edtf (3.2.0)
+      activesupport (>= 3.0, < 9.0)
     equivalent-xml (0.6.0)
       nokogiri (>= 1.4.3)
     erubis (2.7.0)
@@ -250,7 +262,7 @@ GEM
     mini_magick (4.11.0)
     mini_mime (1.0.1)
     mini_portile2 (2.1.0)
-    minitest (5.11.3)
+    minitest (5.15.0)
     multi_json (1.13.1)
     multipart-post (2.0.0)
     mysql2 (0.4.10)
@@ -343,6 +355,7 @@ GEM
     responders (2.4.0)
       actionpack (>= 4.2.0, < 5.3)
       railties (>= 4.2.0, < 5.3)
+    roman (0.2.0)
     rsolr (1.0.13)
       builder (>= 2.1.2)
     rspec (3.8.0)
@@ -424,7 +437,7 @@ GEM
     thor (0.20.3)
     thread_safe (0.3.6)
     tilt (1.4.1)
-    tzinfo (1.2.5)
+    tzinfo (1.2.11)
       thread_safe (~> 0.1)
     tzinfo-data (1.2018.7)
       tzinfo (>= 1.0.0)
@@ -459,6 +472,7 @@ DEPENDENCIES
   config
   devise
   dotiw
+  edtf-humanize!
   equivalent-xml
   ezid-client
   factory_bot_rails

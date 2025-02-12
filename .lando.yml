@@ -2,7 +2,7 @@ name: bulwark
 services:
   solr:
     type: solr:5
-    portforward: true
+    portforward: 8983
     run:
       - mkdir -p /opt/solr/server/solr/lib/contrib/
       - cp -r /opt/solr/contrib/analysis-extras/ /opt/solr/server/solr/lib/contrib/
