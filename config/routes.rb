@@ -52,6 +52,7 @@ Rails.application.routes.draw do
     member do
       delete :destroy, constraints: { format: :json }
       get :manifest
+      get :thumbnail
     end
 
     resources :assets, only: [], constraints: { id: /[a-zA-Z0-9\-]+/ } do

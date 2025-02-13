@@ -151,12 +151,45 @@ RSpec.describe 'Item Endpoints', type: :request do
     end
   end
 
+  # GET /items/:item_id/thumbnail
+  context 'when fetching thumbnail file' do
+    before { get "/items/#{unique_identifier}/thumbnail" }
+
+    context 'when item_id invalid' do
+      let(:unique_identifier) { 'ark:/12345/invalid' }
+
+      it 'returns 404' do
+        expect(response).to have_http_status 404
+      end
+    end
+
+    context 'when item_id is valid' do
+      let(:unique_identifier) { item.unique_identifier }
+
+      context 'when thumbnail available' do
+        let(:item) { FactoryBot.create(:item, :with_image) }
+
+        it 'redirects to presigned URL' do
+          expect(request).to redirect_to %r{\Ahttp://minio-dev.library.upenn.edu/derivatives-dev/b65d33d3-8c34-4e36-acf9-dab273277583/thumbnail}
+        end
+      end
+
+      context 'when thumbnail unavailable' do
+        let(:item) { FactoryBot.create(:item, :with_pdf) }
+
+        it 'returns 404' do
+          expect(response).to have_http_status 404
+        end
+      end
+    end
+  end
+
   # GET /items/:id/manifest
   context 'when fetching iiif manifest' do
     before { item.add_solr_document! if defined?(item) }
 
     context 'when id valid and iiif manifest present' do
-      let(:item) { FactoryBot.create(:item, :with_asset) }
+      let(:item) { FactoryBot.create(:item, :with_image) }
       let(:unique_identifier) { item.unique_identifier }
 
       before do

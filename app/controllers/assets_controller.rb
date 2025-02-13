@@ -5,12 +5,11 @@ class AssetsController < ActionController::Base
   include PresignedUrls
 
   class ItemNotFound < StandardError; end
-  class KeyNotFound < StandardError; end
+  class FileNotFound < StandardError; end
 
-  before_action :fetch_item
-  before_action :fetch_asset, except: [:thumbnail]
+  before_action :fetch_item, :fetch_asset
 
-  rescue_from 'AssetsController::ItemNotFound', 'AssetsController::KeyNotFound' do |_e|
+  rescue_from 'AssetsController::ItemNotFound', 'AssetsController::FileNotFound' do |_e|
     head :not_found
   end
 
@@ -22,7 +21,7 @@ class AssetsController < ActionController::Base
     # Fetching file location from published json.
     key = @asset&.dig('original_file', 'path')
 
-    raise KeyNotFound unless key
+    raise FileNotFound unless key
 
     redirect_to presigned_url(client, config[:bucket], key, :attachment, @asset['filename']),
                 status: :temporary_redirect
@@ -32,7 +31,12 @@ class AssetsController < ActionController::Base
   def thumbnail
     config = Settings.derivative_storage
     client = client(config.to_h.except(:bucket))
-    redirect_to presigned_url(client, config[:bucket], "#{params[:id]}/thumbnail"), status: :temporary_redirect
+
+    # Fetching file location from published json.
+    key = @asset&.dig('thumbnail_file', 'path')
+    raise FileNotFound unless key
+
+    redirect_to presigned_url(client, config[:bucket], key), status: :temporary_redirect
   end
 
   # Access copy download
@@ -42,8 +46,7 @@ class AssetsController < ActionController::Base
 
     # Fetching file location from published json.
     key = @asset&.dig('access_file', 'path')
-
-    raise KeyNotFound unless key
+    raise FileNotFound unless key
 
     access_ext = MIME::Types[@asset&.dig('access_file', 'mime_type')].first&.preferred_extension
     access_filename = "#{File.basename(@asset['filename'], '.*')}.#{access_ext}"
@@ -57,8 +60,7 @@ class AssetsController < ActionController::Base
     # Fetch published json for asset.
     # @return [Hash]
     def fetch_asset
-      assets_json = @item.published_json['assets']
-      @asset = assets_json&.find { |a| a['id'] == params['id'] }
+      @asset = @item.asset(params['id'])
     end
 
     def fetch_item

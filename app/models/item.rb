@@ -13,6 +13,14 @@ class Item < ActiveRecord::Base
 
   serialize :published_json, JSON
 
+  # Fetch nested asset record.
+  #
+  # @param [String] id
+  # @return [Hash]
+  def asset(id)
+    published_json['assets']&.find { |a| a['id'] == id }
+  end
+
   # Ensuring the minimum required fields are present in the published_json
   def required_keys_present
     return if published_json.blank?

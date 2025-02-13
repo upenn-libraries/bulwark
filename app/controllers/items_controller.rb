@@ -3,14 +3,16 @@
 # Controller for Item actions. Contains actions that removes and adds records/items. Also contains an action
 # to serve up our manifests.
 class ItemsController < ActionController::Base
+  include PresignedUrls
+
   class ItemNotFound < StandardError; end
-  class ManifestNotFound < StandardError; end
+  class FileNotFound < StandardError; end
 
   before_action :token_authentication, only: [:create, :destroy]
-  before_action :fetch_item, only: [:destroy]
+  before_action :fetch_item, only: [:destroy, :thumbnail]
   before_action :fetch_solr_document, only: [:manifest]
 
-  rescue_from 'ItemsController::ItemNotFound', 'ItemsController::ManifestNotFound' do |_e|
+  rescue_from 'ItemsController::ItemNotFound', 'ItemsController::FileNotFound' do |_e|
     head :not_found
   end
 
@@ -42,11 +44,24 @@ class ItemsController < ActionController::Base
     render json: { status: 'error', error: e.message }, status: :internal_server_error
   end
 
+  # GET items/:id/thumbnail
+  # Download item thumbnail.
+  def thumbnail
+    config = Settings.derivative_storage
+    client = client(config.to_h.except(:bucket))
+    thumbnail_id = @item.published_json.fetch('thumbnail_asset_id', nil)
+
+    key = @item.asset(thumbnail_id)&.dig('thumbnail_file', 'path')
+    raise FileNotFound unless key
+
+    redirect_to presigned_url(client, config[:bucket], key), status: :temporary_redirect
+  end
+
   # GET items/:id/manifest
   def manifest
     manifest_path = @document.fetch(:iiif_manifest_path_ss, nil)
 
-    raise ManifestNotFound unless manifest_path
+    raise FileNotFound unless manifest_path
 
     config = Settings.iiif_manifest_storage
     client = Aws::S3::Client.new(**config.to_h.except(:bucket))
@@ -58,7 +73,7 @@ class ItemsController < ActionController::Base
 
     send_data r.body.read, type: 'application/json', disposition: :inline
   rescue Aws::S3::Errors::NoSuchKey
-    raise ManifestNotFound
+    raise FileNotFound
   end
 
   private
