@@ -24,6 +24,12 @@ module ApplicationHelper
     link_to 'IIIF presentation manifest', item_manifest_url(@document.unique_identifier)
   end
 
+  def render_pdf_link
+    return unless @document.pdf?
+
+    link_to 'Download PDF', item_pdf_url(@document.unique_identifier)
+  end
+
   # @param [String] label
   def render_catalog_link(document, label: "Full Catalog Record")
     return unless document.bibnumber?

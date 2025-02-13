@@ -9,7 +9,7 @@ class ItemsController < ActionController::Base
   class FileNotFound < StandardError; end
 
   before_action :token_authentication, only: [:create, :destroy]
-  before_action :fetch_item, only: [:destroy, :thumbnail]
+  before_action :fetch_item, only: [:destroy, :thumbnail, :pdf]
   before_action :fetch_solr_document, only: [:manifest]
 
   rescue_from 'ItemsController::ItemNotFound', 'ItemsController::FileNotFound' do |_e|
@@ -55,6 +55,19 @@ class ItemsController < ActionController::Base
     raise FileNotFound unless key
 
     redirect_to presigned_url(client, config[:bucket], key), status: :temporary_redirect
+  end
+
+  # GET items/:id/pdf
+  # Download item pdf.
+  def pdf
+    config = Settings.derivative_storage
+    client = client(config.to_h.except(:bucket))
+    key = @item.published_json.fetch('pdf_path', nil)
+    raise FileNotFound unless key
+
+    pdf_filename = "#{@item.published_json.dig('descriptive_metadata', 'title', 0, 'value').parameterize}.pdf"
+
+    redirect_to presigned_url(client, config[:bucket], key, :attachment, pdf_filename), status: :temporary_redirect
   end
 
   # GET items/:id/manifest

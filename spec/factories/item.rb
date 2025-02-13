@@ -22,6 +22,10 @@ FactoryBot.define do
           uuid: '36a224db-c416-4769-9da1-28513827d179',
           thumbnail_asset_id: 'b65d33d3-8c34-4e36-acf9-dab273277583',
           iiif_manifest_path: '36a224db-c416-4769-9da1-28513827d179/iiif_manifest',
+          pdf_path: '36a224db-c416-4769-9da1-28513827d179/pdf',
+          descriptive_metadata: {
+            title: [{ value: 'Very important item'}]
+          },
           assets: [
             {
               id: 'b65d33d3-8c34-4e36-acf9-dab273277583',
@@ -53,6 +57,7 @@ FactoryBot.define do
           uuid: '36a224db-c416-4769-9da1-28513827d179',
           thumbnail_asset_id: 'b65d33d3-8c34-4e36-acf9-dab273277583',
           iiif_manifest_path: nil,
+          pdf_path: nil,
           assets: [
             {
               id: 'b65d33d3-8c34-4e36-acf9-dab273277583',
@@ -89,6 +94,7 @@ FactoryBot.define do
           uuid: '36a224db-c416-4769-9da1-28513827d179',
           thumbnail_asset_id: 'b65d33d3-8c34-4e36-acf9-dab273277583',
           iiif_manifest_path: nil,
+          pdf_path: nil,
           assets: [
             {
               id: 'b65d33d3-8c34-4e36-acf9-dab273277583',

@@ -184,6 +184,41 @@ RSpec.describe 'Item Endpoints', type: :request do
     end
   end
 
+  # GET /items/:item_id/pdf
+  context 'when fetching pdf file' do
+    before { get "/items/#{unique_identifier}/pdf" }
+
+    context 'when item_id invalid' do
+      let(:unique_identifier) { 'ark:/12345/invalid' }
+
+      it 'returns 404' do
+        expect(response).to have_http_status 404
+      end
+    end
+
+    context 'when item_id is valid' do
+      let(:unique_identifier) { item.unique_identifier }
+
+      context 'when pdf available' do
+        let(:item) { FactoryBot.create(:item, :with_image) }
+
+        it 'redirects to presigned URL' do
+          expect(request).to redirect_to %r{\Ahttp://minio-dev.library.upenn.edu/derivatives-dev/36a224db-c416-4769-9da1-28513827d179/pdf}
+          expect(request).to redirect_to %r{very-important-item.pdf}
+
+        end
+      end
+
+      context 'when pdf unavailable' do
+        let(:item) { FactoryBot.create(:item, :with_video) }
+
+        it 'returns 404' do
+          expect(response).to have_http_status 404
+        end
+      end
+    end
+  end
+
   # GET /items/:id/manifest
   context 'when fetching iiif manifest' do
     before { item.add_solr_document! if defined?(item) }

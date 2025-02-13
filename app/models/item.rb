@@ -65,6 +65,7 @@ class Item < ActiveRecord::Base
       thumbnail_asset_id_ssi: published_json['thumbnail_asset_id'],
       bibnumber_ssi: published_json.dig('descriptive_metadata', 'bibnumber', 0, 'value'),
       iiif_manifest_path_ss: published_json['iiif_manifest_path'],
+      pdf_manifest_path_ss: published_json['pdf_path'],
       from_apotheca_bsi: 'T',
       non_iiif_asset_listing_ss: published_json.fetch('assets', []).select { |a| !a['iiif'] }.to_json # Assets that need to be listed instead of displayed via the IIIF manifest.
     }
