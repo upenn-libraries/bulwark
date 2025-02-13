@@ -24,7 +24,7 @@ FactoryBot.define do
           iiif_manifest_path: '36a224db-c416-4769-9da1-28513827d179/iiif_manifest',
           pdf_path: '36a224db-c416-4769-9da1-28513827d179/pdf',
           descriptive_metadata: {
-            title: [{ value: 'Very important item'}]
+            title: [{ value: 'Very important item' }]
           },
           assets: [
             {

@@ -205,7 +205,6 @@ RSpec.describe 'Item Endpoints', type: :request do
         it 'redirects to presigned URL' do
           expect(request).to redirect_to %r{\Ahttp://minio-dev.library.upenn.edu/derivatives-dev/36a224db-c416-4769-9da1-28513827d179/pdf}
           expect(request).to redirect_to %r{very-important-item.pdf}
-
         end
       end
 
