@@ -9,8 +9,7 @@ class ItemsController < ActionController::Base
   class FileNotFound < StandardError; end
 
   before_action :token_authentication, only: [:create, :destroy]
-  before_action :fetch_item, only: [:destroy, :thumbnail, :pdf]
-  before_action :fetch_solr_document, only: [:manifest]
+  before_action :fetch_item, only: [:destroy, :thumbnail, :pdf, :manifest]
 
   rescue_from 'ItemsController::ItemNotFound', 'ItemsController::FileNotFound' do |_e|
     head :not_found
@@ -72,7 +71,7 @@ class ItemsController < ActionController::Base
 
   # GET items/:id/manifest
   def manifest
-    manifest_path = @document.fetch(:iiif_manifest_path_ss, nil)
+    manifest_path = @item.published_json.fetch('iiif_manifest_path', nil)
 
     raise FileNotFound unless manifest_path
 
@@ -94,11 +93,6 @@ class ItemsController < ActionController::Base
     def fetch_item
       @item = Item.find_by(unique_identifier: params[:id])
       raise ItemNotFound unless @item
-    end
-
-    def fetch_solr_document
-      @document = Item.find_solr_document(params[:id])
-      raise ItemNotFound unless @document
     end
 
     def token_authentication
