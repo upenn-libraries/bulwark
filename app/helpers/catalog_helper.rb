@@ -20,6 +20,10 @@ module CatalogHelper
     "#{root_url}items/#{unique_identifier}/manifest"
   end
 
+  def item_pdf_url(unique_identifier)
+    "#{root_url}items/#{unique_identifier}/pdf"
+  end
+
   def asset_thumbnail_url(unique_identifier, id)
     "#{root_url}items/#{unique_identifier}/assets/#{id}/thumbnail"
   end

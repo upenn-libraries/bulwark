@@ -51,6 +51,11 @@ class SolrDocument
     fetch('iiif_manifest_path_ss', nil).present?
   end
 
+  # Returns true if item has a pdf
+  def pdf?
+    fetch('pdf_path_ss', nil).present?
+  end
+
   # Returns true if bibnumber is present, false otherwise.
   #
   # @return [Boolean]
