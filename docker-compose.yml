@@ -69,20 +69,6 @@ services:
         target: /run/secrets/bulwark_database_root_password
     volumes:
       - 'db:/var/lib/mysql'
-  phalt_app:
-    image: 'gitlab.library.upenn.edu/dld/digital-repository/phalt:${PHALT_IMAGE_TAG}'
-    environment:
-      IIIF:
-      IIIF_BASE:
-      OAI_PMH:
-      VIRTUAL_HOST:
-      VIRTUAL_URL:
-      DOWNLOAD_LINK:
-      DOWNLOAD_PORT:
-      MARMITE_URL:
-      STORAGE_HOST:
-    ports:
-      - '9292'
   web:
     image: 'gitlab.library.upenn.edu/dld/digital-repository/bulwark:${BULWARK_IMAGE_TAG}'
     configs:
@@ -103,7 +89,6 @@ services:
       IIIF_IMAGE_SERVER:
       IMAGING_USER:
       MARMITE_URL:
-      PHALT_ENDPOINT:
       SOLR_URL:
       RAILS_ENV:
       REDIS_URL:
@@ -180,7 +165,6 @@ services:
       IIIF_IMAGE_SERVER:
       IMAGING_USER:
       MARMITE_URL:
-      PHALT_ENDPOINT:
       SOLR_URL:
       RAILS_ENV:
       REDIS_URL:

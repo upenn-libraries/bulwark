@@ -1,7 +1,6 @@
 # Settings for all deployed environment.
 
 mounted_drives:
-  sceti-completed-4: <%= ENV['SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE'] %>
   sceti-completed-5: <%= ENV['SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE'] %>
 marmite:
   url: <%= ENV['MARMITE_URL'] %>
