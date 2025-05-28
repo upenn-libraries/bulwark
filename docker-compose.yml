@@ -111,7 +111,6 @@ services:
       S3_PRESERVATION_BUCKET:
       S3_DERIVATIVES_BUCKET:
       S3_IIIF_MANIFEST_BUCKET:
-      SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE:
       SMTP_ADDRESS:
       SMTP_DOMAIN:
@@ -161,7 +160,6 @@ services:
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
-      - 'sceti_completed_4:${SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_5:${SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE}'
       - '${LOCAL_FEATURED}:/home/app/webapp/public/assets/featured'
   sidekiq:
@@ -190,7 +188,6 @@ services:
       S3_PRESERVATION_BUCKET:
       S3_DERIVATIVES_BUCKET:
       S3_IIIF_MANIFEST_BUCKET:
-      SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE:
       SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE:
       SMTP_ADDRESS:
       SMTP_DOMAIN:
@@ -232,12 +229,9 @@ services:
     volumes:
       - '${LOCAL_DATA}:${REMOTE_DATA}'
       - '${LOCAL_WORKSPACE}:${REMOTE_WORKSPACE}'
-      - 'sceti_completed_4:${SCETI_COMPLETED_4_HARVESTING_ENDPOINT_REMOTE}'
       - 'sceti_completed_5:${SCETI_COMPLETED_5_HARVESTING_ENDPOINT_REMOTE}'
 
 volumes:
-  sceti_completed_4:
-    external: true
   sceti_completed_5:
     external: true
   redis:
